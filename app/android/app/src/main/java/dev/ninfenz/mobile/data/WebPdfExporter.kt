@@ -63,74 +63,87 @@ object WebPdfExporter {
         var web: WebView? = null
         try {
             val html = HtmlExporter.html(markdown, title)
-            val view = WebView(ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Light))
+            val view = createView(context)
             web = view
-            val security = securityConfig()
-            view.settings.javaScriptEnabled = security.javaScriptEnabled
-            view.settings.blockNetworkLoads = security.blockNetworkLoads
-            view.settings.allowFileAccess = security.allowFileAccess
-            view.settings.allowContentAccess = security.allowContentAccess
-            view.settings.loadsImagesAutomatically = true
-            view.setBackgroundColor(Color.WHITE)
-            withTimeout(8_000) {
-                suspendCancellableCoroutine<Unit> { cont ->
-                    view.webViewClient = object : WebViewClient() {
-                        override fun onPageFinished(v: WebView?, url: String?) {
-                            if (cont.isActive) cont.resume(Unit)
-                        }
-
-                        override fun onReceivedError(v: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-                            if (cont.isActive) cont.resumeWithException(IllegalStateException("webview load error"))
-                        }
-                    }
-                    view.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
-                }
-            }
-            val width = 794
-            view.measure(
-                View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
-            )
-            val height = maxOf(view.measuredHeight, view.contentHeight)
-            if (height <= 0) return@withContext null
-            view.layout(0, 0, width, height)
-            if (isBlank(view, width, height)) return@withContext null
-
-            val scale = pageWidth.toFloat() / width
-            val perPage = pageHeight / scale
-            val pageCount = pageCount(height, width, pageWidth, pageHeight)
-            outDir.mkdirs()
-            val target = File(outDir, fileName)
-            val doc = PdfDocument()
-            val footer = Paint().apply {
-                color = Color.GRAY
-                textSize = 8f
-                isAntiAlias = true
-            }
-            try {
-                for (i in 0 until pageCount) {
-                    val page = doc.startPage(PdfDocument.PageInfo.Builder(pageWidth, pageHeight, i + 1).create())
-                    val canvas = page.canvas
-                    canvas.drawColor(Color.WHITE)
-                    canvas.withClip(0f, 0f, pageWidth.toFloat(), pageHeight.toFloat()) {
-                        scale(scale, scale)
-                        translate(0f, -i * perPage)
-                        view.draw(this)
-                    }
-                    val label = (i + 1).toString() + " / " + pageCount
-                    canvas.drawText(label, pageWidth - 12f - footer.measureText(label), pageHeight - 16f, footer)
-                    doc.finishPage(page)
-                }
-                target.outputStream().use { doc.writeTo(it) }
-            } finally {
-                doc.close()
-            }
-            Created(target, pageCount, target.length())
+            awaitLoad(view, html)
+            writePages(view, pageWidth, pageHeight, outDir, fileName)
         } catch (t: Throwable) {
             null
         } finally {
             web?.destroy()
         }
+    }
+
+    private fun createView(context: Context): WebView {
+        val view = WebView(ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Light))
+        val security = securityConfig()
+        view.settings.javaScriptEnabled = security.javaScriptEnabled
+        view.settings.blockNetworkLoads = security.blockNetworkLoads
+        view.settings.allowFileAccess = security.allowFileAccess
+        view.settings.allowContentAccess = security.allowContentAccess
+        view.settings.loadsImagesAutomatically = true
+        view.setBackgroundColor(Color.WHITE)
+        return view
+    }
+
+    private suspend fun awaitLoad(view: WebView, html: String) {
+        withTimeout(8_000) {
+            suspendCancellableCoroutine<Unit> { cont ->
+                view.webViewClient = object : WebViewClient() {
+                    override fun onPageFinished(v: WebView?, url: String?) {
+                        if (cont.isActive) cont.resume(Unit)
+                    }
+
+                    override fun onReceivedError(v: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                        if (cont.isActive) cont.resumeWithException(IllegalStateException("webview load error"))
+                    }
+                }
+                view.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
+            }
+        }
+    }
+
+    private fun writePages(view: WebView, pageWidth: Int, pageHeight: Int, outDir: File, fileName: String): Created? {
+        val width = 794
+        view.measure(
+            View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+        val height = maxOf(view.measuredHeight, view.contentHeight)
+        if (height <= 0) return null
+        view.layout(0, 0, width, height)
+        if (isBlank(view, width, height)) return null
+
+        val scale = pageWidth.toFloat() / width
+        val perPage = pageHeight / scale
+        val pageCount = pageCount(height, width, pageWidth, pageHeight)
+        outDir.mkdirs()
+        val target = File(outDir, fileName)
+        val doc = PdfDocument()
+        val footer = Paint().apply {
+            color = Color.GRAY
+            textSize = 8f
+            isAntiAlias = true
+        }
+        try {
+            for (i in 0 until pageCount) {
+                val page = doc.startPage(PdfDocument.PageInfo.Builder(pageWidth, pageHeight, i + 1).create())
+                val canvas = page.canvas
+                canvas.drawColor(Color.WHITE)
+                canvas.withClip(0f, 0f, pageWidth.toFloat(), pageHeight.toFloat()) {
+                    scale(scale, scale)
+                    translate(0f, -i * perPage)
+                    view.draw(this)
+                }
+                val label = (i + 1).toString() + " / " + pageCount
+                canvas.drawText(label, pageWidth - 12f - footer.measureText(label), pageHeight - 16f, footer)
+                doc.finishPage(page)
+            }
+            target.outputStream().use { doc.writeTo(it) }
+        } finally {
+            doc.close()
+        }
+        return Created(target, pageCount, target.length())
     }
 
     private fun isBlank(view: WebView, width: Int, height: Int): Boolean {

@@ -63,42 +63,62 @@ object PdfUaExporter {
                 lastHeading = l
                 l
             } else 0
-            val type = when {
-                headingLevel == 1 -> StandardStructureTypes.H1
-                headingLevel == 2 -> StandardStructureTypes.H2
-                headingLevel == 3 -> StandardStructureTypes.H3
-                headingLevel >= 4 -> StandardStructureTypes.H4
-                b.code -> StandardStructureTypes.CODE
-                b.quote -> StandardStructureTypes.QUOTE
-                b.bullet -> StandardStructureTypes.P
-                else -> StandardStructureTypes.P
-            }
-            val element = PDStructureElement(type, root)
-            root.appendKid(element)
-            element.page = page
-            element.setKids(listOf(0))
-            val dict = COSDictionary().apply { setInt(COSName.MCID, 0) }
-            val resources = PDResources()
-            page.resources = resources
-            val propName = resources.add(PDPropertyList.create(dict))
-            PDPageContentStream(doc, page).use { cs ->
-                cs.beginMarkedContentSequence(COSName.getPDFName(type), propName)
-                cs.beginText()
-                cs.setFont(font, if (headingLevel > 0) 18f else 11f)
-                cs.newLineAtOffset(48f, 760f)
-                val text = b.text.replace('\n', ' ').take(1200)
-                if (text.isNotBlank()) cs.showText(text)
-                cs.endText()
-                cs.endMarkedContentSequence()
-            }
-            parentNums.add(COSInteger.get(pageIndex.toLong()))
-            val arr = COSArray().apply { add(element.cosObject) }
-            parentNums.add(arr)
+            writeBlockPage(doc, font, root, parentNums, page, b, pageIndex, headingLevel)
             pageIndex++
         }
         tree.cosObject.setItem(COSName.NUMS, parentNums)
         tree.cosObject.setInt(COSName.PARENT_TREE_NEXT_KEY, pageIndex)
         tree.cosObject.setItem(COSName.PARENT_TREE, COSDictionary().apply { setItem(COSName.NUMS, parentNums) })
+        applyCatalogMetadata(doc, title)
+        doc.save(target)
+        doc.close()
+        return Created(target, pageIndex, target.length())
+    }
+
+    private fun writeBlockPage(
+        doc: PDDocument,
+        font: PDType0Font,
+        root: PDStructureElement,
+        parentNums: COSArray,
+        page: PDPage,
+        b: PdfMarkdown.Block,
+        pageIndex: Int,
+        headingLevel: Int
+    ) {
+        val type = when {
+            headingLevel == 1 -> StandardStructureTypes.H1
+            headingLevel == 2 -> StandardStructureTypes.H2
+            headingLevel == 3 -> StandardStructureTypes.H3
+            headingLevel >= 4 -> StandardStructureTypes.H4
+            b.code -> StandardStructureTypes.CODE
+            b.quote -> StandardStructureTypes.QUOTE
+            b.bullet -> StandardStructureTypes.P
+            else -> StandardStructureTypes.P
+        }
+        val element = PDStructureElement(type, root)
+        root.appendKid(element)
+        element.page = page
+        element.setKids(listOf(0))
+        val dict = COSDictionary().apply { setInt(COSName.MCID, 0) }
+        val resources = PDResources()
+        page.resources = resources
+        val propName = resources.add(PDPropertyList.create(dict))
+        PDPageContentStream(doc, page).use { cs ->
+            cs.beginMarkedContentSequence(COSName.getPDFName(type), propName)
+            cs.beginText()
+            cs.setFont(font, if (headingLevel > 0) 18f else 11f)
+            cs.newLineAtOffset(48f, 760f)
+            val text = b.text.replace('\n', ' ').take(1200)
+            if (text.isNotBlank()) cs.showText(text)
+            cs.endText()
+            cs.endMarkedContentSequence()
+        }
+        parentNums.add(COSInteger.get(pageIndex.toLong()))
+        val arr = COSArray().apply { add(element.cosObject) }
+        parentNums.add(arr)
+    }
+
+    private fun applyCatalogMetadata(doc: PDDocument, title: String) {
         val catalog = doc.documentCatalog
         catalog.language = "en-US"
         val mark = PDMarkInfo().apply { isMarked = true }
@@ -117,8 +137,5 @@ object PdfUaExporter {
 </x:xmpmeta>
 <?xpacket end="w"?>""".trimIndent().toByteArray(Charsets.UTF_8)
         catalog.metadata = PDMetadata(doc, ByteArrayInputStream(xmp))
-        doc.save(target)
-        doc.close()
-        return Created(target, pageIndex, target.length())
     }
 }

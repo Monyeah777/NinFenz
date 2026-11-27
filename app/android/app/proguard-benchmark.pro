@@ -4,3 +4,14 @@
 # 模块忽略 proguardFiles，无法给测试 APK 单独加规则；因此改为让被测 app 的 benchmark 变体
 # 不做名称混淆（R8 收缩仍开启，性能口径不受影响），消除冲突。
 -dontobfuscate
+
+# 第二层同进程类遮蔽（2026-11-27 收口）：测试 APK 与本 app 同进程，类加载解析到 app 侧
+# 被 R8 优化/裁剪过的 kotlin 运行时副本，测试 APK 自带的同名副本被遮蔽；真机实测
+# Intrinsics.checkNotNullParameter 抛 NoSuchMethodError。这里保住测试侧会调用的运行时
+# 成员（仅 benchmark 变体，不随 release 发布；release 仍是全量 R8）。
+-keep class kotlin.jvm.internal.** { *; }
+-keep class kotlin.coroutines.jvm.internal.** { *; }
+-keep class kotlin.collections.** { *; }
+-keep class kotlin.ranges.** { *; }
+-keep class kotlin.text.** { *; }
+-keep class kotlin.time.** { *; }

@@ -92,32 +92,14 @@ object CcosModel {
         )
     }
 
-    fun parseResult(text: String): CcosResult = parseResult(J.parseObject(text, RESULT_SCHEMA))
+    fun parseResult(text: String): CcosResult {
+        return parseResult(J.parseObject(text, RESULT_SCHEMA))
+    }
 
     fun parseResult(o: JsonObject): CcosResult {
         J.schema(o, RESULT_SCHEMA)
-        val artifacts = J.array(o, "artifacts", "").mapIndexed { i, el ->
-            val a = el as? JsonObject
-                ?: throw ModelException("NF-E-002", "/artifacts/" + i, "artifact 应为对象", "按 schema 修正")
-            val p = "/artifacts/" + i
-            CcosArtifact(
-                name = J.string(a, "name", p),
-                mime = J.optString(a, "mime") ?: "",
-                path = J.string(a, "path", p),
-                sha256 = J.string(a, "sha256", p),
-                bytes = J.optLong(a, "bytes") ?: 0L
-            )
-        }
-        val evidence = J.array(o, "evidence", "").mapIndexed { i, el ->
-            val e = el as? JsonObject
-                ?: throw ModelException("NF-E-002", "/evidence/" + i, "evidence 应为对象", "按 schema 修正")
-            val p = "/evidence/" + i
-            CcosEvidence(
-                kind = J.string(e, "kind", p),
-                ref = J.string(e, "ref", p),
-                digest = J.string(e, "digest", p)
-            )
-        }
+        val artifacts = parseArtifacts(o)
+        val evidence = parseEvidence(o)
         val report = J.child(o, "report", "")
         val review = J.child(o, "human_review", "")
         val provenance = J.child(o, "provenance", "")
@@ -128,16 +110,7 @@ object CcosModel {
                 "拒绝导入该结果，要求 CCOS 重发"
             )
         }
-        val issues = J.optArray(report, "issues").mapIndexed { i, el ->
-            val it = el as? JsonObject
-                ?: throw ModelException("NF-E-002", "/report/issues/" + i, "issue 应为对象", "按 schema 修正")
-            val p = "/report/issues/" + i
-            CcosIssue(
-                code = J.optString(it, "code") ?: "",
-                message = J.optString(it, "message") ?: "",
-                path = J.optString(it, "path")
-            )
-        }
+        val issues = parseIssues(report)
         return CcosResult(
             taskId = J.string(o, "task_id", ""),
             taskDigest = J.string(o, "task_digest", ""),
@@ -156,6 +129,44 @@ object CcosModel {
             model = J.optString(provenance, "model")
         )
     }
+
+    private fun parseArtifacts(o: JsonObject): List<CcosArtifact> =
+        J.array(o, "artifacts", "").mapIndexed { i, el ->
+            val a = el as? JsonObject
+                ?: throw ModelException("NF-E-002", "/artifacts/" + i, "artifact 应为对象", "按 schema 修正")
+            val p = "/artifacts/" + i
+            CcosArtifact(
+                name = J.string(a, "name", p),
+                mime = J.optString(a, "mime") ?: "",
+                path = J.string(a, "path", p),
+                sha256 = J.string(a, "sha256", p),
+                bytes = J.optLong(a, "bytes") ?: 0L
+            )
+        }
+
+    private fun parseEvidence(o: JsonObject): List<CcosEvidence> =
+        J.array(o, "evidence", "").mapIndexed { i, el ->
+            val e = el as? JsonObject
+                ?: throw ModelException("NF-E-002", "/evidence/" + i, "evidence 应为对象", "按 schema 修正")
+            val p = "/evidence/" + i
+            CcosEvidence(
+                kind = J.string(e, "kind", p),
+                ref = J.string(e, "ref", p),
+                digest = J.string(e, "digest", p)
+            )
+        }
+
+    private fun parseIssues(report: JsonObject): List<CcosIssue> =
+        J.optArray(report, "issues").mapIndexed { i, el ->
+            val it = el as? JsonObject
+                ?: throw ModelException("NF-E-002", "/report/issues/" + i, "issue 应为对象", "按 schema 修正")
+            val p = "/report/issues/" + i
+            CcosIssue(
+                code = J.optString(it, "code") ?: "",
+                message = J.optString(it, "message") ?: "",
+                path = J.optString(it, "path")
+            )
+        }
 
     /** 人审状态机：pending 才能裁决；approved 必须 reviewer + note；rejected 必须有 note。 */
     fun review(result: CcosResult, approve: Boolean, reviewer: String, note: String): ReviewOutcome {

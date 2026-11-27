@@ -17,6 +17,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
@@ -102,68 +103,92 @@ object BatchAssembler {
                 mergedDoc = result.doc
                 conflicts += result.conflicts
             }
-            val manifest = buildJsonObject {
-                put("schema", "nf-batch/1")
-                if (good.size >= 2) {
-                    put("merged", "merged.md")
-                    put("merged_doc", "merged.nf-doc.json")
-                    putJsonArray("doc_conflicts") {
-                        conflicts.forEach { c ->
-                            add(buildJsonObject {
-                                put("title", c.title)
-                                put("reason", c.reason)
-                            })
-                        }
-                    }
-                }
-                putJsonArray("projects") {
-                    items.forEach { item ->
-                        add(buildJsonObject {
-                            put("id", item.projectId)
-                            put("title", item.title)
-                            put("ok", item.ok)
-                            if (item.ok) {
-                                put("markdown", "projects/" + safeName(item.projectId) + ".md")
-                                put("doc", "projects/" + safeName(item.projectId) + ".nf-doc.json")
-                                put("validated", "L1")
-                            }
-                            item.error?.let { put("error", it) }
-                        })
-                    }
-                }
-            }
+            val manifest = buildManifest(items, good, conflicts)
             out.putNextEntry(ZipEntry("nf-batch.json").apply { time = 0L })
             out.write(manifest.toString().toByteArray(Charsets.UTF_8))
             out.closeEntry()
-            good.forEach { item ->
-                val body = item.markdown ?: return@forEach
-                val safe = safeName(item.projectId)
-                out.putNextEntry(ZipEntry("projects/" + safe + ".md").apply { time = 0L })
-                out.write(body.toByteArray(Charsets.UTF_8))
-                out.closeEntry()
-                out.putNextEntry(ZipEntry("projects/" + safe + ".nf-doc.json").apply { time = 0L })
-                out.write(
-                    NfDocModel.toJson(NfDocModel.fromMarkdown(item.title, item.projectId, body))
-                        .toString().toByteArray(Charsets.UTF_8)
-                )
-                out.closeEntry()
-            }
+            writeProjectEntries(out, good)
             if (good.size >= 2) {
-                val merged = good.joinToString("\n\n---\n\n") { item ->
-                    "<!-- project: " + item.projectId + " | " + item.title + " -->\n\n" + item.markdown
-                }
-                out.putNextEntry(ZipEntry("merged.md").apply { time = 0L })
-                out.write(merged.toByteArray(Charsets.UTF_8))
-                out.closeEntry()
-                out.putNextEntry(ZipEntry("merged.nf-doc.json").apply { time = 0L })
-                out.write(NfDocModel.toJson(mergedDoc ?: NfDocModel.append(docs, mergedTitle)).toString().toByteArray(Charsets.UTF_8))
-                out.closeEntry()
+                writeMergedEntries(out, good, docs, mergedDoc, mergedTitle)
             }
         }
+        pruneOldZips(outDir)
+        return target
+    }
+
+    private fun buildManifest(
+        items: List<Item>,
+        good: List<Item>,
+        conflicts: List<NfDocMerger.Conflict>
+    ): JsonObject = buildJsonObject {
+        put("schema", "nf-batch/1")
+        if (good.size >= 2) {
+            put("merged", "merged.md")
+            put("merged_doc", "merged.nf-doc.json")
+            putJsonArray("doc_conflicts") {
+                conflicts.forEach { c ->
+                    add(buildJsonObject {
+                        put("title", c.title)
+                        put("reason", c.reason)
+                    })
+                }
+            }
+        }
+        putJsonArray("projects") {
+            items.forEach { item ->
+                add(buildJsonObject {
+                    put("id", item.projectId)
+                    put("title", item.title)
+                    put("ok", item.ok)
+                    if (item.ok) {
+                        put("markdown", "projects/" + safeName(item.projectId) + ".md")
+                        put("doc", "projects/" + safeName(item.projectId) + ".nf-doc.json")
+                        put("validated", "L1")
+                    }
+                    item.error?.let { put("error", it) }
+                })
+            }
+        }
+    }
+
+    private fun writeProjectEntries(out: ZipOutputStream, good: List<Item>) {
+        good.forEach { item ->
+            val body = item.markdown ?: return@forEach
+            val safe = safeName(item.projectId)
+            out.putNextEntry(ZipEntry("projects/" + safe + ".md").apply { time = 0L })
+            out.write(body.toByteArray(Charsets.UTF_8))
+            out.closeEntry()
+            out.putNextEntry(ZipEntry("projects/" + safe + ".nf-doc.json").apply { time = 0L })
+            out.write(
+                NfDocModel.toJson(NfDocModel.fromMarkdown(item.title, item.projectId, body))
+                    .toString().toByteArray(Charsets.UTF_8)
+            )
+            out.closeEntry()
+        }
+    }
+
+    private fun writeMergedEntries(
+        out: ZipOutputStream,
+        good: List<Item>,
+        docs: List<dev.ninfenz.mobile.model.NfDoc>,
+        mergedDoc: dev.ninfenz.mobile.model.NfDoc?,
+        mergedTitle: String
+    ) {
+        val merged = good.joinToString("\n\n---\n\n") { item ->
+            "<!-- project: " + item.projectId + " | " + item.title + " -->\n\n" + item.markdown
+        }
+        out.putNextEntry(ZipEntry("merged.md").apply { time = 0L })
+        out.write(merged.toByteArray(Charsets.UTF_8))
+        out.closeEntry()
+        out.putNextEntry(ZipEntry("merged.nf-doc.json").apply { time = 0L })
+        out.write(NfDocModel.toJson(mergedDoc ?: NfDocModel.append(docs, mergedTitle)).toString().toByteArray(Charsets.UTF_8))
+        out.closeEntry()
+    }
+
+    private fun pruneOldZips(outDir: File) {
         outDir.listFiles { f -> f.isFile && f.name.startsWith("nf-batch-") && f.name.endsWith(".zip") }
             ?.sortedByDescending { it.lastModified() }
             ?.drop(3)
             ?.forEach { it.delete() }
-        return target
     }
 }

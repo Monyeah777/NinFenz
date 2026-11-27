@@ -55,60 +55,20 @@ fun SettingsMacroSection() {
     var paramMacro by remember { mutableStateOf<MacroStore.Macro?>(null) }
     var paramValues by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
 
-    val validateHandler: suspend (String, JsonObject) -> Result<String> = { action, params ->
-        when (action) {
-            "validate" -> {
-                val spec = params["spec"] as? JsonObject
-                if (spec == null) {
-                    Result.failure(IllegalStateException(context.getString(R.string.settings_macros_validate_missing)))
-                } else {
-                    val response = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
-                    if (response.ok) Result.success("validated")
-                    else Result.failure(IllegalStateException(response.error?.message ?: "validate failed"))
-                }
-            }
-            else -> Result.failure(IllegalStateException(context.getString(R.string.settings_macros_unwired, action)))
-        }
-    }
-
-    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        scope.launch {
-            runCatching {
-                val text = FileAccess.readText(context, uri)
-                store.save(Json.parseToJsonElement(text).jsonObject)
-                items = store.list()
-                note = context.getString(R.string.settings_macros_imported)
-            }.onFailure {
-                note = context.getString(
-                    R.string.settings_macros_failed,
-                    it.message ?: it.javaClass.simpleName
-                )
-            }
-        }
-    }
+    val validateHandler = macroValidateHandler(context)
+    val picker = rememberMacroPicker(context, scope, store,
+        onItems = { items = it }, onNote = { note = it })
 
     CardBox(title = stringResource(R.string.settings_macros_title)) {
-        Text(
-            stringResource(R.string.settings_macros_hint),
-            style = NfType.meta,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-            TextButton(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) {
-                Text(stringResource(R.string.settings_macros_import))
+        MacroSectionHint()
+        MacroImportRow(
+            onImport = { picker(arrayOf("application/json", "text/plain")) },
+            batchEnabled = items.isNotEmpty(),
+            onBatch = {
+                runMacroBatch(context, scope, items, store, validateHandler,
+                    onBatch = { lastBatch = it }, onNote = { note = it })
             }
-            TextButton(enabled = items.isNotEmpty(), onClick = {
-                scope.launch {
-                    val plans = items.mapNotNull { store.plan(it.json).orNullLogged("SettingsMacroSection") }
-                    if (plans.isEmpty()) {
-                        note = context.getString(R.string.settings_macros_batch_empty)
-                    } else {
-                        lastBatch = MacroRunner.runBatch(plans, validateHandler)
-                    }
-                }
-            }) { Text(stringResource(R.string.settings_macros_batch)) }
-        }
+        )
         if (items.isEmpty()) {
             Text(
                 stringResource(R.string.settings_macros_empty),
@@ -117,155 +77,310 @@ fun SettingsMacroSection() {
             )
         }
         items.forEach { macro ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(macro.title.ifBlank { macro.id }, style = NfType.body)
-                    Text(
-                        macro.json["steps"]?.jsonArray?.size?.let { count ->
-                            context.getString(R.string.settings_macros_steps, count)
-                        } ?: "",
-                        style = NfType.meta,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                TextButton(onClick = {
-                    scope.launch {
-                        store.plan(macro.json)
-                            .onSuccess { plan ->
-                                lastPlan = plan
-                                val count = plan["steps"]?.jsonArray?.size ?: 0
-                                note = context.getString(R.string.settings_macros_planned, count)
-                            }
-                            .onFailure {
-                                note = context.getString(
-                                    R.string.settings_macros_failed,
-                                    it.message ?: it.javaClass.simpleName
-                                )
-                            }
-                    }
-                }) { Text(stringResource(R.string.settings_macros_plan)) }
-                TextButton(enabled = lastPlan != null, onClick = {
-                    scope.launch {
-                        val plan = lastPlan ?: return@launch
-                        lastRun = MacroRunner.run(plan, validateHandler)
-                    }
-                }) { Text(stringResource(R.string.settings_macros_run)) }
-                TextButton(onClick = {
-                    paramValues = MacroRunner.placeholders(macro.json).associateWith { "" }
-                    paramMacro = macro
-                }) { Text(stringResource(R.string.settings_macros_params)) }
-                TextButton(onClick = {
-                    store.delete(macro.id)
-                    items = store.list()
-                }) { Text(stringResource(R.string.settings_macros_delete)) }
-            }
+            MacroItemRow(macro, store, validateHandler, lastPlan != null, lastPlan,
+                onPlanReady = { plan, count -> lastPlan = plan; note = context.getString(R.string.settings_macros_planned, count) },
+                onNote = { note = it }, onRun = { lastRun = it },
+                onPickParams = { m, values -> paramMacro = m; paramValues = values },
+                onRefreshItems = { items = store.list() })
         }
-        note?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
-        lastPlan?.let { plan ->
-            val steps = plan["steps"]?.jsonArray.orEmpty()
-            Text(
-                context.getString(R.string.settings_macros_plan_steps, steps.size),
-                style = NfType.meta,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            steps.forEach { step ->
-                val obj = step as? kotlinx.serialization.json.JsonObject ?: return@forEach
-                Text(
-                    (obj["id"]?.toString()?.trim('"') ?: "") + " · " + (obj["action"]?.toString()?.trim('"') ?: ""),
-                    style = NfType.meta
-                )
-            }
-            Text(
-                context.getString(R.string.settings_macros_dry_run_note),
-                style = NfType.meta,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        lastRun?.let { run ->
-            Text(
-                context.getString(R.string.settings_macros_run_status, run.status, run.failures),
-                style = NfType.meta,
-                color = if (run.failures == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-            )
-            run.steps.forEach { step ->
-                Text(
-                    context.getString(R.string.settings_macros_step_status, step.id, step.action, step.status),
-                    style = NfType.meta
-                )
-            }
-        }
-        lastBatch?.let { batch ->
-            Text(
-                context.getString(R.string.settings_macros_batch_status, batch.status, batch.failures),
-                style = NfType.meta,
-                color = if (batch.failures == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-            )
-            batch.runs.forEachIndexed { index, run ->
-                Text(
-                    "#" + (index + 1) + " · " + run.status + " · " + run.failures,
-                    style = NfType.meta
-                )
-            }
-        }
+        MacroResultsHistory(note, lastPlan, lastRun, lastBatch)
     }
 
     paramMacro?.let { macro ->
-        AlertDialog(
-            onDismissRequest = { paramMacro = null },
-            title = { Text(stringResource(R.string.settings_macros_params_title)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    if (paramValues.isEmpty()) {
-                        Text(stringResource(R.string.settings_macros_params_empty), style = NfType.meta)
-                    }
-                    paramValues.keys.forEach { key ->
-                        OutlinedTextField(
-                            value = paramValues[key].orEmpty(),
-                            onValueChange = { value -> paramValues = paramValues + (key to value) },
-                            label = { Text(key) },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    TextButton(onClick = {
-                        scope.launch {
-                            val plan = store.plan(macro.json).orNullLogged("SettingsMacroSection")
-                            if (plan == null) {
-                                note = context.getString(R.string.settings_macros_failed, "plan failed")
-                            } else {
-                                runCatching { store.saveBound(macro, MacroRunner.bind(macro.json, paramValues)) }
-                                    .onSuccess {
-                                        items = store.list()
-                                        note = context.getString(R.string.settings_macros_saved_copy)
-                                    }
-                                    .onFailure {
-                                        note = context.getString(R.string.settings_macros_failed, it.message ?: it.javaClass.simpleName)
-                                    }
-                            }
-                            paramMacro = null
-                        }
-                    }) { Text(stringResource(R.string.settings_macros_save_copy)) }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    scope.launch {
-                        val plan = store.plan(macro.json).orNullLogged("SettingsMacroSection")
-                        if (plan == null) {
-                            note = context.getString(R.string.settings_macros_failed, "plan failed")
-                        } else {
-                            lastRun = MacroRunner.run(MacroRunner.bind(plan, paramValues), validateHandler)
-                        }
-                        paramMacro = null
-                    }
-                }) { Text(stringResource(R.string.settings_macros_run)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { paramMacro = null }) { Text(stringResource(android.R.string.cancel)) }
+        MacroParamsDialog(macro, paramValues, store, validateHandler,
+            onParamValuesChange = { paramValues = it }, onNote = { note = it },
+            onRefreshItems = { items = store.list() }, onRun = { lastRun = it },
+            onDismiss = { paramMacro = null })
+    }
+}
+
+@Composable
+private fun MacroSectionHint() {
+    Text(
+        stringResource(R.string.settings_macros_hint),
+        style = NfType.meta,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun MacroImportRow(onImport: () -> Unit, batchEnabled: Boolean, onBatch: () -> Unit) {
+    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+        TextButton(onClick = onImport) {
+            Text(stringResource(R.string.settings_macros_import))
+        }
+        TextButton(enabled = batchEnabled, onClick = onBatch) {
+            Text(stringResource(R.string.settings_macros_batch))
+        }
+    }
+}
+
+private fun macroValidateHandler(context: android.content.Context): suspend (String, JsonObject) -> Result<String> = { action, params ->
+    when (action) {
+        "validate" -> {
+            val spec = params["spec"] as? JsonObject
+            if (spec == null) {
+                Result.failure(IllegalStateException(context.getString(R.string.settings_macros_validate_missing)))
+            } else {
+                val response = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
+                if (response.ok) Result.success("validated")
+                else Result.failure(IllegalStateException(response.error?.message ?: "validate failed"))
             }
+        }
+        else -> Result.failure(IllegalStateException(context.getString(R.string.settings_macros_unwired, action)))
+    }
+}
+
+private fun runMacroBatch(
+    context: android.content.Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    items: List<MacroStore.Macro>,
+    store: MacroStore,
+    validateHandler: suspend (String, JsonObject) -> Result<String>,
+    onBatch: (MacroBatchResult) -> Unit,
+    onNote: (String?) -> Unit
+) {
+    scope.launch {
+        val plans = items.mapNotNull { store.plan(it.json).orNullLogged("SettingsMacroSection") }
+        if (plans.isEmpty()) {
+            onNote(context.getString(R.string.settings_macros_batch_empty))
+        } else {
+            onBatch(MacroRunner.runBatch(plans, validateHandler))
+        }
+    }
+}
+
+@Composable
+private fun rememberMacroPicker(
+    context: android.content.Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    store: MacroStore,
+    onItems: (List<MacroStore.Macro>) -> Unit,
+    onNote: (String?) -> Unit
+): (Array<String>) -> Unit {
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            runCatching {
+                val text = FileAccess.readText(context, uri)
+                store.save(Json.parseToJsonElement(text).jsonObject)
+                onItems(store.list())
+                onNote(context.getString(R.string.settings_macros_imported))
+            }.onFailure {
+                onNote(context.getString(R.string.settings_macros_failed, it.message ?: it.javaClass.simpleName))
+            }
+        }
+    }
+    return { input -> picker.launch(input) }
+}
+
+private fun saveMacroCopy(
+    context: android.content.Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    store: MacroStore,
+    macro: MacroStore.Macro,
+    paramValues: Map<String, String>,
+    onNote: (String) -> Unit,
+    onRefreshItems: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    scope.launch {
+        val plan = store.plan(macro.json).orNullLogged("SettingsMacroSection")
+        if (plan == null) {
+            onNote(context.getString(R.string.settings_macros_failed, "plan failed"))
+        } else {
+            runCatching { store.saveBound(macro, MacroRunner.bind(macro.json, paramValues)) }
+                .onSuccess {
+                    onRefreshItems()
+                    onNote(context.getString(R.string.settings_macros_saved_copy))
+                }
+                .onFailure {
+                    onNote(context.getString(R.string.settings_macros_failed, it.message ?: it.javaClass.simpleName))
+                }
+        }
+        onDismiss()
+    }
+}
+
+private fun runMacro(
+    context: android.content.Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    store: MacroStore,
+    macro: MacroStore.Macro,
+    paramValues: Map<String, String>,
+    validateHandler: suspend (String, JsonObject) -> Result<String>,
+    onNote: (String) -> Unit,
+    onRun: (MacroRunResult) -> Unit,
+    onDismiss: () -> Unit
+) {
+    scope.launch {
+        val plan = store.plan(macro.json).orNullLogged("SettingsMacroSection")
+        if (plan == null) {
+            onNote(context.getString(R.string.settings_macros_failed, "plan failed"))
+        } else {
+            onRun(MacroRunner.run(MacroRunner.bind(plan, paramValues), validateHandler))
+        }
+        onDismiss()
+    }
+}
+
+@Composable
+private fun MacroItemRow(
+    macro: MacroStore.Macro,
+    store: MacroStore,
+    validateHandler: suspend (String, JsonObject) -> Result<String>,
+    planReady: Boolean,
+    lastPlan: JsonObject?,
+    onPlanReady: (JsonObject, Int) -> Unit,
+    onNote: (String) -> Unit,
+    onRun: (MacroRunResult) -> Unit,
+    onPickParams: (MacroStore.Macro, Map<String, String>) -> Unit,
+    onRefreshItems: () -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(macro.title.ifBlank { macro.id }, style = NfType.body)
+            Text(
+                macro.json["steps"]?.jsonArray?.size?.let { count ->
+                    context.getString(R.string.settings_macros_steps, count)
+                } ?: "",
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        TextButton(onClick = {
+            scope.launch {
+                store.plan(macro.json)
+                    .onSuccess { plan ->
+                        val count = plan["steps"]?.jsonArray?.size ?: 0
+                        onPlanReady(plan, count)
+                    }
+                    .onFailure {
+                        onNote(context.getString(R.string.settings_macros_failed, it.message ?: it.javaClass.simpleName))
+                    }
+            }
+        }) { Text(stringResource(R.string.settings_macros_plan)) }
+        TextButton(enabled = planReady, onClick = {
+            scope.launch {
+                val plan = lastPlan ?: return@launch
+                onRun(MacroRunner.run(plan, validateHandler))
+            }
+        }) { Text(stringResource(R.string.settings_macros_run)) }
+        TextButton(onClick = {
+            onPickParams(macro, MacroRunner.placeholders(macro.json).associateWith { "" })
+        }) { Text(stringResource(R.string.settings_macros_params)) }
+        TextButton(onClick = {
+            store.delete(macro.id)
+            onRefreshItems()
+        }) { Text(stringResource(R.string.settings_macros_delete)) }
+    }
+}
+
+@Composable
+private fun MacroResultsHistory(
+    note: String?,
+    lastPlan: JsonObject?,
+    lastRun: MacroRunResult?,
+    lastBatch: MacroBatchResult?
+) {
+    val context = LocalContext.current
+    note?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
+    lastPlan?.let { plan ->
+        val steps = plan["steps"]?.jsonArray.orEmpty()
+        Text(
+            context.getString(R.string.settings_macros_plan_steps, steps.size),
+            style = NfType.meta,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        steps.forEach { step ->
+            val obj = step as? kotlinx.serialization.json.JsonObject ?: return@forEach
+            Text(
+                (obj["id"]?.toString()?.trim('"') ?: "") + " · " + (obj["action"]?.toString()?.trim('"') ?: ""),
+                style = NfType.meta
+            )
+        }
+        Text(
+            context.getString(R.string.settings_macros_dry_run_note),
+            style = NfType.meta,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
+    lastRun?.let { run ->
+        Text(
+            context.getString(R.string.settings_macros_run_status, run.status, run.failures),
+            style = NfType.meta,
+            color = if (run.failures == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+        )
+        run.steps.forEach { step ->
+            Text(
+                context.getString(R.string.settings_macros_step_status, step.id, step.action, step.status),
+                style = NfType.meta
+            )
+        }
+    }
+    lastBatch?.let { batch ->
+        Text(
+            context.getString(R.string.settings_macros_batch_status, batch.status, batch.failures),
+            style = NfType.meta,
+            color = if (batch.failures == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+        )
+        batch.runs.forEachIndexed { index, run ->
+            Text(
+                "#" + (index + 1) + " · " + run.status + " · " + run.failures,
+                style = NfType.meta
+            )
+        }
+    }
+}
+
+@Composable
+private fun MacroParamsDialog(
+    macro: MacroStore.Macro,
+    paramValues: Map<String, String>,
+    store: MacroStore,
+    validateHandler: suspend (String, JsonObject) -> Result<String>,
+    onParamValuesChange: (Map<String, String>) -> Unit,
+    onNote: (String) -> Unit,
+    onRefreshItems: () -> Unit,
+    onRun: (MacroRunResult) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.settings_macros_params_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                if (paramValues.isEmpty()) {
+                    Text(stringResource(R.string.settings_macros_params_empty), style = NfType.meta)
+                }
+                paramValues.keys.forEach { key ->
+                    OutlinedTextField(
+                        value = paramValues[key].orEmpty(),
+                        onValueChange = { value -> onParamValuesChange(paramValues + (key to value)) },
+                        label = { Text(key) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                TextButton(onClick = {
+                    saveMacroCopy(context, scope, store, macro, paramValues, onNote, onRefreshItems, onDismiss)
+                }) { Text(stringResource(R.string.settings_macros_save_copy)) }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                runMacro(context, scope, store, macro, paramValues, validateHandler, onNote, onRun, onDismiss)
+            }) { Text(stringResource(R.string.settings_macros_run)) }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismiss() }) { Text(stringResource(android.R.string.cancel)) }
+        }
+    )
 }

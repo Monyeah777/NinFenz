@@ -92,11 +92,12 @@ tool/manual 未执行 31 条不计分，也不作为"通过"。
 - 整改关闭只看同 commit 重跑该规则 hits=0 + 门禁通过，不允许口头关闭。
 
 
-## 当前状态（2026-11-27）
+## 当前状态（2026-11-28，第十四轮后）
 
-- 最新证据：audit/evidence/p2-batch10/（同 commit 连跑两次 issues/report 逐字节一致、meta 全等，见 trend.md）。
-- 总分 **98.08**；维度 A100 B97 C80 D99 E100 F98 G–N 全 100；P0=0 / P1=0 / P2=1007 / P3=183。
-- 门禁：bash audit/ci/gate.sh --evidence audit/evidence/p2-batch7 → PASS。
-- 测试面：Android 全量单测 green；engine/rust 全量 249/249 green；Python 资产契约/报告模块等关键套件 green。
-- 残留债务（见 remediation.md 与 calibration.md，均有 owner/到期）：B-004（UI→data 直连 200 处，属单模块架构取舍，待 0.4 领域层拆分）、C 维度结构项（大文件/函数/圈复杂度）、D-005（测试样板重复）、F-003（C# sync-over-async，本机无 .NET SDK 无法构建校验）。
-- 外部阻断（不在本仓能力内）：Play 上传、真机 macrobenchmark（AGP 测试模块规则通道）、on-demand OCR 触发（URI 授权）。
+- 最新证据：`audit/evidence/ROUND14_HASH/`（提交后生成；确定性复跑同 commit 结果一致，见 trend.md）。
+- 总分 **98.70**；维度 A100 B100 C87 D100 E100 F100 G–N 全 100；P0=0 / P1=0 / P2=899 / P3=165。
+- 门禁：`bash audit/ci/gate.sh --evidence audit/evidence/<round14>` → PASS（总分≥95、维度≥80、P0=0、error=0、no_targets=0）。
+- 测试面：engine/rust 249/249 green、app/core 全绿；Android 全量单测 BUILD SUCCESSFUL；C# 3 csproj 0 warn 0 error；Python 分层 327 passed + 2 skipped。
+- 残留债务（见 remediation.md 与 calibration.md，均有 owner/到期）：C-001（98 文件 >400 行）、C-005（792 函数圈复杂度 >10）、C-007（88 处 >6 参数）、C-008（14 处嵌套 >8）、C-009（9 个 Rust 文件 >1000 行，含生成块）、C-012（63 个 Rust 函数 >100 行）、C-010（剩 6 个 Python 真源模块 allow_files）。
+- 已知红（基线存量、非本轮引入）：Python 全量 pytest 的 test_reverse_coupling / test_style_ratchet / test_json_shape_contracts / test_freshness_check / test_dead_code 等，待基线 rebind 批次。
+- 外部阻断（不在本仓能力内）：Play 上传（无 Google 账号）、真机 macrobenchmark（设备未接入 ADB）、on-demand OCR 触发（URI 授权）。

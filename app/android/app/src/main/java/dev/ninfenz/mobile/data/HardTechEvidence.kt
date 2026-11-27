@@ -39,7 +39,9 @@ object HardTechEvidence {
         return hex
     }
 
-    private fun fail(message: String) = Result(false, message, null)
+    private fun fail(message: String): Result {
+        return Result(false, message, null)
+    }
 
     suspend fun pack(context: Context, markdown: String, artifact: File): Result {
         if (!artifact.isFile) return fail("导出文件不存在")
@@ -49,62 +51,21 @@ object HardTechEvidence {
         }
         val bridge = runCatching { Core.bridge }.getOrNull() ?: return fail("共享核心不可用")
         val at = Instant.now().toString()
-        val source = buildJsonObject {
-            put("name", artifact.name)
-            put("mime", mimeOf(format))
-        }
-        val imported = bridge.call(
-            "sdir-import",
-            buildJsonObject {
-                put("markdown", markdown)
-                put("source", source)
-                put("created_at", at)
-                put("lang", "zh")
-            }
-        )
+        val source = sourceJson(artifact, format)
+        val imported = bridge.call("sdir-import", sdirPayload(markdown, source, at))
         if (!imported.ok) return fail(imported.error?.message ?: "SDIR 导入失败")
         val sdir = imported.resultObject() ?: return fail("SDIR 结果为空")
-        val planned = bridge.call(
-            "build-plan",
-            buildJsonObject {
-                put("sdir", sdir)
-                put("locale", "zh")
-                put(
-                    "outputs",
-                    buildJsonArray {
-                        add(buildJsonObject {
-                            put("path", artifact.name)
-                            put("format", format)
-                        })
-                    }
-                )
-            }
-        )
+        val planned = bridge.call("build-plan", planPayload(sdir, artifact, format))
         if (!planned.ok) return fail(planned.error?.message ?: "构建计划失败")
         val graph = planned.resultObject() ?: return fail("构建计划为空")
         val created = bridge.call(
             "evidence-create",
-            buildJsonObject {
-                put("artifact_path", artifact.absolutePath)
-                put("sdir", sdir)
-                put("graph", graph)
-                put("created_at", at)
-                put("private_key", seed(context))
-                put("profile", "accessible")
-            }
+            evidencePayload(artifact, sdir, graph, at, seed(context))
         )
         if (!created.ok) return fail(created.error?.message ?: "证据生成失败")
         val evidence = created.resultObject() ?: return fail("证据为空")
         val target = File(artifact.parentFile, artifact.name + ".nfpkg")
-        val packed = bridge.call(
-            "evidence-pack",
-            buildJsonObject {
-                put("artifact_path", artifact.absolutePath)
-                put("evidence", evidence)
-                put("out_path", target.absolutePath)
-                put("version", 1)
-            }
-        )
+        val packed = bridge.call("evidence-pack", packagePayload(artifact, evidence, target))
         if (!packed.ok) return fail(packed.error?.message ?: "证据打包失败")
         val verified = bridge.call(
             "evidence-verify-package",
@@ -112,5 +73,53 @@ object HardTechEvidence {
         )
         if (!verified.ok) return fail(verified.error?.message ?: "证据包自验失败")
         return Result(true, "证据包已生成：" + target.name, target)
+    }
+
+    private fun sourceJson(artifact: File, format: String): JsonObject = buildJsonObject {
+        put("name", artifact.name)
+        put("mime", mimeOf(format))
+    }
+
+    private fun sdirPayload(markdown: String, source: JsonObject, at: String): JsonObject = buildJsonObject {
+        put("markdown", markdown)
+        put("source", source)
+        put("created_at", at)
+        put("lang", "zh")
+    }
+
+    private fun planPayload(sdir: JsonObject, artifact: File, format: String): JsonObject = buildJsonObject {
+        put("sdir", sdir)
+        put("locale", "zh")
+        put(
+            "outputs",
+            buildJsonArray {
+                add(buildJsonObject {
+                    put("path", artifact.name)
+                    put("format", format)
+                })
+            }
+        )
+    }
+
+    private fun evidencePayload(
+        artifact: File,
+        sdir: JsonObject,
+        graph: JsonObject,
+        at: String,
+        privateKey: String
+    ): JsonObject = buildJsonObject {
+        put("artifact_path", artifact.absolutePath)
+        put("sdir", sdir)
+        put("graph", graph)
+        put("created_at", at)
+        put("private_key", privateKey)
+        put("profile", "accessible")
+    }
+
+    private fun packagePayload(artifact: File, evidence: JsonObject, target: File): JsonObject = buildJsonObject {
+        put("artifact_path", artifact.absolutePath)
+        put("evidence", evidence)
+        put("out_path", target.absolutePath)
+        put("version", 1)
     }
 }

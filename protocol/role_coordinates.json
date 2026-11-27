@@ -3,10 +3,10 @@
     "app": 1512,
     "entry": 26,
     "floor": 5,
-    "prod": 1068,
-    "projection": 247,
-    "support": 958,
-    "verify": 1459
+    "prod": 1069,
+    "projection": 542,
+    "support": 1926,
+    "verify": 1498
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -6035,6 +6035,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "跨实现/断网/删除矩阵（WP-51，G5）。",
+      "path": "desktop/src/core/crosscheck.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "NF 执行层常驻守护 —— 把「每条命令一次解释器启动」换成「一次启动、长期热跑」。",
       "path": "desktop/src/core/daemon.py",
       "role": "prod",
@@ -6091,6 +6097,12 @@
     {
       "function": "42 M4：文档可执行性卫生检查（分类标识 + last-updated + 过期告警）。",
       "path": "desktop/src/core/doc_hygiene.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "文档 claims 一致性（WP-50，G5）：声明数字/措辞必须与门禁实测一致。",
+      "path": "desktop/src/core/docs_claims.py",
       "role": "verify",
       "rule": "auto:R-core"
     },
@@ -7061,6 +7073,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "自扫描全维度聚合（WP-50，G5）：§13.1 S0–S15 逐维证据 + gap/open 显式登记。",
+      "path": "desktop/src/core/self_scan.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "v2.8.0 波C C3：跨模块语义矛盾扫描（41 规划——编译期矛盾拦截）。",
       "path": "desktop/src/core/semantic_conflict.py",
       "role": "verify",
@@ -7099,6 +7117,12 @@
     {
       "function": "ST 制卡校验器原型 v0（任务书 A-S3）：卡 / 世界书 / MVU 变量 → 可复用报告。",
       "path": "desktop/src/core/st_validator.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "稳定性/长稳证据（WP-51，G5）：进程内重复 + 并发确定性对照。",
+      "path": "desktop/src/core/stability.py",
       "role": "verify",
       "rule": "auto:R-core"
     },
@@ -12125,6 +12149,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "CI workflow 契约测试共用的 YAML 访问 helper（D-005：22 份测试此前各抄一份）。",
+      "path": "desktop/tests/workflow_helpers.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "",
       "path": "engine/dotnet/Directory.Build.props",
       "role": "verify",
@@ -12750,6 +12780,18 @@
     },
     {
       "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/AuxGolden.GoldenJsonB.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/AuxGolden.GoldenJsonC.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
       "path": "engine/dotnet/src/Nf.Engine/AuxGolden.cs",
       "role": "verify",
       "rule": "R-verify"
@@ -12972,6 +13014,18 @@
     },
     {
       "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/Interop.Documents.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/Interop.Packages.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
       "path": "engine/dotnet/src/Nf.Engine/Interop.cs",
       "role": "verify",
       "rule": "R-verify"
@@ -13032,6 +13086,18 @@
     },
     {
       "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/McpServer.Payloads.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/McpServer.Repo.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
       "path": "engine/dotnet/src/Nf.Engine/McpServer.cs",
       "role": "verify",
       "rule": "R-verify"
@@ -13081,6 +13147,12 @@
     {
       "function": "",
       "path": "engine/dotnet/src/Nf.Engine/Nf.Engine.csproj",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/OutputForms.RegistryGates.cs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13236,6 +13308,48 @@
     },
     {
       "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/SelfTest.Docs.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/SelfTest.Faces.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/SelfTest.Fixtures.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/SelfTest.KnowledgeAssets.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/SelfTest.Metrics.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/SelfTest.Prose.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/SelfTest.Protocol.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
       "path": "engine/dotnet/src/Nf.Engine/SelfTest.cs",
       "role": "verify",
       "rule": "R-verify"
@@ -13302,6 +13416,12 @@
     },
     {
       "function": "",
+      "path": "engine/dotnet/src/Nf.Engine/WorldModel.Runtime.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
       "path": "engine/dotnet/src/Nf.Engine/WorldModel.cs",
       "role": "verify",
       "rule": "R-verify"
@@ -13327,6 +13447,48 @@
     {
       "function": "",
       "path": "engine/dotnet/tools/nf-canonical/nf-canonical.csproj",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/tools/nf-dotnet/Program.Assets.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/tools/nf-dotnet/Program.Interop.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/tools/nf-dotnet/Program.Knowledge.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/tools/nf-dotnet/Program.Modeling.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/tools/nf-dotnet/Program.Pipeline.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/tools/nf-dotnet/Program.Query.cs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/dotnet/tools/nf-dotnet/Program.Verify.cs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13505,6 +13667,30 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/src/cli/commands_a.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/cli/commands_b.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/cli/commands_c.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/cli/mod.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[derive(Clone, Debug, Default)]",
       "path": "engine/rust/src/code_metrics.rs",
       "role": "verify",
@@ -13529,8 +13715,50 @@
       "rule": "R-verify"
     },
     {
-      "function": "[derive(Default, Clone, Debug)]",
+      "function": "[cfg(test)]",
       "path": "engine/rust/src/contracts.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/contracts/checks_assertions.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/contracts/checks_basic.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/contracts/checks_library.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[derive(Default, Clone, Debug)]",
+      "path": "engine/rust/src/contracts/checks_protocol.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[derive(Default, Clone, Debug)]",
+      "path": "engine/rust/src/contracts/checks_rfc.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[derive(Default, Clone, Debug)]",
+      "path": "engine/rust/src/contracts/checks_st_quality.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "[test]",
+      "path": "engine/rust/src/contracts/tests_extra.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13639,6 +13867,12 @@
     {
       "function": "[cfg(test)]",
       "path": "engine/rust/src/jsonread.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/jsonx.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -13951,6 +14185,12 @@
     {
       "function": "[derive(Default, Clone, Debug)]",
       "path": "engine/rust/src/stats.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "",
+      "path": "engine/rust/src/subject_docs.rs",
       "role": "verify",
       "rule": "R-verify"
     },
@@ -15204,17 +15444,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "208a762bcddc21f7fdc39e63f560094e2cd7f5b29da44d677038d0233b148601",
+  "root_digest": "1dd4982c60ce022147324cb7d21ef41690c195cb38856c3771c43d016b638c51",
   "rule_counts": {
     "R-app": 1512,
-    "R-catch": 802,
+    "R-catch": 1764,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
-    "R-projection": 215,
-    "R-support": 124,
-    "R-verify": 1326,
-    "auto:R-core": 321
+    "R-projection": 513,
+    "R-support": 130,
+    "R-verify": 1362,
+    "auto:R-core": 322
   },
   "schema": "nf-role-coordinates/1"
 }

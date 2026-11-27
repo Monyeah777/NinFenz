@@ -805,73 +805,89 @@ fun CreateScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.nav_create))
         if (packs.isEmpty()) {
-            NfEmptyState(
-                icon = Icons.Filled.Edit,
-                title = stringResource(dev.ninfenz.mobile.R.string.create_no_pack_title),
-                message = stringResource(dev.ninfenz.mobile.R.string.create_no_pack_body),
-                actionLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_load_sample),
-                onAction = onLoadSample,
-                secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_import),
-                onSecondary = onImport
-            )
+            CreateNoPackState(onLoadSample, onImport)
         } else {
             LazyColumn(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = NfSpacing.l),
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
             ) {
-                item {
-                    NfCard(
-                        modifier = Modifier.padding(horizontal = NfSpacing.page),
-                        onClick = onCreateProject
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
-                            Icon(Icons.Filled.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.create_from_pack), style = NfType.itemTitle)
-                                Text(
-                                    stringResource(dev.ninfenz.mobile.R.string.create_from_pack_subtitle),
-                                    style = NfType.meta,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-                }
+                item { CreateNewProjectCard(onCreateProject) }
                 if (projects.isEmpty()) {
-                    item {
-                        NfEmptyState(
-                            icon = Icons.Filled.Edit,
-                            title = stringResource(dev.ninfenz.mobile.R.string.create_no_project_title),
-                            message = stringResource(dev.ninfenz.mobile.R.string.create_no_project_body),
-                            actionLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_new),
-                            onAction = onCreateProject,
-                            secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_library),
-                            onSecondary = onGoLibrary
-                        )
-                    }
+                    item { CreateNoProjectState(onCreateProject, onGoLibrary) }
                 } else {
                     stickyHeader(key = "create-projects-header") { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.create_section_projects)) }
                     items(projects.size) { index ->
                         val entry = projects[index]
-                        NfCard(
-                            modifier = Modifier.padding(horizontal = NfSpacing.page),
-                            onClick = { onOpenProject(entry) }
-                        ) {
-                            Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(entry.project.title, style = NfType.itemTitle, modifier = Modifier.weight(1f))
-                                    NfStatusChip(projectStatusLabel(entry.project))
-                                }
-                                Text(
-                                    "Pack " + entry.project.refs.basePackId + " · " + entry.project.refs.basePackVersion,
-                                    style = NfType.meta,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
+                        CreateProjectCard(entry, onOpenProject)
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun CreateNoPackState(onLoadSample: () -> Unit, onImport: () -> Unit) {
+    NfEmptyState(
+        icon = Icons.Filled.Edit,
+        title = stringResource(dev.ninfenz.mobile.R.string.create_no_pack_title),
+        message = stringResource(dev.ninfenz.mobile.R.string.create_no_pack_body),
+        actionLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_load_sample),
+        onAction = onLoadSample,
+        secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_import),
+        onSecondary = onImport
+    )
+}
+
+@Composable
+private fun CreateNewProjectCard(onCreateProject: () -> Unit) {
+    NfCard(
+        modifier = Modifier.padding(horizontal = NfSpacing.page),
+        onClick = onCreateProject
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
+            Icon(Icons.Filled.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.create_from_pack), style = NfType.itemTitle)
+                Text(
+                    stringResource(dev.ninfenz.mobile.R.string.create_from_pack_subtitle),
+                    style = NfType.meta,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CreateNoProjectState(onCreateProject: () -> Unit, onGoLibrary: () -> Unit) {
+    NfEmptyState(
+        icon = Icons.Filled.Edit,
+        title = stringResource(dev.ninfenz.mobile.R.string.create_no_project_title),
+        message = stringResource(dev.ninfenz.mobile.R.string.create_no_project_body),
+        actionLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_new),
+        onAction = onCreateProject,
+        secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.create_action_library),
+        onSecondary = onGoLibrary
+    )
+}
+
+@Composable
+private fun CreateProjectCard(entry: ProjectEntry, onOpenProject: (ProjectEntry) -> Unit) {
+    NfCard(
+        modifier = Modifier.padding(horizontal = NfSpacing.page),
+        onClick = { onOpenProject(entry) }
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(entry.project.title, style = NfType.itemTitle, modifier = Modifier.weight(1f))
+                NfStatusChip(projectStatusLabel(entry.project))
+            }
+            Text(
+                "Pack " + entry.project.refs.basePackId + " · " + entry.project.refs.basePackVersion,
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -889,15 +905,7 @@ fun DeliverScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.nav_deliver))
         if (projects.isEmpty()) {
-            NfEmptyState(
-                icon = Icons.AutoMirrored.Filled.List,
-                title = stringResource(dev.ninfenz.mobile.R.string.deliver_empty_title),
-                message = stringResource(dev.ninfenz.mobile.R.string.deliver_empty_body),
-                actionLabel = stringResource(dev.ninfenz.mobile.R.string.deliver_action_create),
-                onAction = onGoCreate,
-                secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.deliver_action_pack_update),
-                onSecondary = onPackUpdate
-            )
+            DeliverEmptyState(onGoCreate, onPackUpdate)
         } else {
             LazyColumn(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = NfSpacing.l),
@@ -906,22 +914,7 @@ fun DeliverScreen(
                 stickyHeader(key = "deliver-projects-header") { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.create_section_projects)) }
                 items(projects.size) { index ->
                     val entry = projects[index]
-                    NfCard(
-                        modifier = Modifier.padding(horizontal = NfSpacing.page),
-                        onClick = { onOpenProject(entry) }
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(entry.project.title, style = NfType.itemTitle)
-                                Text(
-                                    stringResource(dev.ninfenz.mobile.R.string.project_flow_label),
-                                    style = NfType.meta,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            Button(onClick = { onOpenDelivery(entry) }) { Text(stringResource(dev.ninfenz.mobile.R.string.deliver_action_go)) }
-                        }
-                    }
+                    DeliverProjectCard(entry, onOpenProject, onOpenDelivery)
                 }
                 item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.deliver_section_more)) }
                 item {
@@ -941,6 +934,43 @@ fun DeliverScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun DeliverEmptyState(onGoCreate: () -> Unit, onPackUpdate: () -> Unit) {
+    NfEmptyState(
+        icon = Icons.AutoMirrored.Filled.List,
+        title = stringResource(dev.ninfenz.mobile.R.string.deliver_empty_title),
+        message = stringResource(dev.ninfenz.mobile.R.string.deliver_empty_body),
+        actionLabel = stringResource(dev.ninfenz.mobile.R.string.deliver_action_create),
+        onAction = onGoCreate,
+        secondaryLabel = stringResource(dev.ninfenz.mobile.R.string.deliver_action_pack_update),
+        onSecondary = onPackUpdate
+    )
+}
+
+@Composable
+private fun DeliverProjectCard(
+    entry: ProjectEntry,
+    onOpenProject: (ProjectEntry) -> Unit,
+    onOpenDelivery: (ProjectEntry) -> Unit
+) {
+    NfCard(
+        modifier = Modifier.padding(horizontal = NfSpacing.page),
+        onClick = { onOpenProject(entry) }
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(entry.project.title, style = NfType.itemTitle)
+                Text(
+                    stringResource(dev.ninfenz.mobile.R.string.project_flow_label),
+                    style = NfType.meta,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Button(onClick = { onOpenDelivery(entry) }) { Text(stringResource(dev.ninfenz.mobile.R.string.deliver_action_go)) }
         }
     }
 }
@@ -1756,9 +1786,7 @@ fun ProjectDetailScreen(
 
 @Composable
 fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) {
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val clipboard = LocalClipboardManager.current
     val audit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
     val trustStore = remember { PackTrustStore(context.filesDir) }
     var pinnedTree by remember { mutableStateOf(trustStore.pinnedTree(pack.id, pack.version)) }
@@ -1774,85 +1802,25 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
             verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
         ) {
             item {
-                NfCard {
-                    Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                        Text(pack.id + " · " + pack.version, style = NfType.itemTitle)
-                        Text(pack.description, style = NfType.secondary)
-                        TextButton(onClick = {
-                            clipboard.setText(androidx.compose.ui.text.AnnotatedString(pack.id))
-                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_copy_id)) }
-                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_items, pack.itemCount), style = NfType.meta)
-                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_tree, pack.tree.take(16) + "…"), style = NfType.meta)
-                        Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_dir, pack.dir.absolutePath), style = NfType.meta)
-                        if (audit) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                when {
-                                    pinnedTree == null -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_unpinned)
-                                    trustMatches -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_pinned)
-                                    else -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_mismatch)
-                                },
-                                style = NfType.meta,
-                                color = when {
-                                    pinnedTree == null -> MaterialTheme.colorScheme.onSurfaceVariant
-                                    trustMatches -> MaterialTheme.colorScheme.primary
-                                    else -> MaterialTheme.colorScheme.error
-                                },
-                                modifier = Modifier.weight(1f)
-                            )
-                            TextButton(onClick = {
-                                if (pinnedTree != null && trustMatches) {
-                                    trustStore.clear(pack.id, pack.version)
-                                } else {
-                                    trustStore.pin(pack.id, pack.version, pack.tree)
-                                }
-                                pinnedTree = trustStore.pinnedTree(pack.id, pack.version)
-                            }) {
-                                Text(
-                                    stringResource(
-                                        when {
-                                            pinnedTree == null -> dev.ninfenz.mobile.R.string.pack_trust_pin
-                                            trustMatches -> dev.ninfenz.mobile.R.string.pack_trust_clear
-                                            else -> dev.ninfenz.mobile.R.string.pack_trust_update
-                                        }
-                                    )
-                                )
-                            }
-                        }
-                        }
+                PackInfoCard(pack, audit, pinnedTree, trustMatches) {
+                    if (pinnedTree != null && trustMatches) {
+                        trustStore.clear(pack.id, pack.version)
+                    } else {
+                        trustStore.pin(pack.id, pack.version, pack.tree)
                     }
+                    pinnedTree = trustStore.pinnedTree(pack.id, pack.version)
                 }
             }
             item {
                 if (audit) {
-                Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    Button(
-                        onClick = {
-                            if (verifying) return@Button
-                            verifying = true
-                            errorText = null
-                            report = null
-                            scope.launch {
-                                val response = PackVerifier().verify(pack)
-                                val result = response.resultObject()
-                                val verdict = result?.get("verdict")?.let { it.toString().trim('"') }
-                                val issues = result?.get("issues")?.toString() ?: ""
-                                if (response.ok) {
-                                    report = context.getString(dev.ninfenz.mobile.R.string.validate_passed, verdict ?: "pass") + (if (issues == "[]") "" else " · issues=" + issues)
-                                } else {
-                                    val err = response.error
-                                    errorText = "[" + (err?.code ?: "NF-VAL-001") + "] " +
-                                        (err?.message ?: context.getString(dev.ninfenz.mobile.R.string.validate_failed)) +
-                                        context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) +
-                                        (err?.fix ?: context.getString(dev.ninfenz.mobile.R.string.view_diagnostics))
-                                }
-                                verifying = false
-                            }
-                        },
-                        enabled = !verifying
-                    ) { Text(if (verifying) context.getString(dev.ninfenz.mobile.R.string.validating) else context.getString(dev.ninfenz.mobile.R.string.validate_pack)) }
-                    Button(onClick = onUpdate) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_update)) }
-                }
+                    PackVerifyRow(
+                        pack = pack,
+                        verifying = verifying,
+                        onVerifying = { verifying = it },
+                        onReport = { report = it },
+                        onErrorText = { errorText = it },
+                        onUpdate = onUpdate
+                    )
                 }
             }
             if (report != null) {
@@ -1870,6 +1838,101 @@ fun PackDetailScreen(pack: PackEntry, onBack: () -> Unit, onUpdate: () -> Unit) 
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PackInfoCard(
+    pack: PackEntry,
+    audit: Boolean,
+    pinnedTree: String?,
+    trustMatches: Boolean,
+    onPinToggle: () -> Unit
+) {
+    val clipboard = LocalClipboardManager.current
+    NfCard {
+        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+            Text(pack.id + " · " + pack.version, style = NfType.itemTitle)
+            Text(pack.description, style = NfType.secondary)
+            TextButton(onClick = {
+                clipboard.setText(androidx.compose.ui.text.AnnotatedString(pack.id))
+            }) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_copy_id)) }
+            Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_items, pack.itemCount), style = NfType.meta)
+            Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_tree, pack.tree.take(16) + "…"), style = NfType.meta)
+            Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_dir, pack.dir.absolutePath), style = NfType.meta)
+            if (audit) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        when {
+                            pinnedTree == null -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_unpinned)
+                            trustMatches -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_pinned)
+                            else -> stringResource(dev.ninfenz.mobile.R.string.pack_trust_mismatch)
+                        },
+                        style = NfType.meta,
+                        color = when {
+                            pinnedTree == null -> MaterialTheme.colorScheme.onSurfaceVariant
+                            trustMatches -> MaterialTheme.colorScheme.primary
+                            else -> MaterialTheme.colorScheme.error
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextButton(onClick = onPinToggle) {
+                        Text(
+                            stringResource(
+                                when {
+                                    pinnedTree == null -> dev.ninfenz.mobile.R.string.pack_trust_pin
+                                    trustMatches -> dev.ninfenz.mobile.R.string.pack_trust_clear
+                                    else -> dev.ninfenz.mobile.R.string.pack_trust_update
+                                }
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PackVerifyRow(
+    pack: PackEntry,
+    verifying: Boolean,
+    onVerifying: (Boolean) -> Unit,
+    onReport: (String?) -> Unit,
+    onErrorText: (String?) -> Unit,
+    onUpdate: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+        Button(
+            onClick = {
+                if (verifying) return@Button
+                onVerifying(true)
+                onErrorText(null)
+                onReport(null)
+                scope.launch {
+                    val response = PackVerifier().verify(pack)
+                    val result = response.resultObject()
+                    val verdict = result?.get("verdict")?.let { it.toString().trim('"') }
+                    val issues = result?.get("issues")?.toString() ?: ""
+                    if (response.ok) {
+                        onReport(context.getString(dev.ninfenz.mobile.R.string.validate_passed, verdict ?: "pass") + (if (issues == "[]") "" else " · issues=" + issues))
+                    } else {
+                        val err = response.error
+                        onErrorText(
+                            "[" + (err?.code ?: "NF-VAL-001") + "] " +
+                                (err?.message ?: context.getString(dev.ninfenz.mobile.R.string.validate_failed)) +
+                                context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) +
+                                (err?.fix ?: context.getString(dev.ninfenz.mobile.R.string.view_diagnostics))
+                        )
+                    }
+                    onVerifying(false)
+                }
+            },
+            enabled = !verifying
+        ) { Text(if (verifying) context.getString(dev.ninfenz.mobile.R.string.validating) else context.getString(dev.ninfenz.mobile.R.string.validate_pack)) }
+        Button(onClick = onUpdate) { Text(stringResource(dev.ninfenz.mobile.R.string.pack_detail_update)) }
     }
 }
 

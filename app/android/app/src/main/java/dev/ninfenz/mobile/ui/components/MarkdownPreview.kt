@@ -77,19 +77,7 @@ fun MarkdownPreview(
 private fun MarkdownBlock(block: PdfMarkdown.Block) {
     when {
         block.rule -> HorizontalDivider()
-        block.image != null -> {
-            val bitmap = remember(block.image) {
-                runCatching { BitmapFactory.decodeByteArray(block.image, 0, block.image.size) }.orNullLogged("MarkdownPreview")
-            }
-            if (bitmap != null) {
-                Image(
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = block.text.ifBlank { stringResource(dev.ninfenz.mobile.R.string.preview_image) },
-                    modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp),
-                    contentScale = ContentScale.Fit
-                )
-            }
-        }
+        block.image != null -> MarkdownImage(block)
         block.level > 0 -> Text(
             text = annotated(block),
             style = when (block.level) {
@@ -133,6 +121,22 @@ private fun MarkdownBlock(block: PdfMarkdown.Block) {
             Text(annotated(block), style = NfType.body)
         }
         else -> Text(annotated(block), style = NfType.body)
+    }
+}
+
+@Composable
+private fun MarkdownImage(block: PdfMarkdown.Block) {
+    val image = block.image ?: return
+    val bitmap = remember(image) {
+        runCatching { BitmapFactory.decodeByteArray(image, 0, image.size) }.orNullLogged("MarkdownPreview")
+    }
+    if (bitmap != null) {
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = block.text.ifBlank { stringResource(dev.ninfenz.mobile.R.string.preview_image) },
+            modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp),
+            contentScale = ContentScale.Fit
+        )
     }
 }
 

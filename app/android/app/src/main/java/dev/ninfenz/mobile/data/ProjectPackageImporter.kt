@@ -84,6 +84,32 @@ object ProjectPackageImporter {
     fun import(filesDir: File, zipFile: File): Imported {
         require(zipFile.isFile) { "zip 不存在" }
         val projectsDir = File(filesDir, "projects").apply { mkdirs() }
+        val entries = readZipEntries(zipFile)
+        val projectEntries = entries.filter { (name, _) ->
+            name.endsWith(".nfproject.json") && name.split('/').size <= 4
+        }
+        require(projectEntries.size == 1) { "zip 需且仅需一个项目 JSON" }
+        val (projectPath, projectBytes) = projectEntries.first()
+        val text = TextEncoding.decode(projectBytes)?.text ?: String(projectBytes, Charsets.UTF_8)
+        val prefix = projectPath.substringBeforeLast('/', "")
+        val dataPrefix = if (prefix.isBlank()) "data/" else prefix + "/data/"
+        val data = entries.filter { (name, _) -> name.startsWith(dataPrefix) }
+            .map { (name, bytes) -> name.removePrefix(dataPrefix) to bytes }
+        verifyManifest(entries, text, prefix, projectPath)
+        val source = Json.parseToJsonElement(text).jsonObject
+        val sourceId = source["id"]?.let { (it as? JsonPrimitive)?.content } ?: throw IllegalArgumentException("项目缺 id")
+        val id = uniqueProjectId(projectsDir, sourceId)
+        val next = source.toMutableMap()
+        next["id"] = JsonPrimitive(id)
+        val json = JsonObject(next)
+        ProjectModel.parse(json) // fail-closed
+        val target = File(projectsDir, id + ".nfproject.json")
+        val dataDir = File(projectsDir, id)
+        installProject(data, json, target, dataDir)
+        return importedResult(id, target, data.size, source)
+    }
+
+    private fun readZipEntries(zipFile: File): List<Pair<String, ByteArray>> {
         val entries = mutableListOf<Pair<String, ByteArray>>()
         ZipFile(zipFile).use { zip ->
             var total = 0L
@@ -103,32 +129,26 @@ object ProjectPackageImporter {
                 entries.add(name to bytes)
             }
         }
-        val projectEntries = entries.filter { (name, _) ->
-            name.endsWith(".nfproject.json") && name.split('/').size <= 4
-        }
-        require(projectEntries.size == 1) { "zip 需且仅需一个项目 JSON" }
-        val (projectPath, projectBytes) = projectEntries.first()
-        val text = TextEncoding.decode(projectBytes)?.text ?: String(projectBytes, Charsets.UTF_8)
-        val prefix = projectPath.substringBeforeLast('/', "")
-        val dataPrefix = if (prefix.isBlank()) "data/" else prefix + "/data/"
-        val data = entries.filter { (name, _) -> name.startsWith(dataPrefix) }
-            .map { (name, bytes) -> name.removePrefix(dataPrefix) to bytes }
-        verifyManifest(entries, text, prefix, projectPath)
-        val source = Json.parseToJsonElement(text).jsonObject
-        val sourceId = source["id"]?.let { (it as? JsonPrimitive)?.content } ?: throw IllegalArgumentException("项目缺 id")
+        return entries
+    }
+
+    private fun uniqueProjectId(projectsDir: File, sourceId: String): String {
         var id = sourceId
         var index = 2
         while (File(projectsDir, id + ".nfproject.json").exists()) {
             id = sourceId + "-import" + (if (index == 2) "" else "-" + index)
             index++
         }
-        val next = source.toMutableMap()
-        next["id"] = JsonPrimitive(id)
-        val json = JsonObject(next)
-        ProjectModel.parse(json) // fail-closed
-        val target = File(projectsDir, id + ".nfproject.json")
-        val dataDir = File(projectsDir, id)
-        val staging = File(projectsDir, ".import-" + id + "-" + System.nanoTime())
+        return id
+    }
+
+    private fun installProject(
+        data: List<Pair<String, ByteArray>>,
+        json: JsonObject,
+        target: File,
+        dataDir: File
+    ) {
+        val staging = File(dataDir.parentFile, ".import-" + dataDir.name + "-" + System.nanoTime())
         try {
             data.forEach { (path, bytes) ->
                 val out = File(staging, path)
@@ -150,13 +170,16 @@ object ProjectPackageImporter {
             target.delete()
             throw t
         }
+    }
+
+    private fun importedResult(id: String, target: File, dataSize: Int, source: JsonObject): Imported {
         val pack = source["refs"]?.let { refs ->
             (refs as? JsonObject)?.get("base_pack") as? JsonObject
         }
         return Imported(
             id = id,
             file = target,
-            dataFiles = data.size,
+            dataFiles = dataSize,
             packId = pack?.get("id")?.let { (it as? JsonPrimitive)?.content }.orEmpty(),
             packVersion = pack?.get("version")?.let { (it as? JsonPrimitive)?.content }.orEmpty()
         )

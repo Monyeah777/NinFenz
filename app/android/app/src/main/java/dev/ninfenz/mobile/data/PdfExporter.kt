@@ -25,26 +25,9 @@ object PdfExporter {
             textSize = 11f
             isAntiAlias = true
         }
-        data class Line(
-            val text: String,
-            val size: Float,
-            val bold: Boolean,
-            val mono: Boolean = false,
-            val italic: Boolean = false,
-            val rule: Boolean = false,
-            val cells: List<String> = emptyList(),
-            val table: Boolean = false,
-            val weights: FloatArray? = null,
-            val spans: List<PdfMarkdown.Span> = emptyList(),
-            val image: Bitmap? = null,
-            val imageWidth: Float = 0f,
-            val imageHeight: Float = 0f,
-            val weight: Int = 1,
-            val tableHeader: Boolean = false
-        )
-
         val lineHeight = 16f
         val contentWidth = pageWidth - margin * 2
+        val layout = PdfLayout(pageWidth, pageHeight, margin, lineHeight, contentWidth, paint)
         val blockList = PdfMarkdown.blocks(markdown)
         val maxCols = blockList.filter { it.table }.maxOfOrNull { it.cells.size } ?: 0
         val colWeights = FloatArray(maxCols) { 1f }
@@ -55,85 +38,7 @@ object PdfExporter {
                 }
             }
         }
-        fun sliceSpans(spans: List<PdfMarkdown.Span>, start: Int, end: Int): List<PdfMarkdown.Span> {
-            val out = mutableListOf<PdfMarkdown.Span>()
-            var pos = 0
-            for (span in spans) {
-                val spanStart = pos
-                val spanEnd = pos + span.text.length
-                val from = maxOf(start, spanStart)
-                val to = minOf(end, spanEnd)
-                if (from < to) {
-                    out.add(span.copy(text = span.text.substring(from - spanStart, to - spanStart)))
-                }
-                pos = spanEnd
-            }
-            return out
-        }
-        val lines = buildList {
-            if (includeTitle) add(Line(title, 18f, true))
-            if (includeTitle) add(Line("", 11f, false))
-            blockList.forEach { block ->
-                if (block.rule) {
-                    add(Line("", 11f, false, rule = true))
-                    return@forEach
-                }
-                if (block.image != null) {
-                    val bitmap = BitmapFactory.decodeByteArray(block.image, 0, block.image.size)
-                    if (bitmap != null) {
-                        val maxWidth = contentWidth * 0.8f
-                        val maxHeight = pageHeight - margin * 2 - lineHeight * 4
-                        val scale = minOf(1f, maxWidth / bitmap.width, maxHeight / bitmap.height)
-                        val w = bitmap.width * scale
-                        val h = bitmap.height * scale
-                        add(
-                            Line(
-                                block.text, 10f, false,
-                                image = bitmap,
-                                imageWidth = w,
-                                imageHeight = h,
-                                weight = (h / lineHeight).toInt().coerceAtLeast(1)
-                            )
-                        )
-                    } else {
-                        add(Line(block.text, 10f, false))
-                    }
-                    return@forEach
-                }
-                if (block.table && block.cells.isNotEmpty()) {
-                    add(
-                        Line(
-                            "", 10f, block.tableHeader,
-                            cells = block.cells,
-                            table = true,
-                            tableHeader = block.tableHeader,
-                            weights = if (colWeights.size == block.cells.size) colWeights else null
-                        )
-                    )
-                    return@forEach
-                }
-                val size = if (block.table) 10f else when (block.level) {
-                    1 -> 20f
-                    2 -> 18f
-                    3 -> 16f
-                    4 -> 14f
-                    5 -> 13f
-                    6 -> 12f
-                    else -> 11f
-                }
-                val bold = block.level > 0 || block.tableHeader
-                val baseSpans = if (block.spans.isEmpty()) listOf(PdfMarkdown.Span(block.text)) else block.spans
-                val spans = if (block.bullet) listOf(PdfMarkdown.Span("• ")) + baseSpans else baseSpans
-                val plain = spans.joinToString("") { it.text }
-                var offset = 0
-                PdfPager.wrap(plain, contentWidth) { paint.measureText(it) * (size / 11f) }
-                    .forEach { wrapped ->
-                        val end = offset + wrapped.length
-                        add(Line(wrapped, size, bold, block.code, block.quote, spans = sliceSpans(spans, offset, end)))
-                        offset = end
-                    }
-            }
-        }
+        val lines = buildLines(blockList, title, includeTitle, colWeights, layout)
         val firstPageLines = ((pageHeight - margin * 2 - lineHeight * 4) / lineHeight).toInt().coerceAtLeast(1)
         val pageRanges = PdfPager.paginateWeighted(lines.map { it.weight }, firstPageLines)
         val pages = PdfPager.repeatTableHeaders(
@@ -144,88 +49,226 @@ object PdfExporter {
         )
         val doc = PdfDocument()
         try {
-            pages.forEachIndexed { index, pageLines ->
-                val page = doc.startPage(PdfDocument.PageInfo.Builder(pageWidth, pageHeight, index + 1).create())
-                val canvas: Canvas = page.canvas
-                var y = margin + 20f
-                pageLines.forEach { line ->
-                    if (line.rule) {
-                        canvas.drawLine(margin, y - 6f, pageWidth - margin, y - 6f, paint)
-                        y += 8f
-                        return@forEach
-                    }
-                    if (line.image != null) {
-                        val bmp = line.image
-                        val x = margin + (contentWidth - line.imageWidth) / 2f
-                        canvas.drawBitmap(bmp, null, RectF(x, y, x + line.imageWidth, y + line.imageHeight), null)
-                        y += line.imageHeight + 4f
-                        return@forEach
-                    }
-                    if (line.spans.isNotEmpty()) {
-                        var x = margin
-                        for (span in line.spans) {
-                            if (span.text.isEmpty()) continue
-                            val sp = Paint(paint).apply {
-                                textSize = line.size
-                                isFakeBoldText = line.bold || span.bold
-                                typeface = if (span.code || line.mono) Typeface.MONOSPACE else Typeface.DEFAULT
-                                if (line.italic || span.italic) textSkewX = -0.25f
-                            }
-                            canvas.drawText(span.text, x, y, sp)
-                            x += sp.measureText(span.text)
-                        }
-                        y += maxOf(lineHeight, line.size * 1.3f)
-                        return@forEach
-                    }
-                    if (line.cells.isNotEmpty()) {
-                        val weights = line.weights ?: FloatArray(line.cells.size) { 1f }
-                        val totalWeight = weights.sum().coerceAtLeast(1f)
-                        val p = Paint(paint).apply {
-                            textSize = line.size
-                            isFakeBoldText = line.bold
-                        }
-                        var x = margin
-                        val xs = mutableListOf<Float>()
-                        line.cells.forEachIndexed { i, cell ->
-                            val w = contentWidth * weights[i] / totalWeight
-                            canvas.drawText(ellipsize(cell, p, w - 6f), x, y, p)
-                            xs.add(x)
-                            x += w
-                        }
-                        if (line.table) {
-                            for (i in 1 until line.cells.size) {
-                                canvas.drawLine(xs[i], y - line.size, xs[i], y + 4f, paint)
-                            }
-                            canvas.drawLine(margin, y + 4f, pageWidth - margin, y + 4f, paint)
-                        }
-                        y += lineHeight
-                        return@forEach
-                    }
-                    if (line.mono) {
-                        val bg = Paint().apply { color = Color.rgb(245, 245, 245) }
-                        canvas.drawRect(margin - 4f, y - line.size - 2f, margin + contentWidth, y + 4f, bg)
-                    }
-                    if (line.italic) {
-                        canvas.drawLine(margin - 6f, y - line.size, margin - 6f, y + 4f, paint)
-                    }
-                    val p = Paint(paint).apply {
-                        textSize = line.size
-                        isFakeBoldText = line.bold
-                        typeface = if (line.mono) Typeface.MONOSPACE else Typeface.DEFAULT
-                        if (line.italic) textSkewX = -0.25f
-                    }
-                    canvas.drawText(line.text, margin, y, p)
-                    y += maxOf(lineHeight, line.size * 1.3f)
-                }
-                canvas.drawText((index + 1).toString() + " / " + pages.size, pageWidth - margin - 40f, pageHeight - margin / 2, paint)
-                doc.finishPage(page)
-            }
-            target.outputStream().use { doc.writeTo(it) }
+            renderPages(doc, pages, layout, target)
         } finally {
             doc.close()
         }
         return Created(target, pages.size, target.length())
     }
+
+    private fun buildLines(
+        blockList: List<PdfMarkdown.Block>,
+        title: String,
+        includeTitle: Boolean,
+        colWeights: FloatArray,
+        layout: PdfLayout
+    ): List<Line> = buildList {
+        if (includeTitle) add(Line(title, 18f, true))
+        if (includeTitle) add(Line("", 11f, false))
+        blockList.forEach { block ->
+            if (block.rule) {
+                add(Line("", 11f, false, rule = true))
+            } else if (block.image != null) {
+                add(imageLine(block, layout))
+            } else if (block.table && block.cells.isNotEmpty()) {
+                add(
+                    Line(
+                        "", 10f, block.tableHeader,
+                        cells = block.cells,
+                        table = true,
+                        tableHeader = block.tableHeader,
+                        weights = if (colWeights.size == block.cells.size) colWeights else null
+                    )
+                )
+            } else {
+                addAll(wrapTextLines(block, layout))
+            }
+        }
+    }
+
+    private fun imageLine(block: PdfMarkdown.Block, layout: PdfLayout): Line {
+        val image = block.image
+        if (image == null) return Line(block.text, 10f, false)
+        val bitmap = BitmapFactory.decodeByteArray(image, 0, image.size) ?: return Line(block.text, 10f, false)
+        val maxWidth = layout.contentWidth * 0.8f
+        val maxHeight = layout.pageHeight - layout.margin * 2 - layout.lineHeight * 4
+        val scale = minOf(1f, maxWidth / bitmap.width, maxHeight / bitmap.height)
+        val w = bitmap.width * scale
+        val h = bitmap.height * scale
+        return Line(
+            block.text, 10f, false,
+            image = bitmap,
+            imageWidth = w,
+            imageHeight = h,
+            weight = (h / layout.lineHeight).toInt().coerceAtLeast(1)
+        )
+    }
+
+    private fun wrapTextLines(block: PdfMarkdown.Block, layout: PdfLayout): List<Line> {
+        val size = if (block.table) 10f else when (block.level) {
+            1 -> 20f
+            2 -> 18f
+            3 -> 16f
+            4 -> 14f
+            5 -> 13f
+            6 -> 12f
+            else -> 11f
+        }
+        val bold = block.level > 0 || block.tableHeader
+        val baseSpans = if (block.spans.isEmpty()) listOf(PdfMarkdown.Span(block.text)) else block.spans
+        val spans = if (block.bullet) listOf(PdfMarkdown.Span("• ")) + baseSpans else baseSpans
+        val plain = spans.joinToString("") { it.text }
+        val out = mutableListOf<Line>()
+        var offset = 0
+        PdfPager.wrap(plain, layout.contentWidth) { layout.paint.measureText(it) * (size / 11f) }
+            .forEach { wrapped ->
+                val end = offset + wrapped.length
+                out.add(Line(wrapped, size, bold, block.code, block.quote, spans = sliceSpans(spans, offset, end)))
+                offset = end
+            }
+        return out
+    }
+
+    private fun sliceSpans(spans: List<PdfMarkdown.Span>, start: Int, end: Int): List<PdfMarkdown.Span> {
+        val out = mutableListOf<PdfMarkdown.Span>()
+        var pos = 0
+        for (span in spans) {
+            val spanStart = pos
+            val spanEnd = pos + span.text.length
+            val from = maxOf(start, spanStart)
+            val to = minOf(end, spanEnd)
+            if (from < to) {
+                out.add(span.copy(text = span.text.substring(from - spanStart, to - spanStart)))
+            }
+            pos = spanEnd
+        }
+        return out
+    }
+
+    private fun renderPages(doc: PdfDocument, pages: List<List<Line>>, layout: PdfLayout, target: File) {
+        pages.forEachIndexed { index, pageLines ->
+            val page = doc.startPage(PdfDocument.PageInfo.Builder(layout.pageWidth, layout.pageHeight, index + 1).create())
+            val frame = PageFrame(page.canvas, layout)
+            var y = layout.margin + 20f
+            pageLines.forEach { line ->
+                y = drawLine(frame, line, y)
+            }
+            frame.canvas.drawText((index + 1).toString() + " / " + pages.size, layout.pageWidth - layout.margin - 40f, layout.pageHeight - layout.margin / 2, layout.paint)
+            doc.finishPage(page)
+        }
+        target.outputStream().use { doc.writeTo(it) }
+    }
+
+    private fun drawLine(frame: PageFrame, line: Line, y: Float): Float {
+        val canvas = frame.canvas
+        val layout = frame.layout
+        if (line.rule) {
+            canvas.drawLine(layout.margin, y - 6f, layout.pageWidth - layout.margin, y - 6f, layout.paint)
+            return y + 8f
+        }
+        if (line.image != null) {
+            val bmp = line.image
+            val x = layout.margin + (layout.contentWidth - line.imageWidth) / 2f
+            canvas.drawBitmap(bmp, null, RectF(x, y, x + line.imageWidth, y + line.imageHeight), null)
+            return y + line.imageHeight + 4f
+        }
+        if (line.spans.isNotEmpty()) return drawSpans(frame, line, y)
+        if (line.cells.isNotEmpty()) return drawCells(frame, line, y)
+        return drawPlain(frame, line, y)
+    }
+
+    private fun drawSpans(frame: PageFrame, line: Line, y: Float): Float {
+        val canvas = frame.canvas
+        val layout = frame.layout
+        var x = layout.margin
+        for (span in line.spans) {
+            if (span.text.isEmpty()) continue
+            val sp = Paint(layout.paint).apply {
+                textSize = line.size
+                isFakeBoldText = line.bold || span.bold
+                typeface = if (span.code || line.mono) Typeface.MONOSPACE else Typeface.DEFAULT
+                if (line.italic || span.italic) textSkewX = -0.25f
+            }
+            canvas.drawText(span.text, x, y, sp)
+            x += sp.measureText(span.text)
+        }
+        return y + maxOf(layout.lineHeight, line.size * 1.3f)
+    }
+
+    private fun drawCells(frame: PageFrame, line: Line, y: Float): Float {
+        val canvas = frame.canvas
+        val layout = frame.layout
+        val weights = line.weights ?: FloatArray(line.cells.size) { 1f }
+        val totalWeight = weights.sum().coerceAtLeast(1f)
+        val p = Paint(layout.paint).apply {
+            textSize = line.size
+            isFakeBoldText = line.bold
+        }
+        var x = layout.margin
+        val xs = mutableListOf<Float>()
+        line.cells.forEachIndexed { i, cell ->
+            val w = layout.contentWidth * weights[i] / totalWeight
+            canvas.drawText(ellipsize(cell, p, w - 6f), x, y, p)
+            xs.add(x)
+            x += w
+        }
+        if (line.table) {
+            for (i in 1 until line.cells.size) {
+                canvas.drawLine(xs[i], y - line.size, xs[i], y + 4f, layout.paint)
+            }
+            canvas.drawLine(layout.margin, y + 4f, layout.pageWidth - layout.margin, y + 4f, layout.paint)
+        }
+        return y + layout.lineHeight
+    }
+
+    private fun drawPlain(frame: PageFrame, line: Line, y: Float): Float {
+        val canvas = frame.canvas
+        val layout = frame.layout
+        if (line.mono) {
+            val bg = Paint().apply { color = Color.rgb(245, 245, 245) }
+            canvas.drawRect(layout.margin - 4f, y - line.size - 2f, layout.margin + layout.contentWidth, y + 4f, bg)
+        }
+        if (line.italic) {
+            canvas.drawLine(layout.margin - 6f, y - line.size, layout.margin - 6f, y + 4f, layout.paint)
+        }
+        val p = Paint(layout.paint).apply {
+            textSize = line.size
+            isFakeBoldText = line.bold
+            typeface = if (line.mono) Typeface.MONOSPACE else Typeface.DEFAULT
+            if (line.italic) textSkewX = -0.25f
+        }
+        canvas.drawText(line.text, layout.margin, y, p)
+        return y + maxOf(layout.lineHeight, line.size * 1.3f)
+    }
+
+    private data class Line(
+        val text: String,
+        val size: Float,
+        val bold: Boolean,
+        val mono: Boolean = false,
+        val italic: Boolean = false,
+        val rule: Boolean = false,
+        val cells: List<String> = emptyList(),
+        val table: Boolean = false,
+        val weights: FloatArray? = null,
+        val spans: List<PdfMarkdown.Span> = emptyList(),
+        val image: Bitmap? = null,
+        val imageWidth: Float = 0f,
+        val imageHeight: Float = 0f,
+        val weight: Int = 1,
+        val tableHeader: Boolean = false
+    )
+
+    private data class PdfLayout(
+        val pageWidth: Int,
+        val pageHeight: Int,
+        val margin: Float,
+        val lineHeight: Float,
+        val contentWidth: Float,
+        val paint: Paint
+    )
+
+    private class PageFrame(val canvas: Canvas, val layout: PdfLayout)
 
     private fun ellipsize(text: String, paint: Paint, maxWidth: Float): String {
         if (paint.measureText(text) <= maxWidth) return text

@@ -2528,12 +2528,12 @@ l2
         (
             concat!(r#"{"forbid_regex": [{"name": ""#, "un", "safe", r#"", "pattern": "\\b"#, "un", "safe", r#"\\b", "why": "第二实现线是**只读判据**；"#, "un", "safe", r#" 会把它变成可写面"}], "glob": "engine/rust/src/**/*.rs", "id": "engine-rust-structural", "lang": "rust", "note": "E2 结构契约（非 AST）：只判禁用式与计数棘轮；完整语法树不在本层范围（ADR-0005 划范围）", "regex_limits": [{"max": 1, "name": "extern-c", "pattern": "extern\\s+\"C\"", "why": "FFI 面只许只减不增（实测 1 处）"}]}"#),
             &[],
-            concat!(r#"{"files": 88, "forbid:"#, "un", "safe", r#"": 0, "limit:extern-c": 1}"#)
+            concat!(r#"{"files": 99, "forbid:"#, "un", "safe", r#"": 0, "limit:extern-c": 1}"#)
         ),
         (
             concat!(r#"{"forbid_regex": [{"name": ""#, "un", "safe", r#"", "pattern": "\\b"#, "un", "safe", r#"\\b", "why": "第二实现线是只读判据"}, {"name": "DllImport", "pattern": "\\bDllImport\\b", "why": "P/Invoke 面须走显式声明与评审"}, {"name": "extern", "pattern": "\\bextern\\b", "why": "外部符号直接绑定会绕过只读边界"}], "glob": "engine/dotnet/**/*.cs", "id": "engine-dotnet-structural", "lang": "cs", "note": "同上（实测三类各 0 处，故按零容忍声明）"}"#),
             &[],
-            concat!(r#"{"files": 109, "forbid:DllImport": 0, "forbid:extern": 0, "forbid:"#, "un", "safe", r#"": 0}"#)
+            concat!(r#"{"files": 131, "forbid:DllImport": 0, "forbid:extern": 0, "forbid:"#, "un", "safe", r#"": 0}"#)
         ),
         (
             concat!(r#"{"glob": "engine/rust/ffi/src/**/*.rs", "id": "engine-rust-ffi", "lang": "rust", "note": "F3 治理面（VULN-02，**WARN 起步、不 FAIL**）：FFI 出口必然 "#, "un", "safe", r#"（C ABI 本质），故不套用「禁 "#, "un", "safe", r#"」的只读契约；改判三条可证治理规则——"#, "un", "safe", r##" 前 3 行内须有 SAFETY: 注释 / from_raw_parts 前须挡空指针 / #[no_mangle] 导出面不得 panic。存量清零后把规则迁进 forbid_regex 或新判据升 FAIL", "warn_rules": {"export_no_panic": {"forbid": ["panic!", ".unwrap(", ".expect(", "assert!"], "pattern": "#\\[no_mangle\\]", "skip_after": "#[cfg(test)]"}, "null_guard_before": {"guard": "is_null", "pattern": "from_raw_parts", "skip_after": "#[cfg(test)]", "within": 20}, ""##, "un", "safe", r#"_safety_comment": {"marker": "SAFETY:", "pattern": "\\b"#, "un", "safe", r##"\\b", "skip_after": "#[cfg(test)]", "within": 3}}}"##),
@@ -2637,7 +2637,7 @@ l2
         assert_eq!(ac_norm(&issues), &[] as &[&str], "聚合 issues 不一致");
         assert_eq!(warns, &[] as &[&str], "聚合 warns 不一致");
         let want: Json = crate::jsonread::convert(
-            &serde_json::from_str::<serde_json::Value>(r#"{"chains": 1, "code": 7, "data": 10, "files": 1260, "index": 1, "no_schema": 206, "script": 4}"#).unwrap(),
+            &serde_json::from_str::<serde_json::Value>(r#"{"chains": 1, "code": 7, "data": 10, "files": 1293, "index": 1, "no_schema": 206, "script": 4}"#).unwrap(),
         )
         .unwrap();
         assert!(crate::jsonread::json_eq(&stats, &want),

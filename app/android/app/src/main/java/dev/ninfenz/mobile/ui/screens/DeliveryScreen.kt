@@ -3522,47 +3522,8 @@ private fun ExportButton(
             setError(null)
             scope.launch {
                 try {
-                    val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
-                    fun payloadFor(dir: File) = buildJsonObject {
-                        put("markdown", md)
-                        put("format", format)
-                        put("out_dir", dir.absolutePath)
-                        put("manifest", true)
-                        put("title", project.title)
-                        put("project_id", project.id)
-                        if (format == "docx" && docxStyles != null) put("docx_styles", docxStyles)
-                        if (format == "docx" && docxSectPr != null) put("docx_sect_pr", docxSectPr)
-                        if (format == "docx" && docxTheme != null) put("docx_theme", docxTheme)
-                        if (format == "docx" && docxNumbering != null) put("docx_numbering", docxNumbering)
-                        if (format == "docx" && docxHeader != null) put("docx_header", docxHeader)
-                        if (format == "docx" && docxFooter != null) put("docx_footer", docxFooter)
-                    }
-                    fun fileFor(dir: File, manifest: kotlinx.serialization.json.JsonObject?): File? {
-                        val name = manifest?.get("files")?.toString()?.let { raw ->
-                            Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1)
-                        }
-                        return name?.let { File(dir, it) }
-                    }
-                    val response = safeCall("export", payloadFor(outDir))
-                    if (response.ok) {
-                        val manifest = response.resultObject()
-                        val file = fileFor(outDir, manifest)
-                        var report: dev.ninfenz.mobile.data.ReproChecker.Report? = null
-                        if (file != null) {
-                            val reproDir = File(context.cacheDir, "repro-core-" + format).apply { deleteRecursively(); mkdirs() }
-                            val second = safeCall("export", payloadFor(reproDir))
-                            if (second.ok) {
-                                val secondFile = fileFor(reproDir, second.resultObject())
-                                if (secondFile != null) {
-                                    report = dev.ninfenz.mobile.data.ReproChecker.check(file, secondFile)
-                                }
-                            }
-                            reproDir.deleteRecursively()
-                        }
-                        onDone(file, manifest?.toString(), report)
-                    } else {
-                        setError(response.error)
-                    }
+                    runDeliveryExport(format, md, project, context, setError, onDone,
+                        docxStyles, docxSectPr, docxTheme, docxNumbering, docxHeader, docxFooter)
                 } finally {
                     setBusy(false)
                 }
@@ -3823,4 +3784,62 @@ private fun mimeFor(format: String): String = when (format) {
     "pdf" -> "application/pdf"
     "html" -> "text/html"
     else -> "application/octet-stream"
+}
+
+
+private suspend fun runDeliveryExport(
+    format: String,
+    md: String,
+    project: Project,
+    context: android.content.Context,
+    setError: (CoreError?) -> Unit,
+    onDone: (File?, String?, dev.ninfenz.mobile.data.ReproChecker.Report?) -> Unit,
+    docxStyles: String?,
+    docxSectPr: String?,
+    docxTheme: String?,
+    docxNumbering: String?,
+    docxHeader: String?,
+    docxFooter: String?
+) {
+    fun payloadFor(dir: File) = buildJsonObject {
+        put("markdown", md)
+        put("format", format)
+        put("out_dir", dir.absolutePath)
+        put("manifest", true)
+        put("title", project.title)
+        put("project_id", project.id)
+        if (format == "docx" && docxStyles != null) put("docx_styles", docxStyles)
+        if (format == "docx" && docxSectPr != null) put("docx_sect_pr", docxSectPr)
+        if (format == "docx" && docxTheme != null) put("docx_theme", docxTheme)
+        if (format == "docx" && docxNumbering != null) put("docx_numbering", docxNumbering)
+        if (format == "docx" && docxHeader != null) put("docx_header", docxHeader)
+        if (format == "docx" && docxFooter != null) put("docx_footer", docxFooter)
+    }
+    fun fileFor(dir: File, manifest: kotlinx.serialization.json.JsonObject?): File? {
+        val name = manifest?.get("files")?.toString()?.let { raw ->
+            Regex("\"name\":\"([^\"]+)\"").find(raw)?.groupValues?.getOrNull(1)
+        }
+        return name?.let { File(dir, it) }
+    }
+    val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
+    val response = safeCall("export", payloadFor(outDir))
+    if (response.ok) {
+        val manifest = response.resultObject()
+        val file = fileFor(outDir, manifest)
+        var report: dev.ninfenz.mobile.data.ReproChecker.Report? = null
+        if (file != null) {
+            val reproDir = File(context.cacheDir, "repro-core-" + format).apply { deleteRecursively(); mkdirs() }
+            val second = safeCall("export", payloadFor(reproDir))
+            if (second.ok) {
+                val secondFile = fileFor(reproDir, second.resultObject())
+                if (secondFile != null) {
+                    report = dev.ninfenz.mobile.data.ReproChecker.check(file, secondFile)
+                }
+            }
+            reproDir.deleteRecursively()
+        }
+        onDone(file, manifest?.toString(), report)
+    } else {
+        setError(response.error)
+    }
 }

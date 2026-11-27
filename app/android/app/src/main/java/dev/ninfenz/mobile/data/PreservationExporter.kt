@@ -33,46 +33,64 @@ object PreservationExporter {
         val seed = md + doc + grant + (contract ?: ByteArray(0)) + (predecessorSha256?.toByteArray(Charsets.UTF_8) ?: ByteArray(0))
         val file = File(outDir, safe + "-" + sha(seed).take(12) + ".preserve.zip")
 
-        val oais = buildJsonObject {
-            put("schema", "nf-oais/1")
-            put("package_id", projectId)
-            put("title", title)
-            put("agent", buildJsonObject {
-                put("name", "NF Mobile")
-                put("version", "0.2.0")
-            })
-            put("rights", buildJsonObject {
-                put("basis", "user-provided")
-                put("license", "unknown")
-            })
-            putJsonArray("fixity") {
-                content.forEach { (name, bytes) ->
-                    add(buildJsonObject { put("path", name); put("sha256", sha(bytes)); put("bytes", bytes.size) })
-                }
-            }
-            putJsonArray("events") {
-                add(buildJsonObject {
-                    put("type", "export")
-                    put("detail", "local deterministic package")
-                })
-            }
-            predecessorSha256?.let {
-                put("lineage", buildJsonObject { put("predecessor_sha256", it) })
-            }
-        }.toString().toByteArray(Charsets.UTF_8)
+        val oais = oaisJson(title, projectId, content, predecessorSha256)
+        val manifest = manifestJson(projectId, title, content, oais, predecessorSha256)
+        writeZip(file, content, oais, manifest)
+        return Created(file)
+    }
 
-        val manifest = buildJsonObject {
-            put("schema", "nf-preservation/1")
-            put("project_id", projectId)
-            put("title", title)
-            predecessorSha256?.let { put("predecessor_sha256", it) }
-            putJsonArray("files") {
-                (content + ("oais.json" to oais)).forEach { (name, bytes) ->
-                    add(buildJsonObject { put("path", name); put("sha256", sha(bytes)); put("bytes", bytes.size) })
-                }
+    private fun oaisJson(
+        title: String,
+        projectId: String,
+        content: List<Pair<String, ByteArray>>,
+        predecessorSha256: String?
+    ): ByteArray = buildJsonObject {
+        put("schema", "nf-oais/1")
+        put("package_id", projectId)
+        put("title", title)
+        put("agent", buildJsonObject {
+            put("name", "NF Mobile")
+            put("version", "0.2.0")
+        })
+        put("rights", buildJsonObject {
+            put("basis", "user-provided")
+            put("license", "unknown")
+        })
+        putJsonArray("fixity") {
+            content.forEach { (name, bytes) ->
+                add(buildJsonObject { put("path", name); put("sha256", sha(bytes)); put("bytes", bytes.size) })
             }
-        }.toString().toByteArray(Charsets.UTF_8)
+        }
+        putJsonArray("events") {
+            add(buildJsonObject {
+                put("type", "export")
+                put("detail", "local deterministic package")
+            })
+        }
+        predecessorSha256?.let {
+            put("lineage", buildJsonObject { put("predecessor_sha256", it) })
+        }
+    }.toString().toByteArray(Charsets.UTF_8)
 
+    private fun manifestJson(
+        projectId: String,
+        title: String,
+        content: List<Pair<String, ByteArray>>,
+        oais: ByteArray,
+        predecessorSha256: String?
+    ): ByteArray = buildJsonObject {
+        put("schema", "nf-preservation/1")
+        put("project_id", projectId)
+        put("title", title)
+        predecessorSha256?.let { put("predecessor_sha256", it) }
+        putJsonArray("files") {
+            (content + ("oais.json" to oais)).forEach { (name, bytes) ->
+                add(buildJsonObject { put("path", name); put("sha256", sha(bytes)); put("bytes", bytes.size) })
+            }
+        }
+    }.toString().toByteArray(Charsets.UTF_8)
+
+    private fun writeZip(file: File, content: List<Pair<String, ByteArray>>, oais: ByteArray, manifest: ByteArray) {
         ZipOutputStream(file.outputStream()).use { out ->
             (content + ("oais.json" to oais) + ("preservation.json" to manifest)).forEach { (name, bytes) ->
                 out.putNextEntry(ZipEntry(name).apply { time = 0L })
@@ -80,6 +98,5 @@ object PreservationExporter {
                 out.closeEntry()
             }
         }
-        return Created(file)
     }
 }

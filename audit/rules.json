@@ -578,7 +578,7 @@
           "scripts/**/*.py",
           "engine/rust/**/src/**/*.rs"
         ],
-        "limit": 350
+        "limit": 315
       },
       "penalty": 2,
       "source": "项目惯例"
@@ -664,13 +664,9 @@
           "desktop/src/core/asset_contract.py",
           "desktop/src/core/conformance_scan.py",
           "desktop/src/core/daemon.py",
-          "desktop/src/core/domain_pack.py",
-          "desktop/src/core/evidence.py",
           "desktop/src/core/interop_export.py",
-          "desktop/src/core/mcp_runtime.py",
           "desktop/src/core/output_forms.py",
-          "desktop/src/core/pack_combo.py",
-          "desktop/src/core/terminal.py"
+          "desktop/src/core/pack_combo.py"
         ]
       },
       "penalty": 2,
@@ -916,7 +912,7 @@
           "**/*_gen.rs",
           "**/generated/**"
         ],
-        "aggregate_limit": 700
+        "aggregate_limit": 226
       },
       "penalty": 3,
       "source": "Rust 惯例"
@@ -1132,7 +1128,7 @@
           "engine/dotnet/**/*.cs"
         ],
         "patterns": [
-          "\\.Result\\b",
+          "\\.Result\\b(?!\\s+[A-Za-z_][A-Za-z0-9_]*\\s*[;,)=({]|>)",
           "\\.Wait\\(\\)",
           "GetAwaiter\\(\\)\\.GetResult\\(\\)"
         ],
@@ -1864,7 +1860,7 @@
         "globs": [
           "protocol/generated/**/*.json"
         ],
-        "limit_bytes": 4194304
+        "limit_bytes": 3200000
       },
       "penalty": 1,
       "source": "包体纪律"
@@ -2114,7 +2110,7 @@
           "pytest\\.mark\\.skip",
           "self\\.skipTest\\("
         ],
-        "limit": 150
+        "limit": 140
       },
       "penalty": 2,
       "source": "测试充分性"

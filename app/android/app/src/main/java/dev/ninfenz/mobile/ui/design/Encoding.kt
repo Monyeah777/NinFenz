@@ -27,7 +27,9 @@ object ChannelRanking {
         )
     }
 
-    fun isEffective(type: DataType, channel: Channel): Boolean = channel in forType(type)
+    fun isEffective(type: DataType, channel: Channel): Boolean {
+        return channel in forType(type)
+    }
 }
 
 /** 色觉模拟与色差：状态不能只靠红/绿。 */

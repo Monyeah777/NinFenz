@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -81,8 +82,6 @@ fun SwipeableProjectCard(
     val offset = remember(entry.project.id) { Animatable(0f) }
     val scope = rememberCoroutineScope()
     var width by remember { mutableIntStateOf(0) }
-    var armed by remember { mutableStateOf(false) }
-    val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(entry.project.id) {
         delay((index.coerceAtMost(6) * 35L))
@@ -94,178 +93,281 @@ fun SwipeableProjectCard(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        // 底层操作面
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .clip(RoundedCornerShape(24.dp))
-                .background(
-                    when {
-                        offset.value > 1f -> MaterialTheme.colorScheme.primary
-                        offset.value < -1f -> MaterialTheme.colorScheme.error
-                        else -> androidx.compose.ui.graphics.Color.Transparent
-                    }
-                )
-                .padding(horizontal = NfSpacing.l)
-        ) {
-            val reveal = (abs(offset.value) / (width * 0.35f).coerceAtLeast(1f)).coerceIn(0f, 1f)
-            if (offset.value > 0f) {
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .alpha(reveal),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
-                ) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.library_swipe_flow), color = MaterialTheme.colorScheme.onPrimary)
-                    Text("→", color = MaterialTheme.colorScheme.onPrimary)
-                }
-            } else if (offset.value < 0f) {
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .alpha(reveal),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
-                ) {
-                    Icon(Icons.Filled.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.onError)
-                    Text(stringResource(dev.ninfenz.mobile.R.string.library_swipe_delete), color = MaterialTheme.colorScheme.onError)
-                }
-            }
-        }
-
-        AnimatedVisibility(
+        SwipeableCardActionBackground(
+            offsetValue = offset.value,
+            width = width,
+            modifier = Modifier.matchParentSize()
+        )
+        SwipeableCardForeground(
+            entry = entry,
             visible = visible,
-            enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .offset { IntOffset(offset.value.roundToInt(), 0) }
-                    .graphicsLayer {
-                        val dragFraction = (abs(offset.value) / (width * 0.5f).coerceAtLeast(1f)).coerceIn(0f, 1f)
-                        scaleX = 1f - dragFraction * 0.012f
-                        scaleY = 1f - dragFraction * 0.012f
-                    }
-                    .pointerInput(entry.project.id) {
-                        detectHorizontalDragGestures(
-                            onDragEnd = {
-                                scope.launch {
-                                    val threshold = width * 0.5f
-                                    armed = false
-                                    val settle = spring<Float>(dampingRatio = 0.78f, stiffness = 420f)
-                                    when {
-                                        offset.value > threshold -> {
-                                            offset.animateTo(0f, animationSpec = settle)
-                                            onFlow()
-                                        }
-                                        offset.value < -threshold -> {
-                                            offset.animateTo(0f, animationSpec = settle)
-                                            onDelete()
-                                        }
-                                        else -> offset.animateTo(0f, animationSpec = settle)
-                                    }
-                                }
-                            },
-                            onHorizontalDrag = { change, dragAmount ->
-                                change.consume()
-                                scope.launch {
-                                    val edge = width * 0.75f
-                                    val resistance = 1f - (abs(offset.value) / edge.coerceAtLeast(1f) * 0.45f).coerceIn(0f, 0.45f)
-                                    val next = (offset.value + dragAmount * resistance).coerceIn(-edge, edge)
-                                    val crossed = width > 0 && kotlin.math.abs(next) >= width * 0.5f
-                                    if (crossed && !armed) {
-                                        armed = true
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    } else if (!crossed) {
-                                        armed = false
-                                    }
-                                    offset.snapTo(next)
-                                }
-                            }
-                        )
-                    }
-            ) {
-                androidx.compose.foundation.layout.BoxWithConstraints {
-                    width = constraints.maxWidth
-                    NfCard(modifier = Modifier.fillMaxWidth()) {
-                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { onOpen() },
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                if (selectable) {
-                                    Checkbox(checked = selected, onCheckedChange = { onOpen() })
-                                }
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        entry.project.title,
-                                        style = NfType.itemTitle,
-                                        maxLines = 2,
-                                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                    )
-                                    Text(
-                                        entry.project.id,
-                                        style = NfType.meta,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                NfStatusChip(projectStatusLabel(entry.project))
-                                val chevron by animateFloatAsState(
-                                    targetValue = if (expanded) 180f else 0f,
-                                    animationSpec = tween(durationMillis = NfMotion.MEDIUM_MS),
-                                    label = "project-chevron"
-                                )
-                                IconButton(onClick = { expanded = !expanded }) {
-                                    Icon(
-                                        Icons.Filled.KeyboardArrowDown,
-                                        contentDescription = stringResource(
-                                            if (expanded) dev.ninfenz.mobile.R.string.action_collapse
-                                            else dev.ninfenz.mobile.R.string.action_expand
-                                        ),
-                                        modifier = Modifier.rotate(chevron)
-                                    )
-                                }
-                            }
-                            AnimatedVisibility(
-                                visible = expanded,
-                                enter = fadeIn(tween(NfMotion.SHORT_MS)) + expandVertically(
-                                    animationSpec = spring(dampingRatio = 0.82f, stiffness = 380f),
-                                    expandFrom = Alignment.Top
-                                ),
-                                exit = fadeOut(tween(NfMotion.SHORT_MS)) + shrinkVertically(
-                                    animationSpec = spring(dampingRatio = 0.9f, stiffness = 480f),
-                                    shrinkTowards = Alignment.Top
-                                )
-                            ) {
-                                Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                                    Text(
-                                        entry.project.refs.basePackId + " · " + entry.project.refs.basePackVersion,
-                                        style = NfType.meta,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Text(
-                                        stringResource(dev.ninfenz.mobile.R.string.project_detail_history, entry.project.historyCount),
-                                        style = NfType.meta,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                                        androidx.compose.material3.TextButton(onClick = onOpen) {
-                                            Text(stringResource(dev.ninfenz.mobile.R.string.flow_open_project))
-                                        }
-                                        androidx.compose.material3.TextButton(onClick = onFlow) {
-                                            Text(stringResource(dev.ninfenz.mobile.R.string.flow_title))
-                                        }
-                                    }
-                                }
+            offset = offset,
+            scope = scope,
+            width = width,
+            onWidthChange = { width = it },
+            selectable = selectable,
+            selected = selected,
+            expanded = expanded,
+            onExpandToggle = { expanded = !expanded },
+            onOpen = onOpen,
+            onFlow = onFlow,
+            onDelete = onDelete
+        )
+    }
+}
+
+@Composable
+private fun SwipeableCardForeground(
+    entry: ProjectEntry,
+    visible: Boolean,
+    offset: Animatable<Float, androidx.compose.animation.core.AnimationVector1D>,
+    scope: kotlinx.coroutines.CoroutineScope,
+    width: Int,
+    onWidthChange: (Int) -> Unit,
+    selectable: Boolean,
+    selected: Boolean,
+    expanded: Boolean,
+    onExpandToggle: () -> Unit,
+    onOpen: () -> Unit,
+    onFlow: () -> Unit,
+    onDelete: () -> Unit
+) {
+    var armed by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn() + expandVertically(expandFrom = Alignment.Top),
+        exit = fadeOut() + shrinkVertically()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset { IntOffset(offset.value.roundToInt(), 0) }
+                .graphicsLayer {
+                    val dragFraction = (abs(offset.value) / (width * 0.5f).coerceAtLeast(1f)).coerceIn(0f, 1f)
+                    scaleX = 1f - dragFraction * 0.012f
+                    scaleY = 1f - dragFraction * 0.012f
+                }
+                .pointerInput(entry.project.id) {
+                    detectHorizontalDragGestures(
+                        onDragEnd = {
+                            scope.launch { settleSwipe(offset, width, { armed = it }, onFlow, onDelete) }
+                        },
+                        onHorizontalDrag = { change, dragAmount ->
+                            change.consume()
+                            scope.launch {
+                                armed = applySwipeDrag(dragAmount, offset, width, armed, haptic)
                             }
                         }
-                    }
+                    )
                 }
+        ) {
+            androidx.compose.foundation.layout.BoxWithConstraints {
+                onWidthChange(constraints.maxWidth)
+                SwipeableProjectCardBody(
+                    entry = entry,
+                    selectable = selectable,
+                    selected = selected,
+                    expanded = expanded,
+                    onExpandToggle = onExpandToggle,
+                    onOpen = onOpen,
+                    onFlow = onFlow
+                )
             }
         }
     }
+}
+
+@Composable
+private fun SwipeableCardActionBackground(
+    offsetValue: Float,
+    width: Int,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(24.dp))
+            .background(
+                when {
+                    offsetValue > 1f -> MaterialTheme.colorScheme.primary
+                    offsetValue < -1f -> MaterialTheme.colorScheme.error
+                    else -> androidx.compose.ui.graphics.Color.Transparent
+                }
+            )
+            .padding(horizontal = NfSpacing.l)
+    ) {
+        val reveal = (abs(offsetValue) / (width * 0.35f).coerceAtLeast(1f)).coerceIn(0f, 1f)
+        if (offsetValue > 0f) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .alpha(reveal),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+            ) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.library_swipe_flow), color = MaterialTheme.colorScheme.onPrimary)
+                Text("→", color = MaterialTheme.colorScheme.onPrimary)
+            }
+        } else if (offsetValue < 0f) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .alpha(reveal),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)
+            ) {
+                Icon(Icons.Filled.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.onError)
+                Text(stringResource(dev.ninfenz.mobile.R.string.library_swipe_delete), color = MaterialTheme.colorScheme.onError)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SwipeableProjectCardBody(
+    entry: ProjectEntry,
+    selectable: Boolean,
+    selected: Boolean,
+    expanded: Boolean,
+    onExpandToggle: () -> Unit,
+    onOpen: () -> Unit,
+    onFlow: () -> Unit
+) {
+    NfCard(modifier = Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+            ProjectCardHeader(entry, selectable, selected, expanded, onExpandToggle, onOpen)
+            AnimatedVisibility(
+                visible = expanded,
+                enter = fadeIn(tween(NfMotion.SHORT_MS)) + expandVertically(
+                    animationSpec = spring(dampingRatio = 0.82f, stiffness = 380f),
+                    expandFrom = Alignment.Top
+                ),
+                exit = fadeOut(tween(NfMotion.SHORT_MS)) + shrinkVertically(
+                    animationSpec = spring(dampingRatio = 0.9f, stiffness = 480f),
+                    shrinkTowards = Alignment.Top
+                )
+            ) {
+                ProjectCardDetails(entry, onOpen, onFlow)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ProjectCardHeader(
+    entry: ProjectEntry,
+    selectable: Boolean,
+    selected: Boolean,
+    expanded: Boolean,
+    onExpandToggle: () -> Unit,
+    onOpen: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onOpen() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (selectable) {
+            Checkbox(checked = selected, onCheckedChange = { onOpen() })
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                entry.project.title,
+                style = NfType.itemTitle,
+                maxLines = 2,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
+            Text(
+                entry.project.id,
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        NfStatusChip(projectStatusLabel(entry.project))
+        val chevron by animateFloatAsState(
+            targetValue = if (expanded) 180f else 0f,
+            animationSpec = tween(durationMillis = NfMotion.MEDIUM_MS),
+            label = "project-chevron"
+        )
+        IconButton(onClick = { onExpandToggle() }) {
+            Icon(
+                Icons.Filled.KeyboardArrowDown,
+                contentDescription = stringResource(
+                    if (expanded) dev.ninfenz.mobile.R.string.action_collapse
+                    else dev.ninfenz.mobile.R.string.action_expand
+                ),
+                modifier = Modifier.rotate(chevron)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProjectCardDetails(entry: ProjectEntry, onOpen: () -> Unit, onFlow: () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+        Text(
+            entry.project.refs.basePackId + " · " + entry.project.refs.basePackVersion,
+            style = NfType.meta,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            stringResource(dev.ninfenz.mobile.R.string.project_detail_history, entry.project.historyCount),
+            style = NfType.meta,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+            androidx.compose.material3.TextButton(onClick = onOpen) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.flow_open_project))
+            }
+            androidx.compose.material3.TextButton(onClick = onFlow) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.flow_title))
+            }
+        }
+    }
+}
+
+private suspend fun settleSwipe(
+    offset: Animatable<Float, androidx.compose.animation.core.AnimationVector1D>,
+    width: Int,
+    onArmedChange: (Boolean) -> Unit,
+    onFlow: () -> Unit,
+    onDelete: () -> Unit
+) {
+    val threshold = width * 0.5f
+    onArmedChange(false)
+    val settle = spring<Float>(dampingRatio = 0.78f, stiffness = 420f)
+    when {
+        offset.value > threshold -> {
+            offset.animateTo(0f, animationSpec = settle)
+            onFlow()
+        }
+        offset.value < -threshold -> {
+            offset.animateTo(0f, animationSpec = settle)
+            onDelete()
+        }
+        else -> offset.animateTo(0f, animationSpec = settle)
+    }
+}
+
+private suspend fun applySwipeDrag(
+    dragAmount: Float,
+    offset: Animatable<Float, androidx.compose.animation.core.AnimationVector1D>,
+    width: Int,
+    armed: Boolean,
+    haptic: HapticFeedback
+): Boolean {
+    val edge = width * 0.75f
+    val resistance = 1f - (abs(offset.value) / edge.coerceAtLeast(1f) * 0.45f).coerceIn(0f, 0.45f)
+    val next = (offset.value + dragAmount * resistance).coerceIn(-edge, edge)
+    val crossed = width > 0 && abs(next) >= width * 0.5f
+    var nowArmed = armed
+    if (crossed && !armed) {
+        nowArmed = true
+        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+    } else if (!crossed) {
+        nowArmed = false
+    }
+    offset.snapTo(next)
+    return nowArmed
 }

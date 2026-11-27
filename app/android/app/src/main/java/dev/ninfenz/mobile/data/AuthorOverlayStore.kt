@@ -83,36 +83,7 @@ class AuthorOverlayStore(
             atomicWrite(overlayFile, overlay.toString())
 
             val raw = Json.parseToJsonElement(projectFile.readText(Charsets.UTF_8)).jsonObject
-            val oldRefs = raw["refs"]?.jsonObject ?: buildJsonObject {}
-            val newRefs = buildJsonObject {
-                for ((key, value) in oldRefs) {
-                    if (key != "overlay") put(key, value)
-                }
-                putJsonObject("overlay") {
-                    put("path", "overlay/nf-overlay.json")
-                    put("sha256", overlaySha)
-                }
-            }
-            val oldHistory = raw["history"]?.jsonArray ?: JsonArray(emptyList())
-            val newHistory = buildJsonArray {
-                for (entry in oldHistory) add(entry)
-                add(buildJsonObject {
-                    put("op", "overlay:save")
-                    put("digest", overlaySha)
-                })
-            }
-            val oldStatus = raw["status"]?.toString()?.trim('"') ?: "draft"
-            val newStatus = if (oldStatus == "draft") "authoring" else oldStatus
-            val newProject = buildJsonObject {
-                for ((key, value) in raw) {
-                    when (key) {
-                        "refs" -> put("refs", newRefs)
-                        "history" -> put("history", newHistory)
-                        "status" -> put("status", newStatus)
-                        else -> put(key, value)
-                    }
-                }
-            }
+            val newProject = updatedProjectJson(raw, overlaySha)
 
             val validate = core.call("project-validate", buildJsonObject { put("project", newProject) })
             if (!validate.ok) {
@@ -132,6 +103,39 @@ class AuthorOverlayStore(
                 "保存覆盖失败：" + (t.message ?: t.javaClass.simpleName),
                 "检查项目文件与核心桥；诊断见设置页"
             )
+        }
+    }
+
+    private fun updatedProjectJson(raw: JsonObject, overlaySha: String): JsonObject {
+        val oldRefs = raw["refs"]?.jsonObject ?: buildJsonObject {}
+        val newRefs = buildJsonObject {
+            for ((key, value) in oldRefs) {
+                if (key != "overlay") put(key, value)
+            }
+            putJsonObject("overlay") {
+                put("path", "overlay/nf-overlay.json")
+                put("sha256", overlaySha)
+            }
+        }
+        val oldHistory = raw["history"]?.jsonArray ?: JsonArray(emptyList())
+        val newHistory = buildJsonArray {
+            for (entry in oldHistory) add(entry)
+            add(buildJsonObject {
+                put("op", "overlay:save")
+                put("digest", overlaySha)
+            })
+        }
+        val oldStatus = raw["status"]?.toString()?.trim('"') ?: "draft"
+        val newStatus = if (oldStatus == "draft") "authoring" else oldStatus
+        return buildJsonObject {
+            for ((key, value) in raw) {
+                when (key) {
+                    "refs" -> put("refs", newRefs)
+                    "history" -> put("history", newHistory)
+                    "status" -> put("status", newStatus)
+                    else -> put(key, value)
+                }
+            }
         }
     }
 

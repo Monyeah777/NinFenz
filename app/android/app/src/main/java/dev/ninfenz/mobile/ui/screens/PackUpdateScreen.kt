@@ -171,7 +171,9 @@ fun PackUpdateScreen(store: LibraryStore, onBack: () -> Unit, onOpenProject: (St
         }
     }
 
-    fun packDir(id: String, version: String): File = File(File(File(context.filesDir, "library/packs"), id), version)
+    fun packDir(id: String, version: String): File {
+        return File(File(File(context.filesDir, "library/packs"), id), version)
+    }
 
     NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.packupdate_title), onBack = onBack) {
         if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.MATRIX)) {

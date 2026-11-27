@@ -39,6 +39,33 @@ fun SettingsStyleSection() {
     var items by remember { mutableStateOf(store.list()) }
     var note by remember { mutableStateOf<String?>(null) }
 
+    val launchPicker = rememberStylePicker(
+        context = context,
+        scope = scope,
+        store = store,
+        onRefreshed = { items = store.list() },
+        onNote = { note = it }
+    )
+
+    StyleTemplateContent(
+        items = items,
+        note = note,
+        onPick = { launchPicker(arrayOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/pdf")) },
+        onDelete = { style ->
+            store.delete(style.id)
+            items = store.list()
+        }
+    )
+}
+
+@Composable
+private fun rememberStylePicker(
+    context: android.content.Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    store: StyleTemplateStore,
+    onRefreshed: () -> Unit,
+    onNote: (String?) -> Unit
+): (Array<String>) -> Unit {
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
         scope.launch {
@@ -53,14 +80,23 @@ fun SettingsStyleSection() {
                         store.fromDocx(file, name)
                     }
                 }
-                items = store.list()
-                note = context.getString(R.string.settings_styles_imported, saved.name)
+                onRefreshed()
+                onNote(context.getString(R.string.settings_styles_imported, saved.name))
             }.onFailure {
-                note = context.getString(R.string.settings_styles_failed, it.message ?: it.javaClass.simpleName)
+                onNote(context.getString(R.string.settings_styles_failed, it.message ?: it.javaClass.simpleName))
             }
         }
     }
+    return { input -> picker.launch(input) }
+}
 
+@Composable
+private fun StyleTemplateContent(
+    items: List<StyleTemplateStore.StyleTemplate>,
+    note: String?,
+    onPick: () -> Unit,
+    onDelete: (StyleTemplateStore.StyleTemplate) -> Unit
+) {
     CardBox(title = stringResource(R.string.settings_styles_title)) {
         Text(
             stringResource(R.string.settings_styles_hint),
@@ -68,14 +104,7 @@ fun SettingsStyleSection() {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-            TextButton(onClick = {
-                picker.launch(
-                    arrayOf(
-                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                        "application/pdf"
-                    )
-                )
-            }) {
+            TextButton(onClick = onPick) {
                 Text(stringResource(R.string.settings_styles_import))
             }
         }
@@ -96,10 +125,7 @@ fun SettingsStyleSection() {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                TextButton(onClick = {
-                    store.delete(style.id)
-                    items = store.list()
-                }) { Text(stringResource(R.string.settings_styles_delete)) }
+                TextButton(onClick = { onDelete(style) }) { Text(stringResource(R.string.settings_styles_delete)) }
             }
         }
         note?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }

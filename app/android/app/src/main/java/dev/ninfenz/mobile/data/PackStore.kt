@@ -224,8 +224,9 @@ object PackRegistry {
         }
     }
 
-    private fun JsonObject.text(key: String): String =
-        this[key]?.jsonPrimitive?.content ?: ""
+    private fun JsonObject.text(key: String): String {
+        return this[key]?.jsonPrimitive?.content ?: ""
+    }
 }
 
 

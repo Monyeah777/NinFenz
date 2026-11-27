@@ -1029,10 +1029,13 @@ def check_rust_unwrap(ctx: Context, rule: dict):
     files = _iter_candidates(ctx, p)
     aggregate_limit = p.get("aggregate_limit")
     per_file_limit = int(p.get("per_file_limit", 10))
+    test_mods = rust_test_module_files(ctx)
     hits = []
     total = 0
     top = []
     for rel in files:
+        if rel in test_mods:
+            continue
         text = ctx.text(rel)
         if not text:
             continue
@@ -1079,12 +1082,54 @@ def strip_rust_test_modules(text: str) -> str:
     return "".join(out)
 
 
+
+
+_TEST_MOD_DECL = re.compile(
+    r"#\[cfg\(test\)\]\s*(?:\r?\n\s*)?(?:pub(?:\([^)]*\))?\s+)?mod\s+([A-Za-z_][A-Za-z0-9_]*)\s*;"
+)
+
+
+def rust_test_module_files(ctx: Context) -> set:
+    """`#[cfg(test)] mod foo;` 声明的外部测试模块文件：整文件按测试面处理。
+
+    E-004/E-008/E-010 的原判据只看生产路径。拆出的测试模块（如 contracts/tests_extra.rs）
+    在 include 站点带 cfg(test)，文件自身没有内联块，旧实现会把它当生产代码统计。
+    这里按声明关系识别这些文件并整体跳过。"""
+    cached = getattr(ctx, "_rust_test_module_files", None)
+    if cached is not None:
+        return cached
+    found = set()
+    for rel in ctx.files:
+        if not rel.endswith(".rs"):
+            continue
+        text = ctx.text(rel)
+        if not text or "#[cfg(test)]" not in text:
+            continue
+        base = Path(rel)
+        stem = base.stem
+        for m in _TEST_MOD_DECL.finditer(text):
+            name = m.group(1)
+            for cand in (
+                (base.parent / (name + ".rs")).as_posix(),
+                (base.parent / stem / (name + ".rs")).as_posix(),
+                (base.parent / name / "mod.rs").as_posix(),
+                (base.parent / (stem + "_" + name + ".rs")).as_posix(),
+            ):
+                if ctx.exists(cand):
+                    found.add(cand)
+    ctx._rust_test_module_files = found
+    return found
+
+
 @check("rust_panic")
 def check_rust_panic(ctx: Context, rule: dict):
     p = rule.get("params") or {}
     files = _iter_candidates(ctx, p)
+    test_mods = rust_test_module_files(ctx)
     hits = []
     for rel in files:
+        if rel in test_mods:
+            continue
         text = ctx.text(rel)
         if not text:
             continue

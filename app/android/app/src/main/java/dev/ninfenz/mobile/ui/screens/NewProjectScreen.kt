@@ -66,78 +66,110 @@ fun NewProjectScreen(
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(NfSpacing.page),
                 verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
             ) {
-                item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.new_project_select_pack)) }
-                item {
-                    OutlinedTextField(
-                        value = packQuery,
-                        onValueChange = { packQuery = it },
-                        label = { Text(stringResource(dev.ninfenz.mobile.R.string.pack_search)) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                newProjectPackSection(
+                    packs = packs,
+                    packQuery = packQuery,
+                    onPackQueryChange = { packQuery = it },
+                    selected = selected,
+                    onSelect = { selectedKey = it.id + "@" + it.version }
+                )
+                newProjectFormSection(
+                    title = title,
+                    onTitleChange = { title = it },
+                    error = error,
+                    creating = creating,
+                    selected = selected,
+                    onCreate = onCreate,
+                    onBack = onBack
+                )
+            }
+        }
+    }
+}
+
+private fun androidx.compose.foundation.lazy.LazyListScope.newProjectPackSection(
+    packs: List<PackEntry>,
+    packQuery: String,
+    onPackQueryChange: (String) -> Unit,
+    selected: PackEntry?,
+    onSelect: (PackEntry) -> Unit
+) {
+    item { NfSectionHeader(stringResource(dev.ninfenz.mobile.R.string.new_project_select_pack)) }
+    item {
+        OutlinedTextField(
+            value = packQuery,
+            onValueChange = onPackQueryChange,
+            label = { Text(stringResource(dev.ninfenz.mobile.R.string.pack_search)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+    val filteredPacks = packs.filter { packQuery.isBlank() || it.title.contains(packQuery, true) || it.id.contains(packQuery, true) }
+    items(filteredPacks.size) { index ->
+        val pack = filteredPacks[index]
+        NfCard(onClick = { onSelect(pack) }) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                RadioButton(selected = selected?.id == pack.id && selected?.version == pack.version, onClick = { onSelect(pack) })
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(pack.title, style = NfType.itemTitle)
+                    Text(
+                        pack.id + " · " + pack.version + " · " + stringResource(dev.ninfenz.mobile.R.string.pack_item_count, pack.itemCount),
+                        style = NfType.meta,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
-                val filteredPacks = packs.filter { packQuery.isBlank() || it.title.contains(packQuery, true) || it.id.contains(packQuery, true) }
-                items(filteredPacks.size) { index ->
-                    val pack = filteredPacks[index]
-                    NfCard(onClick = { selectedKey = pack.id + "@" + pack.version }) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            RadioButton(selected = selected?.id == pack.id && selected?.version == pack.version, onClick = { selectedKey = pack.id + "@" + pack.version })
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(pack.title, style = NfType.itemTitle)
-                                Text(
-                                    pack.id + " · " + pack.version + " · " + stringResource(dev.ninfenz.mobile.R.string.pack_item_count, pack.itemCount),
-                                    style = NfType.meta,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
-                }
-                item {
-                    OutlinedTextField(
-                        value = title,
-                        onValueChange = { title = it },
-                        label = { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_field_title)) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        supportingText = { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_field_hint)) }
-                    )
-                }
-                if (error != null) {
-                    item {
-                        Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
-                            Column(modifier = Modifier.padding(NfSpacing.m), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                                Text(
-                                    error,
-                                    style = NfType.meta,
-                                    color = MaterialTheme.colorScheme.onErrorContainer
-                                )
-                                Text(
-                                    stringResource(dev.ninfenz.mobile.R.string.new_project_error_kept),
-                                    style = NfType.meta,
-                                    color = MaterialTheme.colorScheme.onErrorContainer
-                                )
-                            }
-                        }
-                    }
-                }
-                item {
-                    val unnamedTitle = stringResource(dev.ninfenz.mobile.R.string.unnamed_project)
-                    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalAlignment = Alignment.CenterVertically) {
-                        Button(
-                            onClick = { selected?.let { onCreate(it, title.ifBlank { unnamedTitle }) } },
-                            enabled = selected != null && !creating
-                        ) {
-                            if (creating) {
-                                CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
-                            } else {
-                                Text(stringResource(dev.ninfenz.mobile.R.string.new_project_create))
-                            }
-                        }
-                        TextButton(onClick = onBack) { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_cancel)) }
-                    }
                 }
             }
+        }
+    }
+}
+
+private fun androidx.compose.foundation.lazy.LazyListScope.newProjectFormSection(
+    title: String,
+    onTitleChange: (String) -> Unit,
+    error: String?,
+    creating: Boolean,
+    selected: PackEntry?,
+    onCreate: (PackEntry, String) -> Unit,
+    onBack: () -> Unit
+) {
+    item {
+        OutlinedTextField(
+            value = title,
+            onValueChange = onTitleChange,
+            label = { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_field_title)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+            supportingText = { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_field_hint)) }
+        )
+    }
+    if (error != null) {
+        item {
+            Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
+                Column(modifier = Modifier.padding(NfSpacing.m), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
+                    Text(error, style = NfType.meta, color = MaterialTheme.colorScheme.onErrorContainer)
+                    Text(
+                        stringResource(dev.ninfenz.mobile.R.string.new_project_error_kept),
+                        style = NfType.meta,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+        }
+    }
+    item {
+        val unnamedTitle = stringResource(dev.ninfenz.mobile.R.string.unnamed_project)
+        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalAlignment = Alignment.CenterVertically) {
+            Button(
+                onClick = { selected?.let { onCreate(it, title.ifBlank { unnamedTitle }) } },
+                enabled = selected != null && !creating
+            ) {
+                if (creating) {
+                    CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                } else {
+                    Text(stringResource(dev.ninfenz.mobile.R.string.new_project_create))
+                }
+            }
+            TextButton(onClick = onBack) { Text(stringResource(dev.ninfenz.mobile.R.string.new_project_cancel)) }
         }
     }
 }

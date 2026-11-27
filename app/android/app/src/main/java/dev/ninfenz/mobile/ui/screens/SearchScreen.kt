@@ -75,234 +75,215 @@ fun SearchScreen(
     val context = LocalContext.current
     val capabilityRevision = rememberCapabilityRevision()
     if (capabilityRevision >= 0 && !CapabilityRegistry.isEnabled(Capability.SEARCH)) {
-        Column(Modifier.fillMaxSize()) {
-            NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.search_title), onBack = onBack)
-            Text(
-                stringResource(dev.ninfenz.mobile.R.string.search_module_disabled),
-                modifier = Modifier.padding(NfSpacing.page),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        SearchModuleDisabled(onBack = onBack)
         return
     }
+    val ui = rememberSearchUiState(context, packIds, projects)
     val index = remember { SearchIndex(context.filesDir) }
     val fts = remember { SearchIndexStore(context) }
-    var all by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
-    var ftsResults by remember { mutableStateOf<List<SearchHit>>(emptyList()) }
-    var query by rememberSaveable { mutableStateOf("") }
-    var selected by remember { mutableIntStateOf(0) }
-    var visibleCount by rememberSaveable { mutableIntStateOf(200) }
-    val filterStore = remember { SearchFilterStore(context.filesDir) }
-    val savedFilter = remember { filterStore.load() }
-    var filterName by rememberSaveable { mutableStateOf(savedFilter?.kind) }
-    var selectedPackId by rememberSaveable {
-        mutableStateOf(savedFilter?.packId?.takeIf { it in packIds })
-    }
-    var selectedProjectId by rememberSaveable {
-        mutableStateOf(savedFilter?.projectId?.takeIf { id -> projects.any { it.project.id == id } })
-    }
-    var favoritesOnly by rememberSaveable { mutableStateOf(false) }
-    var scopeTag by rememberSaveable { mutableStateOf<String?>(null) }
     val metaStore = remember { LibraryMetaStore(context.filesDir) }
-    val filterKind = filterName?.let { name -> SearchKind.entries.firstOrNull { it.name == name } }
+    val filterStore = remember { SearchFilterStore(context.filesDir) }
     val historyStore = remember { SearchHistoryStore(context.filesDir) }
-    var history by remember { mutableStateOf(historyStore.load()) }
     val focusRequester = remember { FocusRequester() }
     val listState = rememberLazyListState()
+    val filterKind = ui.filterName?.let { name -> SearchKind.entries.firstOrNull { it.name == name } }
 
-    LaunchedEffect(Unit) {
-        all = withContext(Dispatchers.IO) { index.build() }
-        withContext(Dispatchers.IO) { fts.rebuild(all) }
+    val results = remember(ui.query, ui.all, ui.ftsResults) { if (ui.query.isBlank()) emptyList() else ui.ftsResults }
+    val filtered = remember(results, ui.filterName, ui.selectedPackId, ui.selectedProjectId, ui.favoritesOnly, ui.scopeTag) {
+        applySearchFilters(results, filterKind, ui.selectedPackId, ui.selectedProjectId, ui.favoritesOnly, ui.scopeTag, metaStore)
     }
-    LaunchedEffect(query, all) {
-        ftsResults = if (query.isBlank()) emptyList() else withContext(Dispatchers.IO) {
-            fts.search(query).ifEmpty { index.search(all, query) }
+    SearchEffects(ui, index, fts, filterStore, focusRequester, filtered)
+    val displayed = remember(filtered, ui.visibleCount) { filtered.take(ui.visibleCount) }
+    val rows = remember(displayed) { searchRows(displayed) }
+
+    SearchScreenBody(
+        ui = ui,
+        filterKind = filterKind,
+        results = results,
+        filtered = filtered,
+        displayed = displayed,
+        rows = rows,
+        metaStore = metaStore,
+        historyStore = historyStore,
+        focusRequester = focusRequester,
+        listState = listState,
+        onBack = onBack,
+        onOpenPack = onOpenPack,
+        onOpenProject = onOpenProject,
+        packIds = packIds,
+        projects = projects
+    )
+}
+
+internal class SearchUiState(
+    queryState: androidx.compose.runtime.MutableState<String>,
+    visibleCountState: androidx.compose.runtime.MutableState<Int>,
+    filterNameState: androidx.compose.runtime.MutableState<String?>,
+    selectedPackIdState: androidx.compose.runtime.MutableState<String?>,
+    selectedProjectIdState: androidx.compose.runtime.MutableState<String?>,
+    favoritesOnlyState: androidx.compose.runtime.MutableState<Boolean>,
+    scopeTagState: androidx.compose.runtime.MutableState<String?>,
+    historyState: androidx.compose.runtime.MutableState<List<String>>
+) {
+    var query by queryState
+    var visibleCount by visibleCountState
+    var filterName by filterNameState
+    var selectedPackId by selectedPackIdState
+    var selectedProjectId by selectedProjectIdState
+    var favoritesOnly by favoritesOnlyState
+    var scopeTag by scopeTagState
+    var history by historyState
+    var all by mutableStateOf<List<SearchHit>>(emptyList())
+    var ftsResults by mutableStateOf<List<SearchHit>>(emptyList())
+    var selected by mutableIntStateOf(0)
+}
+
+@Composable
+private fun rememberSearchUiState(
+    context: android.content.Context,
+    packIds: List<String>,
+    projects: List<ProjectEntry>
+): SearchUiState {
+    val savedFilter = remember { SearchFilterStore(context.filesDir).load() }
+    val historyStore = remember { SearchHistoryStore(context.filesDir) }
+    val queryState = rememberSaveable { mutableStateOf("") }
+    val visibleCountState = rememberSaveable { mutableIntStateOf(200) }
+    val filterNameState = rememberSaveable { mutableStateOf(savedFilter?.kind) }
+    val selectedPackIdState = rememberSaveable { mutableStateOf(savedFilter?.packId?.takeIf { it in packIds }) }
+    val selectedProjectIdState = rememberSaveable {
+        mutableStateOf(savedFilter?.projectId?.takeIf { id -> projects.any { it.project.id == id } })
+    }
+    val favoritesOnlyState = rememberSaveable { mutableStateOf(false) }
+    val scopeTagState = rememberSaveable { mutableStateOf<String?>(null) }
+    val historyState = remember { mutableStateOf(historyStore.load()) }
+    return remember {
+        SearchUiState(
+            queryState,
+            visibleCountState,
+            filterNameState,
+            selectedPackIdState,
+            selectedProjectIdState,
+            favoritesOnlyState,
+            scopeTagState,
+            historyState
+        )
+    }
+}
+
+@Composable
+private fun SearchEffects(
+    ui: SearchUiState,
+    index: SearchIndex,
+    fts: SearchIndexStore,
+    filterStore: SearchFilterStore,
+    focusRequester: FocusRequester,
+    filtered: List<SearchHit>
+) {
+    LaunchedEffect(Unit) {
+        ui.all = withContext(Dispatchers.IO) { index.build() }
+        withContext(Dispatchers.IO) { fts.rebuild(ui.all) }
+    }
+    LaunchedEffect(ui.query, ui.all) {
+        ui.ftsResults = if (ui.query.isBlank()) emptyList() else withContext(Dispatchers.IO) {
+            fts.search(ui.query).ifEmpty { index.search(ui.all, ui.query) }
         }
     }
-    LaunchedEffect(filterName, selectedPackId, selectedProjectId) {
-        filterStore.save(filterName, selectedPackId, selectedProjectId)
+    LaunchedEffect(ui.filterName, ui.selectedPackId, ui.selectedProjectId) {
+        filterStore.save(ui.filterName, ui.selectedPackId, ui.selectedProjectId)
     }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
-    val results = remember(query, all, ftsResults) { if (query.isBlank()) emptyList() else ftsResults }
-    val filtered = remember(results, filterName, selectedPackId, selectedProjectId, favoritesOnly, scopeTag) {
-        var scoped = SearchFilter.apply(results, filterKind, selectedPackId, selectedProjectId)
-        if (favoritesOnly) scoped = scoped.filter { hit -> hit.projectId?.let { metaStore.isFavorite(it) } == true }
-        if (scopeTag != null) scoped = scoped.filter { hit -> hit.projectId?.let { scopeTag in metaStore.tags(it) } == true }
-        scoped
-    }
-    LaunchedEffect(filtered) { selected = 0; visibleCount = 200 }
-    val displayed = remember(filtered, visibleCount) { filtered.take(visibleCount) }
-    val rows = remember(displayed) {
-        val out = mutableListOf<SearchRow>()
-        var flat = 0
-        SearchKind.entries.forEach { kind ->
-            val hits = displayed.filter { it.kind == kind }
-            if (hits.isNotEmpty()) {
-                out.add(SearchRow(kind = kind))
-                hits.forEach { hit ->
-                    out.add(SearchRow(hit = hit, flatIndex = flat))
-                    flat++
-                }
-            }
-        }
-        out
-    }
+    LaunchedEffect(filtered) { ui.selected = 0; ui.visibleCount = 200 }
+}
+
+@Composable
+private fun SearchScreenBody(
+    ui: SearchUiState,
+    filterKind: SearchKind?,
+    results: List<SearchHit>,
+    filtered: List<SearchHit>,
+    displayed: List<SearchHit>,
+    rows: List<SearchRow>,
+    metaStore: LibraryMetaStore,
+    historyStore: SearchHistoryStore,
+    focusRequester: FocusRequester,
+    listState: androidx.compose.foundation.lazy.LazyListState,
+    onBack: () -> Unit,
+    onOpenPack: (String, String) -> Unit,
+    onOpenProject: (String) -> Unit,
+    packIds: List<String>,
+    projects: List<ProjectEntry>
+) {
     fun openHit(hit: SearchHit) {
-        historyStore.record(query)
-        history = historyStore.load()
+        historyStore.record(ui.query)
+        ui.history = historyStore.load()
         when {
             hit.kind == SearchKind.PROJECT && hit.projectId != null -> onOpenProject(hit.projectId)
             hit.packId != null && hit.packVersion != null -> onOpenPack(hit.packId, hit.packVersion)
         }
     }
-    fun select(delta: Int) {
-        selected = SearchKeyboard.move(selected, displayed.size, delta)
-    }
-    LaunchedEffect(selected, rows) {
-        val itemIndex = rows.indexOfFirst { it.hit != null && it.flatIndex == selected }
-        if (itemIndex >= 0) listState.animateScrollToItem(itemIndex)
-    }
 
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(title = stringResource(dev.ninfenz.mobile.R.string.search_title), onBack = onBack)
-        OutlinedTextField(
-            value = query,
-            onValueChange = { query = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = NfSpacing.page)
-                .focusRequester(focusRequester)
-                .onPreviewKeyEvent { event ->
-                    if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                    when (event.key) {
-                        Key.DirectionDown -> { select(1); true }
-                        Key.DirectionUp -> { select(-1); true }
-                        Key.Enter, Key.NumPadEnter -> {
-                            val hit = filtered.getOrNull(selected)
-                            if (hit != null) { openHit(hit); true } else false
-                        }
-                        Key.Escape -> {
-                            if (query.isNotEmpty()) { query = ""; true } else false
-                        }
-                        else -> false
-                    }
-                },
-            placeholder = { Text(stringResource(dev.ninfenz.mobile.R.string.search_placeholder_short)) },
-            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
-            trailingIcon = {
-                if (query.isNotEmpty()) {
-                    IconButton(onClick = { query = "" }) {
-                        Icon(Icons.Filled.Close, contentDescription = stringResource(dev.ninfenz.mobile.R.string.search_clear))
-                    }
-                }
-            },
-            singleLine = true
-        )
-        if (query.isNotBlank() && results.isNotEmpty()) {
-            SearchFilterRow(filterKind) { kind ->
-                filterName = kind?.name
-            }
-            if (packIds.isNotEmpty()) {
-                PackFilterRow(packIds, selectedPackId) { selectedPackId = it }
-            }
-            if (projects.isNotEmpty()) {
-                ProjectFilterRow(projects, selectedProjectId) { selectedProjectId = it }
-            }
-            val scopeTags = metaStore.allTags().sorted()
-            if (all.any { it.projectId != null }) {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = NfSpacing.page),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    item {
-                        FilterChip(
-                            selected = favoritesOnly,
-                            onClick = { favoritesOnly = !favoritesOnly },
-                            label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_scope_favorites)) }
-                        )
-                    }
-                    item {
-                        FilterChip(
-                            selected = scopeTag == null,
-                            onClick = { scopeTag = null },
-                            label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_scope_all_tags)) }
-                        )
-                    }
-                    items(scopeTags) { tag ->
-                        FilterChip(
-                            selected = scopeTag == tag,
-                            onClick = { scopeTag = if (scopeTag == tag) null else tag },
-                            label = { Text("#" + tag) }
-                        )
-                    }
-                }
-            }
-            Text(
-                stringResource(dev.ninfenz.mobile.R.string.search_keyboard_hint),
-                style = NfType.meta,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = NfSpacing.page, vertical = 4.dp)
-            )
-        }
-        when {
-            query.isBlank() -> SearchHistoryPanel(
-                history = history,
-                total = all.size,
-                onPick = { query = it },
-                onClear = { historyStore.clear(); history = emptyList() }
-            )
-            filtered.isEmpty() -> Column(modifier = Modifier.padding(NfSpacing.page)) {
-                Text(
-                    stringResource(dev.ninfenz.mobile.R.string.search_no_result),
-                    style = NfType.secondary,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                TextButton(onClick = { query = "" }) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.search_clear))
-                }
-                if (filterName != null || selectedPackId != null || selectedProjectId != null) {
-                    TextButton(onClick = {
-                        filterName = null
-                        selectedPackId = null
-                        selectedProjectId = null
-                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.search_clear_filters)) }
-                }
-            }
-            else -> LazyColumn(
-                state = listState,
-                contentPadding = PaddingValues(bottom = 96.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                itemsIndexed(rows) { _, row ->
-                    val kind = row.kind
-                    val hit = row.hit
-                    when {
-                        kind != null -> SectionLabel(kindLabel(kind))
-                        hit != null -> ResultRow(hit, selected == row.flatIndex) { openHit(hit) }
-                    }
-                }
-                if (filtered.size > visibleCount) {
-                    item {
-                        TextButton(onClick = { visibleCount += 200 }) {
-                            Text(stringResource(dev.ninfenz.mobile.R.string.search_show_more, filtered.size - visibleCount))
-                        }
-                    }
-                }
-            }
-        }
+        SearchQueryField(ui.query, filtered, ui.selected, focusRequester,
+            onQueryChange = { ui.query = it },
+            onSelect = { ui.selected = SearchKeyboard.move(ui.selected, displayed.size, it) },
+            onOpenHit = { openHit(it) })
+        SearchFilterArea(ui.query, results, ui.all, filterKind, ui.filterName, packIds, ui.selectedPackId,
+            projects, ui.selectedProjectId, ui.favoritesOnly, ui.scopeTag, metaStore,
+            onFilterNameChange = { ui.filterName = it }, onPackChange = { ui.selectedPackId = it },
+            onProjectChange = { ui.selectedProjectId = it }, onFavoritesChange = { ui.favoritesOnly = it },
+            onScopeTagChange = { ui.scopeTag = it })
+        SearchResultsArea(ui.query, filtered, ui.history, ui.all, rows, ui.selected, ui.visibleCount, listState,
+            showClearFilters = ui.filterName != null || ui.selectedPackId != null || ui.selectedProjectId != null,
+            onQueryChange = { ui.query = it }, onOpenHit = { openHit(it) },
+            onPickHistory = { ui.query = it }, onClearHistory = { historyStore.clear(); ui.history = emptyList() },
+            onVisibleCountChange = { ui.visibleCount = it },
+            onClearFilters = { ui.filterName = null; ui.selectedPackId = null; ui.selectedProjectId = null })
     }
 }
 
-private data class SearchRow(
+private fun applySearchFilters(
+    results: List<SearchHit>,
+    filterKind: SearchKind?,
+    selectedPackId: String?,
+    selectedProjectId: String?,
+    favoritesOnly: Boolean,
+    scopeTag: String?,
+    metaStore: LibraryMetaStore
+): List<SearchHit> {
+    var scoped = SearchFilter.apply(results, filterKind, selectedPackId, selectedProjectId)
+    if (favoritesOnly) scoped = scoped.filter { hit -> hit.projectId?.let { metaStore.isFavorite(it) } == true }
+    if (scopeTag != null) scoped = scoped.filter { hit -> hit.projectId?.let { scopeTag in metaStore.tags(it) } == true }
+    return scoped
+}
+
+private fun searchRows(displayed: List<SearchHit>): List<SearchRow> {
+    val out = mutableListOf<SearchRow>()
+    var flat = 0
+    SearchKind.entries.forEach { kind ->
+        val hits = displayed.filter { it.kind == kind }
+        if (hits.isNotEmpty()) {
+            out.add(SearchRow(kind = kind))
+            hits.forEach { hit ->
+                out.add(SearchRow(hit = hit, flatIndex = flat))
+                flat++
+            }
+        }
+    }
+    return out
+}
+
+
+internal data class SearchRow(
     val kind: SearchKind? = null,
     val hit: SearchHit? = null,
     val flatIndex: Int = -1
 )
 
 @Composable
-private fun PackFilterRow(packIds: List<String>, selected: String?, onPick: (String?) -> Unit) {
+internal fun PackFilterRow(packIds: List<String>, selected: String?, onPick: (String?) -> Unit) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = NfSpacing.page),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -321,7 +302,7 @@ private fun PackFilterRow(packIds: List<String>, selected: String?, onPick: (Str
 }
 
 @Composable
-private fun ProjectFilterRow(projects: List<ProjectEntry>, selected: String?, onPick: (String?) -> Unit) {
+internal fun ProjectFilterRow(projects: List<ProjectEntry>, selected: String?, onPick: (String?) -> Unit) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = NfSpacing.page),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -345,7 +326,7 @@ private fun ProjectFilterRow(projects: List<ProjectEntry>, selected: String?, on
 }
 
 @Composable
-private fun kindLabel(kind: SearchKind): String = when (kind) {
+internal fun kindLabel(kind: SearchKind): String = when (kind) {
     SearchKind.PROJECT -> stringResource(dev.ninfenz.mobile.R.string.search_kind_project)
     SearchKind.PACK -> stringResource(dev.ninfenz.mobile.R.string.search_kind_pack)
     SearchKind.CLAUSE -> stringResource(dev.ninfenz.mobile.R.string.search_kind_clause)
@@ -357,7 +338,7 @@ private fun kindLabel(kind: SearchKind): String = when (kind) {
 
 
 @Composable
-private fun SearchHistoryPanel(
+internal fun SearchHistoryPanel(
     history: List<String>,
     total: Int,
     onPick: (String) -> Unit,
@@ -389,7 +370,7 @@ private fun SearchHistoryPanel(
 
 
 @Composable
-private fun SearchFilterRow(selected: SearchKind?, onPick: (SearchKind?) -> Unit) {
+internal fun SearchFilterRow(selected: SearchKind?, onPick: (SearchKind?) -> Unit) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = NfSpacing.page),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -412,7 +393,7 @@ private fun SearchFilterRow(selected: SearchKind?, onPick: (SearchKind?) -> Unit
 }
 
 @Composable
-private fun SectionLabel(text: String) {
+internal fun SectionLabel(text: String) {
     Text(
         text,
         style = NfType.itemTitle,
@@ -421,7 +402,7 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun ResultRow(hit: SearchHit, selected: Boolean, onClick: () -> Unit) {
+internal fun ResultRow(hit: SearchHit, selected: Boolean, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()

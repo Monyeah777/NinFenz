@@ -62,37 +62,51 @@ fun InboxScreen(onBack: () -> Unit, onImport: (SharePayload) -> Unit) {
             }
             Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(NfSpacing.m)) {
                 entries.forEach { entry ->
-                    CardBox(title = entry.payload.kind + " · " + entry.payload.count) {
-                        if (selecting) {
-                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = entry.id in selected,
-                                    onCheckedChange = { on ->
-                                        selected = if (on) selected + entry.id else selected - entry.id
-                                    }
-                                )
-                                Text(stringResource(dev.ninfenz.mobile.R.string.inbox_select), style = NfType.meta)
-                            }
-                        }
-                        Text(
-                            entry.payload.summary(
-                                itemLabel = stringResource(dev.ninfenz.mobile.R.string.inbox_items, entry.payload.count),
-                                processLabel = entry.payload.processText?.let { stringResource(dev.ninfenz.mobile.R.string.inbox_chars, it.length) }
-                            ),
-                            style = NfType.secondary
-                        )
-                        Text(
-                            java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date(entry.at)),
-                            style = NfType.meta,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            TextButton(onClick = { onImport(entry.payload) }) { Text(stringResource(dev.ninfenz.mobile.R.string.inbox_import)) }
-                            TextButton(onClick = { store.remove(entry.id); entries = store.load() }) { Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove)) }
-                        }
-                    }
+                    InboxEntryCard(
+                        entry = entry,
+                        selecting = selecting,
+                        selected = entry.id in selected,
+                        onSelectedChange = { on -> selected = if (on) selected + entry.id else selected - entry.id },
+                        onImport = { onImport(entry.payload) },
+                        onRemove = { store.remove(entry.id); entries = store.load() }
+                    )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun InboxEntryCard(
+    entry: InboxStore.Entry,
+    selecting: Boolean,
+    selected: Boolean,
+    onSelectedChange: (Boolean) -> Unit,
+    onImport: () -> Unit,
+    onRemove: () -> Unit
+) {
+    CardBox(title = entry.payload.kind + " · " + entry.payload.count) {
+        if (selecting) {
+            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                Checkbox(checked = selected, onCheckedChange = onSelectedChange)
+                Text(stringResource(dev.ninfenz.mobile.R.string.inbox_select), style = NfType.meta)
+            }
+        }
+        Text(
+            entry.payload.summary(
+                itemLabel = stringResource(dev.ninfenz.mobile.R.string.inbox_items, entry.payload.count),
+                processLabel = entry.payload.processText?.let { stringResource(dev.ninfenz.mobile.R.string.inbox_chars, it.length) }
+            ),
+            style = NfType.secondary
+        )
+        Text(
+            java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault()).format(java.util.Date(entry.at)),
+            style = NfType.meta,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+            TextButton(onClick = onImport) { Text(stringResource(dev.ninfenz.mobile.R.string.inbox_import)) }
+            TextButton(onClick = onRemove) { Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove)) }
         }
     }
 }

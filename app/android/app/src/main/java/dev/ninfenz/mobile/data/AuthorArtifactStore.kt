@@ -40,11 +40,13 @@ class AuthorArtifactStore(
 ) {
     private fun bridge(): CoreBridge? = injectedBridge ?: runCatching { Core.bridge }.getOrNull()
 
-    suspend fun saveGraph(project: Project, graph: PipelineGraph): SaveArtifactResult =
-        save(project, "graph", GraphModel.toJson(graph), graph.id, graph.version)
+    suspend fun saveGraph(project: Project, graph: PipelineGraph): SaveArtifactResult {
+        return save(project, "graph", GraphModel.toJson(graph), graph.id, graph.version)
+    }
 
-    suspend fun saveSpec(project: Project, spec: MdSpec): SaveArtifactResult =
-        save(project, "spec", SpecModel.toJson(spec), spec.id, spec.version)
+    suspend fun saveSpec(project: Project, spec: MdSpec): SaveArtifactResult {
+        return save(project, "spec", SpecModel.toJson(spec), spec.id, spec.version)
+    }
 
     private suspend fun save(project: Project, kind: String, json: JsonObject, id: String, version: String): SaveArtifactResult =
         withContext(Dispatchers.IO) {
@@ -72,42 +74,7 @@ class AuthorArtifactStore(
                 val sha = sha256(bytes)
 
                 val raw = Json.parseToJsonElement(projectFile.readText(Charsets.UTF_8)).jsonObject
-                val refs = raw["refs"]!!.jsonObject
-                val newRefs = buildJsonObject {
-                    for ((key, value) in refs) {
-                        if (key == kind) {
-                            putJsonObject(kind) {
-                                put("id", id)
-                                put("version", version)
-                                put("digest", digest)
-                                put("path", relative)
-                                put("sha256", sha)
-                            }
-                        } else {
-                            put(key, value)
-                        }
-                    }
-                }
-                val status = raw["status"]?.jsonPrimitive?.content
-                val newStatus = if (status == ProjectStatus.DRAFT.wire) ProjectStatus.AUTHORING.wire else status
-                val history = raw["history"]?.jsonArray ?: JsonArray(emptyList())
-                val newHistory = buildJsonArray {
-                    for (entry in history) add(entry)
-                    add(buildJsonObject {
-                        put("op", kind + ":save")
-                        put("digest", sha)
-                    })
-                }
-                val updated = buildJsonObject {
-                    for ((key, value) in raw) {
-                        when (key) {
-                            "refs" -> put("refs", newRefs)
-                            "status" -> put("status", newStatus)
-                            "history" -> put("history", newHistory)
-                            else -> put(key, value)
-                        }
-                    }
-                }
+                val updated = updatedProject(raw, kind, id, version, digest, relative, sha)
                 val validate = core.call("project-validate", buildJsonObject { put("project", updated) })
                 if (!validate.ok) {
                     val e = validate.error
@@ -121,6 +88,53 @@ class AuthorArtifactStore(
                 SaveArtifactResult.Failure("NF-E-005", "保存失败：" + (t.message ?: t.javaClass.simpleName), "检查项目文件与核心桥")
             }
         }
+
+    private fun updatedProject(
+        raw: JsonObject,
+        kind: String,
+        id: String,
+        version: String,
+        digest: String,
+        relative: String,
+        sha: String
+    ): JsonObject {
+        val refs = raw["refs"]!!.jsonObject
+        val newRefs = buildJsonObject {
+            for ((key, value) in refs) {
+                if (key == kind) {
+                    putJsonObject(kind) {
+                        put("id", id)
+                        put("version", version)
+                        put("digest", digest)
+                        put("path", relative)
+                        put("sha256", sha)
+                    }
+                } else {
+                    put(key, value)
+                }
+            }
+        }
+        val status = raw["status"]?.jsonPrimitive?.content
+        val newStatus = if (status == ProjectStatus.DRAFT.wire) ProjectStatus.AUTHORING.wire else status
+        val history = raw["history"]?.jsonArray ?: JsonArray(emptyList())
+        val newHistory = buildJsonArray {
+            for (entry in history) add(entry)
+            add(buildJsonObject {
+                put("op", kind + ":save")
+                put("digest", sha)
+            })
+        }
+        return buildJsonObject {
+            for ((key, value) in raw) {
+                when (key) {
+                    "refs" -> put("refs", newRefs)
+                    "status" -> put("status", newStatus)
+                    "history" -> put("history", newHistory)
+                    else -> put(key, value)
+                }
+            }
+        }
+    }
 
     private fun atomicWrite(target: File, bytes: ByteArray) = AtomicFiles.writeBytes(target, bytes)
 

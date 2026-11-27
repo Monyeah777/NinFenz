@@ -65,138 +65,203 @@ fun ProjectReviewScreen(project: Project, onBack: () -> Unit) {
     var commentBlock by remember { mutableStateOf<Int?>(null) }
     var commentText by remember { mutableStateOf("") }
     var imported by remember { mutableStateOf<HandoffService.Inspect?>(null) }
-    val handoffPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        runCatching {
-            val temp = File(File(context.cacheDir, "handoff-import").apply { mkdirs() }, "handoff.zip")
-            UriIo.copyTo(context, uri, temp)
-            imported = HandoffService.inspect(temp)
-        }.onFailure {
-            imported = HandoffService.Inspect(false, "", emptyList(), it.message ?: it.javaClass.simpleName)
-        }
-    }
+    val handoffPicker = rememberHandoffPicker(context) { imported = it }
 
     NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.review_blocks_title), onBack = onBack) {
-        CardBox(title = null) {
-            Text(project.title, style = NfType.itemTitle)
-            Text(
-                stringResource(dev.ninfenz.mobile.R.string.review_blocks_summary, doc.comments.count { it.status == "unresolved" }, doc.verdict),
-                style = NfType.meta,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            TextButton(onClick = {
-                runCatching {
-                    val projectJson = projectFile.readText(Charsets.UTF_8)
-                    val reviewJson = store.fileFor(project.id).takeIf { it.isFile }?.readText(Charsets.UTF_8) ?: "{}"
-                    val zip = HandoffService.export(
-                        project.id,
-                        projectJson,
-                        reviewJson,
-                        markdown,
-                        File(File(context.filesDir, "exports"), "handoff")
-                    )
-                    val intent = ShareExporter.shareFileIntent(context, zip, "application/zip", project.title + " review")
-                    ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.review_export_handoff))
-                }
-            }) { Text(stringResource(dev.ninfenz.mobile.R.string.review_export_handoff)) }
-            TextButton(onClick = { handoffPicker.launch(arrayOf("application/zip", "*/*")) }) {
-                Text(stringResource(dev.ninfenz.mobile.R.string.review_import_handoff))
-            }
-        }
-        checklists.forEach { checklist ->
-            val title = checklist.config["title"]?.toString()?.trim('"')?.ifBlank { null }
-                ?: stringResource(dev.ninfenz.mobile.R.string.review_checklist)
-            val items = (checklist.config["items"] as? kotlinx.serialization.json.JsonArray)
-                ?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }.orEmpty()
-            if (items.isNotEmpty()) {
-                CardBox(title = title) {
-                    items.forEachIndexed { index, item ->
-                        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                            Checkbox(
-                                checked = (checklist.id + ":" + index) in checkedItems,
-                                onCheckedChange = { on ->
-                                    val key = checklist.id + ":" + index
-                                    checkedItems = if (on) checkedItems + key else checkedItems - key
-                                }
-                            )
-                            Text(item, style = NfType.secondary)
-                        }
-                    }
-                }
-            }
-        }
+        ReviewHandoffCard(project, doc, markdown, projectFile, store,
+            onOpenImport = { handoffPicker(arrayOf("application/zip", "*/*")) })
+        ReviewChecklistCards(checklists, checkedItems,
+            onCheckedItemsChange = { checkedItems = it })
         if (blocks.isEmpty()) {
             EmptyState(stringResource(dev.ninfenz.mobile.R.string.review_blocks_no_content))
         } else {
-            Column(
-                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
-            ) {
-                blocks.forEach { block ->
-                    val comments = doc.comments.filter { it.blockId == block.id.toString() }
-                    CardBox(title = stringResource(dev.ninfenz.mobile.R.string.review_block_title, block.id + 1, block.kind)) {
-                        Text(block.text.take(1200), style = NfType.secondary)
-                        TextButton(onClick = {
-                            commentBlock = block.id
-                            commentText = ""
-                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.review_add_comment)) }
-                        comments.forEach { comment ->
-                            Column(modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
-                                Text(comment.author + " · " + comment.status, style = NfType.meta, color = MaterialTheme.colorScheme.primary)
-                                Text(comment.body, style = NfType.secondary)
-                                TextButton(onClick = {
-                                    doc = store.setStatus(doc, comment.id, if (comment.status == "resolved") "unresolved" else "resolved")
-                                }) {
-                                    Text(stringResource(if (comment.status == "resolved") dev.ninfenz.mobile.R.string.review_reopen else dev.ninfenz.mobile.R.string.review_resolve))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            ReviewBlocksList(blocks, doc, store,
+                onCommentBlockChange = { commentBlock = it },
+                onCommentTextChange = { commentText = it },
+                onDocChange = { doc = it })
         }
     }
 
     imported?.let { info ->
-        AlertDialog(
-            onDismissRequest = { imported = null },
-            title = { Text(stringResource(dev.ninfenz.mobile.R.string.review_import_handoff)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(if (info.ok) stringResource(dev.ninfenz.mobile.R.string.review_handoff_ok) else (info.error ?: "invalid"), style = NfType.meta)
-                    info.files.forEach { Text("• " + it, style = NfType.meta) }
-                }
-            },
-            confirmButton = { TextButton(onClick = { imported = null }) { Text(stringResource(android.R.string.ok)) } }
-        )
+        ReviewHandoffDialog(info) { imported = null }
     }
 
-    commentBlock?.let { blockId ->
-        AlertDialog(
-            onDismissRequest = { commentBlock = null },
-            title = { Text(stringResource(dev.ninfenz.mobile.R.string.review_add_comment)) },
-            text = {
-                OutlinedTextField(
-                    value = commentText,
-                    onValueChange = { commentText = it },
-                    label = { Text(stringResource(dev.ninfenz.mobile.R.string.review_comment_hint)) },
-                    minLines = 3,
-                    modifier = Modifier.fillMaxWidth()
-                )
+    commentBlock?.let {
+        ReviewCommentDialog(
+            commentText = commentText,
+            onCommentTextChange = { commentText = it },
+            onConfirm = {
+                val block = blocks.firstOrNull { b -> b.id == it } ?: return@ReviewCommentDialog
+                doc = store.add(doc, block.id.toString(), block.text, commentText, "local")
+                commentBlock = null
             },
-            confirmButton = {
-                Button(
-                    enabled = commentText.isNotBlank(),
-                    onClick = {
-                        val block = blocks.firstOrNull { it.id == blockId } ?: return@Button
-                        doc = store.add(doc, block.id.toString(), block.text, commentText, "local")
-                        commentBlock = null
-                    }
-                ) { Text(stringResource(android.R.string.ok)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { commentBlock = null }) { Text(stringResource(android.R.string.cancel)) }
-            }
+            onDismiss = { commentBlock = null }
         )
+    }
+}
+
+@Composable
+private fun rememberHandoffPicker(
+    context: android.content.Context,
+    onImported: (HandoffService.Inspect?) -> Unit
+): (Array<String>) -> Unit {
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        runCatching {
+            val temp = File(File(context.cacheDir, "handoff-import").apply { mkdirs() }, "handoff.zip")
+            UriIo.copyTo(context, uri, temp)
+            onImported(HandoffService.inspect(temp))
+        }.onFailure {
+            onImported(HandoffService.Inspect(false, "", emptyList(), it.message ?: it.javaClass.simpleName))
+        }
+    }
+    return { input -> picker.launch(input) }
+}
+
+@Composable
+private fun ReviewHandoffDialog(info: HandoffService.Inspect, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(dev.ninfenz.mobile.R.string.review_import_handoff)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(if (info.ok) stringResource(dev.ninfenz.mobile.R.string.review_handoff_ok) else (info.error ?: "invalid"), style = NfType.meta)
+                info.files.forEach { Text("• " + it, style = NfType.meta) }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) } }
+    )
+}
+
+@Composable
+private fun ReviewCommentDialog(
+    commentText: String,
+    onCommentTextChange: (String) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(dev.ninfenz.mobile.R.string.review_add_comment)) },
+        text = {
+            OutlinedTextField(
+                value = commentText,
+                onValueChange = onCommentTextChange,
+                label = { Text(stringResource(dev.ninfenz.mobile.R.string.review_comment_hint)) },
+                minLines = 3,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            Button(enabled = commentText.isNotBlank(), onClick = onConfirm) { Text(stringResource(android.R.string.ok)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) }
+        }
+    )
+}
+
+@Composable
+private fun ReviewChecklistCards(
+    checklists: List<ExtensionStore.Contribution>,
+    checkedItems: Set<String>,
+    onCheckedItemsChange: (Set<String>) -> Unit
+) {
+    checklists.forEach { checklist ->
+        val title = checklist.config["title"]?.toString()?.trim('"')?.ifBlank { null }
+            ?: stringResource(dev.ninfenz.mobile.R.string.review_checklist)
+        val items = (checklist.config["items"] as? kotlinx.serialization.json.JsonArray)
+            ?.mapNotNull { (it as? kotlinx.serialization.json.JsonPrimitive)?.content }.orEmpty()
+        if (items.isNotEmpty()) {
+            CardBox(title = title) {
+                items.forEachIndexed { index, item ->
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = (checklist.id + ":" + index) in checkedItems,
+                            onCheckedChange = { on ->
+                                val key = checklist.id + ":" + index
+                                onCheckedItemsChange(if (on) checkedItems + key else checkedItems - key)
+                            }
+                        )
+                        Text(item, style = NfType.secondary)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewBlocksList(
+    blocks: List<dev.ninfenz.mobile.model.MarkdownBlock>,
+    doc: ReviewStore.Document,
+    store: ReviewStore,
+    onCommentBlockChange: (Int?) -> Unit,
+    onCommentTextChange: (String) -> Unit,
+    onDocChange: (ReviewStore.Document) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(NfSpacing.m)
+    ) {
+        blocks.forEach { block ->
+            val comments = doc.comments.filter { it.blockId == block.id.toString() }
+            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.review_block_title, block.id + 1, block.kind)) {
+                Text(block.text.take(1200), style = NfType.secondary)
+                TextButton(onClick = {
+                    onCommentBlockChange(block.id)
+                    onCommentTextChange("")
+                }) { Text(stringResource(dev.ninfenz.mobile.R.string.review_add_comment)) }
+                comments.forEach { comment ->
+                    Column(modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
+                        Text(comment.author + " · " + comment.status, style = NfType.meta, color = MaterialTheme.colorScheme.primary)
+                        Text(comment.body, style = NfType.secondary)
+                        TextButton(onClick = {
+                            onDocChange(store.setStatus(doc, comment.id, if (comment.status == "resolved") "unresolved" else "resolved"))
+                        }) {
+                            Text(stringResource(if (comment.status == "resolved") dev.ninfenz.mobile.R.string.review_reopen else dev.ninfenz.mobile.R.string.review_resolve))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewHandoffCard(
+    project: Project,
+    doc: ReviewStore.Document,
+    markdown: String?,
+    projectFile: File,
+    store: ReviewStore,
+    onOpenImport: () -> Unit
+) {
+    val context = LocalContext.current
+    CardBox(title = null) {
+        Text(project.title, style = NfType.itemTitle)
+        Text(
+            stringResource(dev.ninfenz.mobile.R.string.review_blocks_summary, doc.comments.count { it.status == "unresolved" }, doc.verdict),
+            style = NfType.meta,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        TextButton(onClick = {
+            runCatching {
+                val projectJson = projectFile.readText(Charsets.UTF_8)
+                val reviewJson = store.fileFor(project.id).takeIf { it.isFile }?.readText(Charsets.UTF_8) ?: "{}"
+                val zip = HandoffService.export(
+                    project.id,
+                    projectJson,
+                    reviewJson,
+                    markdown,
+                    File(File(context.filesDir, "exports"), "handoff")
+                )
+                val intent = ShareExporter.shareFileIntent(context, zip, "application/zip", project.title + " review")
+                ShareExporter.launchChooser(context, intent, context.getString(dev.ninfenz.mobile.R.string.review_export_handoff))
+            }
+        }) { Text(stringResource(dev.ninfenz.mobile.R.string.review_export_handoff)) }
+        TextButton(onClick = { onOpenImport() }) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.review_import_handoff))
+        }
     }
 }

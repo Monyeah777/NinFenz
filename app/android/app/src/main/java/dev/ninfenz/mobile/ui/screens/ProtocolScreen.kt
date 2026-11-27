@@ -66,150 +66,227 @@ fun ProtocolScreen(onBack: () -> Unit) {
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
         scope.launch {
-            try {
-                val text = FileAccess.readText(context, uri)
-                val obj = J.parseObject(text, "nf-protocol-pack/1")
-                val parsed = ProtocolModel.parse(obj)
-                pack = parsed
-                rawPack = obj
-                values = parsed.fields.associate { it.id to (it.defaultText ?: "") }
-                enabled = parsed.clauses.associate { it.id to it.enabled }
-                error = null
-                rendered = null
-                explainLines = emptyList()
-                renderError = null
-            } catch (e: Exception) {
-                error = CoreResponse.failure(
-                    (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-PRT-001",
-                    context.getString(dev.ninfenz.mobile.R.string.protocol_parse_failed, e.message ?: e.javaClass.simpleName),
-                    context.getString(dev.ninfenz.mobile.R.string.protocol_parse_failed_fix),
-                    1
-                ).error
-            }
+            loadProtocolPack(context, uri,
+                onLoaded = { parsed, obj ->
+                    pack = parsed
+                    rawPack = obj
+                    values = parsed.fields.associate { it.id to (it.defaultText ?: "") }
+                    enabled = parsed.clauses.associate { it.id to it.enabled }
+                    error = null
+                    rendered = null
+                    explainLines = emptyList()
+                    renderError = null
+                },
+                onError = { error = it })
         }
     }
 
     NfScaffold(title = stringResource(dev.ninfenz.mobile.R.string.protocol_title), onBack = onBack) {
-        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.protocol_pack)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { picker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.protocol_pick)) }
-                OutlinedButton(onClick = { rendered = null; renderError = null }) { Text(stringResource(dev.ninfenz.mobile.R.string.protocol_clear_render)) }
-            }
-            val p = pack
-            if (p == null) {
-                EmptyState(stringResource(dev.ninfenz.mobile.R.string.protocol_empty))
-            } else {
-                KeyValue("id/version", p.id + " " + p.version + "（proto " + p.protoVersion + "）")
-                KeyValue(
-                    context.getString(dev.ninfenz.mobile.R.string.protocol_stats),
-                    p.clauses.size.toString() + " / " + p.fields.size + " / " + p.rules.size
-                )
-                KeyValue("compat", "protocol " + p.protocolMin + ".." + p.protocolMax + " · app_min " + p.appMin)
-            }
-        }
+        ProtocolPackCard(
+            context = context,
+            pack = pack,
+            onPick = { picker.launch(arrayOf("application/json", "text/plain")) },
+            onClearRender = { rendered = null; renderError = null }
+        )
 
         error?.let { ErrorNotice(it) }
 
         val p = pack
         if (p != null) {
-            for (clause in p.clauses) {
-                val clauseEnabled = enabled[clause.id] ?: clause.enabled
-                CardBox(title = clause.id + " · " + clause.title + " [" + clause.level + "]") {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(stringResource(dev.ninfenz.mobile.R.string.protocol_enable), style = NfType.secondary)
-                        Switch(
-                            checked = clauseEnabled,
-                            onCheckedChange = { checked -> enabled = enabled + (clause.id to checked) }
-                        )
-                    }
-                    MonoText(clause.text)
-                    val check = ProtocolModel.checkClause(p, clause, values)
-                    if (check.ok) {
-                        Notice(stringResource(dev.ninfenz.mobile.R.string.protocol_placeholder_ok), Tone.INFO)
-                    } else {
-                        if (check.missing.isNotEmpty()) {
-                            Notice(context.getString(dev.ninfenz.mobile.R.string.protocol_missing_fields, check.missing.joinToString(", ")), Tone.ERROR)
-                        }
-                        if (check.unknown.isNotEmpty()) {
-                            Notice(context.getString(dev.ninfenz.mobile.R.string.protocol_unknown_placeholders, check.unknown.joinToString(", ")), Tone.WARN)
-                        }
-                    }
-                    for (field in p.fields.filter { it.clause == clause.id }) {
-                        FormTextField(
-                            label = field.id + " · " + field.label + (if (field.required) context.getString(dev.ninfenz.mobile.R.string.field_required) else context.getString(dev.ninfenz.mobile.R.string.field_optional)) + " [" + field.type + "]",
-                            value = values[field.id] ?: "",
-                            onValueChange = { v -> values = values + (field.id to v) }
-                        )
-                        field.maxLen?.let { Text("max_len=" + it, style = NfType.meta) }
-                        field.pattern?.let { Text("pattern=" + it, style = NfType.meta) }
-                    }
-                    Text(stringResource(dev.ninfenz.mobile.R.string.protocol_rules, p.rules.joinToString { it.id + "(" + it.severity + ")" }), style = NfType.meta)
+            ProtocolClauseCards(
+                p = p,
+                values = values,
+                enabled = enabled,
+                onValuesChange = { values = it },
+                onEnabledChange = { enabled = it }
+            )
+
+            ProtocolRenderCard(rawPack, values, explainRules, busy, rendered, renderError, explainLines,
+                onBusyChange = { busy = it }, onRenderError = { renderError = it }, onRendered = { rendered = it },
+                onExplainLines = { explainLines = it }, onExplainRulesChange = { explainRules = it })
+        }
+    }
+}
+
+private suspend fun loadProtocolPack(
+    context: android.content.Context,
+    uri: Uri,
+    onLoaded: (ProtocolPack, JsonObject) -> Unit,
+    onError: (CoreError?) -> Unit
+) {
+    try {
+        val text = FileAccess.readText(context, uri)
+        val obj = J.parseObject(text, "nf-protocol-pack/1")
+        onLoaded(ProtocolModel.parse(obj), obj)
+    } catch (e: Exception) {
+        onError(CoreResponse.failure(
+            (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-PRT-001",
+            context.getString(dev.ninfenz.mobile.R.string.protocol_parse_failed, e.message ?: e.javaClass.simpleName),
+            context.getString(dev.ninfenz.mobile.R.string.protocol_parse_failed_fix),
+            1
+        ).error)
+    }
+}
+
+@Composable
+private fun ProtocolPackCard(
+    context: android.content.Context,
+    pack: ProtocolPack?,
+    onPick: () -> Unit,
+    onClearRender: () -> Unit
+) {
+    CardBox(title = stringResource(dev.ninfenz.mobile.R.string.protocol_pack)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = onPick) { Text(stringResource(dev.ninfenz.mobile.R.string.protocol_pick)) }
+            OutlinedButton(onClick = onClearRender) { Text(stringResource(dev.ninfenz.mobile.R.string.protocol_clear_render)) }
+        }
+        if (pack == null) {
+            EmptyState(stringResource(dev.ninfenz.mobile.R.string.protocol_empty))
+        } else {
+            KeyValue("id/version", pack.id + " " + pack.version + "（proto " + pack.protoVersion + "）")
+            KeyValue(
+                context.getString(dev.ninfenz.mobile.R.string.protocol_stats),
+                pack.clauses.size.toString() + " / " + pack.fields.size + " / " + pack.rules.size
+            )
+            KeyValue("compat", "protocol " + pack.protocolMin + ".." + pack.protocolMax + " · app_min " + pack.appMin)
+        }
+    }
+}
+
+@Composable
+private fun ProtocolClauseCards(
+    p: ProtocolPack,
+    values: Map<String, String>,
+    enabled: Map<String, Boolean>,
+    onValuesChange: (Map<String, String>) -> Unit,
+    onEnabledChange: (Map<String, Boolean>) -> Unit
+) {
+    val context = LocalContext.current
+    for (clause in p.clauses) {
+        val clauseEnabled = enabled[clause.id] ?: clause.enabled
+        CardBox(title = clause.id + " · " + clause.title + " [" + clause.level + "]") {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.protocol_enable), style = NfType.secondary)
+                Switch(
+                    checked = clauseEnabled,
+                    onCheckedChange = { checked -> onEnabledChange(enabled + (clause.id to checked)) }
+                )
+            }
+            MonoText(clause.text)
+            val check = ProtocolModel.checkClause(p, clause, values)
+            if (check.ok) {
+                Notice(stringResource(dev.ninfenz.mobile.R.string.protocol_placeholder_ok), Tone.INFO)
+            } else {
+                if (check.missing.isNotEmpty()) {
+                    Notice(context.getString(dev.ninfenz.mobile.R.string.protocol_missing_fields, check.missing.joinToString(", ")), Tone.ERROR)
+                }
+                if (check.unknown.isNotEmpty()) {
+                    Notice(context.getString(dev.ninfenz.mobile.R.string.protocol_unknown_placeholders, check.unknown.joinToString(", ")), Tone.WARN)
                 }
             }
-
-            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.protocol_render)) {
-                Button(
-                    enabled = !busy,
-                    onClick = {
-                        val raw = rawPack ?: return@Button
-                        scope.launch {
-                            busy = true
-                            renderError = null
-                            try {
-                                val payload = buildJsonObject {
-                                    put("pack", raw)
-                                    put("values", buildJsonObject {
-                                        for ((k, v) in values) put(k, v)
-                                    })
-                                    put("explain", explainRules)
-                                }
-                                val response = safeCall("protocol-render", payload)
-                                if (response.ok) {
-                                    val result = response.resultObject()
-                                    val clauses = result?.get("clauses") as? JsonArray
-                                    rendered = clauses?.map { el ->
-                                        val o = el as? JsonObject
-                                        (o?.let { J.optString(it, "id") } ?: "?") + "：" + (o?.let { J.optString(it, "text") } ?: "")
-                                    } ?: emptyList()
-                                    val explain = result?.get("explain") as? JsonArray
-                                    explainLines = explain?.flatMap { el ->
-                                        val rule = el as? JsonObject ?: return@flatMap emptyList()
-                                        val rid = J.optString(rule, "rule")
-                                        val trace = rule["trace"] as? JsonArray ?: return@flatMap emptyList()
-                                        trace.mapNotNull { node ->
-                                            val n = node as? JsonObject ?: return@mapNotNull null
-                                            rid + " " + J.optString(n, "path") + " " +
-                                                (n["op"]?.let { J.optString(n, "op") } ?: "") +
-                                                "=" + (n["value"]?.toString() ?: "")
-                                        }
-                                    } ?: emptyList()
-                                } else {
-                                    renderError = response.error
-                                }
-                            } finally {
-                                busy = false
-                            }
-                        }
-                    }
-                ) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.protocol_rendering) else context.getString(dev.ninfenz.mobile.R.string.protocol_render_button)) }
-                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                    Checkbox(checked = explainRules, onCheckedChange = { explainRules = it })
-                    Text(stringResource(dev.ninfenz.mobile.R.string.protocol_explain))
+            for (field in p.fields.filter { it.clause == clause.id }) {
+                FormTextField(
+                    label = field.id + " · " + field.label + (if (field.required) context.getString(dev.ninfenz.mobile.R.string.field_required) else context.getString(dev.ninfenz.mobile.R.string.field_optional)) + " [" + field.type + "]",
+                    value = values[field.id] ?: "",
+                    onValueChange = { v -> onValuesChange(values + (field.id to v)) }
+                )
+                field.maxLen?.let { Text("max_len=" + it, style = NfType.meta) }
+                field.pattern?.let { Text("pattern=" + it, style = NfType.meta) }
+            }
+            Text(stringResource(dev.ninfenz.mobile.R.string.protocol_rules, p.rules.joinToString { it.id + "(" + it.severity + ")" }), style = NfType.meta)
+        }
+    }
+}
+@Composable
+private fun ProtocolRenderCard(
+    rawPack: JsonObject?,
+    values: Map<String, String>,
+    explainRules: Boolean,
+    busy: Boolean,
+    rendered: List<String>?,
+    renderError: CoreError?,
+    explainLines: List<String>,
+    onBusyChange: (Boolean) -> Unit,
+    onRenderError: (CoreError?) -> Unit,
+    onRendered: (List<String>?) -> Unit,
+    onExplainLines: (List<String>) -> Unit,
+    onExplainRulesChange: (Boolean) -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    CardBox(title = stringResource(dev.ninfenz.mobile.R.string.protocol_render)) {
+        Button(
+            enabled = !busy,
+            onClick = {
+                scope.launch {
+                    renderProtocol(rawPack, values, explainRules, onBusyChange, onRenderError, onRendered, onExplainLines)
                 }
-                if (explainLines.isNotEmpty()) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.protocol_explain_trace), style = NfType.itemTitle)
-                    for (line in explainLines) MonoText(line)
-                }
-                Text(stringResource(dev.ninfenz.mobile.R.string.protocol_note), style = NfType.meta)
-                renderError?.let { ErrorNotice(it) }
-                rendered?.let { list ->
-                    if (list.isEmpty()) {
-                        EmptyState(stringResource(dev.ninfenz.mobile.R.string.protocol_no_clauses))
-                    } else {
-                        for (line in list) MonoText(line)
-                    }
-                }
+            }
+        ) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.protocol_rendering) else context.getString(dev.ninfenz.mobile.R.string.protocol_render_button)) }
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Checkbox(checked = explainRules, onCheckedChange = { onExplainRulesChange(it) })
+            Text(stringResource(dev.ninfenz.mobile.R.string.protocol_explain))
+        }
+        if (explainLines.isNotEmpty()) {
+            Text(stringResource(dev.ninfenz.mobile.R.string.protocol_explain_trace), style = NfType.itemTitle)
+            for (line in explainLines) MonoText(line)
+        }
+        Text(stringResource(dev.ninfenz.mobile.R.string.protocol_note), style = NfType.meta)
+        renderError?.let { ErrorNotice(it) }
+        rendered?.let { list ->
+            if (list.isEmpty()) {
+                EmptyState(stringResource(dev.ninfenz.mobile.R.string.protocol_no_clauses))
+            } else {
+                for (line in list) MonoText(line)
             }
         }
+    }
+}
+
+private suspend fun renderProtocol(
+    rawPack: JsonObject?,
+    values: Map<String, String>,
+    explainRules: Boolean,
+    onBusyChange: (Boolean) -> Unit,
+    onRenderError: (CoreError?) -> Unit,
+    onRendered: (List<String>?) -> Unit,
+    onExplainLines: (List<String>) -> Unit
+) {
+    val raw = rawPack ?: return
+    onBusyChange(true)
+    onRenderError(null)
+    try {
+        val payload = buildJsonObject {
+            put("pack", raw)
+            put("values", buildJsonObject {
+                for ((k, v) in values) put(k, v)
+            })
+            put("explain", explainRules)
+        }
+        val response = safeCall("protocol-render", payload)
+        if (response.ok) {
+            val result = response.resultObject()
+            val clauses = result?.get("clauses") as? JsonArray
+            onRendered(clauses?.map { el ->
+                val o = el as? JsonObject
+                (o?.let { J.optString(it, "id") } ?: "?") + "：" + (o?.let { J.optString(it, "text") } ?: "")
+            } ?: emptyList())
+            val explain = result?.get("explain") as? JsonArray
+            onExplainLines(explain?.flatMap { el ->
+                val rule = el as? JsonObject ?: return@flatMap emptyList<String>()
+                val rid = J.optString(rule, "rule")
+                val trace = rule["trace"] as? JsonArray ?: return@flatMap emptyList<String>()
+                trace.mapNotNull { node ->
+                    val n = node as? JsonObject ?: return@mapNotNull null
+                    rid + " " + J.optString(n, "path") + " " +
+                        (n["op"]?.let { J.optString(n, "op") } ?: "") +
+                        "=" + (n["value"]?.toString() ?: "")
+                }
+            } ?: emptyList())
+        } else {
+            onRenderError(response.error)
+        }
+    } finally {
+        onBusyChange(false)
     }
 }

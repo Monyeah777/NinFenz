@@ -40,24 +40,8 @@ fun ProjectFlowScreen(
     onDelivery: () -> Unit
 ) {
     val audit = dev.ninfenz.mobile.data.FeatureGate.auditEnabled()
-    val steps = if (audit) listOf(
-        FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_create), ProjectStatus.AUTHORING),
-        FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_assemble), ProjectStatus.ASSEMBLED),
-        FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_validate), ProjectStatus.VALIDATED),
-        FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_export), ProjectStatus.EXPORTED),
-        FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_review), ProjectStatus.REVIEWED)
-    ) else listOf(
-        FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_create), ProjectStatus.AUTHORING),
-        FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_assemble), ProjectStatus.ASSEMBLED),
-        FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_export), ProjectStatus.EXPORTED)
-    )
-    val current = when (project.status) {
-        ProjectStatus.DRAFT, ProjectStatus.AUTHORING -> 0
-        ProjectStatus.ASSEMBLED -> 1
-        ProjectStatus.VALIDATED -> 2
-        ProjectStatus.EXPORTED -> if (audit) 3 else 2
-        ProjectStatus.REVIEWED -> if (audit) 4 else 2
-    }
+    val steps = flowSteps(audit)
+    val current = currentStep(project.status, audit)
     val nextAuthor = project.status == ProjectStatus.DRAFT || project.status == ProjectStatus.AUTHORING
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -105,6 +89,27 @@ fun ProjectFlowScreen(
             }
         }
     }
+}
+
+@Composable
+private fun flowSteps(audit: Boolean): List<FlowStep> = if (audit) listOf(
+    FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_create), ProjectStatus.AUTHORING),
+    FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_assemble), ProjectStatus.ASSEMBLED),
+    FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_validate), ProjectStatus.VALIDATED),
+    FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_export), ProjectStatus.EXPORTED),
+    FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_review), ProjectStatus.REVIEWED)
+) else listOf(
+    FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_create), ProjectStatus.AUTHORING),
+    FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_assemble), ProjectStatus.ASSEMBLED),
+    FlowStep(stringResource(dev.ninfenz.mobile.R.string.flow_step_export), ProjectStatus.EXPORTED)
+)
+
+private fun currentStep(status: ProjectStatus, audit: Boolean): Int = when (status) {
+    ProjectStatus.DRAFT, ProjectStatus.AUTHORING -> 0
+    ProjectStatus.ASSEMBLED -> 1
+    ProjectStatus.VALIDATED -> 2
+    ProjectStatus.EXPORTED -> if (audit) 3 else 2
+    ProjectStatus.REVIEWED -> if (audit) 4 else 2
 }
 
 @Composable

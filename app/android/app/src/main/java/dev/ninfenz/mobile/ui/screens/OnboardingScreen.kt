@@ -68,23 +68,7 @@ fun OnboardingScreen(
             verticalArrangement = Arrangement.spacedBy(NfSpacing.l)
         ) {
             StepDots(step)
-            when (step) {
-                0 -> Step(
-                    icon = { Icon(Icons.Filled.Home, contentDescription = null, modifier = Modifier.size(58.dp), tint = MaterialTheme.colorScheme.primary) },
-                    title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step0_title),
-                    body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step0_body)
-                )
-                1 -> Step(
-                    icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(58.dp), tint = MaterialTheme.colorScheme.primary) },
-                    title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step1_title),
-                    body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step1_body)
-                )
-                else -> Step(
-                    icon = { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(58.dp), tint = MaterialTheme.colorScheme.primary) },
-                    title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step2_title),
-                    body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step2_body)
-                )
-            }
+            OnboardingStepContent(step)
             SeedStatus(seedState, seeding, onSeed)
         }
         Row(
@@ -103,6 +87,27 @@ fun OnboardingScreen(
                 Button(onClick = onDone) { Text(stringResource(dev.ninfenz.mobile.R.string.onboarding_start)) }
             }
         }
+    }
+}
+
+@Composable
+private fun OnboardingStepContent(step: Int) {
+    when (step) {
+        0 -> Step(
+            icon = { Icon(Icons.Filled.Home, contentDescription = null, modifier = Modifier.size(58.dp), tint = MaterialTheme.colorScheme.primary) },
+            title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step0_title),
+            body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step0_body)
+        )
+        1 -> Step(
+            icon = { Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(58.dp), tint = MaterialTheme.colorScheme.primary) },
+            title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step1_title),
+            body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step1_body)
+        )
+        else -> Step(
+            icon = { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(58.dp), tint = MaterialTheme.colorScheme.primary) },
+            title = stringResource(dev.ninfenz.mobile.R.string.onboarding_step2_title),
+            body = stringResource(dev.ninfenz.mobile.R.string.onboarding_step2_body)
+        )
     }
 }
 

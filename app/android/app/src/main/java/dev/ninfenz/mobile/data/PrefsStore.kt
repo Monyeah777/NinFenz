@@ -95,37 +95,45 @@ data class WorkflowPreset(
 )
 
 object WorkflowPresets {
-    fun minimal(): WorkflowPreset = WorkflowPreset(
-        id = "minimal",
-        name = "minimal",
-        source = "builtin",
-        modules = ModuleToggles.allOff(),
-        ui = UiPrefs(density = Density.COMPACT, motion = false),
-        actionPolicy = ActionPolicy(),
-        validationPolicy = ValidationPolicy(mode = "on_demand")
-    )
+    fun minimal(): WorkflowPreset {
+        return WorkflowPreset(
+            id = "minimal",
+            name = "minimal",
+            source = "builtin",
+            modules = ModuleToggles.allOff(),
+            ui = UiPrefs(density = Density.COMPACT, motion = false),
+            actionPolicy = ActionPolicy(),
+            validationPolicy = ValidationPolicy(mode = "on_demand")
+        )
+    }
 
-    fun standard(): WorkflowPreset = WorkflowPreset(
-        id = "standard",
-        name = "standard",
-        source = "builtin",
-        modules = ModuleToggles.standard(),
-        ui = UiPrefs(),
-        actionPolicy = ActionPolicy(),
-        validationPolicy = ValidationPolicy()
-    )
+    fun standard(): WorkflowPreset {
+        return WorkflowPreset(
+            id = "standard",
+            name = "standard",
+            source = "builtin",
+            modules = ModuleToggles.standard(),
+            ui = UiPrefs(),
+            actionPolicy = ActionPolicy(),
+            validationPolicy = ValidationPolicy()
+        )
+    }
 
-    fun expert(): WorkflowPreset = WorkflowPreset(
-        id = "expert",
-        name = "expert",
-        source = "builtin",
-        modules = ModuleToggles.expert(),
-        ui = UiPrefs(density = Density.COMPACT, motion = false),
-        actionPolicy = ActionPolicy(aiResult = "ask", macroReplay = "dry_run"),
-        validationPolicy = ValidationPolicy(mode = "on_demand")
-    )
+    fun expert(): WorkflowPreset {
+        return WorkflowPreset(
+            id = "expert",
+            name = "expert",
+            source = "builtin",
+            modules = ModuleToggles.expert(),
+            ui = UiPrefs(density = Density.COMPACT, motion = false),
+            actionPolicy = ActionPolicy(aiResult = "ask", macroReplay = "dry_run"),
+            validationPolicy = ValidationPolicy(mode = "on_demand")
+        )
+    }
 
-    fun builtins(): List<WorkflowPreset> = listOf(minimal(), standard(), expert())
+    fun builtins(): List<WorkflowPreset> {
+        return listOf(minimal(), standard(), expert())
+    }
 }
 
 data class NfPrefs(

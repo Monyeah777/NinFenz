@@ -74,320 +74,132 @@ import kotlinx.serialization.json.put
 fun CcosScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val restored = remember(context.filesDir) {
-        val taskText = CcosSessionStore.loadTask(context.filesDir)
-        val resultText = CcosSessionStore.loadResult(context.filesDir)
-        val taskObj = taskText?.let { runCatching { J.parseObject(it, "ccos-task/1") }.orNullLogged("CcosScreen") }
-        val parsedTask = taskObj?.let { runCatching { CcosModel.parseTask(it) }.orNullLogged("CcosScreen") }
-        val parsedResult = resultText?.let { runCatching { CcosModel.parseResult(it) }.orNullLogged("CcosScreen") }
-        RestoredCcos(
-            task = parsedTask,
-            result = parsedResult,
-            rawTask = taskObj,
-            findings = parsedResult?.let { dev.ninfenz.mobile.model.CcosPrecheck.check(it, parsedTask) }.orEmpty()
-        )
-    }
-    var task by remember { mutableStateOf(restored.task) }
-    var result by remember { mutableStateOf(restored.result) }
-    var rawTask by remember { mutableStateOf(restored.rawTask) }
+    val restored = rememberCcosSession(context)
+    val ui = rememberCcosUiState(context, restored)
     var reviewer by rememberSaveable { mutableStateOf("") }
     var note by rememberSaveable { mutableStateOf("") }
-    var error by remember { mutableStateOf<CoreError?>(null) }
-    var outcome by remember { mutableStateOf<String?>(null) }
-    var busy by remember { mutableStateOf(false) }
-    var precheckFindings by remember { mutableStateOf(restored.findings) }
-    val queueStore = remember { CcosQueueStore(context.filesDir) }
-    var queue by remember { mutableStateOf(queueStore.load()) }
-    var showQueue by remember { mutableStateOf(false) }
-    var queueNote by remember { mutableStateOf<String?>(null) }
-    var selectedQueue by remember { mutableStateOf<Set<String>>(emptySet()) }
 
-    val taskPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        scope.launch {
-            try {
-                val text = FileAccess.readText(context, uri)
-                val obj = J.parseObject(text, "ccos-task/1")
-                task = CcosModel.parseTask(obj)
-                rawTask = obj
-                withContext(Dispatchers.IO) {
-                    CcosSessionStore.saveTask(context.filesDir, text)
-                    CcosSessionStore.clearResult(context.filesDir)
-                }
-                result = null
-                precheckFindings = emptyList()
-                outcome = null
-                error = null
-            } catch (e: Exception) {
-                error = CoreResponse.failure(
-                    (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-CCOS-001",
-                    context.getString(dev.ninfenz.mobile.R.string.ccos_task_parse_error, e.message ?: e.javaClass.simpleName),
-                    context.getString(dev.ninfenz.mobile.R.string.ccos_task_parse_fix),
-                    1
-                ).error
-            }
-        }
-    }
-    val resultPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        scope.launch {
-            try {
-                val text = FileAccess.readText(context, uri)
-                result = CcosModel.parseResult(text)
-                withContext(Dispatchers.IO) { CcosSessionStore.saveResult(context.filesDir, text) }
-                precheckFindings = dev.ninfenz.mobile.model.CcosPrecheck.check(result!!, task)
-                error = null
-                outcome = null
-            } catch (e: Exception) {
-                error = CoreResponse.failure(
-                    (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-CCOS-001",
-                    context.getString(dev.ninfenz.mobile.R.string.ccos_result_parse_error, e.message ?: e.javaClass.simpleName),
-                    context.getString(dev.ninfenz.mobile.R.string.ccos_result_parse_fix),
-                    1
-                ).error
-            }
-        }
-    }
+    val (openTask, openResult) = rememberCcosPickers(
+        context, scope, ui.task,
+        onTaskLoaded = ui::onDraftLoaded,
+        onResultLoaded = ui::onResultLoaded,
+        onError = { ui.error = it }
+    )
 
-    fun submitReview(approve: Boolean) {
-        val current = result ?: return
-        val rawT = rawTask
-        val who = reviewer.trim()
-        val why = note.trim()
-        val decision = CcosModel.review(current, approve, who, why)
-        if (!decision.ok) {
-            outcome = context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_not_submitted, decision.message)
-            return
-        }
-        val reviewed = CcosModel.withReview(current, decision.state, who, why)
-        if (rawT == null) {
-            outcome = context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_no_task)
-            return
-        }
-        scope.launch {
-            busy = true
-            error = null
-            try {
-                val payload = buildJsonObject {
-                    put("task", rawT)
-                    put("result", CcosModel.resultJson(reviewed))
-                }
-                val response = safeCall("ccos-import-result", payload)
-                if (response.ok) {
-                    val base = context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_accepted, response.result?.toString() ?: context.getString(dev.ninfenz.mobile.R.string.ccos_outcome_empty))
-                    var extra = ""
-                    val projectId = task?.projectId
-                    if (approve && !projectId.isNullOrBlank()) {
-                        val file = File(File(context.filesDir, "projects"), projectId + ".nfproject.json")
-                        if (file.isFile) {
-                            extra = runCatching {
-                                val project = ProjectModel.parse(file.readText(Charsets.UTF_8))
-                                if (project.status != ProjectStatus.EXPORTED) {
-                                    context.getString(dev.ninfenz.mobile.R.string.ccos_reviewed_skip, project.status.wire)
-                                } else {
-                                    when (val advanced = ProjectStatusStore(context.filesDir).advance(project, ProjectStatus.REVIEWED)) {
-                                        is StatusAdvanceResult.Advanced -> context.getString(dev.ninfenz.mobile.R.string.ccos_reviewed_ok)
-                                        is StatusAdvanceResult.Failure -> context.getString(dev.ninfenz.mobile.R.string.ccos_reviewed_fail, advanced.message)
-                                    }
-                                }
-                            }.getOrDefault("")
-                        }
-                    }
-                    outcome = base + extra
-                    result = reviewed
-                    withContext(Dispatchers.IO) {
-                        CcosSessionStore.saveResult(context.filesDir, CcosModel.resultJson(reviewed).toString())
-                    }
-                } else {
-                    error = response.error
-                }
-            } finally {
-                busy = false
-            }
-        }
-    }
-
-    LaunchedEffect(busy) {
-        if (busy) {
-            delay(30_000)
-            if (busy) {
-                busy = false
-                outcome = context.getString(dev.ninfenz.mobile.R.string.ccos_submit_timeout)
-            }
-        }
-    }
+    CcosBusyTimeout(ui.busy, onBusyChange = { ui.busy = it }, onOutcome = { ui.outcome = it })
 
     NfScaffold(
         title = stringResource(dev.ninfenz.mobile.R.string.ccos_title),
         onBack = onBack,
         bottomBar = {
-            val r = result
-            if (r != null && r.reviewState == "pending") {
-                CcosReviewActions(
-                    busy = busy,
-                    outcome = outcome,
-                    onApprove = { submitReview(true) },
-                    onReject = { submitReview(false) }
-                )
-            }
+            CcosBottomBar(ui.result, ui.busy, ui.outcome,
+                onApprove = { ui.submitReview(scope, context, reviewer, note, true) },
+                onReject = { ui.submitReview(scope, context, reviewer, note, false) })
         }
     ) {
         Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_interface_notice), Tone.INFO)
-        CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_step1)) {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(onClick = { taskPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_open_task)) }
-                OutlinedButton(onClick = { resultPicker.launch(arrayOf("application/json", "text/plain")) }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_open_result)) }
-                if (rawTask != null) {
-                    OutlinedButton(onClick = {
-                        queue = queueStore.add(rawTask!!)
-                        queueNote = "queued"
-                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue_add)) }
-                }
-                OutlinedButton(onClick = { queue = queueStore.load(); showQueue = true }) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue) + " (" + queue.size + ")")
-                }
-                if (task != null || result != null) {
-                    OutlinedButton(enabled = !busy, onClick = {
-                        scope.launch {
-                            withContext(Dispatchers.IO) { CcosSessionStore.clearAll(context.filesDir) }
-                            task = null
-                            result = null
-                            rawTask = null
-                            precheckFindings = emptyList()
-                            outcome = null
-                            error = null
-                        }
-                    }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_clear_session)) }
-                }
-            }
-            Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_steps_notice), Tone.INFO)
-        }
+        CcosStep1Card(ui.rawTask, ui.task, ui.result, ui.queue.size, ui.busy,
+            onOpenTask = openTask, onOpenResult = openResult,
+            onQueueAdd = { ui.enqueue() },
+            onShowQueue = { ui.openQueue() },
+            onClearSession = { scope.launch { ui.clearSession(context) } })
 
-        error?.let { ErrorNotice(it) }
+        ui.error?.let { ErrorNotice(it) }
 
-        val t = task
-        if (t != null) {
-            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_task_title, t.id)) {
-                KeyValue("created_at", t.createdAt)
-                KeyValue("pack", t.packId + " " + t.packVersion)
-                KeyValue("protocol digest", t.protocolDigest.take(16) + "…")
-                KeyValue("pipeline digest", t.pipelineDigest.take(16) + "…")
-                KeyValue("spec digest", t.specDigest.take(16) + "…")
-                KeyValue("inputs", t.inputsCount.toString())
-                KeyValue("budget", "tokens " + t.maxTokens + " · chars " + t.maxChars + " · seconds " + t.maxSeconds)
-                KeyValue("policy", "network=" + t.networkAllowed + " · secrets=" + t.secretsPolicy)
-                KeyValue("provenance", t.projectId + " · " + t.projectDigest.take(16) + "…")
-            }
-        } else {
-            EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_no_task))
-        }
+        val t = ui.task
+        if (t != null) CcosTaskCard(t) else EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_no_task))
 
-        val r = result
-        if (r != null) {
-            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_result_title, r.taskId)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(dev.ninfenz.mobile.R.string.ccos_status), style = NfType.meta)
-                    NfStatusChip(r.status)
-                }
-                KeyValue("task_digest", r.taskDigest.take(24) + "…")
-                if (precheckFindings.isEmpty()) {
-                    Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_precheck_pass), Tone.INFO)
-                } else {
-                    Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_precheck_failed, precheckFindings.size), Tone.ERROR)
-                    for (finding in precheckFindings) {
-                        Notice(finding.field + "：" + finding.message, Tone.WARN)
-                    }
-                }
-                KeyValue("artifacts", r.artifacts.size.toString())
-                for (a in r.artifacts) {
-                    Text(a.name + " · " + a.mime + " · " + a.bytes + " bytes", style = NfType.meta)
-                    Text("  sha256=" + a.sha256.take(24) + "…", style = NfType.meta)
-                }
-                KeyValue("evidence", r.evidence.size.toString())
-                for (e in r.evidence) {
-                    Text(e.kind + " · " + e.ref + " · " + e.digest.take(16) + "…", style = NfType.meta)
-                }
-                KeyValue("report", r.reportSummary)
-                for (issue in r.issues) Notice(issue.code + "：" + issue.message, Tone.WARN)
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("human_review", style = NfType.meta)
-                    NfStatusChip(r.reviewState)
-                }
-                KeyValue("required", r.reviewRequired.toString())
-                if (r.reviewState != "pending") {
-                    Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_review_done, r.reviewState, r.reviewer ?: "-"), Tone.INFO)
-                }
-            }
+        val r = ui.result
+        if (r != null) CcosResultSection(r, ui.precheckFindings, reviewer, note, ui.outcome, onReviewerChange = { reviewer = it }, onNoteChange = { note = it })
+        else EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_no_result))
+    }
+    CcosQueueHost(ui)
+}
 
-            CardBox(title = stringResource(dev.ninfenz.mobile.R.string.ccos_review_title)) {
-                if (r.reviewState != "pending") {
-                    EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_review_closed))
-                } else {
-                    FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.ccos_reviewer_label), value = reviewer, onValueChange = { reviewer = it })
-                    FormTextField(label = stringResource(dev.ninfenz.mobile.R.string.ccos_note_field), value = note, onValueChange = { note = it }, singleLine = false)
-                    Notice(stringResource(dev.ninfenz.mobile.R.string.ccos_review_notice), Tone.INFO)
-                }
-                outcome?.let { MonoText(it) }
-            }
-        } else {
-            EmptyState(stringResource(dev.ninfenz.mobile.R.string.ccos_no_result))
+internal class CcosUiState(context: android.content.Context, restored: RestoredCcos) {
+    val queueStore = CcosQueueStore(context.filesDir)
+    var task by mutableStateOf(restored.task)
+    var result by mutableStateOf(restored.result)
+    var rawTask by mutableStateOf(restored.rawTask)
+    var error by mutableStateOf<CoreError?>(null)
+    var outcome by mutableStateOf<String?>(null)
+    var busy by mutableStateOf(false)
+    var precheckFindings by mutableStateOf(restored.findings)
+    var queue by mutableStateOf(queueStore.load())
+    var showQueue by mutableStateOf(false)
+    var queueNote by mutableStateOf<String?>(null)
+    var selectedQueue by mutableStateOf<Set<String>>(emptySet())
+
+    fun onDraftLoaded(parsed: CcosTask, obj: JsonObject) {
+        task = parsed
+        rawTask = obj
+        result = null
+        precheckFindings = emptyList()
+        outcome = null
+        error = null
+    }
+
+    fun onResultLoaded(parsed: CcosResult, findings: List<dev.ninfenz.mobile.model.CcosPrecheck.Finding>) {
+        result = parsed
+        precheckFindings = findings
+        error = null
+        outcome = null
+    }
+
+    fun enqueue() {
+        queue = queueStore.add(rawTask!!)
+        queueNote = "queued"
+    }
+
+    fun openQueue() {
+        queue = queueStore.load()
+        showQueue = true
+    }
+
+    fun loadFromQueue(parsed: CcosTask, obj: JsonObject) {
+        task = parsed
+        rawTask = obj
+        result = null
+        precheckFindings = emptyList()
+        showQueue = false
+    }
+
+    suspend fun clearSession(context: android.content.Context) {
+        withContext(Dispatchers.IO) { CcosSessionStore.clearAll(context.filesDir) }
+        task = null
+        result = null
+        rawTask = null
+        precheckFindings = emptyList()
+        outcome = null
+        error = null
+    }
+
+    fun submitReview(
+        scope: kotlinx.coroutines.CoroutineScope,
+        context: android.content.Context,
+        reviewer: String,
+        note: String,
+        approve: Boolean
+    ) {
+        val current = result ?: return
+        scope.launch {
+            performCcosReview(context, current, rawTask, task, reviewer, note, approve,
+                onOutcome = { outcome = it }, onBusy = { busy = it }, onError = { error = it }, onResult = { result = it })
         }
     }
-    if (showQueue) {
-        AlertDialog(
-            onDismissRequest = { showQueue = false },
-            title = { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    if (queue.isEmpty()) Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue_empty), style = NfType.meta)
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        TextButton(onClick = {
-                            selectedQueue = if (selectedQueue.size == queue.size) emptySet() else queue.map { it.id }.toSet()
-                        }) { Text(stringResource(if (selectedQueue.size == queue.size) dev.ninfenz.mobile.R.string.ccos_queue_select_none else dev.ninfenz.mobile.R.string.ccos_queue_select_all)) }
-                        TextButton(enabled = selectedQueue.isNotEmpty(), onClick = {
-                            selectedQueue.forEach { queueStore.remove(it) }
-                            selectedQueue = emptySet()
-                            queue = queueStore.load()
-                        }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue_remove_selected)) }
-                    }
-                    queue.forEach { item ->
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(
-                                    checked = item.id in selectedQueue,
-                                    onCheckedChange = { on ->
-                                        selectedQueue = if (on) selectedQueue + item.id else selectedQueue - item.id
-                                    }
-                                )
-                                Text(item.id, style = NfType.meta)
-                            }
-                            Row {
-                                TextButton(onClick = {
-                                    runCatching {
-                                        val obj = item.task
-                                        task = CcosModel.parseTask(obj)
-                                        rawTask = obj
-                                        CcosSessionStore.saveTask(context.filesDir, obj.toString())
-                                        result = null
-                                        precheckFindings = emptyList()
-                                        showQueue = false
-                                    }.onFailure { queueNote = it.message }
-                                }) { Text(stringResource(dev.ninfenz.mobile.R.string.ccos_queue_load)) }
-                                TextButton(onClick = { queueStore.remove(item.id); queue = queueStore.load() }) {
-                                    Text(stringResource(dev.ninfenz.mobile.R.string.inbox_remove))
-                                }
-                            }
-                        }
-                    }
-                    queueNote?.let { Text(it, style = NfType.meta) }
-                }
-            },
-            confirmButton = { TextButton(onClick = { showQueue = false }) { Text(stringResource(android.R.string.ok)) } }
-        )
+}
+
+@Composable
+internal fun rememberCcosUiState(context: android.content.Context, restored: RestoredCcos): CcosUiState =
+    remember(restored) { CcosUiState(context, restored) }
+
+@Composable
+private fun CcosQueueHost(ui: CcosUiState) {
+    if (ui.showQueue) {
+        CcosQueueDialog(ui.queue, ui.selectedQueue, ui.queueNote, ui.queueStore,
+            onSelectedQueueChange = { ui.selectedQueue = it }, onQueueChange = { ui.queue = it },
+            onLoadTask = ui::loadFromQueue,
+            onNote = { ui.queueNote = it }) { ui.showQueue = false }
     }
 }
 
@@ -414,10 +226,9 @@ fun CcosReviewActions(
             }
         }
     }
-
 }
 
-private data class RestoredCcos(
+internal data class RestoredCcos(
     val task: CcosTask?,
     val result: CcosResult?,
     val rawTask: JsonObject?,

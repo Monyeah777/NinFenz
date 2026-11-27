@@ -84,168 +84,284 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                 textStyle = NfType.meta
             )
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                Button(onClick = {
-                    error = null
-                    result = null
-                    try {
-                        val patch = NfPatchModel.parse(json)
-                        entries = patch.ops.map { it to true }
-                    } catch (t: Throwable) {
-                        entries = emptyList()
-                        error = t.message ?: t.javaClass.simpleName
+            PatchActionButtons(json, markdown, entries, history, projectId, filesDir,
+                onEntriesChange = { entries = it }, onError = { error = it }, onMarkdownChange = { markdown = it },
+                onHistoryChange = { history = it }, onResult = { result = it }, onValidation = { validation = it },
+                onValidationIssues = { validationIssues = it })
+            PatchEntryRows(entries = entries, onEntriesChange = { entries = it })
+            PatchResultSection(
+                result = result,
+                validation = validation,
+                validationIssues = validationIssues,
+                history = history,
+                store = store,
+                projectId = projectId,
+                filesDir = filesDir,
+                onMarkdownChange = { markdown = it },
+                onHistoryChange = { history = it },
+                onResult = { result = it },
+                onError = { error = it }
+            )
+        }
+    }
+}
+
+@Composable
+private fun PatchEntryRows(
+    entries: List<Pair<NfPatchModel.Op, Boolean>>,
+    onEntriesChange: (List<Pair<NfPatchModel.Op, Boolean>>) -> Unit
+) {
+    entries.forEachIndexed { index, (op, accepted) ->
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = accepted, onCheckedChange = { on ->
+                onEntriesChange(entries.toMutableList().also { it[index] = op to on })
+            })
+            Text(
+                op.kind + " · " + (op.blockId ?: op.slot ?: "") + " · " + (op.text ?: ""),
+                style = NfType.meta,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun PatchResultSection(
+    result: NfPatchModel.Result?,
+    validation: String?,
+    validationIssues: List<dev.ninfenz.mobile.model.ReportIssue>,
+    history: List<String>,
+    store: DeliveryDraftStore?,
+    projectId: String?,
+    filesDir: File,
+    onMarkdownChange: (String) -> Unit,
+    onHistoryChange: (List<String>) -> Unit,
+    onResult: (NfPatchModel.Result?) -> Unit,
+    onError: (String?) -> Unit
+) {
+    result?.let { r ->
+        PatchResultDetails(
+            r = r,
+            validation = validation,
+            validationIssues = validationIssues
+        )
+        PatchResultActions(
+            r = r,
+            history = history,
+            store = store,
+            projectId = projectId,
+            filesDir = filesDir,
+            onMarkdownChange = onMarkdownChange,
+            onHistoryChange = onHistoryChange,
+            onResult = onResult,
+            onError = onError
+        )
+    }
+}
+
+@Composable
+private fun PatchActionButtons(
+    json: String,
+    markdown: String,
+    entries: List<Pair<NfPatchModel.Op, Boolean>>,
+    history: List<String>,
+    projectId: String?,
+    filesDir: File,
+    onEntriesChange: (List<Pair<NfPatchModel.Op, Boolean>>) -> Unit,
+    onError: (String?) -> Unit,
+    onMarkdownChange: (String) -> Unit,
+    onHistoryChange: (List<String>) -> Unit,
+    onResult: (NfPatchModel.Result?) -> Unit,
+    onValidation: (String?) -> Unit,
+    onValidationIssues: (List<dev.ninfenz.mobile.model.ReportIssue>) -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+        Button(onClick = {
+            onError(null)
+            onResult(null)
+            try {
+                val patch = NfPatchModel.parse(json)
+                onEntriesChange(patch.ops.map { it to true })
+            } catch (t: Throwable) {
+                onEntriesChange(emptyList())
+                onError(t.message ?: t.javaClass.simpleName)
+            }
+        }) { Text(stringResource(R.string.patch_parse)) }
+        OutlinedButton(
+            enabled = entries.isNotEmpty(),
+            onClick = {
+                onError(null)
+                val selected = entries.filter { it.second }.map { it.first }
+                if (selected.isEmpty()) {
+                    onError(context.getString(R.string.patch_none_selected))
+                } else {
+                    onHistoryChange(history + markdown)
+                    val applied = NfPatchModel.apply(markdown, NfPatchModel.Patch(selected))
+                    onResult(applied)
+                    onValidation(null)
+                    onValidationIssues(emptyList())
+                    val issues = mutableListOf<dev.ninfenz.mobile.model.ReportIssue>()
+                    if (projectId != null) {
+                        scope.launch {
+                            onValidation(validatePatch(context, projectId, filesDir, applied, issues))
+                            onValidationIssues(issues)
+                        }
                     }
-                }) { Text(stringResource(R.string.patch_parse)) }
-                OutlinedButton(
-                    enabled = entries.isNotEmpty(),
-                    onClick = {
-                        error = null
-                        val selected = entries.filter { it.second }.map { it.first }
-                        if (selected.isEmpty()) {
-                            error = context.getString(R.string.patch_none_selected)
+                }
+            }
+        ) { Text(stringResource(R.string.patch_apply)) }
+    }
+}
+
+private suspend fun validatePatch(
+    context: android.content.Context,
+    projectId: String,
+    filesDir: File,
+    applied: NfPatchModel.Result,
+    issues: MutableList<dev.ninfenz.mobile.model.ReportIssue>
+): String = withContext(Dispatchers.IO) {
+    runCatching {
+        val entry = LibraryStore(filesDir).loadProjects().projects.firstOrNull { it.project.id == projectId }
+            ?: return@runCatching context.getString(R.string.patch_validation_failed)
+        val pack = PackStore(filesDir).scan().packs.firstOrNull {
+            it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
+        } ?: return@runCatching context.getString(R.string.patch_validation_failed)
+        val art = AuthorArtifactsLoader.load(pack)
+        val compiled = safeCall("graph-compile", buildJsonObject {
+            put("graph", art.graphJson)
+            put("spec", art.specJson)
+        })
+        val plan = compiled.resultObject() ?: return@runCatching context.getString(R.string.patch_validation_failed)
+        val checked = safeCall("validate", buildJsonObject {
+            put("markdown", applied.markdown)
+            put("spec", art.specJson)
+            put("plan", plan)
+            put("level", "L1")
+        })
+        if (checked.ok) {
+            context.getString(R.string.patch_validation_ok)
+        } else {
+            checked.resultObject()?.let { obj ->
+                runCatching { dev.ninfenz.mobile.model.ReportModel.parse(obj) }.orNullLogged("PatchScreen")
+                    ?.issues?.take(3)?.let { issues.addAll(it) }
+            }
+            context.getString(R.string.patch_validation_failed)
+        }
+    }.getOrElse { context.getString(R.string.patch_validation_failed) }
+}
+
+@Composable
+private fun PatchResultDetails(
+    r: NfPatchModel.Result,
+    validation: String?,
+    validationIssues: List<dev.ninfenz.mobile.model.ReportIssue>
+) {
+    Text(stringResource(R.string.patch_result, r.applied, r.rejected.size), style = NfType.itemTitle)
+    Text(stringResource(R.string.patch_changes, r.changes.size), style = NfType.meta, color = MaterialTheme.colorScheme.primary)
+    validation?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.secondary) }
+    validationIssues.forEach { issue ->
+        Text(issue.code + " " + (issue.path ?: "-") + "：" + issue.message, style = NfType.meta, color = MaterialTheme.colorScheme.error)
+    }
+    r.changes.forEach { c ->
+        Text(
+            c.op + " · " + (c.before?.take(60) ?: "∅") + " → " + (c.after?.take(60) ?: "∅"),
+            style = NfType.meta
+        )
+    }
+    r.rejected.forEach { Text("· " + it, color = MaterialTheme.colorScheme.error, style = NfType.meta) }
+    OutlinedTextField(
+        value = r.markdown,
+        onValueChange = {},
+        readOnly = true,
+        modifier = Modifier.fillMaxWidth(),
+        minLines = 5,
+        textStyle = NfType.meta
+    )
+}
+
+@Composable
+private fun PatchResultActions(
+    r: NfPatchModel.Result,
+    history: List<String>,
+    store: DeliveryDraftStore?,
+    projectId: String?,
+    filesDir: File,
+    onMarkdownChange: (String) -> Unit,
+    onHistoryChange: (List<String>) -> Unit,
+    onResult: (NfPatchModel.Result?) -> Unit,
+    onError: (String?) -> Unit
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+        if (history.isNotEmpty()) {
+            OutlinedButton(onClick = {
+                onMarkdownChange(history.last())
+                onHistoryChange(history.dropLast(1))
+                onResult(null)
+            }) { Text(stringResource(R.string.patch_undo)) }
+        }
+        OutlinedButton(onClick = {
+            val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+            manager?.setPrimaryClip(ClipData.newPlainText("nf-patch", r.markdown))
+            Toast.makeText(context, context.getString(R.string.patch_copied), Toast.LENGTH_SHORT).show()
+        }) { Text(stringResource(R.string.patch_copy)) }
+        if (store != null && projectId != null) {
+            Button(onClick = {
+                val rawPlan = store.loadPlan(projectId)
+                val allowed = rawPlan?.let { runCatching { dev.ninfenz.mobile.model.PlanModel.parse(it).slots.toSet() }.orNullLogged("PatchScreen") } ?: emptySet()
+                val unknown = r.slots.keys.filter { it !in allowed }
+                if (unknown.isNotEmpty()) {
+                    onError(context.getString(R.string.patch_unknown_slot, unknown.joinToString()))
+                } else {
+                    store.save(projectId, store.load(projectId) + r.slots, rawPlan, r.markdown)
+                    Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
+                    onHistoryChange(emptyList())
+                }
+            }) { Text(stringResource(R.string.patch_save)) }
+            if (r.slots.isNotEmpty()) {
+                OutlinedButton(onClick = {
+                    scope.launch {
+                        val outcome = assembleAndSavePatch(filesDir, store, projectId, r)
+                        if (outcome == true) {
+                            Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
+                            onHistoryChange(emptyList())
                         } else {
-                            history = history + markdown
-                            val applied = NfPatchModel.apply(markdown, NfPatchModel.Patch(selected))
-                            result = applied
-                            validation = null
-                            validationIssues = emptyList()
-                            val issues = mutableListOf<dev.ninfenz.mobile.model.ReportIssue>()
-                            if (projectId != null) {
-                                scope.launch {
-                                    validation = withContext(Dispatchers.IO) {
-                                        runCatching {
-                                            val entry = LibraryStore(filesDir).loadProjects().projects.firstOrNull { it.project.id == projectId }
-                                                ?: return@runCatching context.getString(R.string.patch_validation_failed)
-                                            val pack = PackStore(filesDir).scan().packs.firstOrNull {
-                                                it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
-                                            } ?: return@runCatching context.getString(R.string.patch_validation_failed)
-                                            val art = AuthorArtifactsLoader.load(pack)
-                                            val compiled = safeCall("graph-compile", buildJsonObject {
-                                                put("graph", art.graphJson)
-                                                put("spec", art.specJson)
-                                            })
-                                            val plan = compiled.resultObject() ?: return@runCatching context.getString(R.string.patch_validation_failed)
-                                            val checked = safeCall("validate", buildJsonObject {
-                                                put("markdown", applied.markdown)
-                                                put("spec", art.specJson)
-                                                put("plan", plan)
-                                                put("level", "L1")
-                                            })
-                                            if (checked.ok) {
-                                                context.getString(R.string.patch_validation_ok)
-                                            } else {
-                                                checked.resultObject()?.let { obj ->
-                                                    runCatching { dev.ninfenz.mobile.model.ReportModel.parse(obj) }.orNullLogged("PatchScreen")
-                                                        ?.issues?.take(3)?.let { issues.addAll(it) }
-                                                }
-                                                context.getString(R.string.patch_validation_failed)
-                                            }
-                                        }.getOrElse { context.getString(R.string.patch_validation_failed) }
-                                    }
-                                    validationIssues = issues
-                                }
-                            }
+                            onError(context.getString(R.string.patch_assemble_failed, context.getString(R.string.patch_assemble_hint)))
                         }
                     }
-                ) { Text(stringResource(R.string.patch_apply)) }
-            }
-            entries.forEachIndexed { index, (op, accepted) ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = accepted, onCheckedChange = { on ->
-                        entries = entries.toMutableList().also { it[index] = op to on }
-                    })
-                    Text(
-                        op.kind + " · " + (op.blockId ?: op.slot ?: "") + " · " + (op.text ?: ""),
-                        style = NfType.meta,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-            result?.let { r ->
-                Text(stringResource(R.string.patch_result, r.applied, r.rejected.size), style = NfType.itemTitle)
-                Text(stringResource(R.string.patch_changes, r.changes.size), style = NfType.meta, color = MaterialTheme.colorScheme.primary)
-                validation?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.secondary) }
-                validationIssues.forEach { issue ->
-                    Text(issue.code + " " + (issue.path ?: "-") + "：" + issue.message, style = NfType.meta, color = MaterialTheme.colorScheme.error)
-                }
-                r.changes.forEach { c ->
-                    Text(
-                        c.op + " · " + (c.before?.take(60) ?: "∅") + " → " + (c.after?.take(60) ?: "∅"),
-                        style = NfType.meta
-                    )
-                }
-                r.rejected.forEach { Text("· " + it, color = MaterialTheme.colorScheme.error, style = NfType.meta) }
-                OutlinedTextField(
-                    value = r.markdown,
-                    onValueChange = {},
-                    readOnly = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    minLines = 5,
-                    textStyle = NfType.meta
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    if (history.isNotEmpty()) {
-                        OutlinedButton(onClick = {
-                            markdown = history.last()
-                            history = history.dropLast(1)
-                            result = null
-                        }) { Text(stringResource(R.string.patch_undo)) }
-                    }
-                    OutlinedButton(onClick = {
-                        val manager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
-                        manager?.setPrimaryClip(ClipData.newPlainText("nf-patch", r.markdown))
-                        Toast.makeText(context, context.getString(R.string.patch_copied), Toast.LENGTH_SHORT).show()
-                    }) { Text(stringResource(R.string.patch_copy)) }
-                    if (store != null && projectId != null) {
-                        Button(onClick = {
-                            val rawPlan = store.loadPlan(projectId)
-                            val allowed = rawPlan?.let { runCatching { dev.ninfenz.mobile.model.PlanModel.parse(it).slots.toSet() }.orNullLogged("PatchScreen") } ?: emptySet()
-                            val unknown = r.slots.keys.filter { it !in allowed }
-                            if (unknown.isNotEmpty()) {
-                                error = context.getString(R.string.patch_unknown_slot, unknown.joinToString())
-                            } else {
-                                store.save(projectId, store.load(projectId) + r.slots, rawPlan, r.markdown)
-                                Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
-                                history = emptyList()
-                            }
-                        }) { Text(stringResource(R.string.patch_save)) }
-                        if (r.slots.isNotEmpty()) {
-                            OutlinedButton(onClick = {
-                                scope.launch {
-                                    val outcome = withContext(Dispatchers.IO) {
-                                        runCatching {
-                                            val entry = LibraryStore(filesDir).loadProjects().projects.firstOrNull { it.project.id == projectId }
-                                                ?: return@runCatching null
-                                            val pack = PackStore(filesDir).scan().packs.firstOrNull {
-                                                it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
-                                            } ?: return@runCatching null
-                                            val art = AuthorArtifactsLoader.load(pack)
-                                            val rawPlan = store.loadPlan(projectId) ?: return@runCatching null
-                                            val merged = store.load(projectId) + r.slots
-                                            val response = safeCall("assemble", buildJsonObject {
-                                                put("plan", rawPlan)
-                                                put("spec", art.specJson)
-                                                put("inputs", buildJsonObject { merged.forEach { (k, v) -> put(k, v) } })
-                                            })
-                                            if (!response.ok) return@runCatching false
-                                            val md = (response.resultObject()?.get("markdown") as? kotlinx.serialization.json.JsonPrimitive)?.content
-                                                ?: return@runCatching false
-                                            store.save(projectId, merged, rawPlan, md)
-                                            true
-                                        }.orNullLogged("PatchScreen")
-                                    }
-                                    if (outcome == true) {
-                                        Toast.makeText(context, context.getString(R.string.patch_saved), Toast.LENGTH_SHORT).show()
-                                        history = emptyList()
-                                    } else {
-                                        error = context.getString(R.string.patch_assemble_failed, context.getString(R.string.patch_assemble_hint))
-                                    }
-                                }
-                            }) { Text(stringResource(R.string.patch_save_assemble)) }
-                        }
-                    }
-                }
+                }) { Text(stringResource(R.string.patch_save_assemble)) }
             }
         }
     }
+}
+
+private suspend fun assembleAndSavePatch(
+    filesDir: File,
+    store: DeliveryDraftStore,
+    projectId: String,
+    r: NfPatchModel.Result
+): Boolean? = withContext(Dispatchers.IO) {
+    runCatching {
+        val entry = LibraryStore(filesDir).loadProjects().projects.firstOrNull { it.project.id == projectId }
+            ?: return@runCatching null
+        val pack = PackStore(filesDir).scan().packs.firstOrNull {
+            it.id == entry.project.refs.basePackId && it.version == entry.project.refs.basePackVersion
+        } ?: return@runCatching null
+        val art = AuthorArtifactsLoader.load(pack)
+        val rawPlan = store.loadPlan(projectId) ?: return@runCatching null
+        val merged = store.load(projectId) + r.slots
+        val response = safeCall("assemble", buildJsonObject {
+            put("plan", rawPlan)
+            put("spec", art.specJson)
+            put("inputs", buildJsonObject { merged.forEach { (k, v) -> put(k, v) } })
+        })
+        if (!response.ok) return@runCatching false
+        val md = (response.resultObject()?.get("markdown") as? kotlinx.serialization.json.JsonPrimitive)?.content
+            ?: return@runCatching false
+        store.save(projectId, merged, rawPlan, md)
+        true
+    }.orNullLogged("PatchScreen")
 }

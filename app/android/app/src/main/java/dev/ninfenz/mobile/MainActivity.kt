@@ -115,62 +115,67 @@ class MainActivity : ComponentActivity() {
             syncSystemLocale(nfPrefs.language)
         }
         setContent {
-            var themeMode by remember {
-                mutableStateOf(
-                    when (nfPrefs.ui.theme) {
-                        PrefsTheme.LIGHT -> ThemeMode.LIGHT
-                        PrefsTheme.DARK, PrefsTheme.HIGH_CONTRAST -> ThemeMode.DARK
-                        PrefsTheme.SYSTEM -> ThemeMode.SYSTEM
-                    }
+            MainActivityContent(prefs, nfPrefs)
+        }
+    }
+
+    @androidx.compose.runtime.Composable
+    private fun MainActivityContent(prefs: AppPrefs, nfPrefs: dev.ninfenz.mobile.data.NfPrefs) {
+        var themeMode by remember {
+            mutableStateOf(
+                when (nfPrefs.ui.theme) {
+                    PrefsTheme.LIGHT -> ThemeMode.LIGHT
+                    PrefsTheme.DARK, PrefsTheme.HIGH_CONTRAST -> ThemeMode.DARK
+                    PrefsTheme.SYSTEM -> ThemeMode.SYSTEM
+                }
+            )
+        }
+        var languageMode by remember { mutableStateOf(nfPrefs.language) }
+        var dynamicColor by remember { mutableStateOf(prefs.dynamicColor) }
+        val dark = when (themeMode) {
+            ThemeMode.SYSTEM -> isSystemInDarkTheme()
+            ThemeMode.LIGHT -> false
+            ThemeMode.DARK -> true
+        }
+        val localizedContext = remember(languageMode) {
+            val tag = languageMode.tag
+            if (tag == null) {
+                this@MainActivity
+            } else {
+                val config = Configuration(resources.configuration).apply {
+                    setLocale(Locale.forLanguageTag(tag))
+                }
+                createConfigurationContext(config)
+            }
+        }
+        CompositionLocalProvider(
+            LocalContext provides localizedContext,
+            LocalConfiguration provides localizedContext.resources.configuration,
+            LocalLayoutDirection provides if (languageMode == LanguageMode.PSEUDO) LayoutDirection.Rtl else LayoutDirection.Ltr,
+            LocalActivityResultRegistryOwner provides this@MainActivity
+        ) {
+            NfTheme(darkTheme = dark, dynamicColor = dynamicColor) {
+                NfMobileApp(
+                    prefs = prefs,
+                    themeMode = themeMode,
+                    onThemeMode = { mode ->
+                        prefs.themeMode = mode
+                        themeMode = mode
+                    },
+                    languageMode = languageMode,
+                    onLanguageMode = { mode ->
+                        prefs.languageMode = mode
+                        languageMode = mode
+                        syncSystemLocale(mode)
+                    },
+                    dynamicColor = dynamicColor,
+                    onDynamicColor = { enabled ->
+                        prefs.dynamicColor = enabled
+                        dynamicColor = enabled
+                    },
+                    shortcut = pendingShortcut,
+                    onShortcutConsumed = { pendingShortcut = null }
                 )
-            }
-            var languageMode by remember { mutableStateOf(nfPrefs.language) }
-            var dynamicColor by remember { mutableStateOf(prefs.dynamicColor) }
-            val dark = when (themeMode) {
-                ThemeMode.SYSTEM -> isSystemInDarkTheme()
-                ThemeMode.LIGHT -> false
-                ThemeMode.DARK -> true
-            }
-            val localizedContext = remember(languageMode) {
-                val tag = languageMode.tag
-                if (tag == null) {
-                    this@MainActivity
-                } else {
-                    val config = Configuration(resources.configuration).apply {
-                        setLocale(Locale.forLanguageTag(tag))
-                    }
-                    createConfigurationContext(config)
-                }
-            }
-            CompositionLocalProvider(
-                LocalContext provides localizedContext,
-                LocalConfiguration provides localizedContext.resources.configuration,
-                LocalLayoutDirection provides if (languageMode == LanguageMode.PSEUDO) LayoutDirection.Rtl else LayoutDirection.Ltr,
-                LocalActivityResultRegistryOwner provides this@MainActivity
-            ) {
-                NfTheme(darkTheme = dark, dynamicColor = dynamicColor) {
-                    NfMobileApp(
-                        prefs = prefs,
-                        themeMode = themeMode,
-                        onThemeMode = { mode ->
-                            prefs.themeMode = mode
-                            themeMode = mode
-                        },
-                        languageMode = languageMode,
-                        onLanguageMode = { mode ->
-                            prefs.languageMode = mode
-                            languageMode = mode
-                            syncSystemLocale(mode)
-                        },
-                        dynamicColor = dynamicColor,
-                        onDynamicColor = { enabled ->
-                            prefs.dynamicColor = enabled
-                            dynamicColor = enabled
-                        },
-                        shortcut = pendingShortcut,
-                        onShortcutConsumed = { pendingShortcut = null }
-                    )
-                }
             }
         }
     }

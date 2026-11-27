@@ -63,7 +63,26 @@ object ProtocolModel {
 
     fun parse(o: JsonObject): ProtocolPack {
         J.schema(o, SCHEMA)
-        val clauses = J.array(o, "clauses", "").mapIndexed { i, el ->
+        val clauses = parseClauses(o)
+        val fields = parseFields(o)
+        val rules = parseRules(o)
+        val compat = J.child(o, "compat", "")
+        return ProtocolPack(
+            id = J.string(o, "id", ""),
+            version = J.string(o, "version", ""),
+            title = J.string(o, "title", ""),
+            protoVersion = J.int(o, "proto_version", ""),
+            clauses = clauses,
+            fields = fields,
+            rules = rules,
+            appMin = J.string(compat, "app_min", "/compat"),
+            protocolMin = J.int(compat, "protocol_min", "/compat"),
+            protocolMax = J.int(compat, "protocol_max", "/compat")
+        )
+    }
+
+    private fun parseClauses(o: JsonObject): List<ProtocolClause> =
+        J.array(o, "clauses", "").mapIndexed { i, el ->
             val c = el as? JsonObject
                 ?: throw ModelException("NF-E-002", "/clauses/" + i, "条款应为对象", "按 schema 修正")
             val p = "/clauses/" + i
@@ -76,7 +95,9 @@ object ProtocolModel {
                 fields = J.optStringList(c, "fields")
             )
         }
-        val fields = J.array(o, "fields", "").mapIndexed { i, el ->
+
+    private fun parseFields(o: JsonObject): List<ProtocolField> =
+        J.array(o, "fields", "").mapIndexed { i, el ->
             val f = el as? JsonObject
                 ?: throw ModelException("NF-E-002", "/fields/" + i, "字段应为对象", "按 schema 修正")
             val p = "/fields/" + i
@@ -93,7 +114,9 @@ object ProtocolModel {
                 pattern = constraint?.let { J.optString(it, "pattern") }
             )
         }
-        val rules = J.array(o, "rules", "").mapIndexed { i, el ->
+
+    private fun parseRules(o: JsonObject): List<ProtocolRule> =
+        J.array(o, "rules", "").mapIndexed { i, el ->
             val r = el as? JsonObject
                 ?: throw ModelException("NF-E-002", "/rules/" + i, "规则应为对象", "按 schema 修正")
             val p = "/rules/" + i
@@ -106,20 +129,6 @@ object ProtocolModel {
                 op = expr?.let { J.optString(it, "op") }
             )
         }
-        val compat = J.child(o, "compat", "")
-        return ProtocolPack(
-            id = J.string(o, "id", ""),
-            version = J.string(o, "version", ""),
-            title = J.string(o, "title", ""),
-            protoVersion = J.int(o, "proto_version", ""),
-            clauses = clauses,
-            fields = fields,
-            rules = rules,
-            appMin = J.string(compat, "app_min", "/compat"),
-            protocolMin = J.int(compat, "protocol_min", "/compat"),
-            protocolMax = J.int(compat, "protocol_max", "/compat")
-        )
-    }
 
     fun placeholders(text: String): List<String> =
         PLACEHOLDER.findAll(text).map { it.groupValues[1] }.toList()

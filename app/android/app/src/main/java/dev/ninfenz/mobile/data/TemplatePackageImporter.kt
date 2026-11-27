@@ -33,57 +33,12 @@ object TemplatePackageImporter {
         require(zipFile.isFile) { "模板包不存在" }
         val out = File(cacheDir, "template-import-" + System.nanoTime()).apply { mkdirs() }
         ZipFile(zipFile).use { zip ->
-            require(zip.size() <= MAX_ENTRIES) { "模板包条目过多" }
-            val manifestEntry = zip.getEntry("nf-template.json") ?: error("缺少 nf-template.json")
-            require(manifestEntry.size in 0..(1024L * 1024L)) { "模板清单过大" }
-            val manifestText = zip.getInputStream(manifestEntry).use { readLimited(it, 1024L * 1024L).toString(Charsets.UTF_8) }
-            val manifest = Json.parseToJsonElement(manifestText).jsonObject
-            require(manifest["schema"]?.jsonPrimitive?.content == "nf-template/1") { "不是 nf-template/1" }
-            val info = manifest["manifest"] as? JsonObject ?: error("模板缺少 manifest")
-            val id = info["id"]?.jsonPrimitive?.content.orEmpty()
-            val version = info["version"]?.jsonPrimitive?.content.orEmpty()
-            val title = info["title"]?.jsonPrimitive?.content.orEmpty()
-            require(Regex("^[a-z][a-z0-9-]{1,63}$").matches(id)) { "模板 id 非法" }
-            require(Regex("^[0-9]+\\.[0-9]+\\.[0-9]+$").matches(version)) { "模板版本非法" }
-            require(title.isNotBlank()) { "模板标题为空" }
-            val compat = manifest["compat"] as? JsonObject ?: error("模板缺少 compat")
-            require(compat["schema_version"]?.jsonPrimitive?.content == "1") { "模板 schema_version 不支持" }
-            val minApp = compat["min_app_version"]?.jsonPrimitive?.content.orEmpty()
-            if (minApp.isNotBlank()) {
-                require(compareVersion(dev.ninfenz.mobile.BuildConfig.VERSION_NAME, minApp) >= 0) {
-                    "模板需要 App " + minApp + " 或更高版本"
-                }
-            }
-            val refs = listOf("template_md", "spec", "protocol", "pipeline").mapNotNull { key ->
-                val obj = manifest[key] as? JsonObject ?: return@mapNotNull null
-                val path = obj["path"]?.jsonPrimitive?.content ?: return@mapNotNull null
-                val sha = obj["sha256"]?.jsonPrimitive?.content ?: return@mapNotNull null
-                Triple(key, path, sha)
-            }
-            require(refs.size == 4) { "模板清单缺少必要文件引用" }
-            var total = 0L
-            val assets = (manifest["assets"] as? kotlinx.serialization.json.JsonArray)?.mapIndexed { index, el ->
-                val o = el as? JsonObject ?: error("assets/" + index + " 不是对象")
-                val path = o["path"]?.jsonPrimitive?.content ?: error("assets/" + index + " 缺 path")
-                val sha = o["sha256"]?.jsonPrimitive?.content ?: error("assets/" + index + " 缺 sha256")
-                path to sha
-            }.orEmpty()
-            val seen = mutableSetOf<String>()
-            (refs.map { it.second to it.third } + assets).forEach { (path, sha) ->
-                require(seen.add(path.lowercase())) { "模板路径重复：" + path }
-                require(safe(path)) { "非法模板路径：" + path }
-                val entry = zip.getEntry(path) ?: error("模板缺少：" + path)
-                total += entry.size
-                require(total <= MAX_BYTES) { "模板包过大" }
-                val bytes = zip.getInputStream(entry).use { readLimited(it, MAX_BYTES - total + entry.size) }
-                total = total - entry.size + bytes.size
-                require(total <= MAX_BYTES) { "模板包过大" }
-                require(sha256(bytes) == sha) { "模板文件摘要不匹配：" + path }
-                File(out, path).apply { parentFile?.mkdirs() }.writeBytes(bytes)
-            }
+            val manifest = readManifest(zip)
+            val title = (manifest["manifest"] as? JsonObject)?.get("title")?.jsonPrimitive?.content.orEmpty()
+            val refs = readRefs(manifest)
+            writeVerifiedFiles(zip, manifest, refs, out)
             val specPath = refs.first { it.first == "spec" }.second
-            val specBytes = File(out, specPath).readBytes()
-            val specText = specBytes.toString(Charsets.UTF_8)
+            val specText = File(out, specPath).readBytes().toString(Charsets.UTF_8)
             val templatePath = refs.first { it.first == "template_md" }.second
             val templateText = File(out, templatePath).readText(Charsets.UTF_8)
             require(templateText.isNotBlank()) { "模板正文为空" }
@@ -97,6 +52,70 @@ object TemplatePackageImporter {
                 (basePack?.get("version") as? kotlinx.serialization.json.JsonPrimitive)?.content,
                 tree, count
             )
+        }
+    }
+
+    private fun readManifest(zip: ZipFile): JsonObject {
+        require(zip.size() <= MAX_ENTRIES) { "模板包条目过多" }
+        val manifestEntry = zip.getEntry("nf-template.json") ?: error("缺少 nf-template.json")
+        require(manifestEntry.size in 0..(1024L * 1024L)) { "模板清单过大" }
+        val manifestText = zip.getInputStream(manifestEntry).use { readLimited(it, 1024L * 1024L).toString(Charsets.UTF_8) }
+        val manifest = Json.parseToJsonElement(manifestText).jsonObject
+        require(manifest["schema"]?.jsonPrimitive?.content == "nf-template/1") { "不是 nf-template/1" }
+        val info = manifest["manifest"] as? JsonObject ?: error("模板缺少 manifest")
+        val id = info["id"]?.jsonPrimitive?.content.orEmpty()
+        val version = info["version"]?.jsonPrimitive?.content.orEmpty()
+        val title = info["title"]?.jsonPrimitive?.content.orEmpty()
+        require(Regex("^[a-z][a-z0-9-]{1,63}$").matches(id)) { "模板 id 非法" }
+        require(Regex("^[0-9]+\\.[0-9]+\\.[0-9]+$").matches(version)) { "模板版本非法" }
+        require(title.isNotBlank()) { "模板标题为空" }
+        val compat = manifest["compat"] as? JsonObject ?: error("模板缺少 compat")
+        require(compat["schema_version"]?.jsonPrimitive?.content == "1") { "模板 schema_version 不支持" }
+        val minApp = compat["min_app_version"]?.jsonPrimitive?.content.orEmpty()
+        if (minApp.isNotBlank()) {
+            require(compareVersion(dev.ninfenz.mobile.BuildConfig.VERSION_NAME, minApp) >= 0) {
+                "模板需要 App " + minApp + " 或更高版本"
+            }
+        }
+        return manifest
+    }
+
+    private fun readRefs(manifest: JsonObject): List<Triple<String, String, String>> {
+        val refs = listOf("template_md", "spec", "protocol", "pipeline").mapNotNull { key ->
+            val obj = manifest[key] as? JsonObject ?: return@mapNotNull null
+            val path = obj["path"]?.jsonPrimitive?.content ?: return@mapNotNull null
+            val sha = obj["sha256"]?.jsonPrimitive?.content ?: return@mapNotNull null
+            Triple(key, path, sha)
+        }
+        require(refs.size == 4) { "模板清单缺少必要文件引用" }
+        return refs
+    }
+
+    private fun writeVerifiedFiles(
+        zip: ZipFile,
+        manifest: JsonObject,
+        refs: List<Triple<String, String, String>>,
+        out: File
+    ) {
+        var total = 0L
+        val assets = (manifest["assets"] as? kotlinx.serialization.json.JsonArray)?.mapIndexed { index, el ->
+            val o = el as? JsonObject ?: error("assets/" + index + " 不是对象")
+            val path = o["path"]?.jsonPrimitive?.content ?: error("assets/" + index + " 缺 path")
+            val sha = o["sha256"]?.jsonPrimitive?.content ?: error("assets/" + index + " 缺 sha256")
+            path to sha
+        }.orEmpty()
+        val seen = mutableSetOf<String>()
+        (refs.map { it.second to it.third } + assets).forEach { (path, sha) ->
+            require(seen.add(path.lowercase())) { "模板路径重复：" + path }
+            require(safe(path)) { "非法模板路径：" + path }
+            val entry = zip.getEntry(path) ?: error("模板缺少：" + path)
+            total += entry.size
+            require(total <= MAX_BYTES) { "模板包过大" }
+            val bytes = zip.getInputStream(entry).use { readLimited(it, MAX_BYTES - total + entry.size) }
+            total = total - entry.size + bytes.size
+            require(total <= MAX_BYTES) { "模板包过大" }
+            require(sha256(bytes) == sha) { "模板文件摘要不匹配：" + path }
+            File(out, path).apply { parentFile?.mkdirs() }.writeBytes(bytes)
         }
     }
 

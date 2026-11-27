@@ -89,157 +89,206 @@ fun DesignSystemScreen(
             LocalDensity provides Density(density = base.density, fontScale = base.fontScale * fontScale)
         ) {
             NfScaffold(title = "设计系统", onBack = onBack) {
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(Space.gap.dp),
-                    verticalArrangement = Arrangement.spacedBy(Space.gap.dp)
-                ) {
-                    if (!dark) Button(onClick = { dark = false }) { Text("浅色") }
-                    else OutlinedButton(onClick = { dark = false }) { Text("浅色") }
-                    if (dark) Button(onClick = { dark = true }) { Text("深色") }
-                    else OutlinedButton(onClick = { dark = true }) { Text("深色") }
-                }
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(Space.gap.dp),
-                    verticalArrangement = Arrangement.spacedBy(Space.gap.dp)
-                ) {
-                    if (fontScale == 1f) Button(onClick = { fontScale = 1f }) { Text("100%") }
-                    else OutlinedButton(onClick = { fontScale = 1f }) { Text("100%") }
-                    if (fontScale == 1.3f) Button(onClick = { fontScale = 1.3f }) { Text("130%") }
-                    else OutlinedButton(onClick = { fontScale = 1.3f }) { Text("130%") }
-                    if (fontScale == 2f) Button(onClick = { fontScale = 2f }) { Text("200%") }
-                    else OutlinedButton(onClick = { fontScale = 2f }) { Text("200%") }
-                }
-                NfMeta("当前：${if (dark) "深色" else "浅色"} · 缩放 ${(fontScale * 100).toInt()}%")
-
-                NfSectionHeader("体系 2.0 约束")
-                Text(
-                    "理论规则 ${VisualTheory.rules.size} 条\n组内/组间 ${Proximity.INTRA}/${Proximity.INTER} = ${"%.1f".format(Proximity.ratio())}",
-                    style = NfType.meta,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                DesignSystemScaleToggles(
+                    dark = dark,
+                    fontScale = fontScale,
+                    onDarkChange = { dark = it },
+                    onFontScaleChange = { fontScale = it }
                 )
-                Text(
-                    "图底阶梯最小 ΔL ${GroundLadder.MIN_STEP}\n反馈预算 ${Feedback.MAX_LATENCY_MS}ms",
-                    style = NfType.meta,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    "密度 320dp=${NfDensity.factor(320, 1f)}\n500dp=${NfDensity.factor(500, 1f)}\n900dp=${NfDensity.factor(900, 1f)}",
-                    style = NfType.meta,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                NfSectionHeader("字阶（4 级）")
-                TypeScale.all.forEach { token ->
-                    Column(verticalArrangement = Arrangement.spacedBy(Space.inline.dp)) {
-                        Text(
-                            text = "${token.name}  ${token.size.toInt()}/${token.line.toInt()}  w${token.weight}",
-                            style = NfType.meta,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = "内容库 Content 123",
-                            style = when (token.name) {
-                                "title.screen" -> NfType.screenTitle
-                                "title.section" -> NfType.sectionTitle
-                                "title.item" -> NfType.itemTitle
-                                "body.long" -> NfType.bodyLong
-                                "body.secondary" -> NfType.secondary
-                                "label" -> NfType.label
-                                "meta" -> NfType.meta
-                                "mono" -> NfType.mono
-                                else -> NfType.body
-                            }
-                        )
-                    }
-                }
-
-                NfSectionHeader("间距（4 的倍数）")
-                Space.all.forEach { value ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .width(value.dp)
-                                .height(8.dp)
-                                .background(MaterialTheme.colorScheme.primary)
-                        )
-                        Spacer(Modifier.width(Space.gap.dp))
-                        NfMeta("${value}dp")
-                    }
-                }
-
-                NfSectionHeader("颜色与对比度")
-                ContrastPairs.all.forEach { pair ->
-                    val ratio = Contrast.ratio(pair, dark)
-                    val pass = ratio >= pair.min
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .background(Color(if (dark) pair.bg.dark else pair.bg.light))
-                                .border(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.outline,
-                                    shape = RoundedCornerShape(Radius.xs.dp)
-                                )
-                        )
-                        Spacer(Modifier.width(Space.gap.dp))
-                        NfMeta(pair.name)
-                        Spacer(Modifier.width(Space.gap.dp))
-                        NfMono("${"%.2f".format(ratio)} ${if (pass) "OK" else "FAIL"}")
-                    }
-                }
-
-                NfSectionHeader("组件")
-                Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp)) {
-                    NfStatusChip("草稿", tone = NfStatusTone.NEUTRAL)
-                    NfStatusChip("已签收", tone = NfStatusTone.SUCCESS)
-                    NfStatusChip("待复核", tone = NfStatusTone.WARNING)
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp)) {
-                    NfStatusChip("错误", tone = NfStatusTone.ERROR)
-                    NfStatusChip("信息", tone = NfStatusTone.INFO)
-                    NfStatusChip("交付中", tone = NfStatusTone.BRAND)
-                }
-                NfTrustMeter(level = 2, caption = "可复核，未签收")
-                NfScreenTitle("屏幕标题 22")
-                Text(text = "区块标题 16/600", style = NfType.sectionTitle)
-                NfItemTitle("条目标题 16/500")
-                NfBody("正文 16/24。中文行距 1.5，字距 0，断行交给系统。")
-                NfSecondary("次要正文 14/20，用于辅助说明。")
-                NfMeta("元信息 12/20 · 3 分钟前")
-                NfHashBlock("88d26e9a4f1c2b3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5")
-                NfNumeric("1,284")
-                NfErrorBlock(
-                    code = "[NF-E-003]",
-                    what = "剪贴板为空。",
-                    fix = "先复制一段内容，再点粘贴。"
-                )
-                NfSkeleton(width = 200, height = 20)
-                NfEmptyState(text = "尚无项目。新建或导入一段内容开始。", actionLabel = "新建项目", onAction = {})
-                NfPrimaryAction(label = "开始成稿", onClick = {})
-
-                NfSectionHeader("7 态（契约驱动）")
-                StateContracts.all.forEach { state ->
-                    Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp), verticalAlignment = Alignment.CenterVertically) {
-                        NfStatusChip(
-                            state.title,
-                            tone = when (state.tone) {
-                                "success" -> NfStatusTone.SUCCESS
-                                "warning" -> NfStatusTone.WARNING
-                                "error" -> NfStatusTone.ERROR
-                                "info" -> NfStatusTone.INFO
-                                else -> NfStatusTone.NEUTRAL
-                            }
-                        )
-                        NfMeta(state.action ?: "无动作")
-                    }
-                }
-
-                NfSectionHeader("尺寸")
-                NfMono("touch ${Sizes.touchTarget}dp · appbar ${Sizes.topAppBar}dp · button ${Sizes.button}dp")
-                NfMono("field ${Sizes.textField}dp · row ${Sizes.listOneLine}/${Sizes.listTwoLine}dp")
-                NfMono("nav ${Sizes.navigationBar}dp · content max ${Layout.maxContentWidth}dp")
+                DesignSystemConstraints()
+                DesignSystemTokenCatalog(dark = dark)
+                DesignSystemComponents()
+                DesignSystemStates()
+                DesignSystemSizes()
             }
+        }
+    }
+}
+
+@Composable
+private fun DesignSystemConstraints() {
+    NfSectionHeader("体系 2.0 约束")
+    Text(
+        "理论规则 ${VisualTheory.rules.size} 条\n组内/组间 ${Proximity.INTRA}/${Proximity.INTER} = ${"%.1f".format(Proximity.ratio())}",
+        style = NfType.meta,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Text(
+        "图底阶梯最小 ΔL ${GroundLadder.MIN_STEP}\n反馈预算 ${Feedback.MAX_LATENCY_MS}ms",
+        style = NfType.meta,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Text(
+        "密度 320dp=${NfDensity.factor(320, 1f)}\n500dp=${NfDensity.factor(500, 1f)}\n900dp=${NfDensity.factor(900, 1f)}",
+        style = NfType.meta,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun DesignSystemComponents() {
+    NfSectionHeader("组件")
+    Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp)) {
+        NfStatusChip("草稿", tone = NfStatusTone.NEUTRAL)
+        NfStatusChip("已签收", tone = NfStatusTone.SUCCESS)
+        NfStatusChip("待复核", tone = NfStatusTone.WARNING)
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp)) {
+        NfStatusChip("错误", tone = NfStatusTone.ERROR)
+        NfStatusChip("信息", tone = NfStatusTone.INFO)
+        NfStatusChip("交付中", tone = NfStatusTone.BRAND)
+    }
+    NfTrustMeter(level = 2, caption = "可复核，未签收")
+    NfScreenTitle("屏幕标题 22")
+    Text(text = "区块标题 16/600", style = NfType.sectionTitle)
+    NfItemTitle("条目标题 16/500")
+    NfBody("正文 16/24。中文行距 1.5，字距 0，断行交给系统。")
+    NfSecondary("次要正文 14/20，用于辅助说明。")
+    NfMeta("元信息 12/20 · 3 分钟前")
+    NfHashBlock("88d26e9a4f1c2b3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5")
+    NfNumeric("1,284")
+    NfErrorBlock(
+        code = "[NF-E-003]",
+        what = "剪贴板为空。",
+        fix = "先复制一段内容，再点粘贴。"
+    )
+    NfSkeleton(width = 200, height = 20)
+    NfEmptyState(text = "尚无项目。新建或导入一段内容开始。", actionLabel = "新建项目", onAction = {})
+    NfPrimaryAction(label = "开始成稿", onClick = {})
+}
+
+@Composable
+private fun DesignSystemStates() {
+    NfSectionHeader("7 态（契约驱动）")
+    StateContracts.all.forEach { state ->
+        Row(horizontalArrangement = Arrangement.spacedBy(Space.gap.dp), verticalAlignment = Alignment.CenterVertically) {
+            NfStatusChip(
+                state.title,
+                tone = when (state.tone) {
+                    "success" -> NfStatusTone.SUCCESS
+                    "warning" -> NfStatusTone.WARNING
+                    "error" -> NfStatusTone.ERROR
+                    "info" -> NfStatusTone.INFO
+                    else -> NfStatusTone.NEUTRAL
+                }
+            )
+            NfMeta(state.action ?: "无动作")
+        }
+    }
+}
+
+@Composable
+private fun DesignSystemSizes() {
+    NfSectionHeader("尺寸")
+    NfMono("touch ${Sizes.touchTarget}dp · appbar ${Sizes.topAppBar}dp · button ${Sizes.button}dp")
+    NfMono("field ${Sizes.textField}dp · row ${Sizes.listOneLine}/${Sizes.listTwoLine}dp")
+    NfMono("nav ${Sizes.navigationBar}dp · content max ${Layout.maxContentWidth}dp")
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun DesignSystemScaleToggles(
+    dark: Boolean,
+    fontScale: Float,
+    onDarkChange: (Boolean) -> Unit,
+    onFontScaleChange: (Float) -> Unit
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(Space.gap.dp),
+        verticalArrangement = Arrangement.spacedBy(Space.gap.dp)
+    ) {
+        if (!dark) Button(onClick = { onDarkChange(false) }) { Text("浅色") }
+        else OutlinedButton(onClick = { onDarkChange(false) }) { Text("浅色") }
+        if (dark) Button(onClick = { onDarkChange(true) }) { Text("深色") }
+        else OutlinedButton(onClick = { onDarkChange(true) }) { Text("深色") }
+    }
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(Space.gap.dp),
+        verticalArrangement = Arrangement.spacedBy(Space.gap.dp)
+    ) {
+        if (fontScale == 1f) Button(onClick = { onFontScaleChange(1f) }) { Text("100%") }
+        else OutlinedButton(onClick = { onFontScaleChange(1f) }) { Text("100%") }
+        if (fontScale == 1.3f) Button(onClick = { onFontScaleChange(1.3f) }) { Text("130%") }
+        else OutlinedButton(onClick = { onFontScaleChange(1.3f) }) { Text("130%") }
+        if (fontScale == 2f) Button(onClick = { onFontScaleChange(2f) }) { Text("200%") }
+        else OutlinedButton(onClick = { onFontScaleChange(2f) }) { Text("200%") }
+    }
+    NfMeta("当前：${if (dark) "深色" else "浅色"} · 缩放 ${(fontScale * 100).toInt()}%")
+}
+
+@Composable
+private fun DesignSystemTokenCatalog(dark: Boolean) {
+    TypeScaleCatalog()
+    SpaceCatalog()
+    ContrastCatalog(dark)
+}
+
+@Composable
+private fun TypeScaleCatalog() {
+    NfSectionHeader("字阶（4 级）")
+    TypeScale.all.forEach { token ->
+        Column(verticalArrangement = Arrangement.spacedBy(Space.inline.dp)) {
+            Text(
+                text = "${token.name}  ${token.size.toInt()}/${token.line.toInt()}  w${token.weight}",
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "内容库 Content 123",
+                style = when (token.name) {
+                    "title.screen" -> NfType.screenTitle
+                    "title.section" -> NfType.sectionTitle
+                    "title.item" -> NfType.itemTitle
+                    "body.long" -> NfType.bodyLong
+                    "body.secondary" -> NfType.secondary
+                    "label" -> NfType.label
+                    "meta" -> NfType.meta
+                    "mono" -> NfType.mono
+                    else -> NfType.body
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SpaceCatalog() {
+    NfSectionHeader("间距（4 的倍数）")
+    Space.all.forEach { value ->
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .width(value.dp)
+                    .height(8.dp)
+                    .background(MaterialTheme.colorScheme.primary)
+            )
+            Spacer(Modifier.width(Space.gap.dp))
+            NfMeta("${value}dp")
+        }
+    }
+}
+
+@Composable
+private fun ContrastCatalog(dark: Boolean) {
+    NfSectionHeader("颜色与对比度")
+    ContrastPairs.all.forEach { pair ->
+        val ratio = Contrast.ratio(pair, dark)
+        val pass = ratio >= pair.min
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(Color(if (dark) pair.bg.dark else pair.bg.light))
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(Radius.xs.dp)
+                    )
+            )
+            Spacer(Modifier.width(Space.gap.dp))
+            NfMeta(pair.name)
+            Spacer(Modifier.width(Space.gap.dp))
+            NfMono("${"%.2f".format(ratio)} ${if (pass) "OK" else "FAIL"}")
         }
     }
 }

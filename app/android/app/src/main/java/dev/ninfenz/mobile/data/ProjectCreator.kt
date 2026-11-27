@@ -117,40 +117,20 @@ class ProjectCreator(
                 val specDigest = canonicalDigest(core, spec) ?: return@withContext coreFailure()
 
                 val projectId = uniqueId(preferredId ?: slug(title))
-                val document = ProjectFactory.build(
-                    id = projectId,
-                    title = title.ifBlank { "未命名项目" },
-                    packId = pack.id,
-                    packVersion = pack.version,
-                    packTree = pack.tree,
-                    protocolId = text(protocol, "id"),
-                    protocolVersion = text(protocol, "version"),
+                val document = newProjectJson(
+                    pack = pack,
+                    title = title,
+                    projectId = projectId,
+                    protocol = protocol,
+                    graph = graph,
+                    spec = spec,
                     protocolDigest = protocolDigest,
-                    graphId = text(graph, "id"),
-                    graphVersion = text(graph, "version"),
                     graphDigest = graphDigest,
-                    graphSha256 = sha256(graphFile.readBytes()),
-                    specId = text(spec, "id"),
-                    specVersion = text(spec, "version"),
                     specDigest = specDigest,
-                    specSha256 = sha256(specFile.readBytes())
+                    graphFile = graphFile,
+                    specFile = specFile
                 )
-
-                val validate = core.call("project-validate", buildJsonObject { put("project", document) })
-                if (!validate.ok) {
-                    val error = validate.error
-                    return@withContext CreateProjectResult.Failure(
-                        error?.code ?: "NF-VAL-001",
-                        error?.message ?: "项目校验失败",
-                        error?.fix ?: "检查 Pack 引用与 schema"
-                    )
-                }
-                val verdict = validate.resultObject()?.get("verdict")?.jsonPrimitive?.content
-                if (verdict != null && verdict == "fail") {
-                    return@withContext CreateProjectResult.Failure(
-                        "NF-VAL-001", "项目校验未通过", "查看校验报告并修复引用"
-                    )
-                }
+                validateProject(core, document)?.let { return@withContext it }
 
                 val projectsDir = File(filesDir, "projects").apply { mkdirs() }
                 val target = File(projectsDir, projectId + ".nfproject.json")
@@ -165,6 +145,56 @@ class ProjectCreator(
                 )
             }
         }
+
+    private fun newProjectJson(
+        pack: PackEntry,
+        title: String,
+        projectId: String,
+        protocol: JsonObject,
+        graph: JsonObject,
+        spec: JsonObject,
+        protocolDigest: String,
+        graphDigest: String,
+        specDigest: String,
+        graphFile: File,
+        specFile: File
+    ): JsonObject = ProjectFactory.build(
+        id = projectId,
+        title = title.ifBlank { "未命名项目" },
+        packId = pack.id,
+        packVersion = pack.version,
+        packTree = pack.tree,
+        protocolId = text(protocol, "id"),
+        protocolVersion = text(protocol, "version"),
+        protocolDigest = protocolDigest,
+        graphId = text(graph, "id"),
+        graphVersion = text(graph, "version"),
+        graphDigest = graphDigest,
+        graphSha256 = sha256(graphFile.readBytes()),
+        specId = text(spec, "id"),
+        specVersion = text(spec, "version"),
+        specDigest = specDigest,
+        specSha256 = sha256(specFile.readBytes())
+    )
+
+    private suspend fun validateProject(core: CoreBridge, document: JsonObject): CreateProjectResult.Failure? {
+        val validate = core.call("project-validate", buildJsonObject { put("project", document) })
+        if (!validate.ok) {
+            val error = validate.error
+            return CreateProjectResult.Failure(
+                error?.code ?: "NF-VAL-001",
+                error?.message ?: "项目校验失败",
+                error?.fix ?: "检查 Pack 引用与 schema"
+            )
+        }
+        val verdict = validate.resultObject()?.get("verdict")?.jsonPrimitive?.content
+        if (verdict != null && verdict == "fail") {
+            return CreateProjectResult.Failure(
+                "NF-VAL-001", "项目校验未通过", "查看校验报告并修复引用"
+            )
+        }
+        return null
+    }
 
     private suspend fun canonicalDigest(core: CoreBridge, obj: JsonObject): String? {
         val response: CoreResponse = try {

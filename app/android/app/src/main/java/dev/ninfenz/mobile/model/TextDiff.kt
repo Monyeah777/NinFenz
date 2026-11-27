@@ -25,14 +25,8 @@ object TextDiff {
     fun diff(oldText: String, newText: String): TextDiffReport {
         val oldLines = oldText.lines()
         val newLines = newText.lines()
-        var prefix = 0
-        while (prefix < oldLines.size && prefix < newLines.size && oldLines[prefix] == newLines[prefix]) prefix++
-        var suffix = 0
-        while (
-            suffix < oldLines.size - prefix &&
-            suffix < newLines.size - prefix &&
-            oldLines[oldLines.size - 1 - suffix] == newLines[newLines.size - 1 - suffix]
-        ) suffix++
+        val prefix = commonPrefix(oldLines, newLines)
+        val suffix = commonSuffix(oldLines, newLines, prefix)
 
         val oldMid = oldLines.subList(prefix, oldLines.size - suffix)
         val newMid = newLines.subList(prefix, newLines.size - suffix)
@@ -42,36 +36,59 @@ object TextDiff {
         }
 
         if (oldMid.size.toLong() * newMid.size.toLong() > MAX_CELLS) {
-            val oldSet = oldMid.toSet()
-            val newSet = newMid.toSet()
-            var oldNo = prefix + 1
-            var newNo = prefix + 1
-            oldMid.filter { it !in newSet }.forEach { line ->
-                out += DiffLine(DiffKind.REMOVE, oldNo, null, line)
-                oldNo++
-            }
-            newMid.filter { it !in oldSet }.forEach { line ->
-                out += DiffLine(DiffKind.ADD, null, newNo, line)
-                newNo++
-            }
-            for (i in 0 until suffix) {
-                out += DiffLine(
-                    DiffKind.EQUAL,
-                    oldLines.size - suffix + i + 1,
-                    newLines.size - suffix + i + 1,
-                    oldLines[oldLines.size - suffix + i]
-                )
-            }
-            return TextDiffReport(
-                lines = out,
-                added = out.count { it.kind == DiffKind.ADD },
-                removed = out.count { it.kind == DiffKind.REMOVE },
-                degraded = true
-            )
+            appendDegraded(oldLines, newLines, oldMid, newMid, prefix, suffix, out)
+            return report(out, degraded = true)
         }
 
         val n = oldMid.size
         val m = newMid.size
+        val dp = lcsTable(oldMid, newMid, n, m)
+        walkDiff(oldMid, newMid, dp, prefix, out)
+        appendSuffix(oldLines, newLines, suffix, out)
+        return report(out, degraded = false)
+    }
+
+    private fun commonPrefix(oldLines: List<String>, newLines: List<String>): Int {
+        var prefix = 0
+        while (prefix < oldLines.size && prefix < newLines.size && oldLines[prefix] == newLines[prefix]) prefix++
+        return prefix
+    }
+
+    private fun commonSuffix(oldLines: List<String>, newLines: List<String>, prefix: Int): Int {
+        var suffix = 0
+        while (
+            suffix < oldLines.size - prefix &&
+            suffix < newLines.size - prefix &&
+            oldLines[oldLines.size - 1 - suffix] == newLines[newLines.size - 1 - suffix]
+        ) suffix++
+        return suffix
+    }
+
+    private fun appendDegraded(
+        oldLines: List<String>,
+        newLines: List<String>,
+        oldMid: List<String>,
+        newMid: List<String>,
+        prefix: Int,
+        suffix: Int,
+        out: MutableList<DiffLine>
+    ) {
+        val oldSet = oldMid.toSet()
+        val newSet = newMid.toSet()
+        var oldNo = prefix + 1
+        var newNo = prefix + 1
+        oldMid.filter { it !in newSet }.forEach { line ->
+            out += DiffLine(DiffKind.REMOVE, oldNo, null, line)
+            oldNo++
+        }
+        newMid.filter { it !in oldSet }.forEach { line ->
+            out += DiffLine(DiffKind.ADD, null, newNo, line)
+            newNo++
+        }
+        appendSuffix(oldLines, newLines, suffix, out)
+    }
+
+    private fun lcsTable(oldMid: List<String>, newMid: List<String>, n: Int, m: Int): Array<IntArray> {
         val dp = Array(n + 1) { IntArray(m + 1) }
         for (i in n - 1 downTo 0) {
             for (j in m - 1 downTo 0) {
@@ -82,6 +99,18 @@ object TextDiff {
                 }
             }
         }
+        return dp
+    }
+
+    private fun walkDiff(
+        oldMid: List<String>,
+        newMid: List<String>,
+        dp: Array<IntArray>,
+        prefix: Int,
+        out: MutableList<DiffLine>
+    ) {
+        val n = oldMid.size
+        val m = newMid.size
         var i = 0
         var j = 0
         while (i < n && j < m) {
@@ -109,6 +138,9 @@ object TextDiff {
             out += DiffLine(DiffKind.ADD, null, prefix + j + 1, newMid[j])
             j++
         }
+    }
+
+    private fun appendSuffix(oldLines: List<String>, newLines: List<String>, suffix: Int, out: MutableList<DiffLine>) {
         for (k in 0 until suffix) {
             out += DiffLine(
                 DiffKind.EQUAL,
@@ -117,11 +149,12 @@ object TextDiff {
                 oldLines[oldLines.size - suffix + k]
             )
         }
-        return TextDiffReport(
-            lines = out,
-            added = out.count { it.kind == DiffKind.ADD },
-            removed = out.count { it.kind == DiffKind.REMOVE },
-            degraded = false
-        )
     }
+
+    private fun report(out: List<DiffLine>, degraded: Boolean): TextDiffReport = TextDiffReport(
+        lines = out,
+        added = out.count { it.kind == DiffKind.ADD },
+        removed = out.count { it.kind == DiffKind.REMOVE },
+        degraded = degraded
+    )
 }

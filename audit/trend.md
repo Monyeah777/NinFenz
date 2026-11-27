@@ -107,3 +107,9 @@
 ## 门禁状态（第十三轮后）
 
 - 最新证据 p2-batch10：总分 98.08，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS；A/B/D/E/J 维度 100。
+
+## 门禁状态（第十四轮后）
+
+- 最新证据：round14（提交后生成，见 audit/evidence/<hash>）；总分 98.70，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
+- 维度：A100 B100 C87 D100 E100 F100 G–N 全 100。
+- C 维度规则清零进度：C-002 / C-003 / C-013 已清零（C 82→87）；C-001 / C-005 / C-007 / C-008 / C-009 / C-012 / C-010（剩 6 模块）待后续批次。

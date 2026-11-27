@@ -242,101 +242,18 @@ fun ImportScreen(
         zeroSliceNote = null
         zeroSliceStore.clear()
         val isZip = file.name.endsWith(".zip", ignoreCase = true) || (mime ?: "").contains("zip", ignoreCase = true)
-        if (isZip && dev.ninfenz.mobile.data.ProjectBundleImporter.hasBundle(file)) {
-            busy = true
-            error = null
-            notice = null
-            try {
-                val imported = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.ProjectBundleImporter.import(context.filesDir, file) }
-                notice = context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.import_bundle_done, imported.count, imported.count)
-                onBundleImported(imported.count)
-            } catch (t: Throwable) {
-                error = CoreResponse.failure(
-                    "NF-PRJ-001",
-                    context.getString(dev.ninfenz.mobile.R.string.import_project_failed, t.message ?: t.javaClass.simpleName),
-                    context.getString(dev.ninfenz.mobile.R.string.import_project_failed_fix),
-                    2
-                ).error
-            } finally {
-                file.delete()
-                busy = false
-            }
+        if (importProjectBundleIfPresent(context, file, isZip,
+                onBusy = { busy = it }, onError = { error = it }, onNotice = { notice = it },
+                onBundleImported = onBundleImported)) {
             return
         }
-        if (isZip && TemplatePackageImporter.hasTemplateJson(file)) {
-            busy = true
-            error = null
-            notice = null
-            var importedDir: File? = null
-            try {
-                val imported = withContext(Dispatchers.IO) { TemplatePackageImporter.inspect(file, context.cacheDir) }
-                importedDir = imported.dir
-                val hash = safeCall("pack-hash", buildJsonObject { put("root", imported.dir.absolutePath) })
-                val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
-                val tree = hashes?.get("tree")?.jsonPrimitive?.content
-                val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
-                val pack = if (imported.packId != null) {
-                    packs.firstOrNull {
-                        it.id == imported.packId && (imported.packVersion == null || it.version == imported.packVersion)
-                    }
-                } else {
-                    packs.firstOrNull()
-                }
-                if (!hash.ok || tree != imported.tree || count != imported.count) {
-                    error = hash.error ?: CoreResponse.failure("NF-PCK-003", context.getString(dev.ninfenz.mobile.R.string.import_template_tree_mismatch), context.getString(dev.ninfenz.mobile.R.string.import_template_tree_mismatch_fix), 2).error
-                } else {
-                    val specObj = kotlinx.serialization.json.Json.parseToJsonElement(imported.specText).jsonObject
-                    val specCheck = safeCall("spec-validate", buildJsonObject { put("spec", specObj) })
-                    if (!specCheck.ok) {
-                        error = specCheck.error
-                    } else if (pack == null) {
-                        error = CoreResponse.failure(
-                            "NF-PCK-002",
-                            if (imported.packId != null) {
-                                context.getString(dev.ninfenz.mobile.R.string.import_template_pack_missing, imported.packId, imported.packVersion.orEmpty())
-                            } else {
-                                context.getString(dev.ninfenz.mobile.R.string.import_template_need_pack)
-                            },
-                            context.getString(dev.ninfenz.mobile.R.string.import_template_need_pack),
-                            2
-                        ).error
-                    } else {
-                        onCreateProjectFromTemplate(pack, imported.title, imported.specText, imported.templateText)
-                    }
-                }
-            } catch (t: Throwable) {
-                error = CoreResponse.failure(
-                    "NF-E-005",
-                    context.getString(dev.ninfenz.mobile.R.string.import_template_import) + ": " + (t.message ?: t.javaClass.simpleName),
-                    context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
-                    2
-                ).error
-            } finally {
-                importedDir?.deleteRecursively()
-            }
-            file.delete()
-            busy = false
+        if (importTemplatePackageIfPresent(context, file, isZip, packs,
+                onBusy = { busy = it }, onError = { error = it }, onNotice = { notice = it },
+                onCreateProjectFromTemplate = onCreateProjectFromTemplate)) {
             return
         }
-        if (isZip && ProjectPackageImporter.hasProjectJson(file)) {
-            try {
-                val imported = withContext(Dispatchers.IO) { ProjectPackageImporter.import(context.filesDir, file) }
-                notice = context.resources.getQuantityString(
-                    dev.ninfenz.mobile.R.plurals.import_project_package_done,
-                    imported.dataFiles,
-                    imported.id,
-                    imported.dataFiles
-                )
-                file.delete()
-                onProjectImported(imported.id, imported.packId, imported.packVersion)
-            } catch (t: Throwable) {
-                error = CoreResponse.failure(
-                    "NF-PRJ-001",
-                    context.getString(dev.ninfenz.mobile.R.string.import_project_failed, t.message ?: t.javaClass.simpleName),
-                    context.getString(dev.ninfenz.mobile.R.string.import_project_failed_fix),
-                    2
-                ).error
-            }
+        if (importProjectPackageIfPresent(context, file, isZip,
+                onError = { error = it }, onNotice = { notice = it }, onProjectImported = onProjectImported)) {
             return
         }
         busy = true
@@ -347,179 +264,15 @@ fun ImportScreen(
         savedName = null
         suggestNote = null
         acceptedMappings = emptySet()
-        val isPdf = name.endsWith(".pdf", true) || (mime ?: "").contains("pdf", ignoreCase = true)
-        val isCsv = name.endsWith(".csv", true) || name.endsWith(".tsv", true) || (mime ?: "").contains("csv", ignoreCase = true) || (mime ?: "").contains("tab-separated", ignoreCase = true)
-        val isImage = (mime ?: "").startsWith("image/") || listOf(".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp").any { name.endsWith(it, true) }
-        val isDocx = name.endsWith(".docx", true) || mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        val isEpub = name.endsWith(".epub", true) || mime == "application/epub+zip" ||
-            ((name.endsWith(".zip", true) || mime == "application/zip") && EpubImporter.isEpub(file))
-        val isHtml = !isEpub && !isDocx && !isPdf && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
-        val isText = !isEpub && !isDocx && !isHtml && !isPdf && !isImage && !isCsv && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
-            name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
-        val sourceFile = when {
-            isCsv -> {
-                val markdown = CsvTable.toMarkdown(TextEncoding.decodeText(file.readBytes()))
-                File(file.parentFile, "csv-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
-            }
-            isImage -> {
-                val extraction = runCatching { dev.ninfenz.mobile.data.ImageOcrImporter.extract(context, file) }
-                if (extraction.isFailure) {
-                    error = CoreResponse.failure(
-                        "NF-IMP-004",
-                        context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_failed, extraction.exceptionOrNull()?.message ?: "unknown"),
-                        context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required_fix),
-                        3
-                    ).error
-                    return
-                }
-                var markdown = extraction.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
-                if (markdown == null) {
-                    val ocr = runCatching { dev.ninfenz.mobile.data.PdfOcrImporter.extract(context, file) }
-                    if (ocr.isFailure) {
-                        error = CoreResponse.failure(
-                            "NF-IMP-004",
-                            context.getString(dev.ninfenz.mobile.R.string.import_pdf_ocr_failed, ocr.exceptionOrNull()?.message ?: "unknown"),
-                            context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
-                            3
-                        ).error
-                        return
-                    }
-                    markdown = ocr.orNullLogged("ImportScreen")?.text?.takeIf { it.isNotBlank() }
-                    if (ocr.orNullLogged("ImportScreen")?.truncated == true) {
-                        notice = context.getString(dev.ninfenz.mobile.R.string.import_pdf_ocr_truncated)
-                    }
-                }
-                if (markdown == null) {
-                    error = CoreResponse.failure(
-                        "NF-IMP-004",
-                        context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required),
-                        context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required_fix),
-                        3
-                    ).error
-                    return
-                }
-                File(file.parentFile, "image-ocr-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
-            }
-            isPdf -> {
-                val extraction = runCatching { dev.ninfenz.mobile.data.PdfTextImporter.extract(context, file) }
-                if (extraction.isFailure) {
-                    error = CoreResponse.failure(
-                        "NF-IMP-004",
-                        context.getString(dev.ninfenz.mobile.R.string.import_pdf_failed, extraction.exceptionOrNull()?.message ?: "unknown"),
-                        context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
-                        3
-                    ).error
-                    return
-                }
-                val markdown = extraction.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
-                if (markdown == null) {
-                    error = CoreResponse.failure(
-                        "NF-IMP-004",
-                        context.getString(dev.ninfenz.mobile.R.string.import_pdf_no_text),
-                        context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
-                        3
-                    ).error
-                    return
-                }
-                File(file.parentFile, "pdf-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
-            }
-            isDocx -> {
-                val markdown = runCatching { DocxImporter.extract(file) }.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
-                if (markdown == null) {
-                    error = CoreResponse.failure(
-                        "NF-IMP-008",
-                        context.getString(dev.ninfenz.mobile.R.string.import_docx_failed),
-                        context.getString(dev.ninfenz.mobile.R.string.import_docx_failed_fix),
-                        2
-                    ).error
-                    return
-                }
-                File(file.parentFile, "docx-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
-            }
-            isEpub -> {
-                val markdown = runCatching { EpubImporter.extract(file) }.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
-                if (markdown == null) {
-                    error = CoreResponse.failure(
-                        "NF-IMP-007",
-                        context.getString(dev.ninfenz.mobile.R.string.import_epub_failed),
-                        context.getString(dev.ninfenz.mobile.R.string.import_epub_failed_fix),
-                        2
-                    ).error
-                    return
-                }
-                File(file.parentFile, "epub-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
-            }
-            isHtml -> {
-                val raw = HtmlImporter.decode(file.readBytes())
-                val markdown = HtmlImporter.toMarkdown(raw)
-                File(file.parentFile, "html-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
-            }
-            isText -> TextEncoding.toUtf8(file) ?: file
-            else -> file
-        }
-        val payload = buildJsonObject {
-            put("file", sourceFile.absolutePath)
-            put("source", buildJsonObject {
-                put("kind", sourceKind)
-                put("name", name)
-                if (mime != null) put("mime", mime)
-                if (size >= 0) put("size", size)
-            })
-        }
-        val response: CoreResponse = safeCall("import", payload)
-        if (response.ok) {
-            val obj = response.resultObject()
-            if (obj == null) {
-                error = CoreResponse.failure(
-                    "NF-E-002",
-                    context.getString(dev.ninfenz.mobile.R.string.import_core_missing_result),
-                    context.getString(dev.ninfenz.mobile.R.string.import_core_missing_result_fix),
-                    2
-                ).error
-            } else {
-                try {
-                    val imported = ImportModel.parse(obj)
-                    val digest = imported.source.sha256 ?: imported.textDigest
-                    if (!digest.isNullOrBlank()) {
-                        val previous = importHistory.find(digest)
-                        if (previous != null) {
-                            notice = context.getString(dev.ninfenz.mobile.R.string.import_duplicate_notice, previous.name, digest.take(12))
-                            duplicatePrompt = DuplicatePrompt(digest, DraftLibrary.findByDigest(context.filesDir, digest))
-                        }
-                        importHistory.record(digest, imported.source.name)
-                        recentImports = importHistory.recent()
-                    }
-                    rawResult = obj
-                    doc = imported
-                    acceptedMappings = imported.mappings.indices.filter { imported.mappings[it].confidence >= mappingThreshold }.toSet()
-                    // 映射建议：core map-suggest（可选；失败不阻断预览，只提示）
-                    val suggest = safeCall("map-suggest", buildJsonObject { put("import", obj) })
-                    if (suggest.ok) {
-                        val suggestedObj = suggest.resultObject()
-                        if (suggestedObj != null) {
-                            doc = ImportModel.parse(suggestedObj)
-                            rawResult = suggestedObj
-                            acceptedMappings = requireNotNull(doc).mappings.indices.filter { requireNotNull(doc).mappings[it].confidence >= mappingThreshold }.toSet()
-                            suggestNote = context.getString(dev.ninfenz.mobile.R.string.import_suggest_done)
-                        }
-                    } else {
-                        suggestNote = context.getString(
-                            dev.ninfenz.mobile.R.string.import_no_suggestion,
-                            suggest.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.unknown_reason)
-                        )
-                    }
-                } catch (e: Exception) {
-                    error = CoreResponse.failure(
-                        (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-E-002",
-                        context.getString(dev.ninfenz.mobile.R.string.import_parse_failed, e.message ?: e.javaClass.simpleName),
-                        context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
-                        1
-                    ).error
-                }
-            }
-        } else {
-            error = response.error
-        }
+        val kind = classifyImport(name, mime, file)
+        val sourceFile = prepareImportSource(context, file, name, mime, kind,
+            onError = { error = it }, onNotice = { notice = it }) ?: return
+        val response = callCoreImport(sourceFile, sourceKind, name, mime, size)
+        applyImportResponse(context, response, mappingThreshold, importHistory,
+            onError = { error = it }, onDoc = { doc = it }, onRawResult = { rawResult = it },
+            onAcceptedMappings = { acceptedMappings = it }, onNotice = { notice = it },
+            onDuplicatePrompt = { duplicatePrompt = it }, onSuggestNote = { suggestNote = it },
+            onRecentImports = { recentImports = it })
         rawResult?.let { importDraftStore.save(it.toString()) }
         if (sourceFile != file) sourceFile.delete()
         busy = false
@@ -2127,3 +1880,405 @@ private data class ImportClearSnapshot(
 )
 
 private data class DuplicatePrompt(val digest: String, val draft: File?)
+
+private class ImportKind(
+    val isCsv: Boolean,
+    val isImage: Boolean,
+    val isPdf: Boolean,
+    val isDocx: Boolean,
+    val isEpub: Boolean,
+    val isHtml: Boolean,
+    val isText: Boolean
+)
+
+private fun classifyImport(name: String, mime: String?, file: File): ImportKind {
+    val isPdf = name.endsWith(".pdf", true) || (mime ?: "").contains("pdf", ignoreCase = true)
+    val isCsv = name.endsWith(".csv", true) || name.endsWith(".tsv", true) || (mime ?: "").contains("csv", ignoreCase = true) || (mime ?: "").contains("tab-separated", ignoreCase = true)
+    val isImage = (mime ?: "").startsWith("image/") || listOf(".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp").any { name.endsWith(it, true) }
+    val isDocx = name.endsWith(".docx", true) || mime == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    val isEpub = name.endsWith(".epub", true) || mime == "application/epub+zip" ||
+        ((name.endsWith(".zip", true) || mime == "application/zip") && EpubImporter.isEpub(file))
+    val isHtml = !isEpub && !isDocx && !isPdf && (name.endsWith(".html", true) || name.endsWith(".htm", true) || mime == "text/html")
+    val isText = !isEpub && !isDocx && !isHtml && !isPdf && !isImage && !isCsv && (name.endsWith(".txt", true) || name.endsWith(".md", true) ||
+        name.endsWith(".markdown", true) || mime?.startsWith("text/") == true)
+    return ImportKind(isCsv, isImage, isPdf, isDocx, isEpub, isHtml, isText)
+}
+
+private suspend fun prepareImportSource(
+    context: android.content.Context,
+    file: File,
+    name: String,
+    mime: String?,
+    kind: ImportKind,
+    onError: (CoreError?) -> Unit,
+    onNotice: (String?) -> Unit
+): File? {
+    return when {
+        kind.isCsv -> {
+            val markdown = CsvTable.toMarkdown(TextEncoding.decodeText(file.readBytes()))
+            File(file.parentFile, "csv-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
+        }
+        kind.isImage -> imageImportSource(context, file, onError, onNotice) ?: return null
+        kind.isPdf -> pdfImportSource(context, file, onError) ?: return null
+        kind.isDocx -> docxImportSource(context, file, onError) ?: return null
+        kind.isEpub -> epubImportSource(context, file, onError) ?: return null
+        kind.isHtml -> {
+            val raw = HtmlImporter.decode(file.readBytes())
+            val markdown = HtmlImporter.toMarkdown(raw)
+            File(file.parentFile, "html-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
+        }
+        kind.isText -> TextEncoding.toUtf8(file) ?: file
+        else -> file
+    }
+}
+
+private suspend fun imageImportSource(
+    context: android.content.Context,
+    file: File,
+    onError: (CoreError?) -> Unit,
+    onNotice: (String?) -> Unit
+): File? {
+    val extraction = runCatching { dev.ninfenz.mobile.data.ImageOcrImporter.extract(context, file) }
+    if (extraction.isFailure) {
+        onError(CoreResponse.failure(
+            "NF-IMP-004",
+            context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_failed, extraction.exceptionOrNull()?.message ?: "unknown"),
+            context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required_fix),
+            3
+        ).error)
+        return null
+    }
+    var markdown = extraction.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
+    if (markdown == null) {
+        val ocr = runCatching { dev.ninfenz.mobile.data.PdfOcrImporter.extract(context, file) }
+        if (ocr.isFailure) {
+            onError(CoreResponse.failure(
+                "NF-IMP-004",
+                context.getString(dev.ninfenz.mobile.R.string.import_pdf_ocr_failed, ocr.exceptionOrNull()?.message ?: "unknown"),
+                context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
+                3
+            ).error)
+            return null
+        }
+        markdown = ocr.orNullLogged("ImportScreen")?.text?.takeIf { it.isNotBlank() }
+        if (ocr.orNullLogged("ImportScreen")?.truncated == true) {
+            onNotice(context.getString(dev.ninfenz.mobile.R.string.import_pdf_ocr_truncated))
+        }
+    }
+    if (markdown == null) {
+        onError(CoreResponse.failure(
+            "NF-IMP-004",
+            context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required),
+            context.getString(dev.ninfenz.mobile.R.string.import_image_ocr_required_fix),
+            3
+        ).error)
+        return null
+    }
+    return File(file.parentFile, "image-ocr-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
+}
+
+private suspend fun pdfImportSource(
+    context: android.content.Context,
+    file: File,
+    onError: (CoreError?) -> Unit
+): File? {
+    val extraction = runCatching { dev.ninfenz.mobile.data.PdfTextImporter.extract(context, file) }
+    if (extraction.isFailure) {
+        onError(CoreResponse.failure(
+            "NF-IMP-004",
+            context.getString(dev.ninfenz.mobile.R.string.import_pdf_failed, extraction.exceptionOrNull()?.message ?: "unknown"),
+            context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
+            3
+        ).error)
+        return null
+    }
+    val markdown = extraction.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
+    if (markdown == null) {
+        onError(CoreResponse.failure(
+            "NF-IMP-004",
+            context.getString(dev.ninfenz.mobile.R.string.import_pdf_no_text),
+            context.getString(dev.ninfenz.mobile.R.string.import_pdf_unsupported_fix),
+            3
+        ).error)
+        return null
+    }
+    return File(file.parentFile, "pdf-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
+}
+
+private fun docxImportSource(context: android.content.Context, file: File, onError: (CoreError?) -> Unit): File? {
+    val markdown = runCatching { DocxImporter.extract(file) }.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
+    if (markdown == null) {
+        onError(CoreResponse.failure(
+            "NF-IMP-008",
+            context.getString(dev.ninfenz.mobile.R.string.import_docx_failed),
+            context.getString(dev.ninfenz.mobile.R.string.import_docx_failed_fix),
+            2
+        ).error)
+        return null
+    }
+    return File(file.parentFile, "docx-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
+}
+
+private fun epubImportSource(context: android.content.Context, file: File, onError: (CoreError?) -> Unit): File? {
+    val markdown = runCatching { EpubImporter.extract(file) }.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
+    if (markdown == null) {
+        onError(CoreResponse.failure(
+            "NF-IMP-007",
+            context.getString(dev.ninfenz.mobile.R.string.import_epub_failed),
+            context.getString(dev.ninfenz.mobile.R.string.import_epub_failed_fix),
+            2
+        ).error)
+        return null
+    }
+    return File(file.parentFile, "epub-import-" + System.nanoTime() + ".md").apply { writeText(markdown, Charsets.UTF_8) }
+}
+
+private suspend fun importProjectBundleIfPresent(
+    context: android.content.Context,
+    file: File,
+    isZip: Boolean,
+    onBusy: (Boolean) -> Unit,
+    onError: (CoreError?) -> Unit,
+    onNotice: (String?) -> Unit,
+    onBundleImported: (Int) -> Unit
+): Boolean {
+    if (!isZip || !dev.ninfenz.mobile.data.ProjectBundleImporter.hasBundle(file)) return false
+    onBusy(true)
+    onError(null)
+    onNotice(null)
+    try {
+        val imported = withContext(Dispatchers.IO) { dev.ninfenz.mobile.data.ProjectBundleImporter.import(context.filesDir, file) }
+        onNotice(context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.import_bundle_done, imported.count, imported.count))
+        onBundleImported(imported.count)
+    } catch (t: Throwable) {
+        onError(CoreResponse.failure(
+            "NF-PRJ-001",
+            context.getString(dev.ninfenz.mobile.R.string.import_project_failed, t.message ?: t.javaClass.simpleName),
+            context.getString(dev.ninfenz.mobile.R.string.import_project_failed_fix),
+            2
+        ).error)
+    } finally {
+        file.delete()
+        onBusy(false)
+    }
+    return true
+}
+
+private suspend fun importTemplatePackageIfPresent(
+    context: android.content.Context,
+    file: File,
+    isZip: Boolean,
+    packs: List<PackEntry>,
+    onBusy: (Boolean) -> Unit,
+    onError: (CoreError?) -> Unit,
+    onNotice: (String?) -> Unit,
+    onCreateProjectFromTemplate: (PackEntry, String, String, String) -> Unit
+): Boolean {
+    if (!isZip || !TemplatePackageImporter.hasTemplateJson(file)) return false
+    onBusy(true)
+    onError(null)
+    onNotice(null)
+    var importedDir: File? = null
+    try {
+        val imported = withContext(Dispatchers.IO) { TemplatePackageImporter.inspect(file, context.cacheDir) }
+        importedDir = imported.dir
+        verifyTemplateImport(context, imported, packs, onError, onCreateProjectFromTemplate)
+    } catch (t: Throwable) {
+        onError(CoreResponse.failure(
+            "NF-E-005",
+            context.getString(dev.ninfenz.mobile.R.string.import_template_import) + ": " + (t.message ?: t.javaClass.simpleName),
+            context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
+            2
+        ).error)
+    } finally {
+        importedDir?.deleteRecursively()
+    }
+    file.delete()
+    onBusy(false)
+    return true
+}
+
+private suspend fun importProjectPackageIfPresent(
+    context: android.content.Context,
+    file: File,
+    isZip: Boolean,
+    onError: (CoreError?) -> Unit,
+    onNotice: (String?) -> Unit,
+    onProjectImported: (String, String, String) -> Unit
+): Boolean {
+    if (!isZip || !ProjectPackageImporter.hasProjectJson(file)) return false
+    try {
+        val imported = withContext(Dispatchers.IO) { ProjectPackageImporter.import(context.filesDir, file) }
+        onNotice(context.resources.getQuantityString(
+            dev.ninfenz.mobile.R.plurals.import_project_package_done,
+            imported.dataFiles,
+            imported.id,
+            imported.dataFiles
+        ))
+        file.delete()
+        onProjectImported(imported.id, imported.packId, imported.packVersion)
+    } catch (t: Throwable) {
+        onError(CoreResponse.failure(
+            "NF-PRJ-001",
+            context.getString(dev.ninfenz.mobile.R.string.import_project_failed, t.message ?: t.javaClass.simpleName),
+            context.getString(dev.ninfenz.mobile.R.string.import_project_failed_fix),
+            2
+        ).error)
+    }
+    return true
+}
+
+private suspend fun callCoreImport(
+    sourceFile: File,
+    sourceKind: String,
+    name: String,
+    mime: String?,
+    size: Long
+): CoreResponse {
+    val payload = buildJsonObject {
+        put("file", sourceFile.absolutePath)
+        put("source", buildJsonObject {
+            put("kind", sourceKind)
+            put("name", name)
+            if (mime != null) put("mime", mime)
+            if (size >= 0) put("size", size)
+        })
+    }
+    return safeCall("import", payload)
+}
+
+private suspend fun applyImportResponse(
+    context: android.content.Context,
+    response: CoreResponse,
+    mappingThreshold: Int,
+    importHistory: dev.ninfenz.mobile.data.ImportHistoryStore,
+    onError: (CoreError?) -> Unit,
+    onDoc: (ImportDoc?) -> Unit,
+    onRawResult: (JsonObject?) -> Unit,
+    onAcceptedMappings: (Set<Int>) -> Unit,
+    onNotice: (String?) -> Unit,
+    onDuplicatePrompt: (DuplicatePrompt?) -> Unit,
+    onSuggestNote: (String?) -> Unit,
+    onRecentImports: (List<dev.ninfenz.mobile.data.ImportHistoryStore.Entry>) -> Unit
+) {
+    if (response.ok) {
+        val obj = response.resultObject()
+        if (obj == null) {
+            onError(CoreResponse.failure(
+                "NF-E-002",
+                context.getString(dev.ninfenz.mobile.R.string.import_core_missing_result),
+                context.getString(dev.ninfenz.mobile.R.string.import_core_missing_result_fix),
+                2
+            ).error)
+        } else {
+            try {
+                val imported = ImportModel.parse(obj)
+                recordImportHistory(context, imported, importHistory, onNotice, onDuplicatePrompt, onRecentImports)
+                onRawResult(obj)
+                onDoc(imported)
+                onAcceptedMappings(imported.mappings.indices.filter { imported.mappings[it].confidence >= mappingThreshold }.toSet())
+                val suggest = safeCall("map-suggest", buildJsonObject { put("import", obj) })
+                if (suggest.ok) {
+                    val suggestedObj = suggest.resultObject()
+                    if (suggestedObj != null) {
+                        applySuggestedImport(context, suggestedObj, mappingThreshold, onDoc, onRawResult, onAcceptedMappings, onSuggestNote)
+                    }
+                } else {
+                    onSuggestNote(context.getString(
+                        dev.ninfenz.mobile.R.string.import_no_suggestion,
+                        suggest.error?.message ?: context.getString(dev.ninfenz.mobile.R.string.unknown_reason)
+                    ))
+                }
+            } catch (e: Exception) {
+                onError(CoreResponse.failure(
+                    (e as? dev.ninfenz.mobile.core.ModelException)?.code ?: "NF-E-002",
+                    context.getString(dev.ninfenz.mobile.R.string.import_parse_failed, e.message ?: e.javaClass.simpleName),
+                    context.getString(dev.ninfenz.mobile.R.string.import_parse_failed_fix),
+                    1
+                ).error)
+            }
+        }
+    } else {
+        onError(response.error)
+    }
+}
+
+private suspend fun verifyTemplateImport(
+    context: android.content.Context,
+    imported: TemplatePackageImporter.Imported,
+    packs: List<PackEntry>,
+    onError: (CoreError?) -> Unit,
+    onCreateProjectFromTemplate: (PackEntry, String, String, String) -> Unit
+) {
+    val hash = safeCall("pack-hash", buildJsonObject { put("root", imported.dir.absolutePath) })
+    val hashes = hash.resultObject()?.get("hashes") as? kotlinx.serialization.json.JsonObject
+    val tree = hashes?.get("tree")?.jsonPrimitive?.content
+    val count = hashes?.get("count")?.jsonPrimitive?.content?.toIntOrNull()
+    val pack = if (imported.packId != null) {
+        packs.firstOrNull {
+            it.id == imported.packId && (imported.packVersion == null || it.version == imported.packVersion)
+        }
+    } else {
+        packs.firstOrNull()
+    }
+    if (!hash.ok || tree != imported.tree || count != imported.count) {
+        onError(hash.error ?: CoreResponse.failure("NF-PCK-003", context.getString(dev.ninfenz.mobile.R.string.import_template_tree_mismatch), context.getString(dev.ninfenz.mobile.R.string.import_template_tree_mismatch_fix), 2).error)
+        return
+    }
+    val specObj = kotlinx.serialization.json.Json.parseToJsonElement(imported.specText).jsonObject
+    val specCheck = safeCall("spec-validate", buildJsonObject { put("spec", specObj) })
+    if (!specCheck.ok) {
+        onError(specCheck.error)
+        return
+    }
+    if (pack == null) {
+        onError(CoreResponse.failure(
+            "NF-PCK-002",
+            if (imported.packId != null) {
+                context.getString(dev.ninfenz.mobile.R.string.import_template_pack_missing, imported.packId, imported.packVersion.orEmpty())
+            } else {
+                context.getString(dev.ninfenz.mobile.R.string.import_template_need_pack)
+            },
+            context.getString(dev.ninfenz.mobile.R.string.import_template_need_pack),
+            2
+        ).error)
+        return
+    }
+    onCreateProjectFromTemplate(pack, imported.title, imported.specText, imported.templateText)
+}
+
+private suspend fun applySuggestedImport(
+    context: android.content.Context,
+    suggestedObj: JsonObject,
+    mappingThreshold: Int,
+    onDoc: (ImportDoc?) -> Unit,
+    onRawResult: (JsonObject?) -> Unit,
+    onAcceptedMappings: (Set<Int>) -> Unit,
+    onSuggestNote: (String?) -> Unit
+) {
+    val suggested = ImportModel.parse(suggestedObj)
+    onDoc(suggested)
+    onRawResult(suggestedObj)
+    onAcceptedMappings(suggested.mappings.indices.filter { suggested.mappings[it].confidence >= mappingThreshold }.toSet())
+    onSuggestNote(context.getString(dev.ninfenz.mobile.R.string.import_suggest_done))
+}
+
+private fun recordImportHistory(
+    context: android.content.Context,
+    imported: ImportDoc,
+    importHistory: dev.ninfenz.mobile.data.ImportHistoryStore,
+    onNotice: (String?) -> Unit,
+    onDuplicatePrompt: (DuplicatePrompt?) -> Unit,
+    onRecentImports: (List<dev.ninfenz.mobile.data.ImportHistoryStore.Entry>) -> Unit
+) {
+    val digest = imported.source.sha256 ?: imported.textDigest
+    if (!digest.isNullOrBlank()) {
+        val previous = importHistory.find(digest)
+        if (previous != null) {
+            onNotice(context.getString(dev.ninfenz.mobile.R.string.import_duplicate_notice, previous.name, digest.take(12)))
+            onDuplicatePrompt(DuplicatePrompt(digest, DraftLibrary.findByDigest(context.filesDir, digest)))
+        }
+        importHistory.record(digest, imported.source.name)
+        onRecentImports(importHistory.recent())
+    }
+}

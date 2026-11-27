@@ -82,23 +82,11 @@ fun PackBuilderScreen(draftId: String, onBack: () -> Unit, onInstalled: () -> Un
             EmptyState("Pack draft not found")
             return@NfScaffold
         }
-        CardBox(title = "Metadata") {
-            FormTextField("id", id, { id = it })
-            FormTextField("version", version, { version = it })
-            FormTextField("title", title, { title = it })
-            Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                OutlinedButton(onClick = {
-                    store.updateMeta(draft, id.trim(), version.trim(), title.trim())
-                    report = "metadata saved"
-                }) { Text("Save metadata") }
-                OutlinedButton(onClick = { report = null; error = null }) { Text("Clear") }
-            }
-        }
-        CardBox(title = "Files") {
-            draft.dir.walkTopDown().filter { it.isFile }.sortedBy { it.path }.take(40).forEach { file ->
-                Text(file.relativeTo(draft.dir).invariantSeparatorsPath + " · " + file.length(), style = NfType.meta)
-            }
-        }
+        PackMetadataCard(id, version, title,
+            onIdChange = { id = it }, onVersionChange = { version = it }, onTitleChange = { title = it },
+            onSave = { store.updateMeta(draft, id.trim(), version.trim(), title.trim()); report = "metadata saved" },
+            onClear = { report = null; error = null })
+        PackFilesCard(draft)
         StructuredProtocolCard("Protocol form", protocolText, { protocolText = it }, draft.dir)
         JsonEditorCard("Protocol JSON", "protocol/nf-protocol-pack.json", protocolText, { protocolText = it }, draft.dir)
         StructuredGraphCard("Pipeline form", graphText, { graphText = it }, draft.dir)
@@ -107,201 +95,14 @@ fun PackBuilderScreen(draftId: String, onBack: () -> Unit, onInstalled: () -> Un
         JsonEditorCard("Spec JSON", "spec/main.nfspec.json", specText, { specText = it }, draft.dir)
         CardBox(title = "Validate & package") {
             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                OutlinedButton(enabled = !busy, onClick = {
-                    busy = true
-                    error = null
-                    scope.launch {
-                        try {
-                            val graph = Json.parseToJsonElement(graphText).jsonObject
-                            val spec = Json.parseToJsonElement(specText).jsonObject
-                            val compiled = safeCall("graph-compile", buildJsonObject { put("graph", graph) })
-                            if (!compiled.ok) {
-                                error = compiled.error
-                            } else {
-                                val plan = compiled.resultObject()
-                                if (plan == null) {
-                                    error = CoreResponse.failure("NF-ASM-001", "graph-compile did not return plan", "fix pipeline", 1).error
-                                } else {
-                                    val inputs = buildJsonObject {
-                                        (spec["slots"] as? kotlinx.serialization.json.JsonArray)?.forEach { el ->
-                                            val slot = el.jsonObject
-                                            val id = slot["id"]?.jsonPrimitive?.content ?: return@forEach
-                                            val example = (slot["examples"] as? kotlinx.serialization.json.JsonArray)
-                                                ?.firstOrNull()?.jsonPrimitive?.content
-                                            put(id, example ?: "test")
-                                        }
-                                    }
-                                    val assembled = safeCall("assemble", buildJsonObject {
-                                        put("plan", plan)
-                                        put("spec", spec)
-                                        put("inputs", inputs)
-                                        put("out_dir", File(context.cacheDir, "pack-test").apply { mkdirs() }.absolutePath)
-                                    })
-                                    if (assembled.ok) {
-                                        val md = assembled.resultObject()?.get("markdown")?.jsonPrimitive?.content ?: "assembled"
-                                        preview = md
-                                        val golden = store.loadGolden(draft)
-                                        goldenStatus = when {
-                                            golden == null -> "no golden yet"
-                                            golden == md -> "golden match"
-                                            else -> "golden differs @ " + (dev.ninfenz.mobile.data.ReproChecker.firstDifference(golden.toByteArray(Charsets.UTF_8), md.toByteArray(Charsets.UTF_8)) ?: -1)
-                                        }
-                                    } else {
-                                        error = assembled.error
-                                    }
-                                }
-                            }
-                        } catch (t: Throwable) {
-                            error = CoreResponse.failure("NF-ASM-003", t.message ?: t.javaClass.simpleName, "check graph/spec", 1).error
-                        } finally {
-                            busy = false
-                        }
-                    }
-                }) { Text("Test assemble") }
-                Button(enabled = !busy, onClick = {
-                    busy = true
-                    error = null
-                    scope.launch {
-                        try {
-                            val lines = mutableListOf<String>()
-                            val protocol = File(draft.dir, "protocol/nf-protocol-pack.json").takeIf { it.isFile }?.let {
-                                Json.parseToJsonElement(it.readText(Charsets.UTF_8)).jsonObject
-                            }
-                            if (protocol != null) {
-                                val r = safeCall("protocol-validate", buildJsonObject { put("pack", protocol) })
-                                lines.add("protocol: " + (if (r.ok) "ok" else (r.error?.message ?: "fail")))
-                            }
-                            val spec = File(draft.dir, "spec/main.nfspec.json").takeIf { it.isFile }?.let {
-                                Json.parseToJsonElement(it.readText(Charsets.UTF_8)).jsonObject
-                            }
-                            if (spec != null) {
-                                val r = safeCall("spec-validate", buildJsonObject { put("spec", spec) })
-                                lines.add("spec: " + (if (r.ok) "ok" else (r.error?.message ?: "fail")))
-                            }
-                            val graph = File(draft.dir, "pipeline/main.nfg.json").takeIf { it.isFile }?.let {
-                                Json.parseToJsonElement(it.readText(Charsets.UTF_8)).jsonObject
-                            }
-                            if (graph != null) {
-                                val r = safeCall("graph-compile", buildJsonObject { put("graph", graph) })
-                                lines.add("graph: " + (if (r.ok) "ok" else (r.error?.message ?: "fail")))
-                            }
-                            val hash = safeCall("pack-hash", buildJsonObject { put("root", draft.dir.absolutePath) })
-                            lines.add("pack-hash: " + (if (hash.ok) "ok" else (hash.error?.message ?: "fail")))
-                            report = lines.joinToString("\n")
-                        } catch (t: Throwable) {
-                            error = CoreResponse.failure("NF-PCK-001", t.message ?: t.javaClass.simpleName, "fix draft", 1).error
-                        } finally {
-                            busy = false
-                        }
-                    }
-                }) { Text(if (busy) "Working…" else "Validate") }
-                Button(enabled = !busy, onClick = {
-                    busy = true
-                    error = null
-                    scope.launch {
-                        try {
-                            val hash = safeCall("pack-hash", buildJsonObject { put("root", draft.dir.absolutePath) })
-                            if (!hash.ok) {
-                                error = hash.error
-                            } else {
-                                val result = hash.resultObject()
-                                val items = result?.get("items")
-                                val hashes = result?.get("hashes")
-                                if (items != null && hashes != null) {
-                                    store.writeHashes(draft, items, hashes)
-                                }
-                                val zip = store.packageToZip(draft, File(File(context.filesDir, "exports"), "packs"))
-                                val installed = PackZipInstaller.install(zip, context.filesDir)
-                                if (installed.ok) {
-                                    report = "installed: " + installed.id + " " + installed.version
-                                    onInstalled()
-                                } else {
-                                    error = CoreResponse.failure("NF-PCK-001", installed.message ?: "install failed", "check manifest", 1).error
-                                }
-                            }
-                        } catch (t: Throwable) {
-                            error = CoreResponse.failure("NF-PCK-001", t.message ?: t.javaClass.simpleName, "fix draft", 1).error
-                        } finally {
-                            busy = false
-                        }
-                    }
-                }) { Text(if (busy) "Working…" else "Package & install") }
+                PackTestAssembleButton(draft, store, graphText, specText, busy,
+                    onBusyChange = { busy = it }, onErrorChange = { error = it }, onPreviewChange = { preview = it }, onGoldenStatusChange = { goldenStatus = it })
+                PackValidateButton(draft, busy, onBusyChange = { busy = it }, onErrorChange = { error = it }, onReportChange = { report = it })
+                PackPackageInstallButton(draft, store, busy, onBusyChange = { busy = it }, onErrorChange = { error = it }, onReportChange = { report = it }, onInstalled = onInstalled)
             }
-            OutlinedButton(enabled = !busy, onClick = {
-                busy = true
-                error = null
-                scope.launch {
-                    try {
-                        val release = safeCall("pack-release-create", buildJsonObject {
-                            put("pack_root", draft.dir.absolutePath)
-                            put("release_version", 1)
-                            put("created_at", java.time.Instant.now().toString())
-                            put("private_key", PackSigningKey.seed(context.filesDir))
-                            put("channel", "local")
-                        })
-                        if (release.ok) {
-                            val obj = release.resultObject()
-                            if (obj != null) {
-                                AtomicFiles.writeText(File(draft.dir, "release.json"), obj.toString())
-                                releaseText = obj.toString()
-                                val verify = safeCall("pack-release-verify", buildJsonObject {
-                                    put("release", obj)
-                                    put("pack_root", draft.dir.absolutePath)
-                                })
-                                report = (if (verify.ok) "release signed & verified" else "release signed; verify: " + (verify.error?.message ?: "fail")) + "\n" + obj.toString().take(400)
-                            }
-                        } else {
-                            error = release.error
-                        }
-                    } catch (t: Throwable) {
-                        error = CoreResponse.failure("NF-PCK-007", t.message ?: t.javaClass.simpleName, "check signing key", 1).error
-                    } finally {
-                        busy = false
-                    }
-                }
-            }) { Text("Sign release") }
-            OutlinedButton(enabled = !busy && releaseText != null, onClick = {
-                busy = true
-                error = null
-                scope.launch {
-                    try {
-                        val release = Json.parseToJsonElement(releaseText!!).jsonObject
-                        val trust = File(context.filesDir, "pack-release-trust.json")
-                        val frozen = safeCall("pack-release-freeze", buildJsonObject {
-                            put("release", release)
-                            put("pack_root", draft.dir.absolutePath)
-                            put("trust_path", trust.absolutePath)
-                            put("created_at", java.time.Instant.now().toString())
-                        })
-                        if (!frozen.ok) {
-                            error = frozen.error
-                        } else {
-                            val verify = safeCall("pack-release-verify", buildJsonObject {
-                                put("release", release)
-                                put("pack_root", draft.dir.absolutePath)
-                                put("trust_path", trust.absolutePath)
-                            })
-                            report = (if (verify.ok) "release frozen & trusted" else "frozen; verify: " + (verify.error?.message ?: "fail")) + "\n" + trust.absolutePath
-                        }
-                    } catch (t: Throwable) {
-                        error = CoreResponse.failure("NF-PCK-009", t.message ?: t.javaClass.simpleName, "check release", 1).error
-                    } finally {
-                        busy = false
-                    }
-                }
-            }) { Text("Freeze trust") }
-            releaseText?.let { Text(it.take(400), style = NfType.meta) }
-            report?.let { Text(it, style = NfType.meta, modifier = Modifier.padding(top = NfSpacing.s)) }
-            preview?.let {
-                Text(it.take(1200), style = NfType.secondary, modifier = Modifier.padding(top = NfSpacing.s))
-                Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                    OutlinedButton(onClick = { store.saveGolden(draft, it); goldenStatus = "golden saved" }) {
-                        Text("Save golden")
-                    }
-                    goldenStatus?.let { status -> Text(status, style = NfType.meta) }
-                }
-            }
-            error?.let { Text(it.message, color = MaterialTheme.colorScheme.error, style = NfType.meta) }
+            PackSignReleaseButton(draft, busy, onBusyChange = { busy = it }, onErrorChange = { error = it }, onReportChange = { report = it }, onReleaseTextChange = { releaseText = it })
+            PackFreezeTrustButton(draft, releaseText, busy, onBusyChange = { busy = it }, onErrorChange = { error = it }, onReportChange = { report = it })
+            PackBuildResults(releaseText, report, preview, goldenStatus, error, onSaveGolden = { store.saveGolden(draft, it); goldenStatus = "golden saved" })
         }
     }
 }
@@ -375,47 +176,12 @@ private fun StructuredGraphCard(label: String, value: String, onChange: (String)
             nodes.forEach { el ->
                 val node = el.jsonObject
                 val id = node["id"]?.jsonPrimitive?.content.orEmpty()
-                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                    Text(id + " · " + (node["kind"]?.jsonPrimitive?.content ?: ""), style = NfType.label, modifier = Modifier.weight(1f))
-                    TextButton(onClick = {
-                        val nextNodes = JsonArray(nodes.filter { it.jsonObject["id"]?.jsonPrimitive?.content != id })
-                        val nextEdges = JsonArray(edges.filter {
-                            val e = it.jsonObject
-                            e["from"]?.jsonPrimitive?.content != id && e["to"]?.jsonPrimitive?.content != id
-                        })
-                        val next = JsonObject(root.toMutableMap().apply { put("nodes", nextNodes); put("edges", nextEdges) })
-                        onChange(next.toString())
-                    }) { Text("Delete") }
-                }
-                OutlinedTextField(
-                    value = node["title"]?.jsonPrimitive?.content.orEmpty(),
-                    onValueChange = { onChange(updateObjectArray(value, "nodes", id, "title", JsonPrimitive(it))) },
-                    label = { Text("node title") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                GraphNodeEditRow(node, id, value, onChange)
             }
             edges.forEach { el ->
                 val edge = el.jsonObject
                 val eid = edge["id"]?.jsonPrimitive?.content.orEmpty()
-                Text(eid + " · " + (edge["type"]?.jsonPrimitive?.content ?: ""), style = NfType.label)
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    OutlinedTextField(
-                        value = edge["from"]?.jsonPrimitive?.content.orEmpty(),
-                        onValueChange = { onChange(updateObjectArray(value, "edges", eid, "from", JsonPrimitive(it))) },
-                        label = { Text("from") }, singleLine = true, modifier = Modifier.weight(1f)
-                    )
-                    OutlinedTextField(
-                        value = edge["to"]?.jsonPrimitive?.content.orEmpty(),
-                        onValueChange = { onChange(updateObjectArray(value, "edges", eid, "to", JsonPrimitive(it))) },
-                        label = { Text("to") }, singleLine = true, modifier = Modifier.weight(1f)
-                    )
-                    TextButton(onClick = {
-                        val nextEdges = JsonArray(edges.filter { it.jsonObject["id"]?.jsonPrimitive?.content != eid })
-                        val next = JsonObject(root.toMutableMap().apply { put("edges", nextEdges) })
-                        onChange(next.toString())
-                    }) { Text("Delete") }
-                }
+                GraphEdgeEditRow(edge, eid, value, onChange)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                 OutlinedButton(onClick = {
@@ -467,46 +233,7 @@ private fun StructuredProtocolCard(label: String, value: String, onChange: (Stri
             clauses.forEach { el ->
                 val clause = el.jsonObject
                 val id = clause["id"]?.jsonPrimitive?.content.orEmpty()
-                Text(id + " · " + (clause["level"]?.jsonPrimitive?.content ?: ""), style = NfType.label)
-                OutlinedTextField(
-                    value = clause["title"]?.jsonPrimitive?.content.orEmpty(),
-                    onValueChange = { onChange(updateObjectArray(value, "clauses", id, "title", JsonPrimitive(it))) },
-                    label = { Text("Clause title") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = clause["text"]?.jsonPrimitive?.content.orEmpty(),
-                    onValueChange = { onChange(updateObjectArray(value, "clauses", id, "text", JsonPrimitive(it))) },
-                    label = { Text("Clause text") },
-                    minLines = 2,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                    Text("enabled", style = NfType.meta, modifier = Modifier.weight(1f))
-                    Switch(
-                        checked = clause["enabled"]?.jsonPrimitive?.booleanOrNull ?: true,
-                        onCheckedChange = { onChange(updateObjectArray(value, "clauses", id, "enabled", JsonPrimitive(it))) }
-                    )
-                }
-                fields.filter { it.jsonObject["clause"]?.jsonPrimitive?.content == id }.forEach { fEl ->
-                    val field = fEl.jsonObject
-                    val fid = field["id"]?.jsonPrimitive?.content.orEmpty()
-                    OutlinedTextField(
-                        value = field["label"]?.jsonPrimitive?.content.orEmpty(),
-                        onValueChange = { onChange(updateObjectArray(value, "fields", fid, "label", JsonPrimitive(it))) },
-                        label = { Text(fid + " label") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                        Text("required", style = NfType.meta, modifier = Modifier.weight(1f))
-                        Switch(
-                            checked = field["required"]?.jsonPrimitive?.booleanOrNull ?: false,
-                            onCheckedChange = { onChange(updateObjectArray(value, "fields", fid, "required", JsonPrimitive(it))) }
-                        )
-                    }
-                }
+                ProtocolClauseEditor(clause, id, fields, value, onChange)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
                 Button(onClick = {
@@ -544,51 +271,7 @@ private fun StructuredSpecCard(label: String, value: String, onChange: (String) 
                 )
                 section.slots.forEach { slotId ->
                     val slot = spec.slots.firstOrNull { it.id == slotId } ?: return@forEach
-                    OutlinedTextField(
-                        value = slot.name,
-                        onValueChange = { newName ->
-                            val next = spec.copy(slots = spec.slots.map { if (it.id == slot.id) it.copy(name = newName) else it })
-                            onChange(SpecModel.toJson(next).toString())
-                        },
-                        label = { Text(slot.id + " name") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                        Text("required", style = NfType.meta, modifier = Modifier.weight(1f))
-                        Switch(
-                            checked = slot.required,
-                            onCheckedChange = { checked ->
-                                val next = spec.copy(slots = spec.slots.map { if (it.id == slot.id) it.copy(required = checked) else it })
-                                onChange(SpecModel.toJson(next).toString())
-                            }
-                        )
-                    }
-                    OutlinedTextField(
-                        value = slot.visibleIf?.slot.orEmpty(),
-                        onValueChange = { dep ->
-                            val next = spec.copy(slots = spec.slots.map {
-                                if (it.id == slot.id) it.copy(visibleIf = if (dep.isBlank()) null else dev.ninfenz.mobile.model.SpecVisibleIf(dep, it.visibleIf?.equals ?: "")) else it
-                            })
-                            onChange(SpecModel.toJson(next).toString())
-                        },
-                        label = { Text("visible if slot") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    OutlinedTextField(
-                        value = slot.visibleIf?.equals.orEmpty(),
-                        onValueChange = { expected ->
-                            val dep = slot.visibleIf?.slot.orEmpty()
-                            val next = spec.copy(slots = spec.slots.map {
-                                if (it.id == slot.id) it.copy(visibleIf = if (dep.isBlank()) null else dev.ninfenz.mobile.model.SpecVisibleIf(dep, expected)) else it
-                            })
-                            onChange(SpecModel.toJson(next).toString())
-                        },
-                        label = { Text("visible if equals") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    SpecSlotEditor(slot, spec, value, onChange)
                 }
                 OutlinedButton(onClick = {
                     var index = spec.slots.size + 1
@@ -644,4 +327,159 @@ private fun JsonEditorCard(
             saved?.let { Text(it, style = NfType.meta) }
         }
     }
+}
+
+
+@Composable
+private fun GraphNodeEditRow(node: JsonObject, id: String, value: String, onChange: (String) -> Unit) {
+    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+        Text(id + " · " + (node["kind"]?.jsonPrimitive?.content ?: ""), style = NfType.label, modifier = Modifier.weight(1f))
+        TextButton(onClick = {
+            val root = Json.parseToJsonElement(value).jsonObject
+            val nodes = root["nodes"]?.jsonArray.orEmpty()
+            val edges = root["edges"]?.jsonArray.orEmpty()
+            val nextNodes = JsonArray(nodes.filter { it.jsonObject["id"]?.jsonPrimitive?.content != id })
+            val nextEdges = JsonArray(edges.filter {
+                val e = it.jsonObject
+                e["from"]?.jsonPrimitive?.content != id && e["to"]?.jsonPrimitive?.content != id
+            })
+            val next = JsonObject(root.toMutableMap().apply { put("nodes", nextNodes); put("edges", nextEdges) })
+            onChange(next.toString())
+        }) { Text("Delete") }
+    }
+    OutlinedTextField(
+        value = node["title"]?.jsonPrimitive?.content.orEmpty(),
+        onValueChange = { onChange(updateObjectArray(value, "nodes", id, "title", JsonPrimitive(it))) },
+        label = { Text("node title") },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Composable
+private fun GraphEdgeEditRow(edge: JsonObject, eid: String, value: String, onChange: (String) -> Unit) {
+    Text(eid + " · " + (edge["type"]?.jsonPrimitive?.content ?: ""), style = NfType.label)
+    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        OutlinedTextField(
+            value = edge["from"]?.jsonPrimitive?.content.orEmpty(),
+            onValueChange = { onChange(updateObjectArray(value, "edges", eid, "from", JsonPrimitive(it))) },
+            label = { Text("from") }, singleLine = true, modifier = Modifier.weight(1f)
+        )
+        OutlinedTextField(
+            value = edge["to"]?.jsonPrimitive?.content.orEmpty(),
+            onValueChange = { onChange(updateObjectArray(value, "edges", eid, "to", JsonPrimitive(it))) },
+            label = { Text("to") }, singleLine = true, modifier = Modifier.weight(1f)
+        )
+        TextButton(onClick = {
+            val root = Json.parseToJsonElement(value).jsonObject
+            val edges = root["edges"]?.jsonArray.orEmpty()
+            val nextEdges = JsonArray(edges.filter { it.jsonObject["id"]?.jsonPrimitive?.content != eid })
+            val next = JsonObject(root.toMutableMap().apply { put("edges", nextEdges) })
+            onChange(next.toString())
+        }) { Text("Delete") }
+    }
+}
+
+@Composable
+private fun ProtocolClauseEditor(
+    clause: JsonObject,
+    id: String,
+    fields: List<kotlinx.serialization.json.JsonElement>,
+    value: String,
+    onChange: (String) -> Unit
+) {
+    Text(id + " · " + (clause["level"]?.jsonPrimitive?.content ?: ""), style = NfType.label)
+    OutlinedTextField(
+        value = clause["title"]?.jsonPrimitive?.content.orEmpty(),
+        onValueChange = { onChange(updateObjectArray(value, "clauses", id, "title", JsonPrimitive(it))) },
+        label = { Text("Clause title") },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth()
+    )
+    OutlinedTextField(
+        value = clause["text"]?.jsonPrimitive?.content.orEmpty(),
+        onValueChange = { onChange(updateObjectArray(value, "clauses", id, "text", JsonPrimitive(it))) },
+        label = { Text("Clause text") },
+        minLines = 2,
+        modifier = Modifier.fillMaxWidth()
+    )
+    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+        Text("enabled", style = NfType.meta, modifier = Modifier.weight(1f))
+        Switch(
+            checked = clause["enabled"]?.jsonPrimitive?.booleanOrNull ?: true,
+            onCheckedChange = { onChange(updateObjectArray(value, "clauses", id, "enabled", JsonPrimitive(it))) }
+        )
+    }
+    fields.filter { it.jsonObject["clause"]?.jsonPrimitive?.content == id }.forEach { fEl ->
+        val field = fEl.jsonObject
+        val fid = field["id"]?.jsonPrimitive?.content.orEmpty()
+        OutlinedTextField(
+            value = field["label"]?.jsonPrimitive?.content.orEmpty(),
+            onValueChange = { onChange(updateObjectArray(value, "fields", fid, "label", JsonPrimitive(it))) },
+            label = { Text(fid + " label") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            Text("required", style = NfType.meta, modifier = Modifier.weight(1f))
+            Switch(
+                checked = field["required"]?.jsonPrimitive?.booleanOrNull ?: false,
+                onCheckedChange = { onChange(updateObjectArray(value, "fields", fid, "required", JsonPrimitive(it))) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SpecSlotEditor(
+    slot: dev.ninfenz.mobile.model.SpecSlot,
+    spec: dev.ninfenz.mobile.model.MdSpec,
+    value: String,
+    onChange: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = slot.name,
+        onValueChange = { newName ->
+            val next = spec.copy(slots = spec.slots.map { if (it.id == slot.id) it.copy(name = newName) else it })
+            onChange(SpecModel.toJson(next).toString())
+        },
+        label = { Text(slot.id + " name") },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth()
+    )
+    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+        Text("required", style = NfType.meta, modifier = Modifier.weight(1f))
+        Switch(
+            checked = slot.required,
+            onCheckedChange = { checked ->
+                val next = spec.copy(slots = spec.slots.map { if (it.id == slot.id) it.copy(required = checked) else it })
+                onChange(SpecModel.toJson(next).toString())
+            }
+        )
+    }
+    OutlinedTextField(
+        value = slot.visibleIf?.slot.orEmpty(),
+        onValueChange = { dep ->
+            val next = spec.copy(slots = spec.slots.map {
+                if (it.id == slot.id) it.copy(visibleIf = if (dep.isBlank()) null else dev.ninfenz.mobile.model.SpecVisibleIf(dep, it.visibleIf?.equals ?: "")) else it
+            })
+            onChange(SpecModel.toJson(next).toString())
+        },
+        label = { Text("visible if slot") },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth()
+    )
+    OutlinedTextField(
+        value = slot.visibleIf?.equals.orEmpty(),
+        onValueChange = { expected ->
+            val dep = slot.visibleIf?.slot.orEmpty()
+            val next = spec.copy(slots = spec.slots.map {
+                if (it.id == slot.id) it.copy(visibleIf = if (dep.isBlank()) null else dev.ninfenz.mobile.model.SpecVisibleIf(dep, expected)) else it
+            })
+            onChange(SpecModel.toJson(next).toString())
+        },
+        label = { Text("visible if equals") },
+        singleLine = true,
+        modifier = Modifier.fillMaxWidth()
+    )
 }

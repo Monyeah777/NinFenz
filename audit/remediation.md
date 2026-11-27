@@ -204,3 +204,37 @@
 - 结果：总分 97.88 → 98.08；C 80→82；C-010 10→0。
 - 说明：这是棘轮而非阈值放宽（豁免精确到路径，新文件照抓）；0.4 拆分时删除对应 allow_files 条目即可恢复全量判据。
 
+## 第十四轮：C 维度结构拆分第一批 + 检测器修正 + macrobenchmark 推进（2026-11-28）
+
+本轮目标：把审计「遗留项 1/2/3」推进到第一批可验收结果（C 维度结构拆分、F-003、macrobenchmark），其余留 0.4 后续批次。
+
+### 代码拆分（C 维度，规则级清零）
+
+- **C-013（7 → 0）**：engine/dotnet 7 个 >800 行 C# 文件（AuxGolden/Interop/McpServer/OutputForms/SelfTest/WorldModel/Program）拆成具名 partial 类（+22 个 400–700 行文件）。3 个 csproj 构建 0 warning 0 error；旧/新二进制 CLI 41 条命令 stdout+stderr+exit 逐字节一致、公共 API 反射转储 2446 行 0 差异、`selftest --json` 输出 sha256 相同。
+- **C-002（18 → 0）/ C-003（84 → 0）**：18 个 >120 行 @Composable + 84 个 >60 行 Kotlin 函数拆成子 composable/私有 helper（+6 个同包文件）；`:app:compileDebugKotlin` + `:app:testDebugUnitTest` BUILD SUCCESSFUL。AuthorScreen.kt 因一次 read 截断事故重建 helper，另做独立复核（task-11）：HEAD 对照的 token/文案/条件/调用点多重集一致，3 处差异均为状态生命周期/协程作用域的非 bug 差异，强制全量重编译通过。
+- **C-009（12 → 9）/ C-001（102 → 98）**：contracts.rs/main.rs/sdir.rs 三个非生成 Rust 大文件拆成子模块（contracts/、cli/、sdir/，+19 个 ≤400 行文件，公共 API 经 pub use 保持）；cargo test 249 passed、app/core 228 passed。
+- **C-010（allow_files 10 → 6）**：terminal/evidence/domain_pack/mcp_runtime 四个 Python 真源模块拆成门面 + 同目录私有子包（_terminal/_evidence/_domain_pack/_mcp，+35 文件，全部 ≤557 行），耦合图/role 摘要/bench 计数不变量与拆分前一致；四个 allow_files 条目已删。分层 pytest 327 passed + 2 skipped，拆分前后 known-red 集合逐条相同（未新增失败）。
+
+### 检测器精度修正（规则意图不变）
+
+- **F-003（2 → 0）**：`.Result` 正则把嵌套 record 类型名（`CoreRegistry.Result`、`ExtensionPolicy.Result`）当属性访问；加负向前瞻区分类型名，真实 `.Result` 取值仍命中；正/负样本回归。
+- **E-004/E-010（1 → 0）**：拆分后外部测试模块（`#[cfg(test)] mod tests_extra;` 声明的 contracts/tests_extra.rs）被当生产代码统计；runner 新增外部测试模块文件识别，整文件跳过；E-004 生产 unwrap 回到 226（上限 226）、E-010 0。
+- **D-004（3 → 0）**：main.rs 拆成 cli/commands_a/b/c 后样板集中触发重复块；抽 cli/mod.rs 的 parse_root_json_out/parse_in_out 两个 helper，D-004 复跑 0、cargo test 249 passed。
+
+### macrobenchmark 推进
+
+- 第二层「同进程类遮蔽」修复：benchmark 变体加 kotlin 运行时 keep（仅 benchmark 变体，release 不变）；`:app:assembleBenchmark` + `:benchmark:assembleBenchmark` 构建通过，解包 dex 实测保留 checkNotNullParameter。
+- 新增运行入口 `app/scripts/device_macrobenchmark.sh`（装 APK/关动画/逐类 instrument/复原动画）；口径与 OPEN 说明写入 0.3.7_PERF_BASELINE.md、0.3.7_DEVICE.md。
+- 当前阻断：`adb devices` 无设备（USB 侧 PLF110 仅有充电态、无 ADB 接口）——设备接入授权后即可跑正式指标。
+
+### 校准复核（对应「遗留项 1」）
+
+- 23 条既有校准逐条复核（结论写进 calibration.md「复核记录」）；C-006/E-004/J-008/I-006 四项余量收紧到当前实测（零余量棘轮），B-002/B-003 暂不收紧（后续拆分会增文件数）。
+
+### 结果与验证
+
+- 审计：总分 **97.88 → 98.70**；C 82→87，D/E/F 回到 100；P0=0/P1=0，error=0，no_targets=0；剩余 C 扣分 13 = C-001(3)+C-005(3)+C-007(1)+C-008(2)+C-009(2)+C-012(2)。
+- 测试：engine/rust 249 passed / app/core 全绿；Android 全量单测 BUILD SUCCESSFUL；C# 3 工程 0 warn 0 error；Python 分层 327 passed + 2 skipped。
+- 已知红（非本轮引入，基线即红）：Python 全量 pytest 的 test_reverse_coupling / test_style_ratchet / test_json_shape_contracts / test_freshness_check / test_dead_code 等（基线记录 300 模块 vs 实测 324 等存量漂移）；待基线 rebind 批次处理。
+
+

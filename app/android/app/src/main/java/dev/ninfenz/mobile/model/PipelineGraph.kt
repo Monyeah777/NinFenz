@@ -162,6 +162,22 @@ object GraphModel {
     /** 本地表单检查（明确非契约校验；图语义权威校验由核心承担）。 */
     fun formIssues(g: PipelineGraph): List<FormIssue> {
         val issues = mutableListOf<FormIssue>()
+        checkNodes(g, issues)
+        checkEdges(g, issues)
+        checkWeights(g, issues)
+        val stages = g.nodes.filter { it.kind == "stage" }
+        val modules = g.nodes.filter { it.kind == "module" }
+        if (stages.isEmpty()) issues.add(FormIssue("NF-GRF-005", "/nodes", "图至少需要 1 个 stage 节点", "补 stage 节点"))
+        if (modules.isEmpty()) issues.add(FormIssue("NF-GRF-005", "/nodes", "图至少需要 1 个 module 节点", "补 module 节点"))
+        checkRequiredStages(g, issues)
+        if (g.mode == "simple") checkSimpleMode(g, issues)
+        if (hasCycle(g)) {
+            issues.add(FormIssue("NF-GRF-004", "/edges", "图含环（非 DAG）", "删除回边或改为 DAG"))
+        }
+        return issues
+    }
+
+    private fun checkNodes(g: PipelineGraph, issues: MutableList<FormIssue>) {
         val nodeIds = mutableMapOf<String, Int>()
         for (n in g.nodes) {
             val count = (nodeIds[n.id] ?: 0) + 1
@@ -176,6 +192,9 @@ object GraphModel {
         for ((id, count) in nodeIds) {
             if (count > 1) issues.add(FormIssue("NF-GRF-002", "/nodes", "节点 id 重复：" + id, "改用唯一 id"))
         }
+    }
+
+    private fun checkEdges(g: PipelineGraph, issues: MutableList<FormIssue>) {
         val edgeIds = mutableMapOf<String, Int>()
         for (e in g.edges) {
             edgeIds[e.id] = (edgeIds[e.id] ?: 0) + 1
@@ -198,6 +217,9 @@ object GraphModel {
         for ((id, count) in edgeIds) {
             if (count > 1) issues.add(FormIssue("NF-GRF-002", "/edges", "边 id 重复：" + id, "改用唯一 id"))
         }
+    }
+
+    private fun checkWeights(g: PipelineGraph, issues: MutableList<FormIssue>) {
         for ((nodeId, weight) in g.weights) {
             val node = g.nodes.firstOrNull { it.id == nodeId }
             if (node == null) {
@@ -209,25 +231,21 @@ object GraphModel {
                 issues.add(FormIssue("NF-GRF-007", "/weights/" + nodeId, "权重越界：" + weight, "权重限 0..100"))
             }
         }
-        val stages = g.nodes.filter { it.kind == "stage" }
-        val modules = g.nodes.filter { it.kind == "module" }
-        if (stages.isEmpty()) issues.add(FormIssue("NF-GRF-005", "/nodes", "图至少需要 1 个 stage 节点", "补 stage 节点"))
-        if (modules.isEmpty()) issues.add(FormIssue("NF-GRF-005", "/nodes", "图至少需要 1 个 module 节点", "补 module 节点"))
+    }
+
+    private fun checkRequiredStages(g: PipelineGraph, issues: MutableList<FormIssue>) {
         for (req in g.requiredStages) {
             if (g.nodes.none { it.id == req }) {
                 issues.add(FormIssue("NF-GRF-005", "/settings/required_stages", "required_stages 指向不存在的节点：" + req, "补节点或改 required_stages"))
             }
         }
-        if (g.mode == "simple") {
-            val forbidden = g.nodes.filter { it.kind == "branch" || it.kind == "merge" || it.kind == "asset" }
-            for (n in forbidden) {
-                issues.add(FormIssue("NF-GRF-006", "/nodes/" + n.id, "simple 模式禁止 " + n.kind + " 节点", "切 pro/expert 模式或删节点"))
-            }
+    }
+
+    private fun checkSimpleMode(g: PipelineGraph, issues: MutableList<FormIssue>) {
+        val forbidden = g.nodes.filter { it.kind == "branch" || it.kind == "merge" || it.kind == "asset" }
+        for (n in forbidden) {
+            issues.add(FormIssue("NF-GRF-006", "/nodes/" + n.id, "simple 模式禁止 " + n.kind + " 节点", "切 pro/expert 模式或删节点"))
         }
-        if (hasCycle(g)) {
-            issues.add(FormIssue("NF-GRF-004", "/edges", "图含环（非 DAG）", "删除回边或改为 DAG"))
-        }
-        return issues
     }
 
     /** Kahn 拓扑排序：检测环（本地预检；核心 L1 会再判一次）。 */
