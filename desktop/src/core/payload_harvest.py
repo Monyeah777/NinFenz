@@ -74,6 +74,34 @@ def _field_type(token: str) -> Tuple[str, str]:
     return _ANNOTATION.sub("", name).strip(), kind
 
 
+def _classify_bracketed(name: str, val: str) -> Optional[Tuple[str, str]]:
+    if val.startswith("{") or val.endswith("}"):
+        return name, "object"
+    if val.startswith("["):
+        return name, "array"
+    low = val.lower()
+    if low in _TYPE_WORDS:
+        return name, _TYPE_WORDS[low]
+    if low in ("true", "false"):
+        return name, "boolean"
+    return None
+
+
+def _classify_text(name: str, val: str) -> Tuple[str, str]:
+    if re.fullmatch(r"\d+(\.\d+)?", val):
+        return name, "number"
+    if val.startswith("<") or val.startswith("（"):
+        if re.search(r"回合|tick|日|分钟|数|量", val):
+            return name, "number"
+        return name, "untyped"
+    if "|" in val:                 # 枚举写法  full|delta  → 字符串
+        return name, "string"
+    if val and not val.startswith(("[", "{")):
+        # 正文写了具体常量/标识符（如 origin: M94、style: 通用）→ 字符串证据
+        return name, "string"
+    return name, "untyped"
+
+
 def _field_type_raw(token: str) -> Tuple[str, str]:
     """类型判定本体（名字清洗在 `_field_type`）。"""
     token = token.strip().rstrip("?")
@@ -83,73 +111,88 @@ def _field_type_raw(token: str) -> Tuple[str, str]:
         return token.split("{", 1)[0].strip(), "object"
     if token.endswith("[]") or token.endswith("[ ]"):
         return token[:-2].strip(), "array"
-    if ":" in token:
-        name, val = token.split(":", 1)
-        name, val = name.strip(), val.strip()
-        if val.startswith("{") or val.endswith("}"):
-            return name, "object"
-        if val.startswith("["):
-            return name, "array"
-        low = val.lower()
-        if low in _TYPE_WORDS:
-            return name, _TYPE_WORDS[low]
-        if low in ("true", "false"):
-            return name, "boolean"
-        if re.fullmatch(r"\d+(\.\d+)?", val):
-            return name, "number"
-        if val.startswith("<") or val.startswith("（"):
-            if re.search(r"回合|tick|日|分钟|数|量", val):
-                return name, "number"
-            return name, "untyped"
-        if "|" in val:                 # 枚举写法  full|delta  → 字符串
-            return name, "string"
-        if val and not val.startswith(("[", "{")):
-            # 正文写了具体常量/标识符（如 origin: M94、style: 通用）→ 字符串证据
-            return name, "string"
-        return name, "untyped"
-    return token, "untyped"
+    if ":" not in token:
+        return token, "untyped"
+    name, val = token.split(":", 1)
+    name, val = name.strip(), val.strip()
+    bracketed = _classify_bracketed(name, val)
+    if bracketed is not None:
+        return bracketed
+    return _classify_text(name, val)
+
+
+def _marker_state() -> Dict[str, Any]:
+    return {"event": "", "block_event": "", "in_publish": False,
+            "publish_indent": -1, "event_indent": -1}
+
+
+def _apply_event_marker(line: str, st: Dict[str, Any]) -> bool:
+    m = re.match(r"\s*(?:event|name)\s*:\s*([a-z_][a-z0-9_]*)", line)
+    if not m:
+        return False
+    st["event"] = m.group(1)
+    st["in_publish"], st["event_indent"] = False, -1
+    return True
+
+
+def _apply_block_event(line: str, indent: int, st: Dict[str, Any]) -> None:
+    mk = re.match(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*:", line)
+    if indent <= st["publish_indent"]:
+        st["in_publish"], st["event_indent"], st["block_event"] = False, -1, ""
+    elif mk and mk.group(1) not in _NOT_EVENT_KEYS:
+        if st["event_indent"] < 0:
+            st["event_indent"] = indent
+        if indent == st["event_indent"]:
+            st["block_event"] = mk.group(1)
+
+
+def _apply_publish_marker(line: str, indent: int, st: Dict[str, Any]) -> None:
+    # 事件标记三写法（实测缺口：模块正文用 `produce:` 时旧规则认不出 →
+    # 28 处 payload 行的类型证据全被漏收，见 AUD-0015；块映射写法见本波 CHANGELOG）
+    m2 = re.match(r"\s*(?:publish|produce)\s*:\s*\[?\s*([a-z_][a-z0-9_]*)", line)
+    if m2 and not st["event"]:
+        st["event"], st["in_publish"], st["event_indent"] = m2.group(1), False, -1
+    elif re.match(r"\s*(?:publish|produce)\s*:\s*$", line):
+        # 块映射写法：`publish:` 换行之后，**缩进一层的事件键**才是事件名
+        st["in_publish"], st["publish_indent"] = True, indent
+        st["event_indent"], st["block_event"] = -1, ""
+    elif st["in_publish"]:
+        _apply_block_event(line, indent, st)
+
+
+def _payload_fields(line: str, event: str, block_event: str) -> Optional[Dict[str, str]]:
+    m3 = re.match(r"\s*payload\s*:\s*\{(.*)\}\s*$", line)
+    if not m3 or not (event or block_event):
+        return None
+    fields: Dict[str, str] = {}
+    for tok in _split_top_level(m3.group(1)):
+        name, kind = _field_type(tok)
+        if name:
+            fields[name] = kind
+    return fields
+
+
+def _harvest_fence(fence: str) -> Dict[str, Dict[str, str]]:
+    st = _marker_state()                 # 显式标记（`event:`/`name:`/行内 `publish:`）优先
+    found: Dict[str, Dict[str, str]] = {}
+    for line in fence.splitlines():
+        if not line.strip():
+            continue
+        indent = len(line) - len(line.lstrip())
+        if not _apply_event_marker(line, st):
+            _apply_publish_marker(line, indent, st)
+        fields = _payload_fields(line, st["event"], st["block_event"])
+        if fields:
+            found.setdefault(st["event"] or st["block_event"], {}).update(fields)
+    return found
 
 
 def harvest_doc(text: str) -> Dict[str, Dict[str, str]]:
     """单篇模块文档 → {事件名: {字段: 类型}}。"""
     out: Dict[str, Dict[str, str]] = {}
     for fence in _FENCE.findall(text):
-        event, block_event = "", ""          # 显式标记（`event:`/`name:`/行内 `publish:`）优先
-        in_publish, publish_indent, event_indent = False, -1, -1
-        for line in fence.splitlines():
-            if not line.strip():
-                continue
-            indent = len(line) - len(line.lstrip())
-            m = re.match(r"\s*(?:event|name)\s*:\s*([a-z_][a-z0-9_]*)", line)
-            if m:
-                event = m.group(1)
-                in_publish, event_indent = False, -1
-            # 事件标记三写法（实测缺口：模块正文用 `produce:` 时旧规则认不出 →
-            # 28 处 payload 行的类型证据全被漏收，见 AUD-0015；块映射写法见本波 CHANGELOG）
-            m2 = re.match(r"\s*(?:publish|produce)\s*:\s*\[?\s*([a-z_][a-z0-9_]*)", line)
-            if m2 and not event:
-                event, in_publish, event_indent = m2.group(1), False, -1
-            elif re.match(r"\s*(?:publish|produce)\s*:\s*$", line):
-                # 块映射写法：`publish:` 换行之后，**缩进一层的事件键**才是事件名
-                in_publish, publish_indent, event_indent, block_event = True, indent, -1, ""
-            elif in_publish:
-                mk = re.match(r"\s*([A-Za-z_][A-Za-z0-9_]*)\s*:", line)
-                if indent <= publish_indent:
-                    in_publish, event_indent, block_event = False, -1, ""
-                elif mk and mk.group(1) not in _NOT_EVENT_KEYS:
-                    if event_indent < 0:
-                        event_indent = indent
-                    if indent == event_indent:
-                        block_event = mk.group(1)
-            m3 = re.match(r"\s*payload\s*:\s*\{(.*)\}\s*$", line)
-            if m3 and (event or block_event):
-                fields = {}
-                for tok in _split_top_level(m3.group(1)):
-                    name, kind = _field_type(tok)
-                    if name:
-                        fields[name] = kind
-                if fields:
-                    out.setdefault(event or block_event, {}).update(fields)
+        for ev, fields in _harvest_fence(fence).items():
+            out.setdefault(ev, {}).update(fields)
     return out
 
 
@@ -168,36 +211,42 @@ def harvest(root: str = ".") -> Dict[str, Dict[str, str]]:
     return merged
 
 
+def _merge_field(ev: str, f: str, kind: str, fmap: Dict[str, Any],
+                 report: Dict[str, List[str]]) -> None:
+    cur = fmap.get(f)
+    if cur is None:
+        fmap[f] = {"type": kind, "note": "正文 payload 收割（证据可溯）"}
+        report["added"].append("%s.%s=%s" % (ev, f, kind))
+    else:
+        ctype = (cur or {}).get("type")
+        if ctype == "untyped" and kind != "untyped":
+            cur["type"] = kind
+            cur["note"] = "45 类型收窄（正文 payload 收割，证据可溯）"
+            report["narrowed"].append("%s.%s: untyped→%s" % (ev, f, kind))
+        elif ctype != kind and kind != "untyped" and ctype != "untyped":
+            report["conflicts"].append("%s.%s: 注册表=%s vs 正文=%s" % (ev, f, ctype, kind))
+
+
 def apply(root: str = ".", write: bool = False) -> Dict[str, Any]:
     """把收割结果并入 `event_registry.json` → 变更/冲突报告。"""
     reg_path = Path(root) / EVENT_REGISTRY
     data = json_doc.load(reg_path, dict, what=EVENT_REGISTRY)
     events = data.setdefault("events", {})
     merged = harvest(root)
-    added, narrowed, conflicts = [], [], []
+    report: Dict[str, List[str]] = {"added": [], "narrowed": [], "conflicts": []}
     for ev, fields in sorted(merged.items()):
         body = events.setdefault(ev, {"payload_status": "declared",
                                       "note": "证据:模块正文事件契约 payload 收割",
                                       "fields": {}})
         fmap = body.setdefault("fields", {})
         for f, kind in sorted(fields.items()):
-            cur = fmap.get(f)
-            if cur is None:
-                fmap[f] = {"type": kind, "note": "正文 payload 收割（证据可溯）"}
-                added.append("%s.%s=%s" % (ev, f, kind))
-            else:
-                ctype = (cur or {}).get("type")
-                if ctype == "untyped" and kind != "untyped":
-                    cur["type"] = kind
-                    cur["note"] = "45 类型收窄（正文 payload 收割，证据可溯）"
-                    narrowed.append("%s.%s: untyped→%s" % (ev, f, kind))
-                elif ctype != kind and kind != "untyped" and ctype != "untyped":
-                    conflicts.append("%s.%s: 注册表=%s vs 正文=%s" % (ev, f, ctype, kind))
+            _merge_field(ev, f, kind, fmap, report)
     if write:
         from core import atomic_write          # 在仓协议件：原子落盘（半截件不留，2026-10-01）
         atomic_write.write_text(reg_path, json.dumps(data, ensure_ascii=False, indent=2,
                                                      sort_keys=True) + "\n")
-    return {"added": added, "narrowed": narrowed, "conflicts": conflicts}
+    return {"added": report["added"], "narrowed": report["narrowed"],
+            "conflicts": report["conflicts"]}
 
 
 def stats(root: str = ".") -> Dict[str, Any]:
@@ -218,15 +267,9 @@ def stats(root: str = ".") -> Dict[str, Any]:
             "coverage": round(100.0 * typed / total, 1) if total else 0.0}
 
 
-def backlog(root: str = ".", write: bool = False) -> Dict[str, Any]:
-    """类型积压台账：把**不可从证据推断**的 untyped 字段显式化（可数、不隐身）。
-
-    纪律：每个 untyped 字段必须带 note（说明为何没有类型证据）——门禁据此判「无声增长」。
-    """
-    reg_path = Path(root) / EVENT_REGISTRY
-    data = json_doc.load(reg_path, dict, what=EVENT_REGISTRY)
+def _untyped_rows(events: Dict[str, Any]) -> Tuple[List[Dict[str, str]], List[str]]:
     rows, missing_note = [], []
-    for ev, body in sorted((data.get("events") or {}).items()):
+    for ev, body in sorted(events.items()):
         for f, spec in sorted((body.get("fields") or {}).items()):
             if (spec or {}).get("type") != "untyped":
                 continue
@@ -234,6 +277,17 @@ def backlog(root: str = ".", write: bool = False) -> Dict[str, Any]:
             rows.append({"event": ev, "field": f, "note": note})
             if not note:
                 missing_note.append("%s.%s" % (ev, f))
+    return rows, missing_note
+
+
+def backlog(root: str = ".", write: bool = False) -> Dict[str, Any]:
+    """类型积压台账：把**不可从证据推断**的 untyped 字段显式化（可数、不隐身）。
+
+    纪律：每个 untyped 字段必须带 note（说明为何没有类型证据）——门禁据此判「无声增长」。
+    """
+    reg_path = Path(root) / EVENT_REGISTRY
+    data = json_doc.load(reg_path, dict, what=EVENT_REGISTRY)
+    rows, missing_note = _untyped_rows(data.get("events") or {})
     doc = {"schema": "nf-type-backlog/1",
            "note": ("事件载荷中无法从正文证据推断类型的字段——待模块正文补充类型证据后收窄。"
                     "纪律：不得新增无 note 的 untyped。"),

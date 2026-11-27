@@ -20,19 +20,18 @@ def _reachable(roots: Iterable[str], out: Dict[str, Set[str]]) -> Set[str]:
     return seen
 
 
-def analyze(nodes: Iterable[str], edges: Iterable[Any], roots: Iterable[str],
-            max_out: int = 0) -> Dict[str, List[str]]:
-    """→ {unreachable, over_out, articulation}（各为节点名列表）。"""
-    names = list(dict.fromkeys(str(n) for n in nodes))
+def _out_edges(names: List[str], edges: Iterable[Any]) -> Dict[str, Set[str]]:
     out: Dict[str, Set[str]] = {n: set() for n in names}
     for e in edges:
         src, dst = (e.get("from"), e.get("to")) if isinstance(e, dict) else (e[0], e[1])
         src, dst = str(src), str(dst)
         if src in out:
             out[src].add(dst)
-    reach = _reachable(roots, out)
-    unreachable = [n for n in names if n not in reach]
-    over = ([n for n in names if len(out[n]) > max_out] if max_out else [])
+    return out
+
+
+def _articulation(names: List[str], roots: Iterable[str],
+                  out: Dict[str, Set[str]]) -> List[str]:
     articulation: List[str] = []
     for n in names:
         sub = {k: set(v) for k, v in out.items() if k != n}
@@ -41,4 +40,16 @@ def analyze(nodes: Iterable[str], edges: Iterable[Any], roots: Iterable[str],
         rr = _reachable([r for r in roots if r != n], sub)
         if any(x not in rr and x != n for x in names):
             articulation.append(n)
+    return articulation
+
+
+def analyze(nodes: Iterable[str], edges: Iterable[Any], roots: Iterable[str],
+            max_out: int = 0) -> Dict[str, List[str]]:
+    """→ {unreachable, over_out, articulation}（各为节点名列表）。"""
+    names = list(dict.fromkeys(str(n) for n in nodes))
+    out = _out_edges(names, edges)
+    reach = _reachable(roots, out)
+    unreachable = [n for n in names if n not in reach]
+    over = ([n for n in names if len(out[n]) > max_out] if max_out else [])
+    articulation = _articulation(names, roots, out)
     return {"unreachable": unreachable, "over_out": over, "articulation": articulation}

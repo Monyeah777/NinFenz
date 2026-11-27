@@ -51,6 +51,37 @@ def adapter_spec(root: str, adapter: str) -> Dict[str, Any]:
 
 # ---------------------------------------------------------------- 形状校验
 
+def _choice_issue(name: str, q: Dict[str, Any]) -> str:
+    opts = q.get("options")
+    if not isinstance(opts, list) or len(opts) < 2:
+        return "choice 问题 %s 须给 ≥2 个候选（候选集由调用方提供）" % name
+    if not all(isinstance(o, str) and o for o in opts):
+        return "choice 问题 %s 的候选须为非空字符串" % name
+    if len(set(opts)) != len(opts):
+        return "choice 问题 %s 的候选取值重复" % name
+    return ""
+
+
+def _score_issue(name: str, q: Dict[str, Any]) -> str:
+    levels = q.get("levels")
+    if not isinstance(levels, list) or len(levels) < 2:
+        return "score 问题 %s 须给 ≥2 个有序等级" % name
+    return ""
+
+
+def _question_issue(name: str, q: Any) -> str:
+    if not isinstance(q, dict):
+        return "问题 %s 须为对象" % name
+    ptype = q.get("type")
+    if ptype not in PRIMITIVES:
+        return "问题 %s 的 type 越词表：%r（允许 %s）" % (name, ptype, "/".join(PRIMITIVES))
+    if ptype == "choice":
+        return _choice_issue(name, q)
+    if ptype == "score":
+        return _score_issue(name, q)
+    return ""
+
+
 def request_issue(req: Any) -> str:
     """请求体检 → 违规说明（空串 = 合规）。"""
     if not isinstance(req, dict):
@@ -61,30 +92,13 @@ def request_issue(req: Any) -> str:
     if not isinstance(qs, dict) or not qs:
         return "缺 questions（须至少一个问题）"
     for name, q in qs.items():
-        if not isinstance(q, dict):
-            return "问题 %s 须为对象" % name
-        ptype = q.get("type")
-        if ptype not in PRIMITIVES:
-            return "问题 %s 的 type 越词表：%r（允许 %s）" % (name, ptype, "/".join(PRIMITIVES))
-        if ptype == "choice":
-            opts = q.get("options")
-            if not isinstance(opts, list) or len(opts) < 2:
-                return "choice 问题 %s 须给 ≥2 个候选（候选集由调用方提供）" % name
-            if not all(isinstance(o, str) and o for o in opts):
-                return "choice 问题 %s 的候选须为非空字符串" % name
-            if len(set(opts)) != len(opts):
-                return "choice 问题 %s 的候选取值重复" % name
-        if ptype == "score":
-            levels = q.get("levels")
-            if not isinstance(levels, list) or len(levels) < 2:
-                return "score 问题 %s 须给 ≥2 个有序等级" % name
+        issue = _question_issue(name, q)
+        if issue:
+            return issue
     return ""
 
 
-def response_issue(out: Any, req: Dict[str, Any]) -> str:
-    """应答体检 → 违规说明（空串 = 合规）。"""
-    if not isinstance(out, dict):
-        return "应答须为对象"
+def _resp_status_issue(out: Dict[str, Any]) -> Optional[str]:
     for k in ("schema", "status", "answers", "meta"):
         if k not in out:
             return "缺字段 %s" % k
@@ -95,44 +109,80 @@ def response_issue(out: Any, req: Dict[str, Any]) -> str:
         return "" if str(out.get("reason") or "").strip() else "abstained 须给 reason"
     if status != "ok":
         return "status 越词表：%r（允许 ok/abstained）" % status
-    answers = out.get("answers")
-    questions = (req or {}).get("questions") or {}
+    return None
+
+
+def _answers_missing_issue(answers: Any, questions: Dict[str, Any]) -> str:
     if not isinstance(answers, dict):
         return "answers 须为对象"
     missing = [n for n in questions if n not in answers]
     if missing:
         return "answers 缺问题：%s（不得静默漏答）" % "、".join(missing)
-    for name, ans in answers.items():
-        if not isinstance(ans, dict):
-            return "答案 %s 须为对象" % name
-        ptype = (questions.get(name) or {}).get("type")
-        if ans.get("type") != ptype:
-            return "答案 %s 的 type 与提问不一致：%r ≠ %r" % (name, ans.get("type"), ptype)
-        if ptype in ("choice", "score"):
-            opts = (questions[name].get("options") or questions[name].get("levels") or [])
-            probs = ans.get("probs")
-            if not isinstance(probs, list) or len(probs) != len(opts):
-                return "答案 %s 的 probs 长度须等于候选/等级数（%d）" % (name, len(opts))
-            if any(not isinstance(p, (int, float)) or p < 0 for p in probs):
-                return "答案 %s 的概率须为非负数" % name
-            if abs(sum(probs) - 1.0) > PROB_TOL:
-                return "答案 %s 的概率和须 ≈1（实得 %.6f）" % (name, sum(probs))
-            if ptype == "choice":
-                if ans.get("argmax") not in opts:
-                    return "答案 %s 的 argmax 须落在候选集内：%r" % (name, ans.get("argmax"))
-            else:
-                if not isinstance(ans.get("value"), (int, float)):
-                    return "答案 %s 须给期望值 value（score 原语）" % name
-        else:  # noul
-            p = ans.get("p")
-            if not isinstance(p, (int, float)) or not (0.0 <= float(p) <= 1.0):
-                return "答案 %s 的 p 须为 [0,1] 内的数" % name
+    return ""
+
+
+def _argmax_issue(name: str, ans: Dict[str, Any], opts: Any, ptype: Any) -> str:
+    if ptype == "choice":
+        if ans.get("argmax") not in opts:
+            return "答案 %s 的 argmax 须落在候选集内：%r" % (name, ans.get("argmax"))
+        return ""
+    if not isinstance(ans.get("value"), (int, float)):
+        return "答案 %s 须给期望值 value（score 原语）" % name
+    return ""
+
+
+def _probs_issue(name: str, ans: Dict[str, Any], q: Dict[str, Any], ptype: Any) -> str:
+    opts = (q.get("options") or q.get("levels") or [])
+    probs = ans.get("probs")
+    if not isinstance(probs, list) or len(probs) != len(opts):
+        return "答案 %s 的 probs 长度须等于候选/等级数（%d）" % (name, len(opts))
+    if any(not isinstance(p, (int, float)) or p < 0 for p in probs):
+        return "答案 %s 的概率须为非负数" % name
+    if abs(sum(probs) - 1.0) > PROB_TOL:
+        return "答案 %s 的概率和须 ≈1（实得 %.6f）" % (name, sum(probs))
+    return _argmax_issue(name, ans, opts, ptype)
+
+
+def _answer_issue(name: str, ans: Any, q: Dict[str, Any]) -> str:
+    if not isinstance(ans, dict):
+        return "答案 %s 须为对象" % name
+    ptype = q.get("type")
+    if ans.get("type") != ptype:
+        return "答案 %s 的 type 与提问不一致：%r ≠ %r" % (name, ans.get("type"), ptype)
+    if ptype in ("choice", "score"):
+        return _probs_issue(name, ans, q, ptype)
+    p = ans.get("p")
+    if not isinstance(p, (int, float)) or not (0.0 <= float(p) <= 1.0):
+        return "答案 %s 的 p 须为 [0,1] 内的数" % name
+    return ""
+
+
+def _resp_meta_issue(out: Dict[str, Any]) -> str:
     meta = out.get("meta") or {}
     if meta.get("non_gate") is not True:
         return "meta.non_gate 须为 true（决策层不出现在门禁路径）"
     if "calibrated" not in meta:
         return "meta 缺 calibrated（是否校准概率必须自述）"
     return ""
+
+
+def response_issue(out: Any, req: Dict[str, Any]) -> str:
+    """应答体检 → 违规说明（空串 = 合规）。"""
+    if not isinstance(out, dict):
+        return "应答须为对象"
+    status_issue = _resp_status_issue(out)
+    if status_issue is not None:
+        return status_issue
+    answers = out.get("answers")
+    questions = (req or {}).get("questions") or {}
+    missing = _answers_missing_issue(answers, questions)
+    if missing:
+        return missing
+    for name, ans in answers.items():
+        issue = _answer_issue(name, ans, questions.get(name) or {})
+        if issue:
+            return issue
+    return _resp_meta_issue(out)
 
 
 # ---------------------------------------------------------------- 适配器
@@ -154,6 +204,28 @@ def _hits(state: str, needles: List[str]) -> int:
     return sum(1 for n in needles if n and str(n).lower() in low)
 
 
+def _choice_answer(state: str, q: Dict[str, Any]) -> Dict[str, Any]:
+    opts = [str(o) for o in q.get("options") or []]
+    scores = [float(_hits(state, [o])) for o in opts]
+    probs = _normalize(scores)
+    return {"type": "choice", "options": opts, "probs": probs,
+            "argmax": opts[probs.index(max(probs))]}
+
+
+def _score_answer(state: str, q: Dict[str, Any]) -> Dict[str, Any]:
+    levels = [str(l) for l in q.get("levels") or []]
+    scores = [float(_hits(state, [l])) for l in levels]
+    probs = _normalize(scores)
+    value = sum((i + 1) * p for i, p in enumerate(probs))
+    return {"type": "score", "levels": levels, "probs": probs,
+            "value": value}
+
+
+def _noul_answer(state: str, q: Dict[str, Any]) -> Dict[str, Any]:
+    hits = _hits(state, [str(h) for h in (q.get("true_hints") or [])])
+    return {"type": "noul", "p": 1.0 if hits else 0.0}
+
+
 def stub_decide(req: Dict[str, Any]) -> Dict[str, Any]:
     """离线确定性决策（门禁/CI/演练用）。
 
@@ -166,21 +238,11 @@ def stub_decide(req: Dict[str, Any]) -> Dict[str, Any]:
     for name, q in (req.get("questions") or {}).items():
         ptype = q.get("type")
         if ptype == "choice":
-            opts = [str(o) for o in q.get("options") or []]
-            scores = [float(_hits(state, [o])) for o in opts]
-            probs = _normalize(scores)
-            answers[name] = {"type": "choice", "options": opts, "probs": probs,
-                             "argmax": opts[probs.index(max(probs))]}
+            answers[name] = _choice_answer(state, q)
         elif ptype == "score":
-            levels = [str(l) for l in q.get("levels") or []]
-            scores = [float(_hits(state, [l])) for l in levels]
-            probs = _normalize(scores)
-            value = sum((i + 1) * p for i, p in enumerate(probs))
-            answers[name] = {"type": "score", "levels": levels, "probs": probs,
-                             "value": value}
+            answers[name] = _score_answer(state, q)
         else:  # noul
-            hits = _hits(state, [str(h) for h in (q.get("true_hints") or [])])
-            answers[name] = {"type": "noul", "p": 1.0 if hits else 0.0}
+            answers[name] = _noul_answer(state, q)
     return {"schema": RESPONSE_SCHEMA, "status": "ok", "answers": answers,
             "meta": {"adapter": "stub", "calibrated": False, "non_gate": True,
                      "note": "规则式确定性输出：排序信号，非校准概率"}}

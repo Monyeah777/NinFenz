@@ -37,36 +37,84 @@ def parse_io_header(text: str) -> Optional[Dict[str, List[str]]]:
 
 
 
+def _paths_from_python(text: str) -> List[str]:
+    out: List[str] = []
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return out
+    for n in ast.walk(tree):
+        if not isinstance(n, ast.Call):
+            continue
+        if _dotted(n.func) not in ("open", "Path", "pathlib.Path"):
+            continue
+        for a in n.args:
+            if isinstance(a, ast.Constant) and isinstance(a.value, str):
+                out.append(a.value)
+    return out
+
+
+def _paths_from_bash(text: str) -> List[str]:
+    out: List[str] = []
+    for m in re.finditer(r">>?[ \t]*([^\s;|&()]+)|<[ \t]*([^\s;|&()]+)", text):
+        out.append(m.group(1) or m.group(2) or "")
+    return out
+
+
+def _paths_from_powershell(text: str) -> List[str]:
+    out: List[str] = []
+    # `#` 注释与 bash 同形（parse_io_header 已覆盖）；路径取字面量的重定向/读写 cmdlet。
+    for m in re.finditer(r"(?:>>?|Out-File|Set-Content|Add-Content|Get-Content|Import-Csv)"
+                         r"[ \t]+([^\s;|&()\[\]$]+)", text):
+        out.append(m.group(1))
+    return out
+
+
+def _paths_from_vba(text: str) -> List[str]:
+    return [m.group(1) for m in re.finditer(r'(?i)\bOpen\s+"([^"]+)"', text)]
+
+
 def observed_paths(text: str, lang: str) -> List[str]:
     """脚本里**字面量**形式的文件路径（可证的那部分；变量拼出来的不判）。"""
     out: List[str] = []
     if lang == "python":
-        try:
-            tree = ast.parse(text)
-        except SyntaxError:
-            return out
-        for n in ast.walk(tree):
-            if not isinstance(n, ast.Call):
-                continue
-            if _dotted(n.func) not in ("open", "Path", "pathlib.Path"):
-                continue
-            for a in n.args:
-                if isinstance(a, ast.Constant) and isinstance(a.value, str):
-                    out.append(a.value)
+        out = _paths_from_python(text)
     elif lang == "bash":
-        for m in re.finditer(r">>?[ \t]*([^\s;|&()]+)|<[ \t]*([^\s;|&()]+)", text):
-            out.append(m.group(1) or m.group(2) or "")
+        out = _paths_from_bash(text)
     elif lang == "powershell":
-        # `#` 注释与 bash 同形（parse_io_header 已覆盖）；路径取字面量的重定向/读写 cmdlet。
-        for m in re.finditer(r"(?:>>?|Out-File|Set-Content|Add-Content|Get-Content|Import-Csv)"
-                             r"[ \t]+([^\s;|&()\[\]$]+)", text):
-            out.append(m.group(1))
+        out = _paths_from_powershell(text)
     elif lang == "vba":
-        for m in re.finditer(r'(?i)\bOpen\s+"([^"]+)"', text):
-            out.append(m.group(1))
+        out = _paths_from_vba(text)
     skip = {"/dev/null", "/dev/stdin", "/dev/stdout", "-"}
     return [p for p in out if p and p not in skip and not p.startswith("$")]
 
+
+
+def _script_counts(spec: Dict[str, Any]) -> Dict[str, Any]:
+    return {"files": 1, "inputs": len(spec.get("inputs") or []),
+            "outputs": len(spec.get("outputs") or [])}
+
+
+def _io_header_issues(rel: str, header: Dict[str, List[str]],
+                      spec: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
+    for key in ("inputs", "outputs"):
+        declared = list(spec.get(key) or [])
+        embedded = list(header.get(key) or [])
+        if declared != embedded:
+            issues.append("脚本 %s 的 %s 双源不一致：声明=%s / 头=%s（修复指引：让两边逐字一致）"
+                          % (rel, key, declared, embedded))
+    return issues
+
+
+def _undeclared_path_issue(rel: str, text: str, lang: str, spec: Dict[str, Any]) -> List[str]:
+    declared_all = set(spec.get("inputs") or []) | set(spec.get("outputs") or [])
+    extra = sorted({x for x in observed_paths(text, lang) if x not in declared_all})
+    if not extra:
+        return []
+    return ["脚本 %s 出现未声明的字面路径 %s（修复指引：补进 inputs/outputs 或去掉硬编码"
+            "）"
+            % (rel, ",".join(extra[:3]))]
 
 
 def _check_script(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
@@ -88,21 +136,64 @@ def _check_script(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str,
         issues.append("脚本 %s 未自带 nf-io 头（修复指引：顶部加一行注释 # nf-io: inputs=a,b "
                       "outputs=c；VBA 用单引号起头——脚本契约必须双源）" % rel)
         header = {"inputs": [], "outputs": []}
-    for key in ("inputs", "outputs"):
-        declared = list(spec.get(key) or [])
-        embedded = list(header.get(key) or [])
-        if declared != embedded:
-            issues.append("脚本 %s 的 %s 双源不一致：声明=%s / 头=%s（修复指引：让两边逐字一致）"
-                          % (rel, key, declared, embedded))
-    declared_all = set(spec.get("inputs") or []) | set(spec.get("outputs") or [])
-    extra = sorted({x for x in observed_paths(text, lang) if x not in declared_all})
-    if extra:
-        issues.append("脚本 %s 出现未声明的字面路径 %s（修复指引：补进 inputs/outputs 或去掉硬编码"
-            "）"
-                      % (rel, ",".join(extra[:3])))
-    return issues, {"files": 1, "inputs": len(spec.get("inputs") or []),
-                    "outputs": len(spec.get("outputs") or [])}
+    issues.extend(_io_header_issues(rel, header, spec))
+    issues.extend(_undeclared_path_issue(rel, text, lang, spec))
+    return issues, _script_counts(spec)
 
+
+
+def _manifest_item_issues(root: str, base: Path, rel: str, item: Any,
+                          declared: set) -> Tuple[List[str], int]:
+    if not isinstance(item, dict):
+        return [], 0
+    pth = str(item.get("path") or "")
+    if not pth:
+        return ["包清单 %s 有一条无 path 的声明（修复指引：补 path）" % rel], 0
+    declared.add(pth)
+    return _declared_item_absent_issues(root, base, rel, item, pth), 1
+
+
+def _item_inputs(item: Any) -> List[Any]:
+    return item.get("inputs") or ((item.get("recompute") or {}).get("inputs") or [])
+
+
+def _declared_item_absent_issues(root: str, base: Path, rel: str, item: Any,
+                                pth: str) -> List[str]:
+    issues: List[str] = []
+    if not (Path(root) / base / pth).is_file():
+        issues.append("包清单 %s 声明的 %s 不在场"
+                      "（修复指引：补件或重跑 nf domain build）" % (rel, pth))
+    sch = str(item.get("schema") or "")
+    if sch and not (Path(root) / base / sch).is_file():
+        issues.append("包清单 %s 声明的 schema %s 不在场（修复指引：补件）" % (rel, sch))
+    for inp in _item_inputs(item):
+        if not (Path(root) / base / str(inp)).is_file():
+            issues.append("包清单 %s 声明的输入 %s 不在场"
+                          "（修复指引：补件或改声明）" % (rel, inp))
+    return issues
+
+
+def _disk_rel_paths(root: str, base: Path) -> set:
+    return {q.relative_to(Path(root) / base).as_posix()
+            for q in sorted((Path(root) / base / "outputs").rglob("*"))
+            if q.is_file() and not q.is_symlink()}
+
+
+def _undeclared_outputs(root: str, base: Path, rel: str, declared: set) -> List[str]:
+    on_disk = _disk_rel_paths(root, base)
+    self_rel = Path(rel).relative_to(base).as_posix()   # 清单自身不是产出面（它是清单）
+    return sorted(x for x in on_disk
+                  if x not in declared and x != self_rel
+                  and not x.startswith("outputs/samples/"))
+
+
+def _manifest_missing(root: str, base: Path, rel: str, declared: set) -> List[str]:
+    missing = _undeclared_outputs(root, base, rel, declared)
+    if not missing:
+        return []
+    return ["包清单 %s 未声明 %d 件实况（例 %s）"
+            "（修复指引：重跑 nf domain build 让清单与实况同步）"
+            % (rel, len(missing), "、".join(missing[:3]))]
 
 
 def _check_index(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
@@ -136,38 +227,35 @@ def _check_index(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, 
             continue
         declared = set()
         for item in outs:
-            if not isinstance(item, dict):
-                continue
-            pth = str(item.get("path") or "")
-            if not pth:
-                issues.append("包清单 %s 有一条无 path 的声明（修复指引：补 path）" % rel)
-                continue
-            declared.add(pth)
-            declared_total += 1
-            if not (Path(root) / base / pth).is_file():
-                issues.append("包清单 %s 声明的 %s 不在场"
-                              "（修复指引：补件或重跑 nf domain build）" % (rel, pth))
-            sch = str(item.get("schema") or "")
-            if sch and not (Path(root) / base / sch).is_file():
-                issues.append("包清单 %s 声明的 schema %s 不在场（修复指引：补件）" % (rel, sch))
-            ins = item.get("inputs") or ((item.get("recompute") or {}).get("inputs") or [])
-            for inp in ins:
-                if not (Path(root) / base / str(inp)).is_file():
-                    issues.append("包清单 %s 声明的输入 %s 不在场"
-                                  "（修复指引：补件或改声明）" % (rel, inp))
-        on_disk = {q.relative_to(Path(root) / base).as_posix()
-                   for q in sorted((Path(root) / base / "outputs").rglob("*"))
-                   if q.is_file() and not q.is_symlink()}
-        self_rel = Path(rel).relative_to(base).as_posix()   # 清单自身不是产出面（它是清单）
-        missing = sorted(x for x in on_disk
-                         if x not in declared and x != self_rel
-                         and not x.startswith("outputs/samples/"))
-        if missing:
-            issues.append("包清单 %s 未声明 %d 件实况（例 %s）"
-                          "（修复指引：重跑 nf domain build 让清单与实况同步）"
-                          % (rel, len(missing), "、".join(missing[:3])))
+            item_issues, counted = _manifest_item_issues(root, base, rel, item, declared)
+            issues.extend(item_issues)
+            declared_total += counted
+        issues.extend(_manifest_missing(root, base, rel, declared))
     return issues, {"files": len(rels), "declared": declared_total}
 
+
+
+def _chain_paths(spec: Dict[str, Any], key: str) -> List[str]:
+    return [str(x).replace("\\", "/") for x in (spec.get(key) or [])]
+
+
+def _chain_feed_issues(a_id: str, b_id: str, feeds: List[Any], ao: List[str],
+                       bi: List[str]) -> List[str]:
+    issues: List[str] = []
+    for f in feeds:
+        out_p = str(f.get("output") or "").replace("\\", "/")
+        in_p = str(f.get("input") or "").replace("\\", "/")
+        if out_p not in ao:
+            issues.append("链 %s→%s：上游未声明产物 %s（修复指引：补进上游 outputs）"
+                          % (a_id, b_id, out_p))
+        if in_p not in bi:
+            issues.append("链 %s→%s：下游未声明该输入 %s（修复指引：补进下游 inputs）"
+                          % (a_id, b_id, in_p))
+        if out_p != in_p:
+            issues.append("链 %s→%s：产物路径不对齐（上游 %s vs 下游 %s）（修复指引：统一路径写"
+                "法）"
+                          % (a_id, b_id, out_p, in_p))
+    return issues
 
 
 def _check_chain(specs: Dict[str, Dict[str, Any]], chain: Dict[str, Any]
@@ -178,24 +266,12 @@ def _check_chain(specs: Dict[str, Dict[str, Any]], chain: Dict[str, Any]
  b_id)],
  {})
     a, b = specs[a_id], specs[b_id]
-    ao = [str(x).replace("\\", "/") for x in a.get("outputs") or []]
-    bi = [str(x).replace("\\", "/") for x in b.get("inputs") or []]
+    ao = _chain_paths(a, "outputs")
+    bi = _chain_paths(b, "inputs")
     issues: List[str] = []
     feeds = chain.get("feeds") or []
     if feeds:
-        for f in feeds:
-            out_p = str(f.get("output") or "").replace("\\", "/")
-            in_p = str(f.get("input") or "").replace("\\", "/")
-            if out_p not in ao:
-                issues.append("链 %s→%s：上游未声明产物 %s（修复指引：补进上游 outputs）"
-                              % (a_id, b_id, out_p))
-            if in_p not in bi:
-                issues.append("链 %s→%s：下游未声明该输入 %s（修复指引：补进下游 inputs）"
-                              % (a_id, b_id, in_p))
-            if out_p != in_p:
-                issues.append("链 %s→%s：产物路径不对齐（上游 %s vs 下游 %s）（修复指引：统一路径写"
-                    "法）"
-                              % (a_id, b_id, out_p, in_p))
+        issues.extend(_chain_feed_issues(a_id, b_id, feeds, ao, bi))
     elif not set(ao) & set(bi):
         issues.append("链 %s→%s：上游产物与下游输入无交集（上游 %s / 下游 %s）（修复指引："
                       "契约未对齐——A 的输出必须匹配 B 的输入）"

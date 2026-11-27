@@ -27,6 +27,48 @@ def _digest(obj: Any) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
+def _pack_obligations(packs: list[dict], claim_kind: str) -> tuple[list, list[str]]:
+    per_pack = []
+    without_kind: list[str] = []
+    for pack in packs:
+        kinds = [std.get("claim_kind") for std in pack.get("evidence_standards") or []]
+        if claim_kind not in kinds:
+            without_kind.append(str(pack.get("id")))
+            continue
+        per_pack.append(pack_obligations(pack, claim_kind))
+    return per_pack, without_kind
+
+
+def _available_kinds(packs: list[dict]) -> list[str]:
+    return sorted({str(std.get("claim_kind")) for pack in packs
+                   for std in pack.get("evidence_standards") or []})
+
+
+def _default_criterion_ids(root: str, claim_kind: str) -> list[str]:
+    return [item["id"] for item in cr.list_criteria(root)
+            if claim_kind in (item.get("applies_to") or ["claim"])] or \
+           ["craft:evidence_sufficiency"]
+
+
+def _claim_criterion_ids(root: str, claim_kind: str,
+                         criterion_ids: list[str] | None) -> list[str]:
+    ids = list(criterion_ids or [])
+    if not ids:
+        ids = _default_criterion_ids(root, claim_kind)
+    return ids
+
+
+def _resolve_criterion(root: str, cid: str, role: str) -> dict[str, Any]:
+    item = next((c for c in cr.list_criteria(root) if c["id"] == cid), None)
+    if item is None:
+        raise ValueError("未知判据：" + cid + "（" + GUIDE + "见 nf cog criteria）")
+    if cr.ROLES.index(role) > cr.ROLES.index(item["max_role"]):
+        raise ValueError("角色升级：以 " + role + " 身份使用判据 " + cid
+                         + "（" + GUIDE + "外部判据只能用 external-advisory/ blind 身份）")
+    return {"id": cid, "layer": item["layer"], "kind": item["kind"],
+            "witness": list(item.get("witness") or [])}
+
+
 def compile_claim(root: str, claim: str, claim_kind: str,
                   pack_ids: list[str], criterion_ids: list[str] | None = None,
                   role: str = "local-trusted") -> dict[str, Any]:
@@ -36,35 +78,14 @@ def compile_claim(root: str, claim: str, claim_kind: str,
     if not pack_ids:
         raise ValueError("至少要一个方法包（" + GUIDE + "nf cognition --packs-list 看可用包）")
     packs = [load_pack(root, pid) for pid in pack_ids]
-    per_pack = []
-    without_kind: list[str] = []
-    for pack in packs:
-        kinds = [std.get("claim_kind") for std in pack.get("evidence_standards") or []]
-        if claim_kind not in kinds:
-            without_kind.append(str(pack.get("id")))
-            continue
-        per_pack.append(pack_obligations(pack, claim_kind))
+    per_pack, without_kind = _pack_obligations(packs, claim_kind)
     if not per_pack:
-        available = sorted({str(std.get("claim_kind")) for pack in packs
-                            for std in pack.get("evidence_standards") or []})
+        available = _available_kinds(packs)
         raise ValueError("所选方法包都没有 claim_kind=" + str(claim_kind)
                          + " 的证据标准（修复指引：可选 " + "、".join(available) + "）")
     composed = compose(packs)
-    ids = list(criterion_ids or [])
-    if not ids:
-        ids = [item["id"] for item in cr.list_criteria(root)
-               if claim_kind in (item.get("applies_to") or ["claim"])] or \
-              ["craft:evidence_sufficiency"]
-    resolved = []
-    for cid in ids:
-        item = next((c for c in cr.list_criteria(root) if c["id"] == cid), None)
-        if item is None:
-            raise ValueError("未知判据：" + cid + "（" + GUIDE + "见 nf cog criteria）")
-        if cr.ROLES.index(role) > cr.ROLES.index(item["max_role"]):
-            raise ValueError("角色升级：以 " + role + " 身份使用判据 " + cid
-                             + "（" + GUIDE + "外部判据只能用 external-advisory/ blind 身份）")
-        resolved.append({"id": cid, "layer": item["layer"], "kind": item["kind"],
-                         "witness": list(item.get("witness") or [])})
+    ids = _claim_criterion_ids(root, claim_kind, criterion_ids)
+    resolved = [_resolve_criterion(root, cid, role) for cid in ids]
     payload = {"schema": SCHEMA, "claim": str(claim), "claim_kind": str(claim_kind),
                "packs": [pack["id"] for pack in packs],
                "role": role,
@@ -82,11 +103,7 @@ def _evidence_index(evidence: Any) -> dict[str, Any]:
     return evidence
 
 
-def check_claim(doc: dict[str, Any], evidence: Any) -> dict[str, Any]:
-    """按义务清单核对证据 → {ready, satisfied, missing, unknown}（三态，不评分）。"""
-    if not isinstance(doc, dict) or str(doc.get("schema") or "") != SCHEMA:
-        raise ValueError("主张文件 schema 不匹配（" + GUIDE + "需要 " + SCHEMA + "）")
-    ev = _evidence_index(evidence)
+def _evidence_status(doc: dict[str, Any], ev: dict[str, Any]) -> tuple[list[str], list[str], list[str]]:
     satisfied: list[str] = []
     missing: list[str] = []
     unknown: list[str] = []
@@ -100,6 +117,15 @@ def check_claim(doc: dict[str, Any], evidence: Any) -> dict[str, Any]:
                     unknown.append(str(need))
                 else:
                     satisfied.append(str(need))
+    return satisfied, missing, unknown
+
+
+def check_claim(doc: dict[str, Any], evidence: Any) -> dict[str, Any]:
+    """按义务清单核对证据 → {ready, satisfied, missing, unknown}（三态，不评分）。"""
+    if not isinstance(doc, dict) or str(doc.get("schema") or "") != SCHEMA:
+        raise ValueError("主张文件 schema 不匹配（" + GUIDE + "需要 " + SCHEMA + "）")
+    ev = _evidence_index(evidence)
+    satisfied, missing, unknown = _evidence_status(doc, ev)
     total = len(satisfied) + len(missing) + len(unknown)
     return {"schema": CHECK_SCHEMA, "ready": bool(total and not missing and not unknown),
             "total": total, "satisfied": satisfied, "missing": missing,
@@ -107,6 +133,18 @@ def check_claim(doc: dict[str, Any], evidence: Any) -> dict[str, Any]:
             "note": "unknown ≠ pass；ready 只在 missing 与 unknown 都为空时为真"}
 
 SHEET_SCHEMA = "nf-cog-claim-sheet/1"
+
+
+def _claim_slots(doc: dict[str, Any]) -> list[dict[str, Any]]:
+    slots = []
+    for block in doc.get("obligations") or []:
+        for standard in block.get("standards") or []:
+            kind = str(standard.get("claim_kind") or "")
+            for need in standard.get("required") or []:
+                slots.append({"need": str(need), "claim_kind": kind,
+                              "status": "unknown", "evidence": "",
+                              "how_to_check": "给出可复算的路径/命令/断言（不接受口头结论）"})
+    return slots
 
 
 def claim_sheet(doc: dict[str, Any]) -> dict[str, Any]:
@@ -117,20 +155,26 @@ def claim_sheet(doc: dict[str, Any]) -> dict[str, Any]:
     """
     if not isinstance(doc, dict) or str(doc.get("schema") or "") != SCHEMA:
         raise ValueError("主张文件 schema 不匹配（" + GUIDE + "需要 " + SCHEMA + "）")
-    slots = []
-    for block in doc.get("obligations") or []:
-        for standard in block.get("standards") or []:
-            kind = str(standard.get("claim_kind") or "")
-            for need in standard.get("required") or []:
-                slots.append({"need": str(need), "claim_kind": kind,
-                              "status": "unknown", "evidence": "",
-                              "how_to_check": "给出可复算的路径/命令/断言（不接受口头结论）"})
+    slots = _claim_slots(doc)
     return {"schema": SHEET_SCHEMA, "claim": doc.get("claim"),
             "claim_kind": doc.get("claim_kind"),
             "packs": list(doc.get("packs") or []),
             "digest": doc.get("digest"),
             "slots": slots,
             "note": "unknown != pass：全部槽位改成 ok 后，check_claim 才会 ready"}
+
+_SHEET_STATUS = {"planned", "unknown", "ok", "failed"}
+
+
+def _sheet_entry(slot: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+    need = str(slot.get("need") or "")
+    if not need:
+        raise ValueError("作业单里有空 need 槽（" + GUIDE + "重新生成作业单）")
+    status = str(slot.get("status") or "unknown")
+    if status not in _SHEET_STATUS:
+        status = "unknown"
+    return need, {"status": status, "evidence": str(slot.get("evidence") or "")}
+
 
 def evidence_from_sheet(sheet: Any) -> dict[str, Any]:
     """作业单 → check_claim 的 evidence 字典（键=义务项，值=该槽）。
@@ -142,13 +186,7 @@ def evidence_from_sheet(sheet: Any) -> dict[str, Any]:
     if not isinstance(sheet, dict) or str(sheet.get("schema") or "") != SHEET_SCHEMA:
         raise ValueError("作业单 schema 不符（" + GUIDE + "需要 " + SHEET_SCHEMA + "）")
     out: dict[str, Any] = {}
-    allowed = {"planned", "unknown", "ok", "failed"}
     for slot in sheet.get("slots") or []:
-        need = str(slot.get("need") or "")
-        if not need:
-            raise ValueError("作业单里有空 need 槽（" + GUIDE + "重新生成作业单）")
-        status = str(slot.get("status") or "unknown")
-        if status not in allowed:
-            status = "unknown"
-        out[need] = {"status": status, "evidence": str(slot.get("evidence") or "")}
+        need, entry = _sheet_entry(slot)
+        out[need] = entry
     return out

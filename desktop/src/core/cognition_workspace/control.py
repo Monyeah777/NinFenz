@@ -69,65 +69,69 @@ def ritual_issue(state: dict[str, Any], op_id: str, payload: dict[str, Any]) -> 
     return ""
 
 
-def _apply_effect(state: dict[str, Any], op_id: str, payload: dict[str, Any],
-                  discourse: dict[str, Any] | None) -> dict[str, Any]:
-    """执行副作用（返回被改动的字段，供记录回填）。"""
-    effect: dict[str, Any] = {}
+def _apply_effect_first(state: dict[str, Any], op_id: str, payload: dict[str, Any],
+                        discourse: dict[str, Any] | None,
+                        effect: dict[str, Any]) -> bool:
     if op_id == "observe":
         state["last_observation"] = {"reading": payload["reading"],
                                      "observation": payload["observation"]}
         effect["last_observation"] = state["last_observation"]
-        return effect
-    if op_id == "estimate":
+    elif op_id == "estimate":
         state["estimate"] = {"claim": payload["claim"], "value": payload["value"],
                              "basis": payload["basis"], "digest": digest_of(payload)}
         effect["estimate"] = state["estimate"]
-        return effect
-    if op_id == "detect":
+    elif op_id == "detect":
         state["detected"].append({"anomaly": payload["anomaly"],
                                   "evidence": payload["evidence"]})
         effect["detected"] = len(state["detected"])
-        return effect
-    if op_id == "calibrate":
+    elif op_id == "calibrate":
         state["calibration"].append({"estimate_ref": payload["estimate_ref"],
                                      "actual": payload["actual"], "gap": payload["gap"]})
         effect["calibration"] = state["calibration"][-1]
-        return effect
-    if op_id == "allocate":
+    elif op_id == "allocate":
         if discourse is not None:
             discourse["budget"]["steps_max"] = int(payload["to"])
         effect["budget"] = {"from": payload["from"], "to": payload["to"]}
-        return effect
+    else:
+        return False
+    return True
+
+
+def _apply_effect_second(state: dict[str, Any], op_id: str, payload: dict[str, Any],
+                         effect: dict[str, Any]) -> None:
     if op_id == "switch":
         state["strategy"] = str(payload["to"])
         effect["strategy"] = state["strategy"]
-        return effect
-    if op_id == "stop":
+    elif op_id == "stop":
         state["status"] = "stopped"
         effect["status"] = "stopped"
-        return effect
-    if op_id == "abstain":
+    elif op_id == "abstain":
         state["abstained"].append({"question": payload["question"],
                                    "missing": payload["missing"],
                                    "searched": payload["searched"]})
         state["status"] = "abstained"
         effect["abstained"] = state["abstained"][-1]
-        return effect
-    if op_id == "revise":
+    elif op_id == "revise":
         state["revision"] = {"target": payload["target"], "before": payload["before"],
                              "after": payload["after"]}
         effect["revision"] = state["revision"]
-        return effect
-    if op_id == "request_context":
+    elif op_id == "request_context":
         state["context_request"] = {"missing": payload["missing"],
                                     "needed_for": payload["needed_for"]}
         effect["context_request"] = state["context_request"]
-        return effect
-    if op_id == "audit":
+    elif op_id == "audit":
         state["audit"].append({"target": payload["target"],
                                "finding": payload["finding"]})
         effect["audit"] = state["audit"][-1]
+
+
+def _apply_effect(state: dict[str, Any], op_id: str, payload: dict[str, Any],
+                  discourse: dict[str, Any] | None) -> dict[str, Any]:
+    """执行副作用（返回被改动的字段，供记录回填）。"""
+    effect: dict[str, Any] = {}
+    if _apply_effect_first(state, op_id, payload, discourse, effect):
         return effect
+    _apply_effect_second(state, op_id, payload, effect)
     return effect
 
 
@@ -156,14 +160,7 @@ def authority_issues(record: Any, allowed: set[str] | frozenset[str]) -> list[st
     return issues
 
 
-def apply(control: dict[str, Any], op_id: str, payload: dict[str, Any],
-          discourse: dict[str, Any] | None = None,
-          trigger: str = "", authority: str = "") -> tuple[dict[str, Any], dict[str, Any]]:
-    """执行一次算子请求 → (新控制面, 输出)。失败抛 ValueError（带修复指引）。
-
-    authority：谁授权了这次状态变更（终态算子必填；其余可空）。它只被**记录并纳入 digest**，
-    不参与放行判定——放行由调用方策略决定，本模块不越权。
-    """
+def _validate_apply(control: dict[str, Any], op_id: str, payload: dict[str, Any]) -> None:
     issues = op.validate_request(op_id, payload)
     if issues:
         raise ValueError("算子请求不合法：" + "；".join(issues[:3]))
@@ -176,12 +173,10 @@ def apply(control: dict[str, Any], op_id: str, payload: dict[str, Any],
     ritual = ritual_issue(control, op_id, payload)
     if ritual:
         raise ValueError(ritual)
-    new_control = json_doc.loads(json.dumps(control))
-    new_discourse = json_doc.loads(json.dumps(discourse)) if discourse is not None else None
-    effect = _apply_effect(new_control, op_id, payload, new_discourse)
-    if op_id in TERMINAL_OPS and not str(authority or "").strip():
-        raise ValueError("终态算子 " + op_id + " 必须给 authority（" + GUIDE
-                         + "不可逆转移要记明谁授权：apply(..., authority=\"<谁>\")）")
+
+
+def _new_record(new_control: dict[str, Any], op_id: str, payload: dict[str, Any],
+                trigger: str, authority: str, effect: dict[str, Any]) -> dict[str, Any]:
     record = {"seq": len(new_control["records"]) + 1, "op": op_id,
               "trigger": trigger or "manual",
               "authority": str(authority or ""),
@@ -190,6 +185,25 @@ def apply(control: dict[str, Any], op_id: str, payload: dict[str, Any],
               "prev": (new_control["records"][-1]["digest"]
                        if new_control["records"] else "")}
     record["digest"] = digest_of({k: v for k, v in record.items() if k != "digest"})
+    return record
+
+
+def apply(control: dict[str, Any], op_id: str, payload: dict[str, Any],
+          discourse: dict[str, Any] | None = None,
+          trigger: str = "", authority: str = "") -> tuple[dict[str, Any], dict[str, Any]]:
+    """执行一次算子请求 → (新控制面, 输出)。失败抛 ValueError（带修复指引）。
+
+    authority：谁授权了这次状态变更（终态算子必填；其余可空）。它只被**记录并纳入 digest**，
+    不参与放行判定——放行由调用方策略决定，本模块不越权。
+    """
+    _validate_apply(control, op_id, payload)
+    new_control = json_doc.loads(json.dumps(control))
+    new_discourse = json_doc.loads(json.dumps(discourse)) if discourse is not None else None
+    effect = _apply_effect(new_control, op_id, payload, new_discourse)
+    if op_id in TERMINAL_OPS and not str(authority or "").strip():
+        raise ValueError("终态算子 " + op_id + " 必须给 authority（" + GUIDE
+                         + "不可逆转移要记明谁授权：apply(..., authority=\"<谁>\")）")
+    record = _new_record(new_control, op_id, payload, trigger, authority, effect)
     new_control["records"].append(record)
     _bump(new_control)
     if new_discourse is not None and op_id == "allocate":
@@ -197,6 +211,15 @@ def apply(control: dict[str, Any], op_id: str, payload: dict[str, Any],
         new_discourse["digest"] = dc.digest_of(
             {k: v for k, v in new_discourse.items() if k != "digest"})
     return new_control, {"record": record, "discourse": new_discourse}
+
+
+def _chain_issues(item: dict[str, Any], prev: str) -> list[str]:
+    if str(item.get("prev") or "") != prev:
+        return ["控制记录链断在第 " + str(item.get("seq"))
+                + " 条（" + GUIDE + "prev 必须等于上一条 digest）"]
+    if digest_of({k: v for k, v in item.items() if k != "digest"}) != item.get("digest"):
+        return ["控制记录 digest 不符（" + GUIDE + "被改过）"]
+    return []
 
 
 def replay(control: dict[str, Any], discourse: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -211,12 +234,9 @@ def replay(control: dict[str, Any], discourse: dict[str, Any] | None = None) -> 
     disc = json_doc.loads(json.dumps(discourse)) if discourse is not None else None
     prev = ""
     for item in control["records"]:
-        if str(item.get("prev") or "") != prev:
-            res["issues"].append("控制记录链断在第 " + str(item.get("seq"))
-                                 + " 条（" + GUIDE + "prev 必须等于上一条 digest）")
-            return res
-        if digest_of({k: v for k, v in item.items() if k != "digest"}) != item.get("digest"):
-            res["issues"].append("控制记录 digest 不符（" + GUIDE + "被改过）")
+        issues = _chain_issues(item, prev)
+        if issues:
+            res["issues"].extend(issues)
             return res
         try:
             # authority 必须回放（第 104 轮）：否则终态算子重放会被「必须给 authority」拒掉
@@ -236,13 +256,9 @@ def replay(control: dict[str, Any], discourse: dict[str, Any] | None = None) -> 
     return res
 
 
-def triggers(discourse: dict[str, Any], control: dict[str, Any]) -> list[dict[str, Any]]:
-    """确定性触发谓词 → [{trigger, op, why}]（顺序固定，便于判据比对）。"""
+def _move_triggers(moves: list[dict[str, Any]], steps_used: int,
+                   steps_max: int) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
-    moves = discourse.get("moves") or []
-    budget = discourse.get("budget") or {}
-    steps_used = int(budget.get("steps_used") or 0)
-    steps_max = int(budget.get("steps_max") or 1)
     recent = [m.get("move") for m in moves[-3:]]
     if len(recent) == 3 and len(set(recent)) == 1:
         out.append({"trigger": "loop", "op": "switch",
@@ -250,7 +266,12 @@ def triggers(discourse: dict[str, Any], control: dict[str, Any]) -> list[dict[st
     if steps_used >= max(1, int(steps_max * 0.75)):
         out.append({"trigger": "budget_low", "op": "allocate",
                     "why": "已用 " + str(steps_used) + "/" + str(steps_max) + " 步"})
-    tensions = discourse.get("tensions") or []
+    return out
+
+
+def _tension_triggers(moves: list[dict[str, Any]], tensions: list[Any],
+                      steps_used: int) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
     has_challenge = any(m.get("move") in ("counterexample", "boundary_case")
                         for m in moves[-3:])
     if tensions and not has_challenge:
@@ -261,6 +282,11 @@ def triggers(discourse: dict[str, Any], control: dict[str, Any]) -> list[dict[st
                                    for k in kinds):
         out.append({"trigger": "blind_spot", "op": "audit",
                     "why": "已走 " + str(steps_used) + " 步仍无反例/边界"})
+    return out
+
+
+def _control_triggers(control: dict[str, Any], steps_used: int) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
     estimate = control.get("estimate")
     calibration = control.get("calibration") or []
     if estimate and not calibration and steps_used >= 3:
@@ -269,4 +295,18 @@ def triggers(discourse: dict[str, Any], control: dict[str, Any]) -> list[dict[st
     if control.get("context_request") and control.get("status") == "running":
         out.append({"trigger": "missing_context", "op": "abstain",
                     "why": "缺上下文未标记弃权"})
+    return out
+
+
+def triggers(discourse: dict[str, Any], control: dict[str, Any]) -> list[dict[str, Any]]:
+    """确定性触发谓词 → [{trigger, op, why}]（顺序固定，便于判据比对）。"""
+    out: list[dict[str, Any]] = []
+    moves = discourse.get("moves") or []
+    budget = discourse.get("budget") or {}
+    steps_used = int(budget.get("steps_used") or 0)
+    steps_max = int(budget.get("steps_max") or 1)
+    tensions = discourse.get("tensions") or []
+    out += _move_triggers(moves, steps_used, steps_max)
+    out += _tension_triggers(moves, tensions, steps_used)
+    out += _control_triggers(control, steps_used)
     return out

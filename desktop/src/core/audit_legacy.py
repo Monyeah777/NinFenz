@@ -26,6 +26,28 @@ def records(decl: dict[str, Any]) -> list[dict[str, str]]:
     return rows
 
 
+def _dup_issue(rows: list[dict[str, str]]) -> list[str]:
+    paths = [row["path"] for row in rows]
+    if len(paths) == len(set(paths)):
+        return []
+    return ["legacy_records.paths 不得重复"]
+
+
+def _row_issue(rel: str, row: dict[str, str], path: Path, target: Path) -> str:
+    if path.is_absolute() or ".." in path.parts:
+        return f"legacy_records 路径不得逃出仓库：{rel}"
+    if path.parent.as_posix() != "results/audit" or path.suffix != ".md":
+        return f"legacy_records 只能登记 results/audit/*.md：{rel}"
+    if not target.is_file():
+        return f"legacy_records 指向不存在的审计件：{rel}"
+    if not row["reason"]:
+        return f"legacy_records 必须为每件写明保留理由：{rel}"
+    fm, _ = parse_frontmatter(target.read_text(encoding="utf-8"))
+    if (fm or {}).get("id"):
+        return f"legacy_records 条目已具备审计 id，应从清单移除：{rel}"
+    return ""
+
+
 def validation_issues(root: str, decl: dict[str, Any]) -> list[str]:
     """Validate that every legacy exemption is explicit, local and still needed."""
     issues: list[str] = []
@@ -35,25 +57,12 @@ def validation_issues(root: str, decl: dict[str, Any]) -> list[str]:
     if isinstance(raw, dict) and not isinstance(raw.get("paths"), list):
         return ["legacy_records.paths 须为列表"]
     rows = records(decl)
-    paths = [row["path"] for row in rows]
-    if len(paths) != len(set(paths)):
-        issues.append("legacy_records.paths 不得重复")
+    issues += _dup_issue(rows)
     for row in rows:
         rel = row["path"]
-        path = Path(rel)
-        target = Path(root) / rel
-        if path.is_absolute() or ".." in path.parts:
-            issues.append(f"legacy_records 路径不得逃出仓库：{rel}")
-        elif path.parent.as_posix() != "results/audit" or path.suffix != ".md":
-            issues.append(f"legacy_records 只能登记 results/audit/*.md：{rel}")
-        elif not target.is_file():
-            issues.append(f"legacy_records 指向不存在的审计件：{rel}")
-        elif not row["reason"]:
-            issues.append(f"legacy_records 必须为每件写明保留理由：{rel}")
-        else:
-            fm, _ = parse_frontmatter(target.read_text(encoding="utf-8"))
-            if (fm or {}).get("id"):
-                issues.append(f"legacy_records 条目已具备审计 id，应从清单移除：{rel}")
+        issue = _row_issue(rel, row, Path(rel), Path(root) / rel)
+        if issue:
+            issues.append(issue)
     return issues
 
 

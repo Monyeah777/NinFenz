@@ -74,18 +74,15 @@ def derive(outputs: List[str], inputs: List[str],
     }
 
 
-def parse_io_types(text: str) -> Optional[Dict[str, Dict[str, str]]]:
-    """从 machine_contract 围栏里读 io_types（行式解析；无则 None）。"""
-    lines = text.splitlines()
-    start = None
+def _io_header(lines: List[str]) -> Tuple[Optional[int], int]:
     for i, ln in enumerate(lines):
         m = _IO_RE.match(ln)
         if m:
-            start = i
-            base = len(m.group(1))
-            break
-    if start is None:
-        return None
+            return i, len(m.group(1))
+    return None, 0
+
+
+def _io_rows(lines: List[str], start: int, base: int) -> Dict[str, Dict[str, str]]:
     out: Dict[str, Dict[str, str]] = {"outputs": {}, "inputs": {}}
     sub = None
     for ln in lines[start + 1:]:
@@ -107,6 +104,15 @@ def parse_io_types(text: str) -> Optional[Dict[str, Dict[str, str]]]:
     return out
 
 
+def parse_io_types(text: str) -> Optional[Dict[str, Dict[str, str]]]:
+    """从 machine_contract 围栏里读 io_types（行式解析；无则 None）。"""
+    lines = text.splitlines()
+    start, base = _io_header(lines)
+    if start is None:
+        return None
+    return _io_rows(lines, start, base)
+
+
 def render_io_types(io: Dict[str, Dict[str, str]], indent: str = "  ") -> str:
     body = ["%sio_types:" % indent]
     for sec in ("outputs", "inputs"):
@@ -120,23 +126,19 @@ def render_io_types(io: Dict[str, Dict[str, str]], indent: str = "  ") -> str:
     return "\n".join(body)
 
 
-def inject(text: str, io: Dict[str, Dict[str, str]]) -> str:
-    """把 io_types 写进第一个 machine_contract 围栏（幂等：已有则整体替换）。"""
-    lines = text.splitlines()
-    io_start = next((i for i, ln in enumerate(lines) if _IO_RE.match(ln)), None)
-    if io_start is not None:
-        m = _IO_RE.match(lines[io_start])
-        base = len(m.group(1)) if m else 0
-        end = io_start + 1
-        while end < len(lines):
-            ln = lines[end]
-            if ln.strip() and (len(ln) - len(ln.lstrip())) <= base:
-                break
-            end += 1
-        block = render_io_types(io).splitlines()
-        lines[io_start:end] = block
-        return "\n".join(lines) + ("\n" if text.endswith("\n") else "")
-    # 插在 interfaces: 行之后（机读块尾部）；找不到就插在围栏闭合前
+def _io_block_end(lines: List[str], io_start: int) -> int:
+    m = _IO_RE.match(lines[io_start])
+    base = len(m.group(1)) if m else 0
+    end = io_start + 1
+    while end < len(lines):
+        ln = lines[end]
+        if ln.strip() and (len(ln) - len(ln.lstrip())) <= base:
+            break
+        end += 1
+    return end
+
+
+def _yaml_fence(lines: List[str]) -> Tuple[Optional[int], Optional[int]]:
     fence_open = fence_close = None
     for i, ln in enumerate(lines):
         if ln.strip() == "```yaml" and fence_open is None:
@@ -144,11 +146,22 @@ def inject(text: str, io: Dict[str, Dict[str, str]]) -> str:
         elif fence_open is not None and ln.strip().startswith("```"):
             fence_close = i
             break
+    return fence_open, fence_close
+
+
+def inject(text: str, io: Dict[str, Dict[str, str]]) -> str:
+    """把 io_types 写进第一个 machine_contract 围栏（幂等：已有则整体替换）。"""
+    lines = text.splitlines()
+    io_start = next((i for i, ln in enumerate(lines) if _IO_RE.match(ln)), None)
+    if io_start is not None:
+        end = _io_block_end(lines, io_start)
+        lines[io_start:end] = render_io_types(io).splitlines()
+        return "\n".join(lines) + ("\n" if text.endswith("\n") else "")
+    # 插在 interfaces: 行之后（机读块尾部）；找不到就插在围栏闭合前
+    fence_open, fence_close = _yaml_fence(lines)
     if fence_open is None or fence_close is None:
         return text
-    anchor = fence_close
-    block_text = render_io_types(io)
-    lines[anchor:anchor] = block_text.splitlines()
+    lines[fence_close:fence_close] = render_io_types(io).splitlines()
     return "\n".join(lines) + ("\n" if text.endswith("\n") else "")
 
 
@@ -182,14 +195,46 @@ def apply(root: str = ".", write: bool = False) -> List[Dict[str, Any]]:
     return out
 
 
-def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """→ (issues, warns, stats)：可证不匹配/越词表 = FAIL；未收窄/L0 = WARN。"""
+def _io_type_issues(mid: str, io: Dict[str, Dict[str, str]]) -> Tuple[List[str], int, int]:
+    issues: List[str] = []
+    typed = untyped = 0
+    for sec in ("outputs", "inputs"):
+        for key, kind in (io.get(sec) or {}).items():
+            if kind not in KINDS:
+                issues.append("%s io_types.%s.%s 类型越词表：%s（%s）"
+                              % (mid, sec, key, kind, "/".join(KINDS)))
+            if kind == "untyped":
+                untyped += 1
+            else:
+                typed += 1
+    return issues, typed, untyped
+
+
+def _io_key_issues(mid: str, mc: Dict[str, Any],
+                   io: Dict[str, Dict[str, str]]) -> List[str]:
+    issues: List[str] = []
+    declared = {str(x) for x in (mc.get("outputs") or [])}
+    marked = set((io.get("outputs") or {}).keys())
+    if declared != marked:
+        issues.append("%s io_types.outputs 与 outputs 键集不一致（缺 %s / 多 %s）"
+                     % (mid, sorted(declared - marked), sorted(marked - declared)))
+    # `inputs` 侧**此前从不核对**（2026-10-02 补）：读者读不出含冒号的跨包依赖键，而这一侧
+    # 没有任何对账 ⇒ 盲区不可见。口径与 outputs 侧一致（键集对齐，不判死、但可数）。
+    declared_in = {str(x) for x in (mc.get("inputs") or [])}
+    marked_in = set((io.get("inputs") or {}).keys())
+    if declared_in != marked_in:
+        issues.append("%s io_types.inputs 与 inputs 键集不一致（缺 %s / 多 %s）"
+                     % (mid, sorted(declared_in - marked_in),
+                        sorted(marked_in - declared_in)))
+    return issues
+
+
+def _module_io_issues(rows: List[Any]) -> Tuple[List[str], List[str], Dict[str, Any], List[str], int, int]:
     issues: List[str] = []
     warns: List[str] = []
-    rows = _modules(root)
-    typed = untyped = 0
     provided: Dict[str, Dict[str, str]] = {}
-    l0 = []
+    l0: List[str] = []
+    typed = untyped = 0
     for rel, text, mc, _doc in rows:
         mid = str(mc.get("id") or "")
         if not mid:
@@ -199,29 +244,17 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         if io is None:
             warns.append("%s 未标 io_types（修复指引：nf module types --write）" % mid)
             continue
-        for sec in ("outputs", "inputs"):
-            for key, kind in (io.get(sec) or {}).items():
-                if kind not in KINDS:
-                    issues.append("%s io_types.%s.%s 类型越词表：%s（%s）"
-                                  % (mid, sec, key, kind, "/".join(KINDS)))
-                if kind == "untyped":
-                    untyped += 1
-                else:
-                    typed += 1
-        declared = {str(x) for x in (mc.get("outputs") or [])}
-        marked = set((io.get("outputs") or {}).keys())
-        if declared != marked:
-            warns.append("%s io_types.outputs 与 outputs 键集不一致（缺 %s / 多 %s）"
-                         % (mid, sorted(declared - marked), sorted(marked - declared)))
-        # `inputs` 侧**此前从不核对**（2026-10-02 补）：读者读不出含冒号的跨包依赖键，而这一侧
-        # 没有任何对账 ⇒ 盲区不可见。口径与 outputs 侧一致（键集对齐，不判死、但可数）。
-        declared_in = {str(x) for x in (mc.get("inputs") or [])}
-        marked_in = set((io.get("inputs") or {}).keys())
-        if declared_in != marked_in:
-            warns.append("%s io_types.inputs 与 inputs 键集不一致（缺 %s / 多 %s）"
-                         % (mid, sorted(declared_in - marked_in),
-                            sorted(marked_in - declared_in)))
+        sec_issues, t, u = _io_type_issues(mid, io)
+        issues += sec_issues
+        typed += t
+        untyped += u
+        issues += _io_key_issues(mid, mc, io)
         provided[mid] = io.get("outputs") or {}
+    return issues, warns, provided, l0, typed, untyped
+
+
+def _mismatch_issues(rows: List[Any], provided: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     # 可证不匹配：消费方声明期望类型，提供方有类型声明但无一匹配
     for rel, text, mc, _doc in rows:
         mid = str(mc.get("id") or "")
@@ -236,6 +269,14 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
                 issues.append("类型不匹配：%s 期望 %s 提供 %s，但 %s 声明输出类型为 %s"
                               "（修复指引：对齐 io_types 或改依赖）"
                               % (mid, dep, want, dep, sorted(set(got.values()))))
+    return issues
+
+
+def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
+    """→ (issues, warns, stats)：可证不匹配/越词表 = FAIL；未收窄/L0 = WARN。"""
+    rows = _modules(root)
+    issues, warns, provided, l0, typed, untyped = _module_io_issues(rows)
+    issues += _mismatch_issues(rows, provided)
     stats = {"modules_with_contract": len(rows) - len(l0), "l0_modules": len(l0),
              "typed_fields": typed, "untyped_fields": untyped}
     if l0:

@@ -25,24 +25,39 @@ def _issue(rid: str, level: str, detail: str) -> Dict[str, str]:
             "detail": detail}
 
 
-def check_card(doc: Dict[str, Any]) -> List[Dict[str, str]]:
-    """R1：卡结构（V1/V2/V3）。"""
+def _card_spec_version(doc: Dict[str, Any], data: Any) -> str:
+    return str(doc.get("spec_version") or (data or {}).get("spec_version") or "")
+
+
+def _card_spec_issues(doc: Dict[str, Any], data: Any) -> List[Dict[str, str]]:
     out: List[Dict[str, str]] = []
     spec = str(doc.get("spec") or "")
-    data = doc.get("data") if isinstance(doc.get("data"), dict) else None
     if spec:
         if spec not in SPEC_EXPECT:
             out.append(_issue("C1", "M", "spec 非法：%s（应为 chara_card_v2/v3）" % spec))
         want = SPEC_EXPECT.get(spec)
-        got = str(doc.get("spec_version") or (data or {}).get("spec_version") or "")
+        got = _card_spec_version(doc, data)
         if want and got != want:
             out.append(_issue("C2", "M", "spec_version 应为 %s，实为 %s" % (want, got or "(缺)")))
-        body = data or {}
     elif data is not None:
         out.append(_issue("C1", "M", "有 data 但缺 spec——无法判定 V2/V3"))
-        body = data
-    else:
-        body = doc                      # V1 平铺
+    return out
+
+
+def _card_body(doc: Dict[str, Any], data: Any) -> Dict[str, Any]:
+    if str(doc.get("spec") or ""):
+        return data or {}
+    if data is not None:
+        return data
+    return doc                      # V1 平铺
+
+
+def check_card(doc: Dict[str, Any]) -> List[Dict[str, str]]:
+    """R1：卡结构（V1/V2/V3）。"""
+    out: List[Dict[str, str]] = []
+    data = doc.get("data") if isinstance(doc.get("data"), dict) else None
+    out += _card_spec_issues(doc, data)
+    body = _card_body(doc, data)
     for k in REQUIRED_SIX:
         v = body.get(k)
         if v is None or (isinstance(v, str) and not v.strip()):
@@ -50,65 +65,109 @@ def check_card(doc: Dict[str, Any]) -> List[Dict[str, str]]:
     return out
 
 
-def check_worldbook(doc: Dict[str, Any]) -> List[Dict[str, str]]:
-    """R3：世界书健康。"""
-    out: List[Dict[str, str]] = []
+def _wb_rows(doc: Dict[str, Any]) -> Any:
     raw = doc.get("entries")
     if raw is None and isinstance(doc.get("character_book"), dict):
         raw = doc["character_book"].get("entries")
-    rows: List[Dict[str, Any]] = []
     if isinstance(raw, dict):
-        rows = [v for v in raw.values() if isinstance(v, dict)]
-    elif isinstance(raw, list):
-        rows = [v for v in raw if isinstance(v, dict)]
-    else:
+        return [v for v in raw.values() if isinstance(v, dict)]
+    if isinstance(raw, list):
+        return [v for v in raw if isinstance(v, dict)]
+    return None
+
+
+def _wb_entry_keys(e: Dict[str, Any]) -> List[str]:
+    keys = e.get("keys") if e.get("keys") is not None else e.get("key")
+    if isinstance(keys, str):
+        keys = [keys]
+    return [str(k) for k in (keys or []) if str(k).strip()]
+
+
+def _wb_entry_issues(e: Dict[str, Any], i: int, keys: List[str],
+                     seen: Dict[str, int]) -> List[Dict[str, str]]:
+    out: List[Dict[str, str]] = []
+    if not keys:
+        out.append(_issue("W1", "M", "第 %d 条 key 为空" % i))
+    if not str(e.get("content") or "").strip():
+        out.append(_issue("W1", "M", "第 %d 条 content 为空" % i))
+    for k in keys:
+        if "," in k:
+            out.append(_issue("W2", "S", "key 含逗号（会被当分隔符）：%s" % k))
+        seen[k] = seen.get(k, 0) + 1
+    if e.get("scanDepth") is None:
+        out.append(_issue("W5", "S", "第 %d 条未声明 scanDepth（触发可能在扫描范围外）" % i))
+    return out
+
+
+def check_worldbook(doc: Dict[str, Any]) -> List[Dict[str, str]]:
+    """R3：世界书健康。"""
+    out: List[Dict[str, str]] = []
+    rows = _wb_rows(doc)
+    if rows is None:
         return [_issue("W1",
  "M",
  "entries 缺失或不是 dict/list（ST convertCharacterBook 要求数组）")]
     seen: Dict[str, int] = {}
     for i, e in enumerate(rows):
-        keys = e.get("keys") if e.get("keys") is not None else e.get("key")
-        if isinstance(keys, str):
-            keys = [keys]
-        keys = [str(k) for k in (keys or []) if str(k).strip()]
-        if not keys:
-            out.append(_issue("W1", "M", "第 %d 条 key 为空" % i))
-        if not str(e.get("content") or "").strip():
-            out.append(_issue("W1", "M", "第 %d 条 content 为空" % i))
-        for k in keys:
-            if "," in k:
-                out.append(_issue("W2", "S", "key 含逗号（会被当分隔符）：%s" % k))
-            seen[k] = seen.get(k, 0) + 1
-        if e.get("scanDepth") is None:
-            out.append(_issue("W5", "S", "第 %d 条未声明 scanDepth（触发可能在扫描范围外）" % i))
+        out += _wb_entry_issues(e, i, _wb_entry_keys(e), seen)
     for k, n in seen.items():
         if n > 1:
             out.append(_issue("W2", "S", "同书内 key 重复 %d 次：%s" % (n, k)))
     return out
 
 
-def check_mvu_variables(doc: Dict[str, Any]) -> List[Dict[str, str]]:
-    """R4：MVU 变量系统。"""
+def _mvu_initial_issues(names: List[str], init: Dict[str, Any]) -> List[Dict[str, str]]:
     out: List[Dict[str, str]] = []
-    names = [str(v.get("name")) for v in (doc.get("variables") or []) if v.get("name")]
-    if not names:
-        return [_issue("V2", "M", "变量表为空——无 schema 可校验")]
-    init = doc.get("initial") or {}
     extra = sorted(set(init) - set(names))
     if extra:
         out.append(_issue("V2", "M", "initial 含未声明变量：%s" % "、".join(extra)))
     missing = sorted(set(names) - set(init))
     if missing:
         out.append(_issue("V2", "M", "变量缺初始值：%s" % "、".join(missing)))
+    return out
+
+
+def _mvu_name_issues(names: List[str]) -> List[Dict[str, str]]:
+    out: List[Dict[str, str]] = []
     for n in names:
         if "{{" in n or "}}" in n:
             out.append(_issue("V5", "S", "变量名含宏：%s" % n))
         if n.startswith(("_", "$")):
             out.append(_issue("V4", "S", "变量名带可见性前缀（%s）——确认语义正确" % n[0]))
-    for v in (doc.get("variables") or []):
+    return out
+
+
+def _mvu_array_issues(variables: List[Dict[str, Any]]) -> List[Dict[str, str]]:
+    out: List[Dict[str, str]] = []
+    for v in variables:
         if str(v.get("kind")) == "array":
             out.append(_issue("V5", "S", "变量 %s 为 array，规范建议优先 record" % v.get("name")))
     return out
+
+
+def check_mvu_variables(doc: Dict[str, Any]) -> List[Dict[str, str]]:
+    """R4：MVU 变量系统。"""
+    out: List[Dict[str, str]] = []
+    variables = doc.get("variables") or []
+    names = [str(v.get("name")) for v in variables if v.get("name")]
+    if not names:
+        return [_issue("V2", "M", "变量表为空——无 schema 可校验")]
+    init = doc.get("initial") or {}
+    out += _mvu_initial_issues(names, init)
+    out += _mvu_name_issues(names)
+    out += _mvu_array_issues(variables)
+    return out
+
+
+def _dispatch(doc: Dict[str, Any]) -> Any:
+    if doc.get("variables") is not None and doc.get("initial") is not None:
+        return "mvu-variables", check_mvu_variables(doc)
+    if doc.get("entries") is not None or doc.get("character_book") is not None:
+        return "worldbook", check_worldbook(doc)
+    if doc.get("spec") is not None or doc.get("name") is not None:
+        return "card", check_card(doc)
+    return "unknown", [_issue("C1", "M", "无法识别资产类型（无 spec/name/entries/variab"
+            "les 特征）")]
 
 
 def validate(path: str) -> Dict[str, Any]:
@@ -118,15 +177,7 @@ def validate(path: str) -> Dict[str, Any]:
     if not isinstance(doc, dict):
         return {"path": path, "kind": "unknown", "issues": [
             _issue("C1", "M", "顶层不是对象，无法判定资产类型")]}
-    if doc.get("variables") is not None and doc.get("initial") is not None:
-        kind, issues = "mvu-variables", check_mvu_variables(doc)
-    elif doc.get("entries") is not None or doc.get("character_book") is not None:
-        kind, issues = "worldbook", check_worldbook(doc)
-    elif doc.get("spec") is not None or doc.get("name") is not None:
-        kind, issues = "card", check_card(doc)
-    else:
-        kind, issues = "unknown", [_issue("C1", "M", "无法识别资产类型（无 spec/name/entries/variab"
-            "les 特征）")]
+    kind, issues = _dispatch(doc)
     return {"path": path, "kind": kind, "issues": issues,
             "counts": {s: sum(1 for i in issues if i["severity"] == s)
                        for s in ("fail", "warn", "info")}}

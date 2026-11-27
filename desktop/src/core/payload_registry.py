@@ -18,6 +18,37 @@ from core import json_doc
 _ROOT = Path(__file__).resolve().parents[3]
 
 
+def _doc_events(doc: Any) -> Tuple[List[str], List[str]]:
+    txt = csc.read_text_cached(doc)
+    parsed = csc._fence_yaml(txt, "machine_contract")
+    mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
+    ev = (mc or {}).get("events") or {}
+    return (ev.get("publish") or []), (ev.get("subscribe") or [])
+
+
+def _used_events(r: Path) -> set:
+    used: set = set()
+    for doc in csc._module_docs(str(r)):
+        pub, sub = _doc_events(doc)
+        used.update(pub)
+        used.update(sub)
+    reg_json = json_doc.loads(csc.read_text_cached(r / "desktop/src/core/registry.json"), dict,
+                              what="desktop/src/core/registry.json")
+    used.update((reg_json.get("subscriptions") or {}).keys())
+    return used
+
+
+def _dead_issues(registered: Dict[str, Any], used: set) -> List[str]:
+    issues: List[str] = []
+    dead = sorted(set(registered) - used)
+    if dead:
+        issues.append("已登记事件无 machine 引用（死注册）：%s" % ", ".join(dead))
+    missing = sorted(used - set(registered))
+    if missing:
+        issues.append("机器事件未登记载荷（漏登）：%s" % ", ".join(missing))
+    return issues
+
+
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     r = Path(root)
     from core import schema_lint as sl
@@ -37,24 +68,9 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                               what="protocol/event_registry.json")
     issues += sl.subset_validate(registry, schema, "event_registry")
 
-    used: set = set()
-    for doc in csc._module_docs(str(r)):
-        txt = csc.read_text_cached(doc)
-        parsed = csc._fence_yaml(txt, "machine_contract")
-        mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
-        ev = (mc or {}).get("events") or {}
-        used.update(ev.get("publish") or [])
-        used.update(ev.get("subscribe") or [])
-    reg_json = json_doc.loads(csc.read_text_cached(r / "desktop/src/core/registry.json"), dict,
-                              what="desktop/src/core/registry.json")
-    used.update((reg_json.get("subscriptions") or {}).keys())
+    used = _used_events(r)
     registered = registry.get("events", {})
-    dead = sorted(set(registered) - used)
-    if dead:
-        issues.append("已登记事件无 machine 引用（死注册）：%s" % ", ".join(dead))
-    missing = sorted(used - set(registered))
-    if missing:
-        issues.append("机器事件未登记载荷（漏登）：%s" % ", ".join(missing))
+    issues += _dead_issues(registered, used)
     declared = sum(1 for v in registered.values() if v.get("fields"))
     return issues, {"registered": len(registered), "used": len(used),
                     "declared": declared,

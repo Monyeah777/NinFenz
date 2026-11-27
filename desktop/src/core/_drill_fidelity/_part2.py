@@ -62,6 +62,25 @@ def _corpus_adjudicate(live: list[tuple[int, str]], keyed: dict[tuple[int, str],
     return tp, fp, resolved, detail + resolved_detail, problems + reverse_problems
 
 
+def _corpus_nonblank(text: str) -> list[tuple[int, str]]:
+    return [(i + 1, line) for i, line in enumerate(text.splitlines()) if line.strip()]
+
+
+def _corpus_entries(block: dict[str, Any]) -> list[dict[str, Any]]:
+    return [e for e in (block.get("adjudications") or []) if isinstance(e, dict)]
+
+
+def _corpus_keyed(entries: list[dict[str, Any]]) -> dict[tuple[int, str], dict[str, Any]]:
+    return {(int(e.get("line") or 0), str(e.get("rule") or "")): e for e in entries}
+
+
+def _corpus_rules(live: list[tuple[int, str]]) -> dict[str, int]:
+    rules: dict[str, int] = {}
+    for _n, rule in live:
+        rules[rule] = rules.get(rule, 0) + 1
+    return rules
+
+
 def real_corpus(root: str = ".") -> dict[str, Any]:
     """真实语料逐命中裁定（活判据）→ 度量块；找不到语料/裁定表时返回 `{}`。
 
@@ -81,17 +100,15 @@ def real_corpus(root: str = ".") -> dict[str, Any]:
         return {}
     text = doc_p.read_text(encoding="utf-8")
     sha = hashlib.sha256(doc_p.read_bytes()).hexdigest()
-    nonblank = [(i + 1, line) for i, line in enumerate(text.splitlines()) if line.strip()]
+    nonblank = _corpus_nonblank(text)
     problems, real_ids = _corpus_meta_problems(block, text, sha, nonblank, allowed)
-    entries = [e for e in (block.get("adjudications") or []) if isinstance(e, dict)]
-    keyed = {(int(e.get("line") or 0), str(e.get("rule") or "")): e for e in entries}
+    entries = _corpus_entries(block)
+    keyed = _corpus_keyed(entries)
     live = _corpus_live_hits(nonblank, real_ids)
     tp, fp, resolved, detail, verdict_problems = _corpus_adjudicate(live, keyed)
     problems += verdict_problems
     raw_turns = int(rd.scan(text, [])[1].get("turns") or 0)
-    rules: dict[str, int] = {}
-    for _n, rule in live:
-        rules[rule] = rules.get(rule, 0) + 1
+    rules = _corpus_rules(live)
     return {"source": REAL_CORPUS_REL,
             "sample": sample,
             "sha256": sha,
@@ -109,52 +126,91 @@ def real_corpus(root: str = ".") -> dict[str, Any]:
             "adjudications": detail}
 
 
+def _exec_cases(ex: list[dict[str, Any]]) -> tuple[int, int]:
+    return sum(s["cases"] for s in ex), sum(s["passed"] for s in ex)
+
+
+def _round_counts(rnd: list[dict[str, Any]]) -> tuple[int, int, int]:
+    adjudicated = [s for s in rnd if not s.get("pending")]
+    rnd_total = len(adjudicated)
+    rnd_pass = sum(1 for s in adjudicated if s.get("matched"))
+    parsed = sum(1 for s in rnd if s.get("parse_ok"))
+    return rnd_total, rnd_pass, parsed
+
+
+def _round_hits(rnd: list[dict[str, Any]]) -> list[str]:
+    return [h for s in rnd if s.get("pending") for h in (s.get("hits") or [])]
+
+
+def _round_adj(rnd: list[dict[str, Any]]) -> dict[str, str]:
+    return {a["hit"]: a["verdict"] for s in rnd if s.get("pending")
+            for a in s.get("adjudication") or []}
+
+
+def _round_hit_counts(rnd: list[dict[str, Any]]) -> tuple[list[str], int, int]:
+    round_hits = _round_hits(rnd)
+    round_adj = _round_adj(rnd)
+    round_tp = sum(1 for h in round_hits if round_adj.get(h) == "TP")
+    round_fp = sum(1 for h in round_hits if round_adj.get(h) == "FP")
+    return round_hits, round_tp, round_fp
+
+
+def _exec_block(ex: list[dict[str, Any]], ex_cases: int, ex_pass: int) -> dict[str, Any]:
+    return {"sets": ex, "cases": ex_cases, "passed": ex_pass,
+            "fidelity": round(ex_pass / ex_cases, 4) if ex_cases else 0.0}
+
+
+def _round_block(rnd: list[dict[str, Any]], counts: tuple[int, int, int],
+                 hits: tuple[list[str], int, int]) -> dict[str, Any]:
+    rnd_total, rnd_pass, parsed = counts
+    round_hits, round_tp, round_fp = hits
+    return {"samples": rnd, "total": rnd_total, "matched": rnd_pass,
+            "pending": len(rnd) - rnd_total,
+            "pending_samples": len(rnd) - rnd_total,
+            "parse_ok": parsed, "parse_total": len(rnd),
+            "parse_rate": round(parsed / len(rnd), 4) if rnd else 0.0,
+            "hits": round_hits, "tp": round_tp, "fp": round_fp,
+            "fidelity": round(rnd_pass / rnd_total, 4) if rnd_total else 0.0}
+
+
+def _metrics_block(rnd: list[dict[str, Any]], parsed: int, corpus: dict[str, Any],
+                   controls: dict[str, Any],
+                   hits: tuple[list[str], int, int]) -> dict[str, Any]:
+    round_hits, round_tp, round_fp = hits
+    return {"parse_rate": round(parsed / len(rnd), 4) if rnd else 0.0,
+            "parse_ok": parsed, "parse_total": len(rnd),
+            "raw_parse_rate": corpus.get("raw_parse_rate", 0.0),
+            "hits": corpus.get("hits", 0),
+            "tp": corpus.get("tp", 0),
+            "fp": corpus.get("fp", 0),
+            "hits_before": corpus.get("hits_before", 0),
+            "fp_resolved": corpus.get("fp_resolved", 0),
+            "round_hits": len(round_hits),
+            "round_tp": round_tp, "round_fp": round_fp,
+            "positive_controls_passed": controls.get("passed", 0),
+            "positive_controls_total": controls.get("total", 0)}
+
+
 def measure(root: str = ".") -> dict[str, Any]:
     """→ 保真度度量（执行演练 + 回合级回放 + 真实语料裁定 + 总口径）。"""
     r = Path(root)
     ex = _exec_sets(r)
     rnd = _round_samples(r)
-    ex_cases = sum(s["cases"] for s in ex)
-    ex_pass = sum(s["passed"] for s in ex)
-    adjudicated = [s for s in rnd if not s.get("pending")]
-    rnd_total = len(adjudicated)
-    rnd_pass = sum(1 for s in adjudicated if s.get("matched"))
-    parsed = sum(1 for s in rnd if s.get("parse_ok"))
+    ex_cases, ex_pass = _exec_cases(ex)
+    rnd_total, rnd_pass, parsed = _round_counts(rnd)
     corpus = real_corpus(str(r))
     controls = positive_controls(str(r))
     #: 待裁定样本的规则命中（逐条裁定）——与真实语料命中分开计，口径不混。
-    round_hits = [h for s in rnd if s.get("pending") for h in (s.get("hits") or [])]
-    round_adj = {a["hit"]: a["verdict"] for s in rnd if s.get("pending")
-                 for a in s.get("adjudication") or []}
-    round_tp = sum(1 for h in round_hits if round_adj.get(h) == "TP")
-    round_fp = sum(1 for h in round_hits if round_adj.get(h) == "FP")
+    hits = _round_hit_counts(rnd)
     total, passed = ex_cases + rnd_total, ex_pass + rnd_pass
     return {"schema": SCHEMA,
-            "execution": {"sets": ex, "cases": ex_cases, "passed": ex_pass,
-                          "fidelity": round(ex_pass / ex_cases, 4) if ex_cases else 0.0},
-            "rounds": {"samples": rnd, "total": rnd_total, "matched": rnd_pass,
-                       "pending": len(rnd) - rnd_total,
-                       "pending_samples": len(rnd) - rnd_total,
-                       "parse_ok": parsed, "parse_total": len(rnd),
-                       "parse_rate": round(parsed / len(rnd), 4) if rnd else 0.0,
-                       "hits": round_hits, "tp": round_tp, "fp": round_fp,
-                       "fidelity": round(rnd_pass / rnd_total, 4) if rnd_total else 0.0},
+            "execution": _exec_block(ex, ex_cases, ex_pass),
+            "rounds": _round_block(rnd, (rnd_total, rnd_pass, parsed), hits),
             "real_corpus": corpus,
             "positive_controls": controls,
             "overall": {"cases": total, "passed": passed,
                         "fidelity": round(passed / total, 4) if total else 0.0},
-            "metrics": {"parse_rate": round(parsed / len(rnd), 4) if rnd else 0.0,
-                        "parse_ok": parsed, "parse_total": len(rnd),
-                        "raw_parse_rate": corpus.get("raw_parse_rate", 0.0),
-                        "hits": corpus.get("hits", 0),
-                        "tp": corpus.get("tp", 0),
-                        "fp": corpus.get("fp", 0),
-                        "hits_before": corpus.get("hits_before", 0),
-                        "fp_resolved": corpus.get("fp_resolved", 0),
-                        "round_hits": len(round_hits),
-                        "round_tp": round_tp, "round_fp": round_fp,
-                        "positive_controls_passed": controls.get("passed", 0),
-                        "positive_controls_total": controls.get("total", 0)}}
+            "metrics": _metrics_block(rnd, parsed, corpus, controls, hits)}
 
 
 def _exec_issues(sets: list[dict[str, Any]]) -> list[str]:
@@ -169,29 +225,42 @@ def _exec_issues(sets: list[dict[str, Any]]) -> list[str]:
     return issues
 
 
+def _replay_issues(s: dict[str, Any]) -> list[str]:
+    if s.get("matched"):
+        return []
+    return ["回合级回放未复现声明：{} 声明={} 实测={}（{}）（修复指引：修样本或"
+            "回合断言——回放须可复现声明结论）"
+            .format(s["sample"], s.get("declared"), s.get("live"),
+                    str(s.get("first_issue"))[:60])]
+
+
+def _pending_issues(s: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    # 待裁定样本：parse 是裁定前提；命中必须逐条裁定，不许留「疑似」。
+    if not s.get("parse_ok"):
+        issues.append("待裁定回合样本未解析出回合标记：{}（parse 失败 ⇒ 裁定前提不成立；"
+                      "修复指引：转录须含「回合 N：」/「第 N 回合」）".format(s["sample"]))
+    declared = {a["hit"]: a["verdict"] for a in s.get("adjudication") or []}
+    for hit in s.get("hits") or []:
+        if declared.get(hit) not in ("TP", "FP"):
+            issues.append("待裁定样本 {} 的规则命中未裁定：{}（修复指引：在样本 adjudication 里"
+                          "逐条给 TP/FP + 依据）".format(s["sample"], hit))
+    return issues
+
+
+def _sample_issues(s: dict[str, Any]) -> list[str]:
+    if s.get("error"):
+        return ["{} {}".format(s["sample"], s["error"])]
+    if not s.get("pending"):
+        return _replay_issues(s)
+    return _pending_issues(s)
+
+
 def _round_issues(samples: list[dict[str, Any]]) -> list[str]:
     """回合级样本的判据问题（声明未复现 / 待裁定样本 parse 或裁定缺位）。"""
     issues: list[str] = []
     for s in samples:
-        if s.get("error"):
-            issues.append("{} {}".format(s["sample"], s["error"]))
-            continue
-        if not s.get("pending"):
-            if not s.get("matched"):
-                issues.append("回合级回放未复现声明：{} 声明={} 实测={}（{}）（修复指引：修样本或"
-                              "回合断言——回放须可复现声明结论）"
-                              .format(s["sample"], s.get("declared"), s.get("live"),
-                                      str(s.get("first_issue"))[:60]))
-            continue
-        # 待裁定样本：parse 是裁定前提；命中必须逐条裁定，不许留「疑似」。
-        if not s.get("parse_ok"):
-            issues.append("待裁定回合样本未解析出回合标记：{}（parse 失败 ⇒ 裁定前提不成立；"
-                          "修复指引：转录须含「回合 N：」/「第 N 回合」）".format(s["sample"]))
-        declared = {a["hit"]: a["verdict"] for a in s.get("adjudication") or []}
-        for hit in s.get("hits") or []:
-            if declared.get(hit) not in ("TP", "FP"):
-                issues.append("待裁定样本 {} 的规则命中未裁定：{}（修复指引：在样本 adjudication 里"
-                              "逐条给 TP/FP + 依据）".format(s["sample"], hit))
+        issues += _sample_issues(s)
     return issues
 
 

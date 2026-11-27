@@ -16,38 +16,47 @@ from ._const import (
 )
 
 
+_SLASH_SPECS = (
+    (("quit", "exit", "q"), "quit", ""),
+    (("help", "?"), "help", "tail"),
+    (("menu", "菜单"), "menu", ""),
+    (("zone", "z", "区"), "zone", "tail"),
+    (("doctor", "自检"), "run", ["doctor"]),
+    (("version", "ver", "版本"), "run", ["--version"]),
+    (("find", "search", "找", "查"), "search", "tail"),
+    (("commands", "cmd", "cmds", "命令"), "commands", "tail"),
+    (("map", "families", "族", "地图"), "map", "tail"),
+    (("history", "hist", "历史"), "history", "tail"),
+    (("complete", "补全"), "complete", "tail"),
+    (("set", "settings", "设置"), "set", "tail"),
+    (("form", "forms", "表单"), "form", "tail"),
+    (("cancel", "取消"), "cancel", "tail"),
+)
+
+
+def _slash_spec(head: str):
+    for words, kind, mode in _SLASH_SPECS:
+        if head in words:
+            return kind, mode
+    return None
+
+
+def _slash_args(mode, tail: str):
+    if mode == "tail":
+        return tail
+    if isinstance(mode, list):
+        return mode
+    return ""
+
+
 def _slash_intent(body: str, raw: str):
     """解析斜杠命令体 → Intent；非斜杠命令词返回 None（调用方决定怎么归类）。"""
     head, _, tail = body.partition(" ")
     head = head.lower()
-    if head in ("quit", "exit", "q"):
-        return Intent("quit", "", raw)
-    if head in ("help", "?"):
-        return Intent("help", tail.strip(), raw)
-    if head in ("menu", "菜单"):
-        return Intent("menu", "", raw)
-    if head in ("zone", "z", "区"):
-        return Intent("zone", tail.strip(), raw)
-    if head in ("doctor", "自检"):
-        return Intent("run", ["doctor"], raw)
-    if head in ("version", "ver", "版本"):
-        return Intent("run", ["--version"], raw)
-    if head in ("find", "search", "找", "查"):
-        return Intent("search", tail.strip(), raw)
-    if head in ("commands", "cmd", "cmds", "命令"):
-        return Intent("commands", tail.strip(), raw)
-    if head in ("map", "families", "族", "地图"):
-        return Intent("map", tail.strip(), raw)
-    if head in ("history", "hist", "历史"):
-        return Intent("history", tail.strip(), raw)
-    if head in ("complete", "补全"):
-        return Intent("complete", tail.strip(), raw)
-    if head in ("set", "settings", "设置"):
-        return Intent("set", tail.strip(), raw)
-    if head in ("form", "forms", "表单"):
-        return Intent("form", tail.strip(), raw)
-    if head in ("cancel", "取消"):
-        return Intent("cancel", tail.strip(), raw)
+    hit = _slash_spec(head)
+    if hit is not None:
+        kind, mode = hit
+        return Intent(kind, _slash_args(mode, tail.strip()), raw)
     if head in ("replay", "重放"):
         # `/replay`（无参数）= 列清单；`/replay n` / `/replay 前缀` = 重放
         return Intent("replay-list" if not tail.strip() else "replay", tail.strip(), raw)
@@ -102,6 +111,26 @@ def _strip_comment(line: str) -> str:
 
 
 
+def _zone_intent(raw: str):
+    if raw.isdigit() and zone_by_key(raw) is not None:
+        return Intent("zone", raw, raw)
+    return None
+
+
+def _bash_path_intent(argv: list, raw: str):
+    # MSYS/Git-Bash 兼容：`"/zone 4"` 这类以 `/` 开头的参数会被通行层当成 POSIX 路径
+    # 转换成 `C:/…/zone 4`（单 token 的 `/menu` 不受影响）。若首 token 的**末段**是斜杠
+    # 命令词，就还原成该命令——否则 Git Bash 用户会看到一条莫名其妙的 argparse 报错。
+    head_path = argv[0].replace("\\", "/")
+    if "/" in head_path:
+        seg = head_path.rsplit("/", 1)[-1].lower()
+        if seg in SLASH_WORDS:
+            hit = _slash_intent(" ".join([seg] + [str(a) for a in argv[1:]]), raw)
+            if hit is not None:
+                return hit
+    return None
+
+
 def parse(line: str) -> Intent:
     """解析一行输入 → Intent。
 
@@ -120,23 +149,17 @@ def parse(line: str) -> Intent:
     if raw.startswith("/"):
         hit = _slash_intent(raw[1:].strip(), raw)
         return hit if hit is not None else Intent("unknown", raw, raw)
-    if raw.isdigit() and zone_by_key(raw) is not None:
-        return Intent("zone", raw, raw)
+    zone_hit = _zone_intent(raw)
+    if zone_hit is not None:
+        return zone_hit
     argv = _strip_nf(split_args(raw))
     if not argv:
         return Intent("empty", "", raw)
     if argv[0] in ("quit", "exit"):
         return Intent("quit", "", raw)
-    # MSYS/Git-Bash 兼容：`"/zone 4"` 这类以 `/` 开头的参数会被通行层当成 POSIX 路径
-    # 转换成 `C:/…/zone 4`（单 token 的 `/menu` 不受影响）。若首 token 的**末段**是斜杠
-    # 命令词，就还原成该命令——否则 Git Bash 用户会看到一条莫名其妙的 argparse 报错。
-    head_path = argv[0].replace("\\", "/")
-    if "/" in head_path:
-        seg = head_path.rsplit("/", 1)[-1].lower()
-        if seg in SLASH_WORDS:
-            hit = _slash_intent(" ".join([seg] + [str(a) for a in argv[1:]]), raw)
-            if hit is not None:
-                return hit
+    hit = _bash_path_intent(argv, raw)
+    if hit is not None:
+        return hit
     return Intent("run", argv, raw)
 
 
@@ -219,6 +242,27 @@ def did_you_mean(word: str, names, limit: int = 3) -> list:
 
 
 
+def _entry_text(e: dict) -> tuple:
+    low = str(e.get("path") or "").lower()
+    return low, low.split(" ")[0], str(e.get("summary") or "").lower()
+
+
+def _score_entry(q: str, e: dict) -> int:
+    low, head, summary = _entry_text(e)
+    if low == q or head == q:
+        return 100
+    if low.startswith(q) or head.startswith(q):
+        return 80
+    if q in low:
+        return 60
+    if q in summary:
+        return 40
+    d = min(_lev(q, head), _lev(q, low))
+    if d <= 2:
+        return 35 - 5 * d
+    return 0
+
+
 def search(index, query: str, limit: int = 8) -> list:
     """在命令面上检索 → [(score, entry)]（确定性：分数降序、路径升序）。
 
@@ -231,23 +275,7 @@ def search(index, query: str, limit: int = 8) -> list:
         return [(0, e) for e in sorted(entries, key=lambda x: str(x.get("path")))[:limit]]
     out = []
     for e in entries:
-        path = str(e.get("path") or "")
-        low = path.lower()
-        head = low.split(" ")[0]
-        summary = str(e.get("summary") or "").lower()
-        score = 0
-        if low == q or head == q:
-            score = 100
-        elif low.startswith(q) or head.startswith(q):
-            score = 80
-        elif q in low:
-            score = 60
-        elif q in summary:
-            score = 40
-        else:
-            d = min(_lev(q, head), _lev(q, low))
-            if d <= 2:
-                score = 35 - 5 * d
+        score = _score_entry(q, e)
         if score:
             out.append((score, e))
     out.sort(key=lambda x: (-x[0], str(x[1].get("path"))))

@@ -83,20 +83,30 @@ def _context_ids(task: Dict[str, Any], pack: Optional[Dict[str, Any]]) -> List[s
     return ids
 
 
+def _mock_lines(entries: List[Dict[str, Any]]) -> List[str]:
+    lines = []
+    for entry in entries:
+        lines.append("## %s" % entry.get("id"))
+        lines.append(str(entry.get("summary") or ""))
+    return lines
+
+
+def _output_schema(task: Dict[str, Any], default_kind: str, default_path: str) -> Dict[str, str]:
+    schema = task.get("output_schema") or {}
+    return {"kind": str(schema.get("kind") or default_kind),
+            "path": str(schema.get("path") or default_path)}
+
+
 def _mock_output(task: Dict[str, Any], pack: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     entries = (pack or {}).get("entries") or []
     if not entries:
         raise AdapterError("空上下文无法产出（修复指引：先跑 Context Packer 打包）",
                            code="CONTEXT-EMPTY")
-    lines = []
-    for entry in entries:
-        lines.append("## %s" % entry.get("id"))
-        lines.append(str(entry.get("summary") or ""))
-    content = "\n\n".join(lines)
+    content = "\n\n".join(_mock_lines(entries))
     ids = [str(e.get("id")) for e in entries]
+    out_schema = _output_schema(task, "md", "out.md")
     return {"schema": OUTPUT_SCHEMA, "adapter": "mock", "task_slot": task["slot"]["id"],
-            "output": {"kind": str((task.get("output_schema") or {}).get("kind") or "md"),
-                       "path": str((task.get("output_schema") or {}).get("path") or "out.md"),
+            "output": {"kind": out_schema["kind"], "path": out_schema["path"],
                        "content": content},
             "citations": ids,
             "usage": {"tokens": max(1, len(content) // 4), "steps": 1}}
@@ -159,33 +169,71 @@ def run(adapter_id: str, task: Dict[str, Any], pack: Optional[Dict[str, Any]] = 
     return out
 
 
-def validate_output(out: Dict[str, Any], task: Dict[str, Any],
-                    pack: Optional[Dict[str, Any]] = None) -> List[str]:
+def _citation_issues(out: Dict[str, Any], task: Dict[str, Any],
+                     pack: Optional[Dict[str, Any]]) -> List[str]:
     issues: List[str] = []
-    if str(out.get("schema")) != OUTPUT_SCHEMA:
-        issues.append("output schema 必须 %s" % OUTPUT_SCHEMA)
     allowed = set(_context_ids(task, pack))
     cited = {str(c) for c in out.get("citations") or []}
     if not cited:
         issues.append("output 缺 citations")
     if cited - allowed:
         issues.append("编造引用（不在上下文内）：%s" % sorted(cited - allowed)[:3])
+    return issues
+
+
+def _content_issues(out: Dict[str, Any], task: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     content = str(((out.get("output") or {}).get("content")) or "")
     if not content.strip():
         issues.append("output.content 为空")
     max_chars = _budget(task) * 4
     if len(content) > max_chars:
         issues.append("output 超预算（%d > %d 字符）" % (len(content), max_chars))
+    return issues
+
+
+def _kind_issues(out: Dict[str, Any], task: Dict[str, Any]) -> List[str]:
     want_kind = str((task.get("output_schema") or {}).get("kind") or "")
     got_kind = str((out.get("output") or {}).get("kind") or "")
     if want_kind and got_kind != want_kind:
-        issues.append("output.kind 与 task.output_schema 不符：%s != %s" % (got_kind, want_kind))
+        return ["output.kind 与 task.output_schema 不符：%s != %s" % (got_kind, want_kind)]
+    return []
+
+
+def _budget_issues(out: Dict[str, Any], task: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     usage = out.get("usage") or {}
     if int(usage.get("tokens") or 0) > _budget(task):
         issues.append("usage.tokens 超 budget")
     if str(out.get("task_slot")) != str((task.get("slot") or {}).get("id")):
         issues.append("output.task_slot 与 task 不一致")
     return issues
+
+
+def validate_output(out: Dict[str, Any], task: Dict[str, Any],
+                    pack: Optional[Dict[str, Any]] = None) -> List[str]:
+    issues: List[str] = []
+    if str(out.get("schema")) != OUTPUT_SCHEMA:
+        issues.append("output schema 必须 %s" % OUTPUT_SCHEMA)
+    issues += _citation_issues(out, task, pack)
+    issues += _content_issues(out, task)
+    issues += _kind_issues(out, task)
+    issues += _budget_issues(out, task)
+    return issues
+
+
+def _parity_row(aid: str, task: Dict[str, Any], pack: Optional[Dict[str, Any]],
+                root: str) -> tuple:
+    try:
+        out = run(aid, task, pack, root)
+    except AdapterError as exc:
+        return {"id": aid, "ok": False, "error": exc.code}, None, "%s 失败：%s" % (aid, exc.code)
+    row = {"id": aid, "ok": True,
+           "citations": sorted(str(c) for c in out.get("citations") or []),
+           "chars": len(str(((out.get("output") or {}).get("content")) or "")),
+           "tokens": int((out.get("usage") or {}).get("tokens") or 0)}
+    kind = str((out.get("output") or {}).get("kind"))
+    return row, kind, None
 
 
 def parity_report(task: Dict[str, Any], pack: Optional[Dict[str, Any]] = None,
@@ -196,18 +244,13 @@ def parity_report(task: Dict[str, Any], pack: Optional[Dict[str, Any]] = None,
     kinds = set()
     citations = []
     for aid in sorted(ADAPTERS):
-        try:
-            out = run(aid, task, pack, root)
-        except AdapterError as exc:
-            rows.append({"id": aid, "ok": False, "error": exc.code})
-            issues.append("%s 失败：%s" % (aid, exc.code))
+        row, kind, issue = _parity_row(aid, task, pack, root)
+        rows.append(row)
+        if issue is not None:
+            issues.append(issue)
             continue
-        rows.append({"id": aid, "ok": True,
-                     "citations": sorted(str(c) for c in out.get("citations") or []),
-                     "chars": len(str(((out.get("output") or {}).get("content")) or "")),
-                     "tokens": int((out.get("usage") or {}).get("tokens") or 0)})
-        kinds.add(str((out.get("output") or {}).get("kind")))
-        citations.append(tuple(sorted(str(c) for c in out.get("citations") or [])))
+        kinds.add(kind)
+        citations.append(tuple(row["citations"]))
     parity = len(citations) >= 2 and len(set(citations)) == 1 and len(kinds) == 1
     if not parity:
         issues.append("parity 不一致（citations/kind 不同）")

@@ -45,6 +45,35 @@ def _header_lines(text: str) -> List[str]:
 _FENCE = re.compile(r"```(?:yaml|yml)\n(.*?)```", re.S)
 
 
+def _inline_events(rest: str) -> List[str]:
+    items: List[str] = []
+    for item in rest[1:-1].split(","):
+        item = item.strip().strip("'\"")
+        if item:
+            items.append(item)
+    return items
+
+
+def _event_marks(m: re.Match, pub: set, sub: set) -> Optional[str]:
+    cur = "publish" if m.group(1) == "publish" else "subscribe"
+    rest = m.group(2).strip()
+    if rest.startswith("[") and rest.endswith("]"):
+        target = pub if cur == "publish" else sub
+        target.update(_inline_events(rest))
+        return None
+    return cur
+
+
+def _event_block_item(ln: str, cur: str, pub: set, sub: set) -> Optional[str]:
+    mm = re.match(r"\s*-\s*([A-Za-z_][A-Za-z0-9_]*)\s*$", ln)
+    if mm:
+        (pub if cur == "publish" else sub).add(mm.group(1))
+        return cur
+    if ln.strip():
+        return None
+    return cur
+
+
 def _body_events(text: str) -> Dict[str, List[str]]:
     """正文事件契约（01 §1.1：机读块须覆盖正文全集，不能只看引用块）。
 
@@ -59,22 +88,11 @@ def _body_events(text: str) -> Dict[str, List[str]]:
         for ln in lines:
             m = re.match(r"\s*(publish|subscribe)\s*:\s*(.*)$", ln)
             if m:
-                cur = "publish" if m.group(1) == "publish" else "subscribe"
-                rest = m.group(2).strip()
-                if rest.startswith("[") and rest.endswith("]"):
-                    for item in rest[1:-1].split(","):
-                        item = item.strip().strip("'\"")
-                        if item:
-                            (pub if cur == "publish" else sub).add(item)
-                    cur = None
+                cur = _event_marks(m, pub, sub)
                 continue
             if cur is None:
                 continue
-            mm = re.match(r"\s*-\s*([A-Za-z_][A-Za-z0-9_]*)\s*$", ln)
-            if mm:
-                (pub if cur == "publish" else sub).add(mm.group(1))
-            elif ln.strip():
-                cur = None
+            cur = _event_block_item(ln, cur, pub, sub)
     return {"publish": sorted(pub), "subscribe": sorted(sub)}
 
 
@@ -95,54 +113,74 @@ def _segments(text: str) -> Dict[str, str]:
     return got
 
 
+def _header_ids(title: str, rel: str) -> Tuple[str, str]:
+    m = re.match(r"#\s*模块\s*(M\d{2})\s*[·:：]?\s*(.*)$", title)
+    mid = m.group(1) if m else (os.path.basename(rel).split("_", 1)[0])
+    name = (m.group(2).strip() if m else "") or Path(rel).stem.split("_", 1)[-1]
+    return mid, name
+
+
+def _header_category(segs: Dict[str, str]) -> str:
+    cat = re.split(r"[:：]", segs.get("类别", ""), maxsplit=1)[-1].strip()
+    return cat.replace("类", "") if cat.endswith("类") else cat
+
+
+def _header_deps(segs: Dict[str, str], mid: str) -> List[str]:
+    deps = _ID_TOKEN.findall(segs.get("依赖", "").replace("（", "、").replace("(", "、"))
+    return [d for d in deps if not d.endswith(mid)] or deps
+
+
+def _events_of(segs: Dict[str, str], key: str) -> List[str]:
+    val = segs.get(key, "")
+    val = val.split("——")[0]
+    hits = [a or b for a, b in _EVENT_TOKEN.findall(val)]
+    bad = {"无", "none"}
+    return sorted({h for h in hits if h and h not in bad and not h.startswith("M")})
+
+
 def parse_header(text: str, rel: str) -> Dict[str, Any]:
     """人读头 → 契约字段（解析不到的留空，由调用方决定写什么）。"""
     segs = _segments(text)
     title = next((ln.strip() for ln in text.splitlines() if ln.startswith("# 模块")), "")
-    m = re.match(r"#\s*模块\s*(M\d{2})\s*[·:：]?\s*(.*)$", title)
-    mid = m.group(1) if m else (os.path.basename(rel).split("_", 1)[0])
-    name = (m.group(2).strip() if m else "") or Path(rel).stem.split("_", 1)[-1]
-    cat = re.split(r"[:：]", segs.get("类别", ""), maxsplit=1)[-1].strip()
-    cat = cat.replace("类", "") if cat.endswith("类") else cat
+    mid, name = _header_ids(title, rel)
+    cat = _header_category(segs)
     layer_m = re.search(r"P\d{2}", segs.get("挂载点", ""))
-    deps = _ID_TOKEN.findall(segs.get("依赖", "").replace("（", "、").replace("(", "、"))
-    deps = [d for d in deps if not d.endswith(mid)] or deps
-    def _events(key: str) -> List[str]:
-        val = segs.get(key, "")
-        val = val.split("——")[0]
-        hits = [a or b for a, b in _EVENT_TOKEN.findall(val)]
-        bad = {"无", "none"}
-        return sorted({h for h in hits if h and h not in bad and not h.startswith("M")})
+    deps = _header_deps(segs, mid)
+    body = _body_events(text)
     return {"id": mid, "name": name, "category": cat or "通用",
             "layer": layer_m.group(0) if layer_m else "",
             "inputs": sorted(set(deps)),
-            "publish": sorted(set(_events("发布")) | set(_body_events(text)["publish"])),
-            "subscribe": sorted(set(_events("订阅")) | set(_body_events(text)["subscribe"])),
+            "publish": sorted(set(_events_of(segs, "发布")) | set(body["publish"])),
+            "subscribe": sorted(set(_events_of(segs, "订阅")) | set(body["subscribe"])),
             "had_deps": "依赖" in segs, "had_publish": "发布" in segs}
 
 
-def _provable_level(root: str, mid: str, package_dir: str) -> str:
-    """L2 = 在册 + 被管线引用（01 §1.2）；否则 L1。"""
+def _registered_module(root: str, mid: str) -> bool:
     reg = Path(root) / "desktop" / "src" / "core" / "registry.json"
-    registered = False
     try:
         data = json_doc.loads(reg.read_text(encoding="utf-8"), dict, what="registry.json")
         for p in data.get("protocols") or []:
             if mid in (p.get("module_ids") or []):
-                registered = True
-                break
+                return True
     except (OSError, ValueError):  # registry 不可读/不可解析 ⇒ 保守判 L1（不冒认 L2）
         pass
-    referenced = False
+    return False
+
+
+def _referenced_by_pipeline(root: str, mid: str, package_dir: str) -> bool:
     for pat in ("03_管线库/*.md", "community/*/pipelines/*.md"):
         for p in sorted(Path(root).glob(pat)):
             if package_dir and package_dir not in p.as_posix():
                 continue
             if re.search(r"\b%s\b" % re.escape(mid), p.read_text(encoding="utf-8")):
-                referenced = True
-                break
-        if referenced:
-            break
+                return True
+    return False
+
+
+def _provable_level(root: str, mid: str, package_dir: str) -> str:
+    """L2 = 在册 + 被管线引用（01 §1.2）；否则 L1。"""
+    registered = _registered_module(root, mid)
+    referenced = _referenced_by_pipeline(root, mid, package_dir)
     return "L2" if (registered and referenced) else "L1"
 
 
@@ -242,44 +280,60 @@ def _replace_outputs_line(text: str, tokens: List[str]) -> str:
     return text
 
 
+def _event_fields(root: str) -> Dict[str, Dict[str, Any]]:
+    ev_fields: Dict[str, Dict[str, Any]] = {}
+    reg = Path(root) / "protocol" / "event_registry.json"
+    if not reg.is_file():
+        return ev_fields
+    try:
+        data = json_doc.loads(reg.read_text(encoding="utf-8"), dict,
+                              what="protocol/event_registry.json")
+        for ev, body in (data.get("events") or {}).items():
+            ev_fields[ev] = {k: (v.get("type") if isinstance(v, dict) else "untyped")
+                             for k, v in (body.get("fields") or {}).items()}
+    except ValueError:  # 事件注册表不可读/不可解析 ⇒ 字段面留空（不凭空造字段）
+        pass
+    return ev_fields
+
+
+def _module_mc(csc: Any, text: str) -> Any:
+    parsed = csc._fence_yaml(text, "machine_contract")
+    return parsed.get("machine_contract") if isinstance(parsed, dict) else None
+
+
+def _apply_module(doc: Any, root: str, ev_fields: Dict[str, Dict[str, Any]],
+                  write: bool, csc: Any) -> Optional[Dict[str, Any]]:
+    rel = Path(doc).relative_to(root).as_posix()
+    text = Path(doc).read_text(encoding="utf-8")
+    mc = _module_mc(csc, text)
+    if not isinstance(mc, dict) or not mc.get("id"):
+        return None
+    if [str(x) for x in (mc.get("outputs") or [])]:
+        return None                       # 已显式声明 → 不动
+    toks = derive_outputs(mc, ev_fields)
+    if not toks:
+        return {"path": rel, "id": str(mc["id"]), "tokens": [],
+                "changed": False, "reason": "无事件载荷证据（如实留空）"}
+    new = _replace_outputs_line(text, toks)
+    changed = new != text
+    if changed and write:
+        # 原子写（2026-09-30 收口）：这是**就地编辑源件**（模块 md 的 outputs 行），
+        # 与同文件 `:210` 那处同规——裸 `write_text` 崩在中途会把源件截断成半截。
+        atomic_write.write_text(Path(doc), new)
+    return {"path": rel, "id": str(mc["id"]), "tokens": toks,
+            "changed": changed, "reason": "事件载荷证据"}
+
+
 def apply_outputs(root: str = ".", write: bool = False) -> List[Dict[str, Any]]:
     """给 **outputs 为空且有事件证据**的模块补 outputs 声明（幂等）。"""
     from core import conformance_scan as csc
 
-    ev_fields: Dict[str, Dict[str, Any]] = {}
-    reg = Path(root) / "protocol" / "event_registry.json"
-    if reg.is_file():
-        try:
-            data = json_doc.loads(reg.read_text(encoding="utf-8"), dict,
-                                    what="protocol/event_registry.json")
-            for ev, body in (data.get("events") or {}).items():
-                ev_fields[ev] = {k: (v.get("type") if isinstance(v, dict) else "untyped")
-                                 for k, v in (body.get("fields") or {}).items()}
-        except ValueError:  # 事件注册表不可读/不可解析 ⇒ 字段面留空（不凭空造字段）
-            pass
+    ev_fields = _event_fields(root)
     out = []
     for doc in csc._module_docs(root):
-        rel = Path(doc).relative_to(root).as_posix()
-        text = Path(doc).read_text(encoding="utf-8")
-        parsed = csc._fence_yaml(text, "machine_contract")
-        mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
-        if not isinstance(mc, dict) or not mc.get("id"):
-            continue
-        if [str(x) for x in (mc.get("outputs") or [])]:
-            continue                       # 已显式声明 → 不动
-        toks = derive_outputs(mc, ev_fields)
-        if not toks:
-            out.append({"path": rel, "id": str(mc["id"]), "tokens": [],
-                        "changed": False, "reason": "无事件载荷证据（如实留空）"})
-            continue
-        new = _replace_outputs_line(text, toks)
-        changed = new != text
-        if changed and write:
-            # 原子写（2026-09-30 收口）：这是**就地编辑源件**（模块 md 的 outputs 行），
-            # 与同文件 `:210` 那处同规——裸 `write_text` 崩在中途会把源件截断成半截。
-            atomic_write.write_text(Path(doc), new)
-        out.append({"path": rel, "id": str(mc["id"]), "tokens": toks,
-                    "changed": changed, "reason": "事件载荷证据"})
+        row = _apply_module(doc, root, ev_fields, write, csc)
+        if row is not None:
+            out.append(row)
     return out
 
 

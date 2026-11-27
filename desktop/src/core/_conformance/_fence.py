@@ -151,20 +151,31 @@ def _fence_yaml_opt(text: str, marker: str) -> Optional[Dict[str, Any]]:
 
 
 
-def _evidence_ids(root: str, reg: Any = None) -> List[str]:
+def _module_ids(reg: Dict[str, Any]) -> list[str]:
+    return [m["id"] for m in reg.get("modules") or []
+            if isinstance(m, dict) and isinstance(m.get("id"), str)]
+
+
+def _protocol_ids(reg: Dict[str, Any]) -> list[str]:
+    ids: List[str] = []
+    for p in reg.get("protocols") or []:
+        for mid in (p.get("module_ids") or []):
+            if isinstance(mid, str):
+                ids.append(mid)
+    return ids
+
+
+def _registry_ids(reg: Any) -> list[str]:
+    if not isinstance(reg, dict):
+        return []
+    return _module_ids(reg) + _protocol_ids(reg)
+
+
+def _evidence_ids(root: str, reg: Any = None) -> list[str]:
     """官方 registry modules[] + community registry protocols[].module_ids（装配在册证据）。
 
     `reg` 可由调用方传入（同一次扫描里 registry.json 只该读一次——见 `scan`）。
     """
     if reg is None:
         reg, _ = _read_json(os.path.join(root, "desktop", "src", "core", "registry.json"))
-    ids: List[str] = []
-    if isinstance(reg, dict):
-        for m in reg.get("modules") or []:
-            if isinstance(m, dict) and isinstance(m.get("id"), str):
-                ids.append(m["id"])
-        for p in reg.get("protocols") or []:
-            for mid in (p.get("module_ids") or []):
-                if isinstance(mid, str):
-                    ids.append(mid)
-    return ids
+    return _registry_ids(reg)

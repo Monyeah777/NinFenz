@@ -18,35 +18,61 @@ from ._io import (
 )
 
 
-def allocate(root: str, spec: Dict[str, Any]) -> Dict[str, Any]:
-    """分配全局唯一 id（幂等：已登记包返回其现值）。"""
-    code = spec["code"]
+def _proto_existing(root: str, spec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     proto = Path(root) / "community" / spec["pack_name"] / "protocol.yaml"
-    if proto.is_file():
-        text = csc.read_text_cached(proto)
-        pipe = re.search(r"(?m)^\s*pipeline:\s*(P\d{2,3})\s*$", text)
-        ids = re.findall(r'(?m)^\s*-\s*"([^"]+:M\d{2})"\s*$', text)
-        if pipe and len(ids) == 2:
-            return {"pipeline": pipe.group(1), "exist": True, "module_ids": ids,
-                    "stems": ["%sa" % code, "%sb" % code]}
+    if not proto.is_file():
+        return None
+    text = csc.read_text_cached(proto)
+    pipe = re.search(r"(?m)^\s*pipeline:\s*(P\d{2,3})\s*$", text)
+    ids = re.findall(r'(?m)^\s*-\s*"([^"]+:M\d{2})"\s*$', text)
+    if not pipe or len(ids) != 2:
+        return None
+    return {"pipeline": pipe.group(1), "exist": True, "module_ids": ids,
+            "stems": ["%sa" % spec["code"], "%sb" % spec["code"]]}
+
+
+def _registry_existing(root: str, spec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     reg = _read_json(Path(root) / REGISTRY_REL) or {}
     for p in reg.get("protocols") or []:
-        if p.get("id") == spec["pack_name"] and re.fullmatch(r"P\d{2,3}",
-                                                             str(p.get("pipeline") or "")):
+        if p.get("id") != spec["pack_name"]:
+            continue
+        pipeline = str(p.get("pipeline") or "")
+        if re.fullmatch(r"P\d{2,3}", pipeline):
             return {"pipeline": p["pipeline"], "exist": True,
                     "module_ids": [str(x) for x in p.get("module_ids") or []]}
-    used = set(used_pipeline_ids(root))
-    pipe_id = next((x for x in PIPELINE_POOL if x not in used), "")
-    if not pipe_id:
-        raise ValueError("管线 id 池已用尽（%d 个）" % len(PIPELINE_POOL))
+    return None
+
+
+def _existing_pack(root: str, spec: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    found = _proto_existing(root, spec)
+    if found is not None:
+        return found
+    return _registry_existing(root, spec)
+
+
+def _module_ids_for(root: str, spec: Dict[str, Any]) -> List[str]:
     stems = module_stems(root)
     ids = []
     for letter in ("a", "b"):
-        stem = "%s%s" % (code, letter)
+        stem = "%s%s" % (spec["code"], letter)
         others = [p for p in stems.get(stem, []) if "/%s/" % spec["pack_name"] not in p]
         if others:
             raise ValueError("模块文件名 token 冲突：%s ∈ %s" % (stem, others))
         ids.append("%s:M%02d" % (spec["category"], 1 if letter == "a" else 2))
+    return ids
+
+
+def allocate(root: str, spec: Dict[str, Any]) -> Dict[str, Any]:
+    """分配全局唯一 id（幂等：已登记包返回其现值）。"""
+    code = spec["code"]
+    existing = _existing_pack(root, spec)
+    if existing is not None:
+        return existing
+    used = set(used_pipeline_ids(root))
+    pipe_id = next((x for x in PIPELINE_POOL if x not in used), "")
+    if not pipe_id:
+        raise ValueError("管线 id 池已用尽（%d 个）" % len(PIPELINE_POOL))
+    ids = _module_ids_for(root, spec)
     return {"pipeline": pipe_id, "exist": False, "module_ids": ids,
             "stems": ["%sa" % code, "%sb" % code]}
 
@@ -71,6 +97,49 @@ def _yaml_scalar(v: Any) -> str:
 
 
 
+def _yaml_dict(obj: Dict[str, Any], pad: str, indent: int) -> List[str]:
+    out: List[str] = []
+    for k, v in obj.items():
+        if isinstance(v, (dict, list)) and v:
+            out.append("%s%s:" % (pad, k))
+            out += dump_yaml(v, indent + 2)
+        else:
+            out.append("%s%s: %s" % (pad,
+ k,
+ "[]" if v == [] else "{}" if v == {} else _yaml_scalar(v)))
+    return out
+
+
+def _yaml_item_fields(item: Dict[str, Any], pad: str, indent: int) -> List[str]:
+    out: List[str] = []
+    first = True
+    for k, v in item.items():
+        if first and not isinstance(v, (dict, list)):
+            out.append("%s- %s: %s" % (pad, k, _yaml_scalar(v)))
+            first = False
+        elif first:
+            out.append("%s- %s:" % (pad, k))
+            out += dump_yaml(v, indent + 4)
+            first = False
+        elif isinstance(v, (dict, list)) and v:
+            out.append("%s  %s:" % (pad, k))
+            out += dump_yaml(v, indent + 4)
+        else:
+            out.append("%s  %s: %s"
+                       % (pad, k, "[]" if v == [] else _yaml_scalar(v)))
+    return out
+
+
+def _yaml_list(obj: List[Any], pad: str, indent: int) -> List[str]:
+    out: List[str] = []
+    for item in obj:
+        if isinstance(item, dict):
+            out += _yaml_item_fields(item, pad, indent)
+        else:
+            out.append("%s- %s" % (pad, _yaml_scalar(item)))
+    return out
+
+
 def dump_yaml(obj: Any, indent: int = 0) -> List[str]:
     """极简确定性 YAML 发射器（只覆盖本工厂的数据形状；字符串一律带引号）。
 
@@ -78,37 +147,9 @@ def dump_yaml(obj: Any, indent: int = 0) -> List[str]:
     concept_graph.fenced_block 的首键判据）。
     """
     pad = " " * indent
-    out: List[str] = []
     if isinstance(obj, dict):
-        for k, v in obj.items():
-            if isinstance(v, (dict, list)) and v:
-                out.append("%s%s:" % (pad, k))
-                out += dump_yaml(v, indent + 2)
-            else:
-                out.append("%s%s: %s" % (pad,
- k,
- "[]" if v == [] else "{}" if v == {} else _yaml_scalar(v)))
-        return out
+        return _yaml_dict(obj, pad, indent)
     if isinstance(obj, list):
-        for item in obj:
-            if isinstance(item, dict):
-                first = True
-                for k, v in item.items():
-                    if first and not isinstance(v, (dict, list)):
-                        out.append("%s- %s: %s" % (pad, k, _yaml_scalar(v)))
-                        first = False
-                    elif first:
-                        out.append("%s- %s:" % (pad, k))
-                        out += dump_yaml(v, indent + 4)
-                        first = False
-                    elif isinstance(v, (dict, list)) and v:
-                        out.append("%s  %s:" % (pad, k))
-                        out += dump_yaml(v, indent + 4)
-                    else:
-                        out.append("%s  %s: %s"
-                                   % (pad, k, "[]" if v == [] else _yaml_scalar(v)))
-            else:
-                out.append("%s- %s" % (pad, _yaml_scalar(item)))
-        return out
+        return _yaml_list(obj, pad, indent)
     return ["%s%s" % (pad, _yaml_scalar(obj))]
 # ruff: noqa: UP035 — 拆分产物按需重复 typing 注解 import（债未新增）

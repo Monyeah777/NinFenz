@@ -101,23 +101,31 @@ def clarify(requirement: str) -> Dict[str, Any]:
     }
 
 
+def _dossier_status(plan_: Dict[str, Any], questions: Sequence[str]) -> str:
+    if questions:
+        return "澄清中（nf assemble 已抛问句，待回填）"
+    return "custom 用户自定义流" if not plan_.get("matched") else "preset 预设匹配"
+
+
+def _domain_line(plan_: Dict[str, Any]) -> str:
+    if plan_.get("matched"):
+        return "%s/%s" % (plan_.get("package"), plan_.get("pipeline"))
+    return ("未命中官方预设 → 用户自定义（可借用包：%s）"
+            % ("、".join(plan_.get("known_packages") or []) or "—"))
+
+
 def dossier(requirement: str, plan_: Dict[str, Any],
             questions: Sequence[str] = (), answers: Sequence[str] = ()) -> str:
     """漏斗产出 → 需求档案（对齐 docs/需求收敛模板.md 八字段回填稿）。"""
     req = requirement.strip()
-    status = "澄清中（nf assemble 已抛问句，待回填）" if questions else (
-        "custom 用户自定义流" if not plan_.get("matched") else "preset 预设匹配")
+    status = _dossier_status(plan_, questions)
     lines = [
         "需求澄清稿",
         "1. 一句话需求：%s" % req,
         "2. 背景与痛点：（待回填——为什么现在做 / 现有哪一环断了）",
         "3. 谁消费（决策人 / 外部方）：（待确认——作者 / agent 用户）",
         "4. 范围边界（做 / 不做）：%s" % status,
-        "   领域判定：%s" % (
-            "%s/%s" % (plan_.get("package"), plan_.get("pipeline"))
-            if plan_.get("matched") else
-            "未命中官方预设 → 用户自定义（可借用包：%s）"
-            % ("、".join(plan_.get("known_packages") or []) or "—")),
+        "   领域判定：%s" % _domain_line(plan_),
         "   取件模块：%s" % "、".join(plan_.get("fetch_modules") or []),
         "5. 验收标准（可测断言）：nf assemble \"%s\" --check <out.md> 期望 PASS"
         "（八段骨架 / 编号在装配允许集 / 决策句带引用）" % req,
@@ -140,6 +148,35 @@ def dossier(requirement: str, plan_: Dict[str, Any],
     return "\n".join(lines) + "\n"
 
 
+def _preset_modules(pkg: Optional[str]) -> List[str]:
+    proto = _ROOT / "community" / pkg / "protocol.yaml"
+    if not proto.is_file():
+        return []
+    try:
+        _y = _yaml_module()
+        data = _y.safe_load(proto.read_text(encoding="utf-8")) if _y else {}
+        return [str(x) for x in (data.get("package") or {}).get("module_id_range") or []]
+    except Exception:
+        return []
+
+
+def _auto_modules(packages: Dict[str, Any], modules: List[str]) -> Tuple[List[str], List[str]]:
+    for mids in packages.values():
+        modules += mids
+    return sorted(set(modules)), sorted(packages)
+
+
+def _fetch_modules(modules: List[str]) -> List[str]:
+    return modules or [str(x) for x in _official_core_ids()]
+
+
+def _pipeline_files(pkg: Optional[str], pipeline: Optional[str]) -> List[str]:
+    if not (pipeline and pkg):
+        return []
+    paths = (_ROOT / "community" / pkg / "pipelines").glob("%s*.md" % pipeline)
+    return [p.relative_to(_ROOT).as_posix() for p in paths]
+
+
 def plan(requirement: str) -> Dict[str, Any]:
     """需求 → 装配计划（预设包 + 取件清单）。"""
     req = requirement.strip()
@@ -149,60 +186,75 @@ def plan(requirement: str) -> Dict[str, Any]:
         if any(k in req for k in keys):
             pkg, pipeline = hit
             break
-    modules: List[str] = []
+    modules: List[str] = _preset_modules(pkg) if pkg else []
     matched = bool(pkg)
-    if pkg:
-        proto = _ROOT / "community" / pkg / "protocol.yaml"
-        if proto.is_file():
-            try:
-                _y = _yaml_module()
-                data = _y.safe_load(proto.read_text(encoding="utf-8")) if _y else {}
-                modules = [str(x) for x in (data.get("package") or {}).get("module_id_range") or []]
-            except Exception:
-                modules = []
     packages = _package_module_sets()
     if pkg is None or not matched:
         # 用户自定义/未命中：允许全域已登记模块（官方核心 + 各社区包），
         # 并给出自定义预留槽位；自定义件须先按模板落库登记，验收才认。
-        for mids in packages.values():
-            modules += mids
-        modules = sorted(set(modules))
-        known = sorted(packages)
+        modules, known = _auto_modules(packages, modules)
     else:
         known = [pkg]
     all_registered = _official_core_ids()
     for mids in packages.values():
         all_registered += mids
     allowed = sorted(set(all_registered))
-    if pipeline and pkg:
-        pipeline_path = (_ROOT / "community" / pkg / "pipelines").glob("%s*.md" % pipeline)
-        pipe_files = [p.relative_to(_ROOT).as_posix() for p in pipeline_path]
-    else:
-        pipe_files = []
+    pipe_files = _pipeline_files(pkg, pipeline)
     return {
         "requirement": req,
         "matched": matched,
         "package": pkg,
         "pipeline": pipeline,
         "pipeline_files": pipe_files,
-        "fetch_modules": modules or [str(x) for x in _official_core_ids()],
+        "fetch_modules": _fetch_modules(modules),
         "allowed_module_ids": allowed,
         "known_packages": known,
         "status": "preset" if matched else "custom",
     }
 
 
+_EXPL = ("残留", "不命中", "源编号", "未装配", "说明")
+_NARRATIVE = {0, 1, 2}
+
+
+def _skeleton_issues(output_md: str) -> Tuple[set, List[str]]:
+    segs = {int(m.group(1)) for m in _SEG.finditer(output_md)}
+    missing = [i for i in range(8) if i not in segs]
+    if not missing:
+        return segs, []
+    return segs, ["八段骨架缺段：##%s" % ", ".join(str(i) for i in missing)]
+
+
+def _mentioned_issue(tok: str, allowed: set, line: str) -> str:
+    if tok in allowed or tok.split(":", 1)[-1] in {
+            a.split(":", 1)[-1] for a in allowed}:
+        return ""
+    if any(k in line for k in _EXPL):
+        return ""
+    return "编造/越界编号：%s（全库允许集外，且非残留/不命中说明）" % tok
+
+
+def _decision_issue(line: str, cur_seg: Any) -> List[str]:
+    if cur_seg not in _NARRATIVE or line.strip().startswith(("-", "*", "|")):
+        return []
+    issues: List[str] = []
+    for clause in re.split(r"[。！？；\n]+", line):
+        clause = clause.strip()
+        if not clause:
+            continue
+        if _DECISION.search(clause) and not _CITATION.search(clause) \
+                and not _MODULE.search(clause):
+            issues.append("无引用决策句：%s" % clause[:60])
+    return issues
+
+
 def check(output_md: str, plan_: Dict[str, Any]) -> Tuple[List[str], Dict[str, int]]:
     """成品机器验收：八段骨架 / 编号在允许集 / 决策句带引用 / 无编造编号。"""
     issues: List[str] = []
-    segs = {int(m.group(1)) for m in _SEG.finditer(output_md)}
-    missing = [i for i in range(8) if i not in segs]
-    if missing:
-        issues.append("八段骨架缺段：##%s" % ", ".join(str(i) for i in missing))
+    segs, skel = _skeleton_issues(output_md)
+    issues += skel
     allowed = set(plan_.get("allowed_module_ids") or [])
     mentioned = set()
-    _EXPL = ("残留", "不命中", "源编号", "未装配", "说明")
-    narrative = {0, 1, 2}
     cur_seg = None
     in_code = False
     for line in output_md.splitlines():
@@ -218,21 +270,10 @@ def check(output_md: str, plan_: Dict[str, Any]) -> Tuple[List[str], Dict[str, i
             continue
         for tok in _MODULE.findall(line):
             mentioned.add(tok)
-            if tok in allowed or tok.split(":", 1)[-1] in {
-                    a.split(":", 1)[-1] for a in allowed}:
-                continue
-            if any(k in line for k in _EXPL):
-                continue
-            issues.append("编造/越界编号：%s（全库允许集外，且非残留/不命中说明）" % tok)
-        if cur_seg not in narrative or s.startswith(("-", "*", "|")):
-            continue
-        for clause in re.split(r"[。！？；\n]+", line):
-            clause = clause.strip()
-            if not clause:
-                continue
-            if _DECISION.search(clause) and not _CITATION.search(clause) \
-                    and not _MODULE.search(clause):
-                issues.append("无引用决策句：%s" % clause[:60])
+            issue = _mentioned_issue(tok, allowed, line)
+            if issue:
+                issues.append(issue)
+        issues += _decision_issue(line, cur_seg)
     stats = {
         "segments": len(segs),
         "modules_mentioned": len(mentioned),

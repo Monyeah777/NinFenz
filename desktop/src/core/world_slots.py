@@ -19,6 +19,30 @@ SLOT_KINDS = {"string", "integer", "number", "boolean", "array", "object"}
 ITEM_KINDS = {"string", "integer", "number", "boolean"}
 
 
+def _slot_issues(at: str, spec: Any) -> List[str]:
+    if not isinstance(spec, dict):
+        return [f"{at}: 槽位定义非对象"]
+    issues: List[str] = []
+    kind = spec.get("kind")
+    owner = spec.get("owner")
+    item_kind = spec.get("item_kind")
+    if kind not in SLOT_KINDS:
+        issues.append(f"{at}.kind: 非法类型 {kind!r}")
+    if not isinstance(owner, str) or not owner.strip():
+        issues.append(f"{at}.owner: 非空字符串")
+    if kind == "array":
+        if item_kind is not None and item_kind not in ITEM_KINDS:
+            issues.append(f"{at}.item_kind: 非法元素类型 {item_kind!r}")
+    elif item_kind is not None:
+        issues.append(f"{at}.item_kind: 仅 kind=array 可用")
+    return issues
+
+
+def _slots_of(data: Any) -> Dict[str, Any]:
+    raw = data.get("slots") if isinstance(data, dict) else {}
+    return raw if isinstance(raw, dict) else {}
+
+
 def validate_registry(data: Any, label: str = "world_slots") -> List[str]:
     issues: List[str] = []
     if not isinstance(data, dict):
@@ -33,21 +57,24 @@ def validate_registry(data: Any, label: str = "world_slots") -> List[str]:
         at = f"{label}.slots.{path!r}"
         if not isinstance(path, str) or not path.strip():
             issues.append(f"{at}: 槽位路径非空字符串")
-        if not isinstance(spec, dict):
-            issues.append(f"{at}: 槽位定义非对象")
-            continue
-        kind = spec.get("kind")
-        owner = spec.get("owner")
-        item_kind = spec.get("item_kind")
-        if kind not in SLOT_KINDS:
-            issues.append(f"{at}.kind: 非法类型 {kind!r}")
-        if not isinstance(owner, str) or not owner.strip():
-            issues.append(f"{at}.owner: 非空字符串")
-        if kind == "array":
-            if item_kind is not None and item_kind not in ITEM_KINDS:
-                issues.append(f"{at}.item_kind: 非法元素类型 {item_kind!r}")
-        elif item_kind is not None:
-            issues.append(f"{at}.item_kind: 仅 kind=array 可用")
+        issues += _slot_issues(at, spec)
+    return issues
+
+
+def _m00_issues(root: str, data: Any) -> List[str]:
+    m00_path = Path(root) / "04_模块库" / "通用类" / "M00_数据槽总线.md"
+    if not m00_path.is_file():
+        return ["04_模块库/通用类/M00_数据槽总线.md 缺失"]
+    m00_text = m00_path.read_text(encoding="utf-8")
+    slots = _slots_of(data)
+    issues: List[str] = []
+    for slot in slots:
+        for part in str(slot).split("."):
+            if part and part not in m00_text:
+                issues.append(
+                    "world_slots slot 路径段未在 M00 文档锚定：%r（%s）"
+                    % (part, slot)
+                )
     return issues
 
 
@@ -61,22 +88,8 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     except Exception as exc:
         return ["protocol/world_slots.json 解析失败：%s" % exc], {"slots": 0}
     issues = validate_registry(data)
-    m00_path = r / "04_模块库" / "通用类" / "M00_数据槽总线.md"
-    if m00_path.is_file():
-        m00_text = m00_path.read_text(encoding="utf-8")
-        slots_raw = data.get("slots") if isinstance(data, dict) else {}
-        slots: Dict[str, Any] = slots_raw if isinstance(slots_raw, dict) else {}
-        for slot in slots:
-            for part in str(slot).split("."):
-                if part and part not in m00_text:
-                    issues.append(
-                        "world_slots slot 路径段未在 M00 文档锚定：%r（%s）"
-                        % (part, slot)
-                    )
-    else:
-        issues.append("04_模块库/通用类/M00_数据槽总线.md 缺失")
-    slots_raw = data.get("slots") if isinstance(data, dict) else {}
-    slots = slots_raw if isinstance(slots_raw, dict) else {}
+    issues += _m00_issues(root, data)
+    slots = _slots_of(data)
     arrays = sum(1 for v in slots.values()
                  if isinstance(v, dict) and v.get("kind") == "array")
     return issues, {

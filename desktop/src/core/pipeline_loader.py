@@ -37,30 +37,18 @@ MAX_TREE_DEPTH = 64
 
 
 # ---------------------------------------------------------------- yaml 子集
-def _parse_scalar(s: str):
-    s = s.strip()
-    if not s:
-        return ""
-    if s.startswith("[") and s.endswith("]"):
-        inner = s[1:-1].strip()
-        if not inner:
-            return []
-        items = []
-        for it in inner.split(","):
-            it = it.strip().strip("'\"").strip()
-            items.append(it)
-        return items
-    low = s.lower()
-    if low in ("true", "yes", "on"):
-        return True
-    if low in ("false", "no", "off"):
-        return False
-    if low == "null" or low == "~":
-        return None
-    if (s.startswith('"') and s.endswith('"')) or \
-       (s.startswith("'") and s.endswith("'")):
-        return s[1:-1]
-    # 数字
+def _parse_list(s: str) -> List[str]:
+    inner = s[1:-1].strip()
+    if not inner:
+        return []
+    items = []
+    for it in inner.split(","):
+        it = it.strip().strip("'\"").strip()
+        items.append(it)
+    return items
+
+
+def _parse_number(s: str) -> Any:
     try:
         if re.fullmatch(r"-?\d+", s):
             return int(s)
@@ -68,7 +56,32 @@ def _parse_scalar(s: str):
             return float(s)
     except ValueError:
         pass
-    return s
+    return None
+
+
+def _is_quoted(s: str) -> bool:
+    return (s.startswith('"') and s.endswith('"')) or \
+           (s.startswith("'") and s.endswith("'"))
+
+
+def _parse_scalar(s: str):
+    s = s.strip()
+    if not s:
+        return ""
+    if s.startswith("[") and s.endswith("]"):
+        return _parse_list(s)
+    low = s.lower()
+    if low in ("true", "yes", "on"):
+        return True
+    if low in ("false", "no", "off"):
+        return False
+    if low == "null" or low == "~":
+        return None
+    if _is_quoted(s):
+        return s[1:-1]
+    # 数字
+    num = _parse_number(s)
+    return s if num is None else num
 
 
 def _kv(line: str):
@@ -90,6 +103,20 @@ class _Node:
         self.children: List["_Node"] = []
 
 
+def _line_node(indent: int, content: str, is_item: bool) -> Optional[_Node]:
+    if is_item:
+        content = content[2:].strip()
+        # 列表项形如 "- id: P00"（键值）或 "- 纯文本"
+        if ":" in content and not content.startswith(("http", "{")):
+            key, val = _kv(content)
+            return _Node(indent, key, _parse_scalar(val), True)
+        return _Node(indent, "", _parse_scalar(content), True)
+    if ":" not in content:
+        return None
+    key, val = _kv(content)
+    return _Node(indent, key, _parse_scalar(val), False)
+
+
 def _build_tree(lines: List[str]) -> List[_Node]:
     """按缩进建树（只处理本实现需要的子集：键值行与 `- ` 列表行，标题行跳过）。"""
     roots: List[_Node] = []
@@ -99,20 +126,9 @@ def _build_tree(lines: List[str]) -> List[_Node]:
             continue
         indent = len(raw) - len(raw.lstrip(" "))
         content = raw.strip()
-        is_item = content.startswith("- ")
-        if is_item:
-            content = content[2:].strip()
-            # 列表项形如 "- id: P00"（键值）或 "- 纯文本"
-            if ":" in content and not content.startswith(("http", "{")):
-                key, val = _kv(content)
-                node = _Node(indent, key, _parse_scalar(val), True)
-            else:
-                node = _Node(indent, "", _parse_scalar(content), True)
-        else:
-            if ":" not in content:
-                continue
-            key, val = _kv(content)
-            node = _Node(indent, key, _parse_scalar(val), False)
+        node = _line_node(indent, content, content.startswith("- "))
+        if node is None:
+            continue
 
         # 找父节点：缩进严格小于当前节点的最近祖先
         while stack and stack[-1].indent >= indent:
@@ -123,6 +139,23 @@ def _build_tree(lines: List[str]) -> List[_Node]:
             roots.append(node)
         stack.append(node)
     return roots
+
+
+def _child_value(c: _Node, depth: int):
+    if c.children:
+        return _tree_to_dict(c, depth + 1)
+    return c.value
+
+
+def _children_dict(root: _Node, depth: int) -> dict:
+    d: dict = {}
+    if root.is_list_item and root.key:
+        d[root.key] = root.value
+    for c in root.children:
+        if c.is_list_item:
+            continue
+        d[c.key] = _child_value(c, depth)
+    return d
 
 
 def _tree_to_dict(root: _Node, _depth: int = 0):
@@ -137,17 +170,7 @@ def _tree_to_dict(root: _Node, _depth: int = 0):
     items = [c for c in root.children if c.is_list_item]
     if items:
         return [_tree_to_dict(c, _depth + 1) for c in items]
-    d: dict = {}
-    if root.is_list_item and root.key:
-        d[root.key] = root.value
-    for c in root.children:
-        if c.is_list_item:
-            continue
-        if c.children:
-            d[c.key] = _tree_to_dict(c, _depth + 1)
-        else:
-            d[c.key] = c.value
-    return d
+    return _children_dict(root, _depth)
 
 
 def _parse_yaml_block(text: str) -> dict:
@@ -166,6 +189,50 @@ def _parse_yaml_block(text: str) -> dict:
 def _norm_module_ref(ref: str) -> str:
     """模块引用归一：M00 / 通用:M10 → 保留原样；loader 侧不做类别补全。"""
     return ref.strip()
+
+
+def _pipeline_base(pnode: Dict[str, Any]) -> Pipeline:
+    pid = str(pnode.get("id", "")).strip() or "P00"
+    p = Pipeline(
+        id=pid,
+        name=str(pnode.get("name", pid)).strip(),
+        description=str(pnode.get("description", "")).strip(),
+        structure_type="linear",
+        tags=list(pnode.get("tags", []) or []),
+    )
+    # structure
+    struct = pnode.get("structure") or {}
+    if isinstance(struct, dict):
+        p.structure_type = str(struct.get("type", "linear"))
+    return p
+
+
+def _pipeline_dependencies(pnode: Dict[str, Any]) -> List[Dict[str, str]]:
+    deps: List[Dict[str, str]] = []
+    # dependencies
+    for dep in pnode.get("dependencies", []) or []:
+        if isinstance(dep, dict):
+            deps.append({
+                "from": dep.get("from", ""), "to": dep.get("to", ""),
+                "reason": dep.get("reason", "")})
+    return deps
+
+
+def _pipeline_layers(pnode: Dict[str, Any]) -> List[PipelineLayer]:
+    layers: List[PipelineLayer] = []
+    # layers
+    for ly in pnode.get("layers", []) or []:
+        if not isinstance(ly, dict):
+            continue
+        layers.append(PipelineLayer(
+            id=str(ly.get("id", "")).strip(),
+            name=str(ly.get("name", "")).strip(),
+            description=str(ly.get("description", "")).strip(),
+            optional=bool(ly.get("optional", False)),
+            default_modules=[_norm_module_ref(x) for x in (ly.get("default_modules") or [])],
+            allowed_modules=[_norm_module_ref(x) for x in (ly.get("allowed_modules") or [])],
+        ))
+    return layers
 
 
 def parse_pipeline_md(text: str) -> Optional[Pipeline]:
@@ -187,36 +254,9 @@ def parse_pipeline_md(text: str) -> Optional[Pipeline]:
     if not isinstance(pnode, dict):
         return None
 
-    pid = str(pnode.get("id", "")).strip() or "P00"
-    p = Pipeline(
-        id=pid,
-        name=str(pnode.get("name", pid)).strip(),
-        description=str(pnode.get("description", "")).strip(),
-        structure_type="linear",
-        tags=list(pnode.get("tags", []) or []),
-    )
-    # structure
-    struct = pnode.get("structure") or {}
-    if isinstance(struct, dict):
-        p.structure_type = str(struct.get("type", "linear"))
-    # dependencies
-    for dep in pnode.get("dependencies", []) or []:
-        if isinstance(dep, dict):
-            p.dependencies.append({
-                "from": dep.get("from", ""), "to": dep.get("to", ""),
-                "reason": dep.get("reason", "")})
-    # layers
-    for ly in pnode.get("layers", []) or []:
-        if not isinstance(ly, dict):
-            continue
-        p.layers.append(PipelineLayer(
-            id=str(ly.get("id", "")).strip(),
-            name=str(ly.get("name", "")).strip(),
-            description=str(ly.get("description", "")).strip(),
-            optional=bool(ly.get("optional", False)),
-            default_modules=[_norm_module_ref(x) for x in (ly.get("default_modules") or [])],
-            allowed_modules=[_norm_module_ref(x) for x in (ly.get("allowed_modules") or [])],
-        ))
+    p = _pipeline_base(pnode)
+    p.dependencies.extend(_pipeline_dependencies(pnode))
+    p.layers.extend(_pipeline_layers(pnode))
     return p
 
 

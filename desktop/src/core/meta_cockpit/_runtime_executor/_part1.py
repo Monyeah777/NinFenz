@@ -74,12 +74,8 @@ def machine_digest() -> str:
     return hashlib.sha256(canon.encode("utf-8")).hexdigest()
 
 
-def graph_issues(p: dict) -> list[str]:
+def _graph_edge_issues(p: dict, nodes: dict) -> list[str]:
     issues: list[str] = []
-    ids = [n["id"] for n in p["nodes"]]
-    if len(ids) != len(set(ids)):
-        issues.append("duplicate-node-id")
-    nodes = {n["id"]: n for n in p["nodes"]}
     for e in p["edges"]:
         if e["from"] not in nodes or e["to"] not in nodes:
             issues.append("edge-ref-missing")
@@ -88,10 +84,10 @@ def graph_issues(p: dict) -> list[str]:
         ti = {(x["token"], x["kind"]) for x in nodes[e["to"]]["inputs"]}
         if (e["output"], e["kind"]) not in fo or (e["input"], e["kind"]) not in ti:
             issues.append("typed-edge-mismatch")
-    adj: dict[str, list[str]] = {i: [] for i in ids}
-    for e in p["edges"]:
-        if e["from"] in adj and e["to"] in adj:
-            adj[e["from"]].append(e["to"])
+    return issues
+
+
+def _graph_has_cycle(ids: list[str], adj: dict[str, list[str]]) -> bool:
     color = dict.fromkeys(ids, 0)
 
     def dfs(u: str) -> bool:
@@ -102,8 +98,11 @@ def graph_issues(p: dict) -> list[str]:
         color[u] = 2
         return True
 
-    if not all(dfs(i) for i in ids if color[i] == 0):
-        issues.append("cycle")
+    return not all(dfs(i) for i in ids if color[i] == 0)
+
+
+def _graph_tail_issues(p: dict, ids: list[str]) -> list[str]:
+    issues: list[str] = []
     outdeg: dict[str, int] = dict.fromkeys(ids, 0)
     for e in p["edges"]:
         if e["from"] in outdeg:
@@ -116,14 +115,36 @@ def graph_issues(p: dict) -> list[str]:
     return issues
 
 
-def topo(p: dict) -> list[str]:
+def graph_issues(p: dict) -> list[str]:
+    issues: list[str] = []
     ids = [n["id"] for n in p["nodes"]]
+    if len(ids) != len(set(ids)):
+        issues.append("duplicate-node-id")
+    nodes = {n["id"]: n for n in p["nodes"]}
+    issues += _graph_edge_issues(p, nodes)
+    adj: dict[str, list[str]] = {i: [] for i in ids}
+    for e in p["edges"]:
+        if e["from"] in adj and e["to"] in adj:
+            adj[e["from"]].append(e["to"])
+    if _graph_has_cycle(ids, adj):
+        issues.append("cycle")
+    issues += _graph_tail_issues(p, ids)
+    return issues
+
+
+def _topo_state(p: dict, ids: list[str]) -> tuple[dict[str, list[str]], dict[str, int]]:
     adj: dict[str, list[str]] = {i: [] for i in ids}
     indeg: dict[str, int] = dict.fromkeys(ids, 0)
     for e in p["edges"]:
         if e["from"] in adj and e["to"] in indeg:
             adj[e["from"]].append(e["to"])
             indeg[e["to"]] += 1
+    return adj, indeg
+
+
+def topo(p: dict) -> list[str]:
+    ids = [n["id"] for n in p["nodes"]]
+    adj, indeg = _topo_state(p, ids)
     q = [i for i in ids if indeg[i] == 0]
     order: list[str] = []
     while q:
@@ -136,6 +157,39 @@ def topo(p: dict) -> list[str]:
     return order if len(order) == len(ids) else []
 
 
+def _ratio_criterion_issues(nid: str, c: dict) -> list[str]:
+    issues: list[str] = []
+    if "max_missing" not in c:
+        issues.append("{}/{} missing max_missing".format(nid, c["dimension"]))
+    elif c["max_missing"] > MAX_MISSING_CAP:
+        issues.append(
+            "{}/{} max_missing={} exceeds cap {}".format(
+                nid, c["dimension"], c["max_missing"], MAX_MISSING_CAP
+            )
+        )
+    if c["threshold"] <= 0:
+        issues.append(
+            "{}/{} degenerate threshold={}".format(nid, c["dimension"], c["threshold"])
+        )
+    return issues
+
+
+def _primitive_criterion_issues(nid: str, c: dict) -> list[str]:
+    issues: list[str] = []
+    if (
+        c.get("primitive") == "count"
+        and c["threshold"] < 1
+        and c.get("direction") != "lower_better"
+    ):
+        issues.append("{}/{} count threshold<1".format(nid, c["dimension"]))
+    if c.get("primitive") == "check_ref":
+        if "ref_kind" not in c:
+            issues.append("{}/{} missing ref_kind".format(nid, c["dimension"]))
+        elif c["ref_kind"] == "identifier" and "requires_real_id" not in c:
+            issues.append("{}/{} missing requires_real_id".format(nid, c["dimension"]))
+    return issues
+
+
 def policy_issues(nodes: dict | None = None) -> list[str]:
     nodes = nodes if nodes is not None else NODES
     issues: list[str] = []
@@ -143,29 +197,8 @@ def policy_issues(nodes: dict | None = None) -> list[str]:
         for c in node.get("criteria", []):
             unit = c.get("unit", "ratio")
             if unit == "ratio":
-                if "max_missing" not in c:
-                    issues.append("{}/{} missing max_missing".format(nid, c["dimension"]))
-                elif c["max_missing"] > MAX_MISSING_CAP:
-                    issues.append(
-                        "{}/{} max_missing={} exceeds cap {}".format(
-                            nid, c["dimension"], c["max_missing"], MAX_MISSING_CAP
-                        )
-                    )
-                if c["threshold"] <= 0:
-                    issues.append(
-                        "{}/{} degenerate threshold={}".format(nid, c["dimension"], c["threshold"])
-                    )
-            if (
-                c.get("primitive") == "count"
-                and c["threshold"] < 1
-                and c.get("direction") != "lower_better"
-            ):
-                issues.append("{}/{} count threshold<1".format(nid, c["dimension"]))
-            if c.get("primitive") == "check_ref":
-                if "ref_kind" not in c:
-                    issues.append("{}/{} missing ref_kind".format(nid, c["dimension"]))
-                elif c["ref_kind"] == "identifier" and "requires_real_id" not in c:
-                    issues.append("{}/{} missing requires_real_id".format(nid, c["dimension"]))
+                issues += _ratio_criterion_issues(nid, c)
+            issues += _primitive_criterion_issues(nid, c)
     return issues
 
 
@@ -215,6 +248,30 @@ def policy_drift(doc: dict | None = None, nodes: dict | None = None) -> list[str
     return issues
 
 
+def _review_validator() -> jsonschema.Draft202012Validator:
+    hr_schema = json_asset.load(BASE / "human_review.schema.json")
+    return jsonschema.Draft202012Validator(
+        {"$schema": hr_schema["$schema"], "$defs": hr_schema["$defs"], "$ref": "#/$defs/record"}
+    )
+
+
+def _has_non_pass_check(rec: dict) -> bool:
+    return any(c.get("verdict") != "pass" for c in rec.get("checks", []))
+
+
+def _review_record_issues(rec: dict, gate: dict) -> list[str]:
+    issues = [e.message for e in _review_validator().iter_errors(rec)]
+    if rec.get("gate_id") != gate.get("gate_id"):
+        issues.append("gate_id mismatch")
+    if rec.get("machine_digest") != machine_digest():
+        issues.append("stale machine_digest")
+    if rec.get("decision") != "approve":
+        issues.append("decision is not approve")
+    if rec.get("decision") == "approve" and _has_non_pass_check(rec):
+        issues.append("approve with non-pass check")
+    return issues
+
+
 def review_status() -> tuple[str, list[str]]:
     gate_path = BASE / "human_review_gate.json"
     rec_path = BASE / "human_review_record.json"
@@ -224,26 +281,12 @@ def review_status() -> tuple[str, list[str]]:
     if not rec_path.is_file():
         return "PENDING", ["no human_review_record.json"]
     rec = json_asset.load(rec_path)
-    hr_schema = json_asset.load(BASE / "human_review.schema.json")
-    rv = jsonschema.Draft202012Validator(
-        {"$schema": hr_schema["$schema"], "$defs": hr_schema["$defs"], "$ref": "#/$defs/record"}
-    )
-    issues = [e.message for e in rv.iter_errors(rec)]
-    if rec.get("gate_id") != gate.get("gate_id"):
-        issues.append("gate_id mismatch")
-    if rec.get("machine_digest") != machine_digest():
-        issues.append("stale machine_digest")
-    if rec.get("decision") != "approve":
-        issues.append("decision is not approve")
-    if rec.get("decision") == "approve" and any(
-        c.get("verdict") != "pass" for c in rec.get("checks", [])
-    ):
-        issues.append("approve with non-pass check")
+    issues = _review_record_issues(rec, gate)
     return ("APPROVED" if not issues else "REJECTED"), issues
 
 
-def run_meta_pipeline(results: dict) -> dict:
-    catalog = [
+def _pipeline_catalog() -> list[dict]:
+    return [
         {
             "id": nid,
             "meta_level": n.get("meta_level"),
@@ -252,10 +295,18 @@ def run_meta_pipeline(results: dict) -> dict:
         }
         for nid, n in sorted(NODES.items())
     ]
-    verdicts = [
+
+
+def _pipeline_verdicts(results: dict) -> list[dict]:
+    return [
         {"id": nid, "ok": ok, "fails": [r["dimension"] for r in rows if r.get("ok") is False]}
         for nid, (ok, rows) in sorted(results.items())
     ]
+
+
+def run_meta_pipeline(results: dict) -> dict:
+    catalog = _pipeline_catalog()
+    verdicts = _pipeline_verdicts(results)
     used = sum(n["cost"] for n in PIPELINE["nodes"])
     budget_state = {
         "envelope": PIPELINE["budget_envelope"],

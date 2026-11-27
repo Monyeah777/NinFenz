@@ -31,6 +31,23 @@ SCAN_DIR = "desktop/src/core"
 SKIP = {"__init__"}
 
 
+def _import_from_deps(n: Any, out: Set[str]) -> None:
+    if n.module == "core":
+        out.update(a.name.split(".")[0] for a in n.names)
+    elif n.module and n.module.startswith("core."):
+        out.add(n.module.split(".")[1])
+    elif n.level and n.module:
+        out.add(n.module.split(".")[0])
+    elif n.level and not n.module:
+        out.update(a.name.split(".")[0] for a in n.names)
+
+
+def _import_deps(n: Any, out: Set[str]) -> None:
+    for a in n.names:
+        if a.name.startswith("core."):
+            out.add(a.name.split(".")[1])
+
+
 def _module_deps(path: Path, known: Set[str]) -> Set[str]:
     """该模块依赖的同包模块名集合（`core.X` / `from core import X` / `from . import X`）。"""
     try:
@@ -40,18 +57,9 @@ def _module_deps(path: Path, known: Set[str]) -> Set[str]:
     out: Set[str] = set()
     for n in ast.walk(tree):
         if isinstance(n, ast.ImportFrom):
-            if n.module == "core":
-                out.update(a.name.split(".")[0] for a in n.names)
-            elif n.module and n.module.startswith("core."):
-                out.add(n.module.split(".")[1])
-            elif n.level and n.module:
-                out.add(n.module.split(".")[0])
-            elif n.level and not n.module:
-                out.update(a.name.split(".")[0] for a in n.names)
+            _import_from_deps(n, out)
         elif isinstance(n, ast.Import):
-            for a in n.names:
-                if a.name.startswith("core."):
-                    out.add(a.name.split(".")[1])
+            _import_deps(n, out)
     return {d for d in out if d in known and d != path.stem}
 
 
@@ -103,6 +111,30 @@ def sdp_violations(deps: Dict[str, Set[str]], metrics: Dict[str, Dict[str, Any]]
     return sorted(out)
 
 
+def _metric_fields(m: str, mv: Dict[str, Any]) -> Tuple[Any, str]:
+    ca, ce, i = mv.get("ca"), mv.get("ce"), mv.get("i")
+    if not all(isinstance(x, (int, float)) and not isinstance(x, bool)
+               for x in (ca, ce, i)):
+        return None, "基线 metrics[%s] 含非数值（ca/ce/i=%r/%r/%r）" % (m, ca, ce, i)
+    return (ca, ce, i), ""
+
+
+def _metric_issue(m: str, mv: Any) -> Tuple[str, Any]:
+    if not isinstance(mv, dict):
+        return "基线 metrics[%s] 不是对象（基线被改坏）" % m, None
+    fields, err = _metric_fields(m, mv)
+    if err:
+        return err, None
+    ca, ce, i = fields
+    if ca < 0 or ce < 0 or not (0.0 <= float(i) <= 1.0):
+        return "基线 metrics[%s] 越界（ca=%s ce=%s i=%s）" % (m, ca, ce, i), None
+    want = round(ce / (ca + ce), 4) if (ca + ce) else 0.0
+    if abs(float(i) - want) > 1e-9:
+        return ("基线 metrics[%s] 自相矛盾：I=%.4f ≠ Ce/(Ca+Ce)=%.4f"
+                % (m, float(i), want)), None
+    return "", (ca, ce)
+
+
 def metrics_face_issues(base: Dict[str, Any], live: Dict[str, Dict[str, Any]]
                         ) -> Tuple[List[str], Dict[str, Any]]:
     """校验基线的 **metrics 面**（审计 §11v.4 F1：写了却从不读——面会烂在里面）。
@@ -117,23 +149,11 @@ def metrics_face_issues(base: Dict[str, Any], live: Dict[str, Dict[str, Any]]
         return out, {"metrics_recorded": 0, "metrics_drift": 0, "metrics_missing": len(live)}
     drift = 0
     for m, mv in rec.items():
-        if not isinstance(mv, dict):
-            out.append("基线 metrics[%s] 不是对象（基线被改坏）" % m)
+        issue, pair = _metric_issue(m, mv)
+        if issue:
+            out.append(issue)
             continue
-        ca, ce, i = mv.get("ca"), mv.get("ce"), mv.get("i")
-        if not all(isinstance(x, (int, float)) and not isinstance(x, bool)
-                   for x in (ca, ce, i)):
-            out.append("基线 metrics[%s] 含非数值（ca/ce/i=%r/%r/%r）" % (m, ca, ce, i))
-            continue
-        if ca < 0 or ce < 0 or not (0.0 <= float(i) <= 1.0):
-            out.append("基线 metrics[%s] 越界（ca=%s ce=%s i=%s）" % (m, ca, ce, i))
-            continue
-        want = round(ce / (ca + ce), 4) if (ca + ce) else 0.0
-        if abs(float(i) - want) > 1e-9:
-            out.append("基线 metrics[%s] 自相矛盾：I=%.4f ≠ Ce/(Ca+Ce)=%.4f"
-                       % (m, float(i), want))
-            continue
-        if m not in live or (live[m]["ca"], live[m]["ce"]) != (int(ca), int(ce)):
+        if m not in live or (live[m]["ca"], live[m]["ce"]) != (int(pair[0]), int(pair[1])):
             drift += 1
     missing = [m for m in live if m not in rec]
     return out, {"metrics_recorded": len(rec), "metrics_drift": drift,
@@ -150,37 +170,60 @@ def load_baseline(root: str = ".") -> Dict[str, Any]:
         return {}
 
 
-def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """→ (issues, warns, stats)：**新增**环 / **新增** SDP 违例 = FAIL；已消债务仍挂 = WARN。"""
-    deps, metrics = graph(root)
-    cyc = cycles(deps)
-    sdp = sdp_violations(deps, metrics)
-    base = load_baseline(root)
+def _baseline_known(base: Dict[str, Any]) -> Tuple[set, set]:
     known_cyc = {tuple(sorted(c)) for c in (base.get("cycles") or [])}
     # SDP 有**方向**（A 依赖 B，不是 B 依赖 A）——故不排序，按 (依赖方, 被依赖方) 精确比对
     known_sdp = {tuple(p) for p in (base.get("sdp") or [])}
+    return known_cyc, known_sdp
+
+
+def _cycle_issues(cyc: List[Any], known_cyc: set) -> List[str]:
     issues: List[str] = []
-    warns: List[str] = []
-    if not base:
-        warns.append("无耦合基线 %s（本次按「零容忍」判：修复指引 "
-                     "python scripts/coupling_metrics.py --write 登记存量债）" % BASELINE_REL)
-        known_cyc, known_sdp = set(), set()
     for c in cyc:
         if c not in known_cyc:
             issues.append("新增模块级环：%s（修复指引：断开其中一条依赖——常是惰性 import 循环；"
                           "确属设计债须评审后 python scripts/coupling_metrics.py --write 登记）"
                           % " → ".join(list(c) + [c[0]]))
+    return issues
+
+
+def _sdp_issues(sdp: List[Any], known_sdp: set, metrics: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     for a, b in sdp:
         if (a, b) not in known_sdp:
             issues.append("新增 SDP 违例：%s(I=%.2f) 依赖了更不稳的 %s(I=%.2f)（修复指引：把依赖"
                           "反向——让稳定侧定义接口、由不稳侧实现；确属存量债须评审后 --write 登记）"
                           % (a, metrics[a]["i"], b, metrics[b]["i"]))
+    return issues
+
+
+def _stale_warns(known_cyc: set, cyc: List[Any], known_sdp: set, sdp: List[Any]) -> List[str]:
+    warns: List[str] = []
     for c in sorted(known_cyc - set(cyc)):
         warns.append("登记环已消除：%s（修复指引：从 %s 的 cycles 移除）"
                      % (" → ".join(list(c) + [c[0]]), BASELINE_REL))
     for a, b in sorted(known_sdp - set(sdp)):
         warns.append("登记 SDP 违例已消除：%s → %s（修复指引：从 %s 的 sdp 移除）"
                      % (a, b, BASELINE_REL))
+    return warns
+
+
+def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
+    """→ (issues, warns, stats)：**新增**环 / **新增** SDP 违例 = FAIL；已消债务仍挂 = WARN。"""
+    deps, metrics = graph(root)
+    cyc = cycles(deps)
+    sdp = sdp_violations(deps, metrics)
+    base = load_baseline(root)
+    known_cyc, known_sdp = _baseline_known(base)
+    issues: List[str] = []
+    warns: List[str] = []
+    if not base:
+        warns.append("无耦合基线 %s（本次按「零容忍」判：修复指引 "
+                     "python scripts/coupling_metrics.py --write 登记存量债）" % BASELINE_REL)
+        known_cyc, known_sdp = set(), set()
+    issues += _cycle_issues(cyc, known_cyc)
+    issues += _sdp_issues(sdp, known_sdp, metrics)
+    warns += _stale_warns(known_cyc, cyc, known_sdp, sdp)
     face_issues, face_stats = metrics_face_issues(base, metrics)
     issues.extend(face_issues)
     stats = {"modules": len(deps), "cycles": len(cyc), "sdp": len(sdp),

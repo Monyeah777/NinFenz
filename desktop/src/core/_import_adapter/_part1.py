@@ -102,79 +102,90 @@ _RE_DESC_NF = re.compile(
 _PLACEHOLDER_NO_BODY = "（无正文）"
 
 
+def _nf_state() -> Dict[str, Any]:
+    return {"title": None, "layers": [], "extra": [], "warnings": [],
+            "cur_layer": None, "cur_mod": None, "buf": [], "in_extra": False}
+
+
+def _nf_flush(st: Dict[str, Any]) -> None:
+    cur_mod = st["cur_mod"]
+    if cur_mod is None:
+        st["buf"] = []
+        return
+    content = "\n".join(st["buf"]).strip("\n")
+    if content == _PLACEHOLDER_NO_BODY:
+        content = ""                      # 占位还原为空正文（高保真）
+    cur_mod.content = content
+    if st["in_extra"]:
+        st["extra"].append(cur_mod)
+    elif st["cur_layer"] is not None:
+        st["cur_layer"].modules.append(cur_mod)
+    else:                                  # 模块头出现在任何层头之前 → 损坏
+        st["warnings"].append(f"模块 {cur_mod.full_id} 前无层头，归入层外模块")
+        st["extra"].append(cur_mod)
+    st["cur_mod"] = None
+    st["buf"] = []
+
+
+def _nf_skip_line(st: Dict[str, Any], ln: str, lines: List[str]) -> bool:
+    if st["title"] is not None and ln == lines[0]:
+        return True                           # # title 行本身不入 content
+    if ln.startswith(("# ", "## ", "### ", "#### ")):
+        # 未匹配 NF 层级模板的标题行：宽容保留进当前 content，不静默丢
+        if st["cur_mod"] is not None or st["cur_layer"] is not None:
+            st["buf"].append(ln)
+        return True
+    return False
+
+
+def _nf_line(st: Dict[str, Any], ln: str, lines: List[str]) -> None:
+    lm = _RE_LAYER.match(ln)
+    if lm:
+        _nf_flush(st)
+        st["in_extra"] = False
+        st["cur_layer"] = IRLayer(id=lm.group(1).strip(),
+                                  name=lm.group(2).strip())
+        st["layers"].append(st["cur_layer"])
+        return
+    if _RE_EXTRA.match(ln):
+        _nf_flush(st)
+        st["in_extra"] = True
+        st["cur_layer"] = None
+        return
+    mm = _RE_MODULE.match(ln)
+    if mm:
+        _nf_flush(st)
+        full_id = mm.group(1).strip()
+        st["cur_mod"] = IRModule(full_id=full_id,
+                                 name=mm.group(2).strip(),
+                                 layer=(st["cur_layer"].id if st["cur_layer"] else ""))
+        return
+    if _nf_skip_line(st, ln, lines):
+        return
+    if st["cur_mod"] is not None or st["in_extra"]:
+        st["buf"].append(ln)
+    # 层头与模块头之间的空行/游离行不收集（对齐 _build_skill_md 结构）
+
+
+def _nf_title(lines: List[str]) -> Optional[str]:
+    # 一级标题 = title（NF 导出 body 首行 # {title}）
+    for ln in lines:
+        if ln.startswith("# "):
+            return ln[2:].strip()
+    return None
+
+
 def _parse_nf_body(body: str) -> tuple[Optional[str], List[IRLayer], List[IRModule],
                                        List[str]]:
     """解析 NF 层级正文 → (title, layers, extra_modules, warnings)。"""
-    title: Optional[str] = None
-    layers: List[IRLayer] = []
-    extra: List[IRModule] = []
-    warnings: List[str] = []
-
-    cur_layer: Optional[IRLayer] = None
-    cur_mod: Optional[IRModule] = None
-    buf: List[str] = []
-    in_extra = False
-
-    def flush() -> None:
-        nonlocal cur_mod, buf
-        if cur_mod is None:
-            buf = []
-            return
-        content = "\n".join(buf).strip("\n")
-        if content == _PLACEHOLDER_NO_BODY:
-            content = ""                      # 占位还原为空正文（高保真）
-        cur_mod.content = content
-        if in_extra:
-            extra.append(cur_mod)
-        elif cur_layer is not None:
-            cur_layer.modules.append(cur_mod)
-        else:                                  # 模块头出现在任何层头之前 → 损坏
-            warnings.append(f"模块 {cur_mod.full_id} 前无层头，归入层外模块")
-            extra.append(cur_mod)
-        cur_mod = None
-        buf = []
-
+    st = _nf_state()
     lines = body.split("\n")
-    # 一级标题 = title（NF 导出 body 首行 # {title}）
-    for ln in lines:
-        if ln.startswith("# ") and title is None:
-            title = ln[2:].strip()
-            break
+    st["title"] = _nf_title(lines)
     for raw in lines:
         ln = raw.rstrip("\r")
-        lm = _RE_LAYER.match(ln)
-        if lm:
-            flush()
-            in_extra = False
-            cur_layer = IRLayer(id=lm.group(1).strip(),
-                                name=lm.group(2).strip())
-            layers.append(cur_layer)
-            continue
-        if _RE_EXTRA.match(ln):
-            flush()
-            in_extra = True
-            cur_layer = None
-            continue
-        mm = _RE_MODULE.match(ln)
-        if mm:
-            flush()
-            full_id = mm.group(1).strip()
-            cur_mod = IRModule(full_id=full_id,
-                               name=mm.group(2).strip(),
-                               layer=(cur_layer.id if cur_layer else ""))
-            continue
-        if title is not None and ln == lines[0]:
-            continue                           # # title 行本身不入 content
-        if ln.startswith(("# ", "## ", "### ", "#### ")):
-            # 未匹配 NF 层级模板的标题行：宽容保留进当前 content，不静默丢
-            if cur_mod is not None or cur_layer is not None:
-                buf.append(ln)
-            continue
-        if cur_mod is not None or in_extra:
-            buf.append(ln)
-        # 层头与模块头之间的空行/游离行不收集（对齐 _build_skill_md 结构）
-    flush()
-    return title, layers, extra, warnings
+        _nf_line(st, ln, lines)
+    _nf_flush(st)
+    return st["title"], st["layers"], st["extra"], st["warnings"]
 
 
 #: skill 资源随行装载目录（Agent Skills 目录约定：scripts/references/assets）
@@ -199,12 +210,7 @@ def _scan_resources(skill_dir: Path) -> List[str]:
     return out
 
 
-def parse_skill(text: str, skill_dir: Optional[Path] = None) -> SkillParseResult:
-    """SKILL.md 文本 → SkillParseResult（结构层高保真重建 / 宽容层保留）。
-
-    skill_dir（v2.5.0 Wave1）：传入 SKILL.md 所在目录时，扫描 scripts/
-    references/assets 子目录随行资源 → bundled_resources 清单。
-    """
+def _skill_header(text: str, skill_dir: Optional[Path]) -> tuple:
     bundled = _scan_resources(skill_dir) if skill_dir else []
     if not text or not text.strip():
         raise ValueError("SKILL.md 内容为空——请先填充正文再解析")
@@ -217,28 +223,20 @@ def parse_skill(text: str, skill_dir: Optional[Path] = None) -> SkillParseResult
         raise ValueError("frontmatter 缺少必填字段 description")
     if not body.strip():
         raise ValueError("SKILL.md 正文为空——请先补正文（非空）再解析")
+    return bundled, fm, body, name, desc
 
-    # ---- 宽容层判定：body 无 NF 层级模式（官方技能自由说明文）→ 不套层级
-    # 注意：正则无 re.MULTILINE，`^` 只锚定串首——须逐行 match 而非整串 search
-    has_nf_hierarchy = any(
-        _RE_LAYER.match(ln) or _RE_EXTRA.match(ln)
-        for ln in body.splitlines())
-    if not has_nf_hierarchy:
-        return SkillParseResult(
-            ok=True, mode="external", ir=None,
-            frontmatter=fm, body=body,
-            bundled_resources=bundled,
-            warnings=["正文非 NF 导出层级结构（`## 层`/`## 附加规则` 未命中），"
-                      "按宽容层保留 frontmatter 与正文；是否升 IR 由消费方判定"])
 
-    # ---- 结构层：NF 层级 body → 高保真重建 IRDocument（techdoc 型）
-    title, layers, extra, w = _parse_nf_body(body)
-    warnings = list(w)
-    if title is None:
-        # NF 导出必有 # title；缺失时回退 frontmatter name（罕见，记警告）
-        title = name
-        warnings.append("正文未找到一级标题 `# ...`，title 回退 frontmatter name")
-    # description 回填 pipeline 字段（NF 导出格式）
+def _external_result(fm: Dict[str, Any], body: str, bundled: List[Any]) -> SkillParseResult:
+    return SkillParseResult(
+        ok=True, mode="external", ir=None,
+        frontmatter=fm, body=body,
+        bundled_resources=bundled,
+        warnings=["正文非 NF 导出层级结构（`## 层`/`## 附加规则` 未命中），"
+                  "按宽容层保留 frontmatter 与正文；是否升 IR 由消费方判定"])
+
+
+def _pipeline_fields(desc: str, layers: List[IRLayer], extra: List[IRModule],
+                     warnings: List[str]) -> tuple:
     pipeline_id = pipeline_name = ""
     mdesc = _RE_DESC_NF.match(desc)
     if mdesc:
@@ -254,6 +252,34 @@ def parse_skill(text: str, skill_dir: Optional[Path] = None) -> SkillParseResult
         warnings.append(
             "description 非 NF 导出格式（未解析出 pipeline/规则块计数），"
             "pipeline 字段留空，正文层级仍按结构层重建")
+    return pipeline_id, pipeline_name
+
+
+def parse_skill(text: str, skill_dir: Optional[Path] = None) -> SkillParseResult:
+    """SKILL.md 文本 → SkillParseResult（结构层高保真重建 / 宽容层保留）。
+
+    skill_dir（v2.5.0 Wave1）：传入 SKILL.md 所在目录时，扫描 scripts/
+    references/assets 子目录随行资源 → bundled_resources 清单。
+    """
+    bundled, fm, body, name, desc = _skill_header(text, skill_dir)
+
+    # ---- 宽容层判定：body 无 NF 层级模式（官方技能自由说明文）→ 不套层级
+    # 注意：正则无 re.MULTILINE，`^` 只锚定串首——须逐行 match 而非整串 search
+    has_nf_hierarchy = any(
+        _RE_LAYER.match(ln) or _RE_EXTRA.match(ln)
+        for ln in body.splitlines())
+    if not has_nf_hierarchy:
+        return _external_result(fm, body, bundled)
+
+    # ---- 结构层：NF 层级 body → 高保真重建 IRDocument（techdoc 型）
+    title, layers, extra, w = _parse_nf_body(body)
+    warnings = list(w)
+    if title is None:
+        # NF 导出必有 # title；缺失时回退 frontmatter name（罕见，记警告）
+        title = name
+        warnings.append("正文未找到一级标题 `# ...`，title 回退 frontmatter name")
+    # description 回填 pipeline 字段（NF 导出格式）
+    pipeline_id, pipeline_name = _pipeline_fields(desc, layers, extra, warnings)
     ir = IRDocument(
         type="techdoc", title=title,
         pipeline_id=pipeline_id, pipeline_name=pipeline_name,
@@ -285,8 +311,7 @@ _RE_DESC_CCV3 = re.compile(
     r"^(.+?)[（(]([^（）()]+)[)）]装配产物")
 
 
-def _entry_to_module(e: dict, seen: set, warnings: List[str]) -> Optional[IRModule]:
-    """chara/world lorebook 条目 → IRModule（含层位/资产/层外归属判定）。"""
+def _entry_head(e: dict, seen: set, warnings: List[str]) -> Optional[str]:
     keys = e.get("keys") or []
     full_id = str(keys[0]) if keys else str(e.get("name") or "")
     if not full_id:
@@ -295,6 +320,14 @@ def _entry_to_module(e: dict, seen: set, warnings: List[str]) -> Optional[IRModu
     if full_id in seen:
         return None                            # 已收集（chara 与 world 重复）
     seen.add(full_id)
+    return full_id
+
+
+def _entry_to_module(e: dict, seen: set, warnings: List[str]) -> Optional[IRModule]:
+    """chara/world lorebook 条目 → IRModule（含层位/资产/层外归属判定）。"""
+    full_id = _entry_head(e, seen, warnings)
+    if full_id is None:
+        return None
     name = str(e.get("name") or full_id)
     content = str(e.get("content") or "")
     comment = str(e.get("comment") or "")

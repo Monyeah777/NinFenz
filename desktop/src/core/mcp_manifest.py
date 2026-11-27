@@ -74,39 +74,107 @@ def _infer_side_effect(name: str, declared: str = "") -> str:
     return "none"
 
 
+def _tool_meta(name: str, raw: dict[str, Any], conf: dict[str, Any]) -> dict[str, Any]:
+    side_effect = _infer_side_effect(name, str(conf.get("side_effect") or ""))
+    return {"ccos": {
+        "manifest_version": "1.0.0",
+        "side_effect": side_effect,
+        "idempotent": bool(conf.get("idempotent", side_effect == "none")),
+        "requires_consent": bool(conf.get("requires_consent", side_effect != "none")),
+        "resource": {"max_bytes": int(conf.get("max_bytes") or 64 * 1024 * 1024),
+                     "timeout_ms": int(conf.get("timeout_ms") or 60000)},
+        "outputSchema": conf.get("outputSchema"),
+        "evidence": {"emit": True, "schema": RECEIPT_SCHEMA},
+        "deprecated_at": conf.get("deprecated_at"),
+        "replacement": conf.get("replacement"),
+    }}
+
+
+def _tool_item(raw: dict[str, Any], decl: dict[str, Any]) -> dict[str, Any]:
+    name = str(raw.get("name") or "")
+    if not name:
+        raise ValueError("工具缺 name（" + GUIDE + "tools/list 里每个工具必须有 name）")
+    item = {key: raw[key] for key in TOP_LEVEL_ALLOWED if key in raw}
+    conf = dict(_from_annotations(raw))
+    conf.update(decl.get(name) or {})   # 显式声明可覆盖推断
+    if raw.get("outputSchema") and not conf.get("outputSchema"):
+        conf["outputSchema"] = raw["outputSchema"]
+    item["_meta"] = _tool_meta(name, raw, conf)
+    return item
+
+
 def build(tool_defs: list[dict[str, Any]],
           declarations: dict[str, dict[str, Any]] | None = None) -> dict[str, Any]:
     """从 tools/list 的原始工具定义派生增强清单（不改原定义）。"""
     decl = declarations or {}
-    tools: list[dict[str, Any]] = []
-    for raw in tool_defs:
-        name = str(raw.get("name") or "")
-        if not name:
-            raise ValueError("工具缺 name（" + GUIDE + "tools/list 里每个工具必须有 name）")
-        item = {key: raw[key] for key in TOP_LEVEL_ALLOWED if key in raw}
-        conf = dict(_from_annotations(raw))
-        conf.update(decl.get(name) or {})   # 显式声明可覆盖推断
-        if raw.get("outputSchema") and not conf.get("outputSchema"):
-            conf["outputSchema"] = raw["outputSchema"]
-        side_effect = _infer_side_effect(name, str(conf.get("side_effect") or ""))
-        item["_meta"] = {
-            "ccos": {
-                "manifest_version": "1.0.0",
-                "side_effect": side_effect,
-                "idempotent": bool(conf.get("idempotent", side_effect == "none")),
-                "requires_consent": bool(conf.get("requires_consent",
-                                                 side_effect != "none")),
-                "resource": {"max_bytes": int(conf.get("max_bytes") or 64 * 1024 * 1024),
-                             "timeout_ms": int(conf.get("timeout_ms") or 60000)},
-                "outputSchema": conf.get("outputSchema"),
-                "evidence": {"emit": True, "schema": RECEIPT_SCHEMA},
-                "deprecated_at": conf.get("deprecated_at"),
-                "replacement": conf.get("replacement"),
-            }
-        }
-        tools.append(item)
+    tools = [_tool_item(raw, decl) for raw in tool_defs]
     return {"schema": SCHEMA, "tools": tools,
             "top_level_allowed": list(TOP_LEVEL_ALLOWED)}
+
+
+def _item_fields_issues(item: dict[str, Any]) -> list[str]:
+    name = str(item.get("name") or "")
+    extra = set(item) - set(TOP_LEVEL_ALLOWED) - {"_meta"}
+    if extra:
+        return [name + " 顶层出现非 MCP 字段 " + str(sorted(extra))
+                + "（" + GUIDE + "扩展字段必须放 _meta）"]
+    return []
+
+
+def _resource_issues(name: str, res: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    for field in ("max_bytes", "timeout_ms"):
+        if not isinstance(res.get(field), int) or res[field] <= 0:
+            issues.append(name + " 的 resource." + field + " 必须是正整数")
+    return issues
+
+
+def _meta_bool_issues(name: str, meta: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    if not isinstance(meta.get("idempotent"), bool):
+        issues.append(name + " 的 idempotent 必须是布尔")
+    if not isinstance(meta.get("requires_consent"), bool):
+        issues.append(name + " 的 requires_consent 必须是布尔")
+    if meta.get("side_effect") != "none" and not meta.get("requires_consent"):
+        issues.append(name + " 有副作用却不需要同意（" + GUIDE + "写盘/出网必须显式同意）")
+    return issues
+
+
+def _meta_tail_issues(name: str, meta: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    if "outputSchema" not in meta:
+        issues.append(name + " 必须在 _meta 里显式声明 outputSchema（没有就写 null）")
+    ev = meta.get("evidence") or {}
+    if not ev.get("emit") or not ev.get("schema"):
+        issues.append(name + " 的 evidence 必须声明 emit 与 schema")
+    if meta.get("deprecated_at") and not meta.get("replacement"):
+        issues.append(name + " 已弃用但没给 replacement")
+    return issues
+
+
+def _ccos_meta_issues(name: str, meta: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    if meta.get("side_effect") not in SIDE_EFFECTS:
+        issues.append(name + " 的 side_effect 非法：" + str(meta.get("side_effect")))
+    issues += _meta_bool_issues(name, meta)
+    issues += _resource_issues(name, meta.get("resource") or {})
+    issues += _meta_tail_issues(name, meta)
+    return issues
+
+
+def _tool_issues(item: dict[str, Any], seen: set[str]) -> list[str]:
+    issues: list[str] = []
+    name = str(item.get("name") or "")
+    if name in seen:
+        issues.append("工具重名：" + name)
+    seen.add(name)
+    issues += _item_fields_issues(item)
+    meta = (item.get("_meta") or {}).get("ccos") or {}
+    if not meta:
+        issues.append(name + " 缺 _meta.ccos（" + GUIDE + "增强字段放这里）")
+        return issues
+    issues += _ccos_meta_issues(name, meta)
+    return issues
 
 
 def validate(manifest: Any) -> list[str]:
@@ -122,37 +190,7 @@ def validate(manifest: Any) -> list[str]:
         if not isinstance(item, dict):
             issues.append("tools 里有非对象条目")
             continue
-        name = str(item.get("name") or "")
-        if name in seen:
-            issues.append("工具重名：" + name)
-        seen.add(name)
-        extra = set(item) - set(TOP_LEVEL_ALLOWED) - {"_meta"}
-        if extra:
-            issues.append(name + " 顶层出现非 MCP 字段 " + str(sorted(extra))
-                          + "（" + GUIDE + "扩展字段必须放 _meta）")
-        meta = (item.get("_meta") or {}).get("ccos") or {}
-        if not meta:
-            issues.append(name + " 缺 _meta.ccos（" + GUIDE + "增强字段放这里）")
-            continue
-        if meta.get("side_effect") not in SIDE_EFFECTS:
-            issues.append(name + " 的 side_effect 非法：" + str(meta.get("side_effect")))
-        if not isinstance(meta.get("idempotent"), bool):
-            issues.append(name + " 的 idempotent 必须是布尔")
-        if not isinstance(meta.get("requires_consent"), bool):
-            issues.append(name + " 的 requires_consent 必须是布尔")
-        if meta.get("side_effect") != "none" and not meta.get("requires_consent"):
-            issues.append(name + " 有副作用却不需要同意（" + GUIDE + "写盘/出网必须显式同意）")
-        res = meta.get("resource") or {}
-        for field in ("max_bytes", "timeout_ms"):
-            if not isinstance(res.get(field), int) or res[field] <= 0:
-                issues.append(name + " 的 resource." + field + " 必须是正整数")
-        if "outputSchema" not in meta:
-            issues.append(name + " 必须在 _meta 里显式声明 outputSchema（没有就写 null）")
-        ev = meta.get("evidence") or {}
-        if not ev.get("emit") or not ev.get("schema"):
-            issues.append(name + " 的 evidence 必须声明 emit 与 schema")
-        if meta.get("deprecated_at") and not meta.get("replacement"):
-            issues.append(name + " 已弃用但没给 replacement")
+        issues += _tool_issues(item, seen)
     return issues
 
 
@@ -165,6 +203,27 @@ def sign(manifest: dict[str, Any], seed: bytes) -> dict[str, Any]:
     sig = ed25519.sign(seed, body.encode("ascii"))
     return {"manifest_digest": body, "signature": sig.hex(),
             "pubkey": ed25519.public_key(seed).hex()}
+
+
+def _envelope_hex(envelope: dict[str, Any]) -> tuple:
+    try:
+        sig = bytes.fromhex(str(envelope.get("signature") or ""))
+        pub = bytes.fromhex(str(envelope.get("pubkey") or ""))
+    except ValueError:
+        return None, None, ["签名/公钥不是合法 hex（" + GUIDE + "重建签名信封）"]
+    return sig, pub, []
+
+
+def _pubkey_issues(expected_pubkey: str, pub: bytes) -> list[str]:
+    if expected_pubkey and str(expected_pubkey).lower() != pub.hex():
+        return ["公钥与钉根不符（" + GUIDE + "换根/换清单都必须显式批准）"]
+    return []
+
+
+def _revoked_issues(tool_id: str, revoked_ids: list[str] | None) -> list[str]:
+    if tool_id and tool_id in (revoked_ids or []):
+        return ["工具已被吊销：" + tool_id + "（" + GUIDE + "从清单移除并停用）"]
+    return []
 
 
 def verify_signature(manifest: dict[str, Any], envelope: dict[str, Any],
@@ -182,20 +241,20 @@ def verify_signature(manifest: dict[str, Any], envelope: dict[str, Any],
     if str(envelope.get("manifest_digest")) != body:
         res["issues"].append("清单 digest 与签名信封不符（" + GUIDE + "清单被改过）")
         return res
-    try:
-        sig = bytes.fromhex(str(envelope.get("signature") or ""))
-        pub = bytes.fromhex(str(envelope.get("pubkey") or ""))
-    except ValueError:
-        res["issues"].append("签名/公钥不是合法 hex（" + GUIDE + "重建签名信封）")
+    sig, pub, hex_issues = _envelope_hex(envelope)
+    if hex_issues:
+        res["issues"].extend(hex_issues)
         return res
-    if expected_pubkey and str(expected_pubkey).lower() != pub.hex():
-        res["issues"].append("公钥与钉根不符（" + GUIDE + "换根/换清单都必须显式批准）")
+    pubkey_issues = _pubkey_issues(expected_pubkey, pub)
+    if pubkey_issues:
+        res["issues"].extend(pubkey_issues)
         return res
     if not ed25519.verify(pub, body.encode("ascii"), sig):
         res["issues"].append("清单签名验签失败（" + GUIDE + "来源不可信，拒用）")
         return res
-    if tool_id and tool_id in (revoked_ids or []):
-        res["issues"].append("工具已被吊销：" + tool_id + "（" + GUIDE + "从清单移除并停用）")
+    revoked_issues = _revoked_issues(tool_id, revoked_ids)
+    if revoked_issues:
+        res["issues"].extend(revoked_issues)
         return res
     res["ok"] = True
     return res

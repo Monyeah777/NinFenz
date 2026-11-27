@@ -41,6 +41,30 @@ def _gate_calls(verify_txt: str) -> set:
 
 
 
+def _item_evidence_issues(root: str, iid: Any, item: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
+    if item.get("conformance") != "L3":
+        issues.append(f"导出面 {iid}: conformance 应为 L3（导出门禁锁定面）")
+    for ev in item.get("evidence") or []:
+        if not os.path.isfile(os.path.join(root, ev)):
+            issues.append(f"导出面 {iid}: 证据文件缺失 {ev}")
+    return issues
+
+
+def _gate_issue(iid: Any, gate: Any, defs: Any, calls: Any) -> str:
+    gid = str(gate)
+    num = gid[5:] if gid.startswith("check") and gid[5:].isdigit() else ""
+    if not num or num not in defs:
+        return (f"导出面 {iid}: 证据门禁 {gid} 在 verify.sh 无 check 定义"
+                f"（修复指引：只声明真存在的 checkN）")
+    if num not in calls:
+        return f"导出面 {iid}: 证据门禁 {gid} 未在主执行体调用（声明了却不跑）"
+    if not any(tok in defs[num] for tok in _GATE_FAIL_TOKENS):
+        return (f"导出面 {iid}: 证据门禁 {gid} 无可失败路径"
+                f"（判据空转：该 check 任何分支都不会红）")
+    return ""
+
+
 def export_manifest_issues(root: str,
  verify_txt: str,
  manifest: Dict[str,
@@ -62,22 +86,9 @@ def export_manifest_issues(root: str,
             issues.append("export manifest item 非对象")
             continue
         iid = item.get("id")
-        if item.get("conformance") != "L3":
-            issues.append(f"导出面 {iid}: conformance 应为 L3（导出门禁锁定面）")
-        for ev in item.get("evidence") or []:
-            if not os.path.isfile(os.path.join(root, ev)):
-                issues.append(f"导出面 {iid}: 证据文件缺失 {ev}")
+        issues += _item_evidence_issues(root, iid, item)
         for gate in item.get("gates") or []:
-            gid = str(gate)
-            num = gid[5:] if gid.startswith("check") and gid[5:].isdigit() else ""
-            if not num or num not in defs:
-                issues.append(f"导出面 {iid}: 证据门禁 {gid} 在 verify.sh 无 check 定义"
-                              f"（修复指引：只声明真存在的 checkN）")
-                continue
-            if num not in calls:
-                issues.append(f"导出面 {iid}: 证据门禁 {gid} 未在主执行体调用（声明了却不跑）")
-                continue
-            if not any(tok in defs[num] for tok in _GATE_FAIL_TOKENS):
-                issues.append(f"导出面 {iid}: 证据门禁 {gid} 无可失败路径"
-                              f"（判据空转：该 check 任何分支都不会红）")
+            issue = _gate_issue(iid, gate, defs, calls)
+            if issue:
+                issues.append(issue)
     return issues, len(items)

@@ -68,27 +68,36 @@ def package_grade(prots: Dict[str, Dict[str, Any]], pkg_id: str) -> str:
     return GRADE_COMMUNITY
 
 
+def _module_rows(reg: Any) -> List[dict]:
+    return [{"kind": "module", "id": m.get("id"), "name": m.get("name"),
+             "grade": GRADE_OFFICIAL} for m in (reg.modules or [])]
+
+
+def _package_rows(prots: Dict[str, Dict[str, Any]],
+                  protocols: List[Dict[str, Any]]) -> List[dict]:
+    rows: List[dict] = []
+    for p in protocols:
+        pid = p.get("id")
+        if not pid:
+            continue
+        rows.append({"kind": "package", "id": pid, "name": p.get("name", pid),
+                     "grade": package_grade(prots, pid),
+                     "version": str(p.get("version") or "1.0.0"),
+                     "modules": len(p.get("module_ids") or [])})
+    return rows
+
+
 def list_market(reg: Any, tier: Optional[str] = None) -> List[dict]:
     """市场目录（v2.5.0 Wave3）：官方核心 13 件 + community 包，各带 grade。
 
     tier 筛选（official/community/experimental）；None 返回全量。
     消费 35-A6 grade_of_module 分级字段做目录视图（C-a 消费方兑现）。
     """
-    out: List[dict] = []
     # 官方核心（registry modules[] 13 件 → official）
-    for m in (reg.modules or []):
-        out.append({"kind": "module", "id": m.get("id"), "name": m.get("name"),
-                    "grade": GRADE_OFFICIAL})
+    out: List[dict] = _module_rows(reg)
     # 社区包（registry protocols[] → community/experimental）
     prots = {p.get("id"): p for p in (reg.protocols or []) if p.get("id")}
-    for p in (reg.protocols or []):
-        pid = p.get("id")
-        if not pid:
-            continue
-        out.append({"kind": "package", "id": pid, "name": p.get("name", pid),
-                    "grade": package_grade(prots, pid),
-                    "version": str(p.get("version") or "1.0.0"),
-                    "modules": len(p.get("module_ids") or [])})
+    out += _package_rows(prots, reg.protocols or [])
     if tier:
         out = [x for x in out if x["grade"] == tier]
     return out
@@ -123,24 +132,12 @@ def _pkg_raw(data: Dict[str, Any], pkg_id: str) -> Dict[str, Any]:
     return pkg if isinstance(pkg, dict) else {}
 
 
-def dependencies(pkg_id: str,
-                 prots: Dict[str, Dict[str, Any]],
-                 data: Dict[str, Dict[str, Any]]) -> Tuple[set, List[str]]:
-    """以 references 为起点沿源包 core_modules 递归展开依赖闭包（verify check15 ② 同构）。
-
-    - seen：已访问源包 id 集（不含根 pkg_id 自身）；
-    - issues：空 = 通过；命中 = 源包不可读 / 叶节点越界官方 13 /
-      源包嵌套 references（多层组合不支持，须闭合官方核心）。
-    注：源包嵌套检查取 **package 层 references**（protocol.yaml 中 references 与
-    dependencies 平级）。verify.sh check15 ② 误取 dependencies.references 恒空
-    （死检查）——本库按真实层级修正，差异记入交付报告与 ROADMAP 待修项。
-    """
+def _refs_stack(entry: Dict[str, Any], data: Dict[str, Dict[str, Any]]
+                ) -> Tuple[List[Tuple[str, List[str]]], List[str]]:
     issues: List[str] = []
-    entry = prots.get(pkg_id) or {}
-    refs = list(entry.get("references") or [])
     stack: List[Tuple[str, List[str]]] = []
     pushed: set = set()      # 同一源包的多条 references = **一条包级依赖**（去重，勿判成环）
-    for r in refs:
+    for r in list(entry.get("references") or []):
         sp = r.get("source_package")
         if not sp:
             continue
@@ -151,7 +148,12 @@ def dependencies(pkg_id: str,
             continue
         pushed.add(sp)
         stack.append((sp, list(_pkg_deps(data, sp).get("core_modules") or [])))
+    return stack, issues
 
+
+def _walk_deps(stack: List[Tuple[str, List[str]]], data: Dict[str, Dict[str, Any]]
+               ) -> Tuple[set, List[str]]:
+    issues: List[str] = []
     seen: set = set()
     while stack:
         sp, cms = stack.pop()
@@ -166,6 +168,48 @@ def dependencies(pkg_id: str,
         if _pkg_raw(data, sp).get("references"):
             issues.append(f"依赖闭包检测到源包嵌套 references: {sp}（当前不支持多层组合）")
     return seen, issues
+
+
+def dependencies(pkg_id: str,
+                 prots: Dict[str, Dict[str, Any]],
+                 data: Dict[str, Dict[str, Any]]) -> Tuple[set, List[str]]:
+    """以 references 为起点沿源包 core_modules 递归展开依赖闭包（verify check15 ② 同构）。
+
+    - seen：已访问源包 id 集（不含根 pkg_id 自身）；
+    - issues：空 = 通过；命中 = 源包不可读 / 叶节点越界官方 13 /
+      源包嵌套 references（多层组合不支持，须闭合官方核心）。
+    注：源包嵌套检查取 **package 层 references**（protocol.yaml 中 references 与
+    dependencies 平级）。verify.sh check15 ② 误取 dependencies.references 恒空
+    （死检查）——本库按真实层级修正，差异记入交付报告与 ROADMAP 待修项。
+    """
+    entry = prots.get(pkg_id) or {}
+    stack, issues = _refs_stack(entry, data)
+    seen, walk_issues = _walk_deps(stack, data)
+    return seen, issues + walk_issues
+
+
+def _find_layer_spec(sp_ml: Dict[str, Any], key: str) -> Any:
+    for lk, ls in sp_ml.items():
+        if layer_key(lk) == key or str(lk) == key:
+            return ls
+    return None
+
+
+def _ref_layer_conflicts(pkg_id: str, sp: str, sp_ml: Dict[str, Any],
+                         pkg_ml: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
+    for raw_key, spec in pkg_ml.items():
+        if not isinstance(spec, dict):
+            continue
+        key = layer_key(raw_key)
+        sp_spec = _find_layer_spec(sp_ml, key)
+        if not isinstance(sp_spec, dict):
+            continue
+        inter = set(spec.get("default") or []) & set(sp_spec.get("default") or [])
+        if inter:
+            issues.append(
+                f"挂载层 {key} default 冲突: {pkg_id}∩{sp}={sorted(inter)}")
+    return issues
 
 
 def conflicts(pkg_id: str,
@@ -183,23 +227,94 @@ def conflicts(pkg_id: str,
         sp = r.get("source_package")
         if not sp or sp not in data:
             continue
-        sp_ml = _pkg_ml(data, sp)
-        for raw_key, spec in pkg_ml.items():
-            if not isinstance(spec, dict):
-                continue
-            key = layer_key(raw_key)
-            sp_spec = None
-            for lk, ls in sp_ml.items():
-                if layer_key(lk) == key or str(lk) == key:
-                    sp_spec = ls
-                    break
-            if not isinstance(sp_spec, dict):
-                continue
-            inter = set(spec.get("default") or []) & set(sp_spec.get("default") or [])
-            if inter:
-                issues.append(
-                    f"挂载层 {key} default 冲突: {pkg_id}∩{sp}={sorted(inter)}")
+        issues += _ref_layer_conflicts(pkg_id, sp, _pkg_ml(data, sp), pkg_ml)
     return issues
+
+
+def _refs_of(pkgs: Dict[str, Dict[str, Any]], pid: str) -> set:
+    return {r.get("source_package") for r in (pkgs[pid].get("references") or [])
+            if r.get("source_package")}
+
+
+def _owner_label(owner: Dict[str, str], mid: str) -> str:
+    return owner.get(mid, "官方核心")
+
+
+def _related_index(prots: Dict[str, Dict[str, Any]]
+                   ) -> Tuple[Dict[str, Dict[str, Any]], dict]:
+    pkgs = {}
+    for pid, p in prots.items():
+        if isinstance(p, dict) and p.get("module_ids") is not None:
+            pkgs[pid] = p
+    mod2pkgs: dict = {}
+    for pid, p in pkgs.items():
+        for m in p.get("module_ids") or []:
+            mod2pkgs.setdefault(m, set()).add(pid)
+    return pkgs, mod2pkgs
+
+
+def _dep_shared(graph: Dict[str, set], mids: Any, own: set) -> bool:
+    return any(set(graph.get(m) or []) & own for m in mids)
+
+
+def _dep_hits(graph: Dict[str, set], mids: Any, target: str) -> bool:
+    return any(target in set(graph.get(m) or []) for m in mids)
+
+
+def _related_to_package(pid: str, target: str, pkgs: Dict[str, Dict[str, Any]],
+                        pkg_modules: Dict[str, set], graph: Dict[str, set]) -> bool:
+    own = pkg_modules[target]
+    shared = pkg_modules[pid] & own
+    dep_hit = _dep_shared(graph, pkg_modules[pid], own)
+    return target in _refs_of(pkgs, pid) or dep_hit or shared
+
+
+def _package_view(target: str, pkgs: Dict[str, Dict[str, Any]],
+                  pkg_modules: Dict[str, set], graph: Dict[str, set],
+                  owner: Dict[str, str]) -> Tuple[set, set, set]:
+    refs = _refs_of(pkgs, target)
+    own = pkg_modules[target]
+    deps = set()
+    for m in own:
+        deps |= set(graph.get(m) or [])
+    deps -= own
+    refs |= {_owner_label(owner, m) for m in deps}
+    related_modules = set(deps)
+    referenced_by = set()
+    for pid in pkgs:
+        if pid == target:
+            continue
+        if _related_to_package(pid, target, pkgs, pkg_modules, graph):
+            referenced_by.add(pid)
+            related_modules |= pkg_modules[pid]
+    return refs, referenced_by, related_modules
+
+
+def _owner_refs(pkgs: Dict[str, Dict[str, Any]], owners: set, deps: set,
+                owner: Dict[str, str]) -> set:
+    refs = {_owner_label(owner, m) for m in deps}
+    for pid in owners:
+        refs |= _refs_of(pkgs, pid)
+    return refs
+
+
+def _module_view(target: str, pkgs: Dict[str, Dict[str, Any]], mod2pkgs: dict,
+                 pkg_modules: Dict[str, set], graph: Dict[str, set],
+                 owner: Dict[str, str]) -> Tuple[set, set, set]:
+    owners = mod2pkgs.get(target, set())
+    deps = set(graph.get(target) or [])
+    refs = _owner_refs(pkgs, owners, deps, owner)
+    related_modules = set(deps)
+    referenced_by = set()
+    for pid in pkgs:
+        if pid in owners:
+            continue
+        if target in pkg_modules[pid] or _dep_hits(graph, pkg_modules[pid], target):
+            referenced_by.add(pid)
+            related_modules |= pkg_modules[pid]
+    if not related_modules and owners:
+        related_modules = set(owners)
+    return refs, referenced_by, related_modules
 
 
 def related_of(target: str, prots: Dict[str, Dict[str, Any]],
@@ -215,64 +330,18 @@ def related_of(target: str, prots: Dict[str, Dict[str, Any]],
     官方核心 / 归属包），使 techdoc↔官方核心 之类跨层互见可人读暴露。
     references/who-refers 机读基底不变，本函数只做人读暴露（不新增图数据）。
     """
-    pkgs = {}
-    for pid, p in prots.items():
-        if isinstance(p, dict) and p.get("module_ids") is not None:
-            pkgs[pid] = p
-    mod2pkgs: dict = {}
-    for pid, p in pkgs.items():
-        for m in p.get("module_ids") or []:
-            mod2pkgs.setdefault(m, set()).add(pid)
-
-    def _refs_of(pid: str) -> set:
-        return {r.get("source_package") for r in (pkgs[pid].get("references") or [])
-                if r.get("source_package")}
-
+    pkgs, mod2pkgs = _related_index(prots)
     pkg_modules = {pid: set(p.get("module_ids") or []) for pid, p in pkgs.items()}
     graph = module_graph or {}
     owner = owner_map or {}
-
-    def _owner_label(mid: str) -> str:
-        return owner.get(mid, "官方核心")
-
-    refs = set()
-    referenced_by = set()
-    related_modules = set()
-    kind = "package"
     if target in pkgs:
-        refs = _refs_of(target)
-        own = pkg_modules[target]
-        deps = set()
-        for m in own:
-            deps |= set(graph.get(m) or [])
-        deps -= own
-        refs |= {_owner_label(m) for m in deps}
-        related_modules |= deps
-        for pid in pkgs:
-            if pid == target:
-                continue
-            shared = pkg_modules[pid] & own
-            dep_hit = any(set(graph.get(m) or []) & own for m in pkg_modules[pid])
-            if target in _refs_of(pid) or dep_hit or shared:
-                referenced_by.add(pid)
-                related_modules |= pkg_modules[pid]
+        kind = "package"
+        refs, referenced_by, related_modules = _package_view(
+            target, pkgs, pkg_modules, graph, owner)
     else:
         kind = "module"
-        owners = mod2pkgs.get(target, set())
-        deps = set(graph.get(target) or [])
-        refs |= {_owner_label(m) for m in deps}
-        related_modules |= deps
-        for pid in owners:
-            refs |= _refs_of(pid)
-        for pid in pkgs:
-            if pid in owners:
-                continue
-            dep_hit = any(target in set(graph.get(m) or []) for m in pkg_modules[pid])
-            if target in pkg_modules[pid] or dep_hit:
-                referenced_by.add(pid)
-                related_modules |= pkg_modules[pid]
-        if not related_modules and owners:
-            related_modules = owners
+        refs, referenced_by, related_modules = _module_view(
+            target, pkgs, mod2pkgs, pkg_modules, graph, owner)
     return {
         "kind": kind,
         "target": target,

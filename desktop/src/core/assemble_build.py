@@ -43,10 +43,11 @@ def _contract(text: str) -> str:
     return ""
 
 
-def _meta(mid: str, reg_by_id: Dict[str, Dict[str, Any]],
-          files: Dict[str, Path], root: Path) -> Dict[str, str]:
-    """模块元数据：优先注册表（官方核心），否则从模块件标题/类别行取（社区件）。"""
-    got = reg_by_id.get(mid) or reg_by_id.get(mid.split(":")[-1]) or {}
+def _or(value: str, fallback: str) -> str:
+    return value or fallback
+
+
+def _meta_source(got: Dict[str, Any]) -> Tuple[str, str, str, str]:
     name = str(got.get("name") or "")
     category = str(got.get("category") or "")
     layer = ""
@@ -54,17 +55,31 @@ def _meta(mid: str, reg_by_id: Dict[str, Dict[str, Any]],
     if mounts:
         layer = str(mounts[0].get("layer") or "")
     src = str(got.get("source") or "")
+    return name, category, layer, src
+
+
+def _meta_fallback(path: Path, mid: str, name: str,
+                   category: str) -> Tuple[str, str]:
+    text = path.read_text(encoding="utf-8")
+    tm = _TITLE.search(text)
+    cm = _CATEGORY.search(text)
+    name = name or (tm.group(2) if tm else mid)
+    category = category or (cm.group(1).strip() if cm else "")
+    return name, category
+
+
+def _meta(mid: str, reg_by_id: Dict[str, Dict[str, Any]],
+          files: Dict[str, Path], root: Path) -> Dict[str, str]:
+    """模块元数据：优先注册表（官方核心），否则从模块件标题/类别行取（社区件）。"""
+    got = reg_by_id.get(mid) or reg_by_id.get(mid.split(":")[-1]) or {}
+    name, category, layer, src = _meta_source(got)
     path = files.get(mid.split(":")[-1])
     rel = path.relative_to(root).as_posix() if path else ""
     if path and (not name or not category):
-        text = path.read_text(encoding="utf-8")
-        tm = _TITLE.search(text)
-        cm = _CATEGORY.search(text)
-        name = name or (tm.group(2) if tm else mid)
-        category = category or (cm.group(1).strip() if cm else "")
-    return {"id": mid, "name": name or mid, "category": category or "（未登记）",
-            "layer": layer or "（见模块件挂载点）", "source": src or "社区包",
-            "path": rel or "（未找到模块件——缺口如实记）"}
+        name, category = _meta_fallback(path, mid, name, category)
+    return {"id": mid, "name": _or(name, mid), "category": _or(category, "（未登记）"),
+            "layer": _or(layer, "（见模块件挂载点）"), "source": _or(src, "社区包"),
+            "path": _or(rel, "（未找到模块件——缺口如实记）")}
 
 
 def _module_order(plan: Dict[str, Any], core_ids: List[str]) -> List[str]:
@@ -124,6 +139,24 @@ def _section1(plan: Dict[str, Any], pkg: str) -> List[str]:
     return lines
 
 
+def _load_pipe(root: Path, files: List[str]):
+    try:
+        from core.pipeline_loader import load_pipeline_file
+        return load_pipeline_file(root / files[0])
+    except Exception:
+        return None
+
+
+def _layer_rows(pipe: Any) -> List[str]:
+    rows = ["", "| 层 | 层名 | 职责 | 默认模块 |", "|---|---|---|---|"]
+    for lay in pipe.layers:
+        mods = "、".join(lay.default_modules or [])
+        rows.append("| %s | %s | %s | %s |"
+                    % (lay.id, lay.name or "—",
+                       (lay.description or "—").replace("|", "/"), mods or "—"))
+    return rows
+
+
 def _section2(root: Path, plan: Dict[str, Any]) -> List[str]:
     lines = ["## 2. 管线", ""]
     files = plan.get("pipeline_files") or []
@@ -131,21 +164,10 @@ def _section2(root: Path, plan: Dict[str, Any]) -> List[str]:
         lines.append("- 未命中预设管线——按 `P00` 通用骨架（九层位）装配，层名以源包为准。")
         lines.append("")
         return lines
-    try:
-        from core.pipeline_loader import load_pipeline_file
-        pipe = load_pipeline_file(root / files[0])
-    except Exception:
-        pipe = None
+    pipe = _load_pipe(root, files)
     lines.append("- 管线件：`%s`" % files[0])
     if pipe and getattr(pipe, "layers", None):
-        lines.append("")
-        lines.append("| 层 | 层名 | 职责 | 默认模块 |")
-        lines.append("|---|---|---|---|")
-        for lay in pipe.layers:
-            mods = "、".join(lay.default_modules or [])
-            lines.append("| %s | %s | %s | %s |"
-                         % (lay.id, lay.name or "—",
-                            (lay.description or "—").replace("|", "/"), mods or "—"))
+        lines += _layer_rows(pipe)
     else:
         lines.append("- 层表以管线件机读块为准（本档未解析出层表——缺口如实记）。")
     lines.append("")
@@ -241,6 +263,18 @@ _FALLBACK_PROTECTED = ("protocol/", "03_管线库/", "04_模块库/", "05_资产
                        "results/", "docs/standards/", "docs/fde-sample/")
 
 
+def _glob_prefix(g: Any) -> Optional[str]:
+    segs = str(g).split("/")[:-1]          # 去掉文件名/通配段
+    lit: List[str] = []
+    for seg in segs:
+        if any(ch in seg for ch in "*?[{"):
+            break
+        lit.append(seg)
+    if not lit:
+        return None
+    return "/".join(lit) + "/"
+
+
 def protected_prefixes(root: str | Path) -> List[str]:
     """受保护目录前缀（真源面）——取自 `protocol/LAYERS.json` 四阶 source.globs 的目录段。
 
@@ -254,14 +288,9 @@ def protected_prefixes(root: str | Path) -> List[str]:
     out = set()
     for tier in layers.get("tiers") or []:
         for g in ((tier.get("source") or {}).get("globs") or []):
-            segs = str(g).split("/")[:-1]          # 去掉文件名/通配段
-            lit: List[str] = []
-            for seg in segs:
-                if any(ch in seg for ch in "*?[{"):
-                    break
-                lit.append(seg)
-            if lit:
-                out.add("/".join(lit) + "/")
+            pref = _glob_prefix(g)
+            if pref:
+                out.add(pref)
     return sorted(out) or list(_FALLBACK_PROTECTED)
 
 
@@ -293,6 +322,18 @@ def check_dest(root: str | Path, dest: str) -> str:
     return ""
 
 
+def _registry_index(reg: Dict[str, Any]) -> Tuple[Dict[str, Dict[str, Any]], List[str]]:
+    reg_by_id: Dict[str, Dict[str, Any]] = {}
+    core_ids: List[str] = []
+    for m in reg.get("modules") or []:
+        mid = str(m.get("id") or "")
+        if mid:
+            reg_by_id[mid] = m
+            reg_by_id.setdefault(mid.split(":")[-1], m)
+            core_ids.append(mid)
+    return reg_by_id, core_ids
+
+
 def build(root: str | Path, requirement: str, plan: Dict[str, Any],
           stamp: str = "") -> Tuple[str, Dict[str, Any]]:
     """组装 → (完整版 md 文本, stats)。同输入同输出（`stamp` 为空即不含日期）。"""
@@ -303,14 +344,7 @@ def build(root: str | Path, requirement: str, plan: Dict[str, Any],
  what="desktop/src/core/registry.json")
     except (OSError, ValueError):
         reg = {}
-    reg_by_id: Dict[str, Dict[str, Any]] = {}
-    core_ids: List[str] = []
-    for m in reg.get("modules") or []:
-        mid = str(m.get("id") or "")
-        if mid:
-            reg_by_id[mid] = m
-            reg_by_id.setdefault(mid.split(":")[-1], m)
-            core_ids.append(mid)
+    reg_by_id, core_ids = _registry_index(reg)
     files = _mod_files(root)
     order = _module_order(plan, core_ids)
     regs = [_meta(mid, reg_by_id, files, root) for mid in order]

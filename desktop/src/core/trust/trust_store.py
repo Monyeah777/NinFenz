@@ -18,6 +18,20 @@ GUIDE = "修复指引："
 REASON_STORE_INVALID = "TRUST-STORE-INVALID"
 
 
+def _store_entry(item: dict, issuer_registry: dict, keyids: dict, by_issuer: dict) -> None:
+    resolved = tk.resolve_issuer(issuer_registry, str(item.get("id")))
+    issuer = resolved.get("issuer") or {}
+    keys = {str(k.get("keyid")): k for k in issuer.get("keys") or []}
+    key = keys[str(item.get("keyid"))]
+    if key["keyid"] in keyids:
+        raise ValueError(f"keyid 重复：{key['keyid']}（{GUIDE}跨 issuer 不得复用 keyid）")
+    keyids[key["keyid"]] = {"issuer_id": issuer["id"], "alg": key["alg"],
+                            "kind": issuer.get("kind")}
+    by_issuer[str(item.get("id"))] = {"id": issuer["id"], "kind": issuer.get("kind"),
+                                      "types": list(item.get("types") or []),
+                                      "keyid": key["keyid"]}
+
+
 def build_store(policy: dict, issuer_registry: dict, type_registry: dict) -> dict:
     """装配 store → {issuers, keyids, types}；不一致即抛（带修复指引）。"""
     issues = build_store_issues(policy, issuer_registry, type_registry)
@@ -26,19 +40,48 @@ def build_store(policy: dict, issuer_registry: dict, type_registry: dict) -> dic
     by_issuer = {}
     keyids = {}
     for item in (policy or {}).get("issuers") or []:
-        resolved = tk.resolve_issuer(issuer_registry, str(item.get("id")))
-        issuer = resolved.get("issuer") or {}
-        keys = {str(k.get("keyid")): k for k in issuer.get("keys") or []}
-        key = keys[str(item.get("keyid"))]
-        if key["keyid"] in keyids:
-            raise ValueError(f"keyid 重复：{key['keyid']}（{GUIDE}跨 issuer 不得复用 keyid）")
-        keyids[key["keyid"]] = {"issuer_id": issuer["id"], "alg": key["alg"],
-                                "kind": issuer.get("kind")}
-        by_issuer[str(item.get("id"))] = {"id": issuer["id"], "kind": issuer.get("kind"),
-                                          "types": list(item.get("types") or []),
-                                          "keyid": key["keyid"]}
+        _store_entry(item, issuer_registry, keyids, by_issuer)
     types = {str(t.get("id")): t for t in (type_registry or {}).get("types") or []}
     return {"issuers": by_issuer, "keyids": keyids, "types": types}
+
+
+def _type_issues(iid: str, item: dict, issuer: dict, types: dict) -> list:
+    issues: list = []
+    for type_id in item.get("types") or []:
+        entry = types.get(str(type_id))
+        if entry is None:
+            issues.append(f"{iid} 声称类型 {type_id} 未在 type registry 注册")
+            continue
+        if str(issuer.get("kind")) not in (entry.get("allowed_issuer_kinds") or []):
+            issues.append(f"issuer kind={issuer.get('kind')} 不被类型 {type_id} 接受")
+    return issues
+
+
+def _issuer_item_issues(item: dict, issuer_registry: dict, types: dict,
+                        algorithms: set, seen_keyids: set) -> list:
+    issues: list = []
+    iid = str(item.get("id"))
+    resolved = tk.resolve_issuer(issuer_registry, iid)
+    if not resolved.get("ok"):
+        issues.append(f"policy issuer 不在 issuer registry：{iid}")
+        return issues
+    issuer = resolved.get("issuer") or {}
+    keys = {str(k.get("keyid")): k for k in issuer.get("keys") or []}
+    keyid = str(item.get("keyid"))
+    key = keys.get(keyid)
+    if key is None:
+        issues.append(f"policy issuer {iid} 的 keyid 不在 registry：{keyid}")
+        return issues
+    if keyid in seen_keyids:
+        issues.append(f"keyid 跨 issuer 重复：{keyid}")
+    seen_keyids.add(keyid)
+    if item.get("alg") != key.get("alg"):
+        issues.append(f"{iid} 的 alg 与 registry key.alg 不一致"
+                      f"（policy={item.get('alg')} / registry={key.get('alg')}）")
+    if item.get("alg") not in algorithms:
+        issues.append(f"{iid} 的 alg 不在 policy.algorithms：{item.get('alg')}")
+    issues += _type_issues(iid, item, issuer, types)
+    return issues
 
 
 def build_store_issues(policy: dict, issuer_registry: dict, type_registry: dict) -> list:
@@ -50,33 +93,7 @@ def build_store_issues(policy: dict, issuer_registry: dict, type_registry: dict)
     types = {str(t.get("id")): t for t in (type_registry or {}).get("types") or []}
     seen_keyids = set()
     for item in policy.get("issuers") or []:
-        iid = str(item.get("id"))
-        resolved = tk.resolve_issuer(issuer_registry, iid)
-        if not resolved.get("ok"):
-            issues.append(f"policy issuer 不在 issuer registry：{iid}")
-            continue
-        issuer = resolved.get("issuer") or {}
-        keys = {str(k.get("keyid")): k for k in issuer.get("keys") or []}
-        keyid = str(item.get("keyid"))
-        key = keys.get(keyid)
-        if key is None:
-            issues.append(f"policy issuer {iid} 的 keyid 不在 registry：{keyid}")
-            continue
-        if keyid in seen_keyids:
-            issues.append(f"keyid 跨 issuer 重复：{keyid}")
-        seen_keyids.add(keyid)
-        if item.get("alg") != key.get("alg"):
-            issues.append(f"{iid} 的 alg 与 registry key.alg 不一致"
-                          f"（policy={item.get('alg')} / registry={key.get('alg')}）")
-        if item.get("alg") not in algorithms:
-            issues.append(f"{iid} 的 alg 不在 policy.algorithms：{item.get('alg')}")
-        for type_id in item.get("types") or []:
-            entry = types.get(str(type_id))
-            if entry is None:
-                issues.append(f"{iid} 声称类型 {type_id} 未在 type registry 注册")
-                continue
-            if str(issuer.get("kind")) not in (entry.get("allowed_issuer_kinds") or []):
-                issues.append(f"issuer kind={issuer.get('kind')} 不被类型 {type_id} 接受")
+        issues += _issuer_item_issues(item, issuer_registry, types, algorithms, seen_keyids)
     return issues
 
 

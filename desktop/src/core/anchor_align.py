@@ -56,11 +56,7 @@ def bound_ids(root: str = ".") -> set:
     return out
 
 
-def stats(root: str = ".") -> Dict[str, Any]:
-    """反向：目录利用率总览（确定性）。"""
-    rows = catalog(root)
-    ids = [str(s.get("id")) for s in rows if s.get("id")]
-    bound = bound_ids(root) & set(ids)
+def _by_layer(rows: List[Dict[str, Any]], bound: set) -> Dict[str, Dict[str, int]]:
     by_layer: Dict[str, Dict[str, int]] = {}
     for s in rows:
         cell = by_layer.setdefault(str(s.get("layer") or "(未声明)"),
@@ -70,7 +66,28 @@ def stats(root: str = ".") -> Dict[str, Any]:
             cell["bound"] += 1
         else:
             cell["unbound"] += 1
-    packs = [p for p in (_read(root, BINDING_REL).get("packs") or []) if isinstance(p, dict)]
+    return by_layer
+
+
+def _valid_packs(root: str) -> List[Dict[str, Any]]:
+    return [p for p in (_read(root, BINDING_REL).get("packs") or []) if isinstance(p, dict)]
+
+
+def _bindings_total(packs: List[Dict[str, Any]]) -> int:
+    return sum(len(p.get("bindings") or []) for p in packs)
+
+
+def _layer_map(by_layer: Dict[str, Dict[str, int]]) -> Dict[str, Dict[str, int]]:
+    return {k: by_layer[k] for k in sorted(by_layer)}
+
+
+def stats(root: str = ".") -> Dict[str, Any]:
+    """反向：目录利用率总览（确定性）。"""
+    rows = catalog(root)
+    ids = [str(s.get("id")) for s in rows if s.get("id")]
+    bound = bound_ids(root) & set(ids)
+    by_layer = _by_layer(rows, bound)
+    packs = _valid_packs(root)
     total = len(ids)
     return {
         "standards": total,
@@ -78,8 +95,8 @@ def stats(root: str = ".") -> Dict[str, Any]:
         "unbound": total - len(bound),
         "utilization": round(len(bound) / total, 4) if total else 0.0,
         "packs": len(packs),
-        "bindings": sum(len(p.get("bindings") or []) for p in packs),
-        "by_layer": {k: by_layer[k] for k in sorted(by_layer)},
+        "bindings": _bindings_total(packs),
+        "by_layer": _layer_map(by_layer),
     }
 
 
@@ -108,6 +125,34 @@ def _terms(text: Any) -> List[str]:
     return list(_terms_cached(str(text or "")))
 
 
+def _intersect_row(s: Dict[str, Any], sid: str, want: set,
+                    b: set) -> Dict[str, Any] | None:
+    hay = set(_terms_cached(sid) + _terms_cached(str(s.get("title") or ""))
+              + _terms_cached(str(s.get("body") or "")))
+    hit = sum(1 for t in want if t in hay)
+    if not hit:
+        return None
+    return {"id": sid, "layer": str(s.get("layer") or ""),
+            "body": str(s.get("body") or ""),
+            "title": str(s.get("title") or ""), "hits": hit,
+            "bound": sid in b}
+
+
+def _intersect_candidates(root: str, want: set, b: set, look: str,
+                          include_bound: bool) -> List[Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
+    for s in catalog(root):
+        sid = str(s.get("id"))
+        if not include_bound and sid in b:
+            continue
+        if look and str(s.get("layer")) != look:
+            continue
+        row = _intersect_row(s, sid, want, b)
+        if row is not None:
+            rows.append(row)
+    return rows
+
+
 def intersect(root: str = ".", term: str = "", layer: str = "",
               limit: int = 0, include_bound: bool = False) -> List[Dict[str, Any]]:
     """正向：按词汇在标准里找交叉候选（命中数降序，同分按 id 升序）。
@@ -119,47 +164,48 @@ def intersect(root: str = ".", term: str = "", layer: str = "",
         return []
     b = bound_ids(root)
     look = str(layer).strip()
-    rows: List[Dict[str, Any]] = []
-    for s in catalog(root):
-        sid = str(s.get("id"))
-        if not include_bound and sid in b:
-            continue
-        if look and str(s.get("layer")) != look:
-            continue
-        hay = set(_terms_cached(sid) + _terms_cached(str(s.get("title") or ""))
-                  + _terms_cached(str(s.get("body") or "")))
-        hit = sum(1 for t in want if t in hay)
-        if hit:
-            rows.append({"id": sid, "layer": str(s.get("layer") or ""),
-                         "body": str(s.get("body") or ""),
-                         "title": str(s.get("title") or ""), "hits": hit,
-                         "bound": sid in b})
+    rows = _intersect_candidates(root, want, b, look, include_bound)
     rows.sort(key=lambda r: (-int(r["hits"]), str(r["id"])))
     return rows[:limit] if limit and limit > 0 else rows
+
+
+def _s(value: Any) -> str:
+    return str(value or "")
+
+
+def _pack_binds(p: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return [b for b in (p.get("bindings") or []) if isinstance(b, dict)]
+
+
+def _pack_layers(binds: List[Dict[str, Any]]) -> Dict[str, int]:
+    layers: Dict[str, int] = {}
+    for b in binds:
+        lay = _s(b.get("standard_layer")) or "(未声明)"
+        layers[lay] = layers.get(lay, 0) + 1
+    return layers
+
+
+def _pack_row(p: Dict[str, Any]) -> Dict[str, Any]:
+    binds = _pack_binds(p)
+    layers = _pack_layers(binds)
+    return {
+        "code": _s(p.get("code")),
+        "package": _s(p.get("package")),
+        "category": _s(p.get("category")),
+        "subdivisions": int(p.get("subdivisions") or 0),
+        "bindings": len(binds),
+        "distinct_standards": len({str(b.get("standard")) for b in binds if b.get("standard")}),
+        "layers": {k: layers[k] for k in sorted(layers)},
+        "layer_breadth": len(layers),
+        "missing_layers": [x for x in LAYERS if x not in layers],
+    }
 
 
 def pack_stats(root: str = ".") -> List[Dict[str, Any]]:
     """逐域包标准对齐概览（按层覆盖宽度升序）：绑定数 / 标准数 / 各层计数 / 层覆盖宽度。"""
     rows: List[Dict[str, Any]] = []
-    for p in (_read(root, BINDING_REL).get("packs") or []):
-        if not isinstance(p, dict):
-            continue
-        binds = [b for b in (p.get("bindings") or []) if isinstance(b, dict)]
-        layers: Dict[str, int] = {}
-        for b in binds:
-            lay = str(b.get("standard_layer") or "(未声明)")
-            layers[lay] = layers.get(lay, 0) + 1
-        rows.append({
-            "code": str(p.get("code") or ""),
-            "package": str(p.get("package") or ""),
-            "category": str(p.get("category") or ""),
-            "subdivisions": int(p.get("subdivisions") or 0),
-            "bindings": len(binds),
-            "distinct_standards": len({str(b.get("standard")) for b in binds if b.get("standard")}),
-            "layers": {k: layers[k] for k in sorted(layers)},
-            "layer_breadth": len(layers),
-            "missing_layers": [x for x in LAYERS if x not in layers],
-        })
+    for p in _valid_packs(root):
+        rows.append(_pack_row(p))
     return sorted(rows, key=lambda r: (int(r["layer_breadth"]), int(r["distinct_standards"]),
                                        str(r["code"])))
 
@@ -189,6 +235,33 @@ def dependents(root: str = ".") -> Dict[str, List[str]]:
     return {k: sorted(v) for k, v in rev.items()}
 
 
+def _seed_node(s: Dict[str, Any], term: str) -> tuple:
+    sid = str(s["id"])
+    return sid, {"id": sid, "layer": str(s.get("layer") or ""),
+                 "title": str(s.get("title") or ""), "hits": int(s["hits"]),
+                 "depth": 0, "via": str(term)}
+
+
+def _expand_node(nb: str, s: Dict[str, Any], level: int, via: str) -> Dict[str, Any]:
+    return {"id": nb, "layer": str(s.get("layer") or ""),
+            "title": str(s.get("title") or ""), "hits": 0,
+            "depth": level, "via": via}
+
+
+def _expand_frontier(frontier: List[str], fwd: Dict[str, List[str]],
+                     rev: Dict[str, List[str]], by_id: Dict[str, Dict[str, Any]],
+                     nodes: Dict[str, Dict[str, Any]], level: int) -> List[str]:
+    nxt: List[str] = []
+    for sid in sorted(frontier):
+        for nb in sorted(set(fwd.get(sid, []) + rev.get(sid, []))):
+            if nb in nodes:
+                continue
+            s = by_id.get(nb) or {}
+            nodes[nb] = _expand_node(nb, s, level, sid)
+            nxt.append(nb)
+    return nxt
+
+
 def bootstrap(root: str = ".", term: str = "", depth: int = 1,
               limit: int = 0) -> List[Dict[str, Any]]:
     """正向自举：词汇命中标准（种子）→ 沿依赖与反向依赖各扩 depth 层。
@@ -204,23 +277,11 @@ def bootstrap(root: str = ".", term: str = "", depth: int = 1,
     nodes: Dict[str, Dict[str, Any]] = {}
     frontier: List[str] = []
     for s in seeds:
-        sid = str(s["id"])
-        nodes[sid] = {"id": sid, "layer": str(s.get("layer") or ""),
-                      "title": str(s.get("title") or ""), "hits": int(s["hits"]),
-                      "depth": 0, "via": str(term)}
+        sid, node = _seed_node(s, term)
+        nodes[sid] = node
         frontier.append(sid)
     for level in range(1, max(0, int(depth)) + 1):
-        nxt: List[str] = []
-        for sid in sorted(frontier):
-            for nb in sorted(set(fwd.get(sid, []) + rev.get(sid, []))):
-                if nb in nodes:
-                    continue
-                s = by_id.get(nb) or {}
-                nodes[nb] = {"id": nb, "layer": str(s.get("layer") or ""),
-                             "title": str(s.get("title") or ""), "hits": 0,
-                             "depth": level, "via": sid}
-                nxt.append(nb)
-        frontier = nxt
+        frontier = _expand_frontier(frontier, fwd, rev, by_id, nodes, level)
         if not frontier:
             break
     rows = sorted(nodes.values(), key=lambda r: (int(r["depth"]), -int(r["hits"]), str(r["id"])))

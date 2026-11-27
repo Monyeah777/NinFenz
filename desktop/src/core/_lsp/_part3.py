@@ -231,11 +231,8 @@ def _check_capabilities(srv: "LspServer", init: Dict[str, Any]) -> List[str]:
     return issues
 
 
-def _check_lifecycle(srv: "LspServer", probe: str, root_s: str) -> List[str]:
-    """诊断定位 / didClose 清理 / 未 shutdown 的 exit 退出码。"""
+def _lifecycle_close_issues(srv: "LspServer", probe: str) -> List[str]:
     issues: List[str] = []
-    srv.handle({"jsonrpc": "2.0", "method": M_DID_OPEN,
-                "params": {"textDocument": {"uri": probe, "text": "# 标题  \n\n正文  \n"}}})
     diags = srv._publish(probe)["params"]["diagnostics"]
     if not diags:
         issues.append("已知坏文档零诊断（诊断源与 nf lint 失同源？）")
@@ -245,6 +242,11 @@ def _check_lifecycle(srv: "LspServer", probe: str, root_s: str) -> List[str]:
                 "params": {"textDocument": {"uri": probe}}})
     if probe in srv.docs:
         issues.append("didClose 未清理文档状态（长驻会话状态泄漏）")
+    return issues
+
+
+def _lifecycle_state_issues(probe: str, root_s: str) -> List[str]:
+    issues: List[str] = []
     # 协议状态机（2026-10-08 补）：未初始化就发请求 / 重复 initialize / shutdown 后再发请求
     fresh = LspServer(root=root_s, explicit_root=True)
     pre = fresh.handle({"jsonrpc": "2.0", "id": 90, "method": M_COMPLETION,
@@ -260,6 +262,16 @@ def _check_lifecycle(srv: "LspServer", probe: str, root_s: str) -> List[str]:
                           "params": {"textDocument": {"uri": probe}}})[0]
     if (after.get("error") or {}).get("code") != INVALID_REQUEST:
         issues.append("shutdown 之后仍服务请求（未回 -32600）")
+    return issues
+
+
+def _check_lifecycle(srv: "LspServer", probe: str, root_s: str) -> List[str]:
+    """诊断定位 / didClose 清理 / 未 shutdown 的 exit 退出码。"""
+    issues: List[str] = []
+    srv.handle({"jsonrpc": "2.0", "method": M_DID_OPEN,
+                "params": {"textDocument": {"uri": probe, "text": "# 标题  \n\n正文  \n"}}})
+    issues += _lifecycle_close_issues(srv, probe)
+    issues += _lifecycle_state_issues(probe, root_s)
     buf = io.BytesIO()
     write_message(buf, {"jsonrpc": "2.0", "method": M_EXIT})
     if LspServer(root=root_s).serve(stdin=io.BytesIO(buf.getvalue()),
@@ -302,13 +314,25 @@ def _folding_issues(srv: "LspServer", probe: str) -> List[str]:
     return []
 
 
+def _helix_issues(cfg: str) -> List[str]:
+    import tomllib
+    issues: List[str] = []
+    try:
+        data = tomllib.loads("\n".join(cfg.split("\n")[1:]))
+    except tomllib.TOMLDecodeError as exc:
+        return ["Helix 配置不是合法 TOML：%s" % exc]
+    srv_cfg = ((data.get("language-server") or {}).get("nf-lsp") or {})
+    if srv_cfg.get("command") != "python" or "lsp" not in (srv_cfg.get("args") or []):
+        issues.append("Helix 配置的 language-server 段结构不对：%s" % srv_cfg)
+    return issues
+
+
 def _client_config_issues(r: Path) -> List[str]:
     """客户端配置体检：生成件必须指向 nf lsp 入口，且 **Helix 那份要能当 TOML 解析**。
 
     为什么加解析（2026-10-08）：此前只查子串——生成器若把 Windows 路径写成非法 TOML
     （反斜杠留在基本字符串里），子串判据全绿，用户粘进 languages.toml 才炸。
     """
-    import tomllib
     out = []
     for editor in CLIENT_EDITORS:
         cfg = render_client_config(editor, str(r.resolve()))
@@ -316,23 +340,19 @@ def _client_config_issues(r: Path) -> List[str]:
             out.append("客户端配置 %s 未指向 nf lsp 入口" % editor)
         if editor != "helix":
             continue
-        try:
-            data = tomllib.loads("\n".join(cfg.split("\n")[1:]))
-        except tomllib.TOMLDecodeError as exc:
-            out.append("Helix 配置不是合法 TOML：%s" % exc)
-            continue
-        srv_cfg = ((data.get("language-server") or {}).get("nf-lsp") or {})
-        if srv_cfg.get("command") != "python" or "lsp" not in (srv_cfg.get("args") or []):
-            out.append("Helix 配置的 language-server 段结构不对：%s" % srv_cfg)
+        out += _helix_issues(cfg)
     return out
 
 
-def _check_intelligence(srv: "LspServer", probe: str, r: Path) -> List[str]:
-    """领域解析（真仓库件）+ 补全 / 悬停 / 跳定义 / 大纲真跑 + 客户端配置生成。"""
-    issues: List[str] = []
+def _symbol_issue(srv: "LspServer", r: Path) -> List[str]:
     sym = srv.symbols().resolve("M00")
     if sym is None or not (r / sym["path"]).is_file():
-        issues.append("模块 M00 未解析到真实模块件（符号表与仓库失同步）")
+        return ["模块 M00 未解析到真实模块件（符号表与仓库失同步）"]
+    return []
+
+
+def _probe_issues(srv: "LspServer", probe: str) -> List[str]:
+    issues: List[str] = []
     srv.handle({"jsonrpc": "2.0", "method": M_DID_OPEN,
                 "params": {"textDocument": {"uri": probe, "text": "# 模块 M00\n"}}})
     pos = {"line": 0, "character": 6}
@@ -353,6 +373,13 @@ def _check_intelligence(srv: "LspServer", probe: str, r: Path) -> List[str]:
                        "params": {"textDocument": {"uri": probe}}})[0]["result"]
     if not outl:
         issues.append("文档大纲为空")
+    return issues
+
+
+def _check_intelligence(srv: "LspServer", probe: str, r: Path) -> List[str]:
+    """领域解析（真仓库件）+ 补全 / 悬停 / 跳定义 / 大纲真跑 + 客户端配置生成。"""
+    issues = _symbol_issue(srv, r)
+    issues += _probe_issues(srv, probe)
     issues += _client_config_issues(r)
     issues += _references_issues(srv, probe)
     issues += _folding_issues(srv, probe)

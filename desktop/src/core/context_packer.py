@@ -69,19 +69,39 @@ def _entry(page: Dict[str, Any]) -> tuple:
     return entry, len(json.dumps(payload, ensure_ascii=False))
 
 
-def _ordered_candidates(pages: Dict[str, Dict[str, Any]], ids: List[str],
-                        role: str) -> List[Dict[str, Any]]:
-    """候选：直接 context_refs 优先，再本页 relations 目标的邻居（仅允许类型）。"""
+def _pack_allowed(role: str) -> Any:
     allowed = ROLES.get(role)
     if allowed is None:
         raise PackError(
             "未知角色 %r（修复指引：role 只允许 %s；角色升级=拒绝）"
             % (role, "/".join(sorted(ROLES))), code="ROLE-FORBIDDEN")
+    return allowed
+
+
+def _require_pages(pages: Dict[str, Dict[str, Any]], ids: List[str]) -> None:
     missing = [pid for pid in ids if pid not in pages]
     if missing:
         raise PackError(
             "Wiki 页不在场：%s（修复指引：先编译 Wiki 或用 nf wiki search 查 id）" % missing[:3],
             code="WIKI-ID-UNKNOWN")
+
+
+def _relation_candidates(pages: Dict[str, Dict[str, Any]], pid: str, seen: set,
+                         allowed: Any) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    for rel in pages[pid].get("relations") or []:
+        target = str((rel or {}).get("target"))
+        if target in pages and target not in seen and str(pages[target].get("type")) in allowed:
+            out.append({"page": pages[target], "weight": 1})
+            seen.add(target)
+    return out
+
+
+def _ordered_candidates(pages: Dict[str, Dict[str, Any]], ids: List[str],
+                        role: str) -> List[Dict[str, Any]]:
+    """候选：直接 context_refs 优先，再本页 relations 目标的邻居（仅允许类型）。"""
+    allowed = _pack_allowed(role)
+    _require_pages(pages, ids)
     seen: set = set()
     ordered: List[Dict[str, Any]] = []
     for pid in ids:
@@ -90,23 +110,24 @@ def _ordered_candidates(pages: Dict[str, Dict[str, Any]], ids: List[str],
             ordered.append({"page": page, "weight": 2})
             seen.add(pid)
     for pid in ids:
-        for rel in pages[pid].get("relations") or []:
-            target = str((rel or {}).get("target"))
-            if target in pages and target not in seen and str(pages[target].get("type")) in allowed:
-                ordered.append({"page": pages[target], "weight": 1})
-                seen.add(target)
+        ordered += _relation_candidates(pages, pid, seen, allowed)
     return ordered
 
 
-def pack_ids(ids: List[str], root: str = ".", budget_chars: int = 4000,
-             role: str = "author", task_slot: str = "") -> Dict[str, Any]:
-    """按 id 列表打包（CLI/测试共用）；同输入逐字节确定。"""
-    if budget_chars < 200:
+def _truncate_first(entry: Dict[str, Any], budget_chars: int) -> int:
+    overhead = len(json.dumps({**entry, "summary": ""}, ensure_ascii=False))
+    room = budget_chars - overhead
+    if room <= 16:
         raise PackError(
-            "预算过小：%s（修复指引：budget_chars ≥200，否则连 spec_ref 都放不下）"
-            % budget_chars, code="BUDGET-TOO-SMALL")
-    pages = _pages(root)
-    candidates = _ordered_candidates(pages, [str(x) for x in ids], role)
+            "预算 %s 放不下首条（修复指引：调大 budget_chars）" % budget_chars,
+            code="BUDGET-TOO-SMALL")
+    entry["summary"] = str(entry["summary"])[:max(16, room - 8)] + "…"
+    return len(json.dumps({k: v for k, v in entry.items()
+                           if k != "sanitized"}, ensure_ascii=False))
+
+
+def _add_entries(candidates: List[Dict[str, Any]], budget_chars: int,
+                 role: str) -> tuple:
     entries: List[Dict[str, Any]] = []
     used = 0
     truncated = False
@@ -122,19 +143,14 @@ def pack_ids(ids: List[str], root: str = ".", budget_chars: int = 4000,
                 truncated = True
                 break
             # 首条也放不下：截 summary（spec_ref/citations 永不截）
-            overhead = len(json.dumps({**entry, "summary": ""}, ensure_ascii=False))
-            room = budget_chars - overhead
-            if room > 16:
-                entry["summary"] = str(entry["summary"])[:max(16, room - 8)] + "…"
-                size = len(json.dumps({k: v for k, v in entry.items()
-                                       if k != "sanitized"}, ensure_ascii=False))
-                truncated = True
-            else:
-                raise PackError(
-                    "预算 %s 放不下首条（修复指引：调大 budget_chars）" % budget_chars,
-                    code="BUDGET-TOO-SMALL")
+            size = _truncate_first(entry, budget_chars)
+            truncated = True
         used += size
         entries.append(entry)
+    return entries, used, truncated, injection
+
+
+def _pack_citations(entries: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     citations: List[Dict[str, Any]] = []
     seen_cit: set = set()
     for entry in entries:
@@ -143,6 +159,20 @@ def pack_ids(ids: List[str], root: str = ".", budget_chars: int = 4000,
             if key not in seen_cit:
                 seen_cit.add(key)
                 citations.append(cite)
+    return citations
+
+
+def pack_ids(ids: List[str], root: str = ".", budget_chars: int = 4000,
+             role: str = "author", task_slot: str = "") -> Dict[str, Any]:
+    """按 id 列表打包（CLI/测试共用）；同输入逐字节确定。"""
+    if budget_chars < 200:
+        raise PackError(
+            "预算过小：%s（修复指引：budget_chars ≥200，否则连 spec_ref 都放不下）"
+            % budget_chars, code="BUDGET-TOO-SMALL")
+    pages = _pages(root)
+    candidates = _ordered_candidates(pages, [str(x) for x in ids], role)
+    entries, used, truncated, injection = _add_entries(candidates, budget_chars, role)
+    citations = _pack_citations(entries)
     cited = sum(1 for e in entries if e.get("citations"))
     rate = 1.0 if entries and cited == len(entries) else (cited / len(entries) if entries else 0.0)
     report = {"schema": REPORT_SCHEMA, "task_slot": task_slot, "role": role,
@@ -172,6 +202,35 @@ def pack_task(task: Dict[str, Any], root: str = ".", budget_chars: int = 4000,
     return pack_ids(ids, root, budget_chars, role, slot)
 
 
+def _pack_entry_issues(entry: Dict[str, Any], allowed: set, role: str) -> List[str]:
+    issues: List[str] = []
+    if str(entry.get("type")) not in allowed:
+        issues.append("角色隔离失败：%s 类型 %s 不在 %s 白名单"
+                      % (entry.get("id"), entry.get("type"), role))
+    if not entry.get("citations"):
+        issues.append("条目缺 citations：%s" % entry.get("id"))
+    if not entry.get("spec_ref"):
+        issues.append("条目缺 spec_ref：%s" % entry.get("id"))
+    return issues
+
+
+def _has_sanitized(pack: Dict[str, Any]) -> bool:
+    return any(e.get("sanitized") for e in pack.get("entries") or [])
+
+
+def _pack_budget_issues(pack: Dict[str, Any], report: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
+    budget = pack.get("budget") or {}
+    used = int(budget.get("used_chars") or 0)
+    if used > int(budget.get("max_chars") or 0):
+        issues.append("超预算未截断：used=%s > max=%s" % (used, budget.get("max_chars")))
+    if report.get("citation_rate") != 1.0 and pack.get("entries"):
+        issues.append("citation_rate 非 100%%：%s" % report.get("citation_rate"))
+    if int(report.get("injection") or 0) and not _has_sanitized(pack):
+        issues.append("injection>0 但无 sanitized 标记")
+    return issues
+
+
 def validate_pack(pack: Dict[str, Any]) -> List[str]:
     """打包契约：schema/引用/预算/角色/注入/确定性字段。"""
     issues: List[str] = []
@@ -183,23 +242,9 @@ def validate_pack(pack: Dict[str, Any]) -> List[str]:
         return issues
     allowed = set(ROLES[role])
     for entry in pack.get("entries") or []:
-        if str(entry.get("type")) not in allowed:
-            issues.append("角色隔离失败：%s 类型 %s 不在 %s 白名单"
-                          % (entry.get("id"), entry.get("type"), role))
-        if not entry.get("citations"):
-            issues.append("条目缺 citations：%s" % entry.get("id"))
-        if not entry.get("spec_ref"):
-            issues.append("条目缺 spec_ref：%s" % entry.get("id"))
-    budget = pack.get("budget") or {}
-    used = int(budget.get("used_chars") or 0)
-    if used > int(budget.get("max_chars") or 0):
-        issues.append("超预算未截断：used=%s > max=%s" % (used, budget.get("max_chars")))
+        issues += _pack_entry_issues(entry, allowed, role)
     report = pack.get("report") or {}
-    if report.get("citation_rate") != 1.0 and pack.get("entries"):
-        issues.append("citation_rate 非 100%%：%s" % report.get("citation_rate"))
-    if int(report.get("injection") or 0) and not any(
-            e.get("sanitized") for e in pack.get("entries") or []):
-        issues.append("injection>0 但无 sanitized 标记")
+    issues += _pack_budget_issues(pack, report)
     return issues
 
 
