@@ -206,18 +206,18 @@ def _enrich(s: dict, atom_id: str, output: dict | None = None) -> None:
     parts = a["parts"] or parts_from(s["goal"])
     if atom_id == "k.represent":
         a["representation"] = s["goal"]
-    elif atom_id == "k.partition":
+    if atom_id == "k.partition":
         a["parts"] = parts
-    elif atom_id == "k.define":
+    if atom_id == "k.define":
         a["definitions"] = [f"{part}：目标中的边界、状态与验收条件。" for part in parts]
-    elif atom_id == "k.relate":
+    if atom_id == "k.relate":
         rels = [f"{left} → {right}" for left, right in zip(parts, parts[1:], strict=False)]
         for p in parts:
             rels += [f"{p} → {ref}" for ref in REL_MAP.get(p, [])]
         if len(parts) == 1:
             rels.append("{} → {}".format(s["goal"], parts[0]))
         a["relations"] = sorted(set(rels))
-    elif atom_id == "m.trace":
+    if atom_id == "m.trace":
         a["trace"] = sorted(
             {
                 item["source"]
@@ -225,18 +225,18 @@ def _enrich(s: dict, atom_id: str, output: dict | None = None) -> None:
                 if not item.get("context_only", False)
             }
         )
-    elif atom_id == "e.falsify":
+    if atom_id == "e.falsify":
         risks = [f"若「{part}」缺少可观察状态或回退路径，相关结论不可验证。" for part in parts]
         risks.append("若各部分之间的约束相互冲突，组合结构会在执行阶段断裂。")
         a["risks"] = risks
-    elif atom_id == "i.reconcile":
+    if atom_id == "i.reconcile":
         q = s["open_questions"].pop(0) if s["open_questions"] else "未命名缺口"
         a["resolutions"].append({"question": q, "resolution": "把缺口转成可观察状态与回退路径。"})
-    elif atom_id == "k.abstract":
+    if atom_id == "k.abstract":
         a["abstract"] = "目标由 {} 组成；各部分的约束、反馈与失败成本必须闭合。".format(
             "、".join(parts)
         )
-    elif atom_id == "i.compose":
+    if atom_id == "i.compose":
         a["plan"] = [
             "1. 明确目标边界、输入与验收状态。",
             "2. 定义 {} 的约束与相互作用。".format("、".join(parts)),
@@ -244,7 +244,7 @@ def _enrich(s: dict, atom_id: str, output: dict | None = None) -> None:
             "4. 设计反例、失败成本、停止条件与回退路径。",
             "5. 用 NF 证据核验结构完整性与可执行性。",
         ]
-    elif atom_id == "e.verify":
+    if atom_id == "e.verify":
         a["evidence"] = list(a["trace"] or select_references(s["goal"]))
         a["verified"] = True
     # 其余原子按契约把执行器输出投影到共享状态；已有语义值不覆盖。

@@ -87,6 +87,50 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
         return vec![format!("{}: 非对象", label)];
     }
 
+    let (variables, initial) = parse_abstract(wm, label, &mut issues);
+
+    let valid_vars = check_variables(label, &variables, &mut issues);
+
+    check_initial(label, initial.as_ref(), &valid_vars, &mut issues);
+
+    let (initial_phase, phases) = parse_transition(wm, label, &mut issues);
+
+    let (phase_names, edges) = check_phases(label, &phases, &mut issues);
+
+    check_reachability(label, initial_phase.as_deref(), &phase_names, &edges, &mut issues);
+
+    check_invariants(wm, label, &mut issues);
+
+    let (declared_names, declared_kinds) = declared_names_kinds(&valid_vars);
+    if let Some(checks_v) = get(wm, "checks") {
+        if !matches!(checks_v, Json::Null) {
+            let checks = match &checks_v {
+                Json::Array(c) if !c.is_empty() => c.clone(),
+                _ => {
+                    issues.push(format!("{}.checks: 非空数组", label));
+                    Vec::new()
+                }
+            };
+            for (idx, check) in checks.iter().enumerate() {
+                check_one_check(
+                    label,
+                    idx,
+                    check,
+                    &declared_names,
+                    &declared_kinds,
+                    &valid_vars,
+                    &mut issues,
+                );
+            }
+        }
+    }
+
+    check_slots(label, &valid_vars, slot_registry, &mut issues);
+    issues
+}
+
+/// abstract_state 骨架解析（变量数组 / 初始值对象）。
+fn parse_abstract(wm: &Json, label: &str, issues: &mut Vec<String>) -> (Vec<Json>, Option<Json>) {
     let abstract_v = get(wm, "abstract_state");
     let mut variables: Vec<Json> = Vec::new();
     let mut initial: Option<Json> = None;
@@ -109,7 +153,11 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
             issues.push(format!("{}.abstract_state: 缺失或非对象", label));
         }
     }
+    (variables, initial)
+}
 
+/// 变量面的 name / kind / item_kind / source / slot 核对；返回通过筛的变量。
+fn check_variables(label: &str, variables: &[Json], issues: &mut Vec<String>) -> Vec<Json> {
     let mut names: Vec<String> = Vec::new();
     let mut slots: Vec<String> = Vec::new();
     let mut valid_vars: Vec<Json> = Vec::new();
@@ -196,8 +244,17 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
         }
         valid_vars.push(var.clone());
     }
+    valid_vars
+}
 
-    if let Some(init @ Json::Object(_)) = &initial {
+/// initial 面：未声明变量 / 缺初始值 / 值类型不符。
+fn check_initial(
+    label: &str,
+    initial: Option<&Json>,
+    valid_vars: &[Json],
+    issues: &mut Vec<String>,
+) {
+    if let Some(init @ Json::Object(_)) = initial {
         let declared: Vec<String> = valid_vars
             .iter()
             .filter_map(|v| match get(v, "name") {
@@ -219,7 +276,7 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
                 ));
             }
         }
-        for var in &valid_vars {
+        for var in valid_vars {
             let name = match get(var, "name") {
                 Some(Json::Str(s)) => s,
                 _ => continue,
@@ -252,7 +309,14 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
             }
         }
     }
+}
 
+/// transition 骨架解析（initial_phase / phases）。
+fn parse_transition(
+    wm: &Json,
+    label: &str,
+    issues: &mut Vec<String>,
+) -> (Option<String>, Vec<Json>) {
     let transition_v = get(wm, "transition");
     let mut initial_phase: Option<String> = None;
     let mut phases: Vec<Json> = Vec::new();
@@ -274,7 +338,15 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
             issues.push(format!("{}.transition: 缺失或非对象", label));
         }
     }
+    (initial_phase, phases)
+}
 
+/// 相位面的 phase / next / guard / writes 核对与边表构建。
+fn check_phases(
+    label: &str,
+    phases: &[Json],
+    issues: &mut Vec<String>,
+) -> (Vec<String>, Vec<(String, String)>) {
     let mut phase_names: Vec<String> = Vec::new();
     let mut edges: Vec<(String, String)> = Vec::new();
     for (idx, phase) in phases.iter().enumerate() {
@@ -333,17 +405,27 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
             }
         }
     }
+    (phase_names, edges)
+}
 
-    if let Some(ip) = &initial_phase {
-        if !phase_names.contains(ip) {
+/// initial_phase 在位 + next 指向存在 + 从初始相位可达性。
+fn check_reachability(
+    label: &str,
+    initial_phase: Option<&str>,
+    phase_names: &[String],
+    edges: &[(String, String)],
+    issues: &mut Vec<String>,
+) {
+    if let Some(ip) = initial_phase {
+        if !phase_names.iter().any(|p| p == ip) {
             issues.push(format!(
                 "{}.transition.initial_phase: {} 不在 phases 内",
                 label,
-                pyval::py_repr(&Json::Str(ip.clone()))
+                pyval::py_repr(&Json::Str(ip.to_string()))
             ));
         }
     }
-    for (pname, nxt) in &edges {
+    for (pname, nxt) in edges {
         if !phase_names.contains(nxt) {
             issues.push(format!(
                 "{}.transition.phases[{}].next: {} 无对应相位",
@@ -355,10 +437,10 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
     }
 
     let all_next_ok = edges.iter().all(|(_, n)| phase_names.contains(n));
-    if let Some(ip0) = &initial_phase {
-        if phase_names.contains(ip0) && all_next_ok {
-            let mut seen: Vec<String> = vec![ip0.clone()];
-            let mut frontier: Vec<String> = vec![ip0.clone()];
+    if let Some(ip0) = initial_phase {
+        if phase_names.iter().any(|p| p == ip0) && all_next_ok {
+            let mut seen: Vec<String> = vec![ip0.to_string()];
+            let mut frontier: Vec<String> = vec![ip0.to_string()];
             while !frontier.is_empty() {
                 let current = frontier.remove(0);
                 if let Some((_, nxt)) = edges.iter().find(|(p, _)| *p == current) {
@@ -389,7 +471,10 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
             }
         }
     }
+}
 
+/// invariants 面：非空字符串数组。
+fn check_invariants(wm: &Json, label: &str, issues: &mut Vec<String>) {
     let invariants_v = get(wm, "invariants");
     match &invariants_v {
         Some(Json::Array(inv)) if !inv.is_empty() => {
@@ -401,7 +486,10 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
         }
         _ => issues.push(format!("{}.invariants: 非空数组", label)),
     }
+}
 
+/// 已声明变量名与 (名, kind) 表，供 checks 面引用。
+fn declared_names_kinds(valid_vars: &[Json]) -> (Vec<String>, Vec<(String, String)>) {
     let declared_names: Vec<String> = valid_vars
         .iter()
         .filter_map(|v| match get(v, "name") {
@@ -416,104 +504,112 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
             _ => None,
         })
         .collect();
-    if let Some(checks_v) = get(wm, "checks") {
-        if !matches!(checks_v, Json::Null) {
-            let checks = match &checks_v {
-                Json::Array(c) if !c.is_empty() => c.clone(),
-                _ => {
-                    issues.push(format!("{}.checks: 非空数组", label));
-                    Vec::new()
-                }
-            };
-            for (idx, check) in checks.iter().enumerate() {
-                let at = format!("{}.checks[{}]", label, idx);
-                if !matches!(check, Json::Object(_)) {
-                    issues.push(format!("{}: 非对象", at));
-                    continue;
-                }
-                let kind = match get(check, "kind") {
-                    Some(Json::Str(s)) => s,
-                    _ => String::new(),
-                };
-                let field_v = get(check, "field");
-                let values_v = get(check, "values");
-                if !["finite_phase", "monotonic", "finite_sequence"].contains(&kind.as_str()) {
-                    issues.push(format!(
-                        "{}.kind: 非法检查类型 {}",
-                        at,
-                        pyval::py_repr(&get(check, "kind").unwrap_or(Json::Null))
-                    ));
-                }
-                let field_ok = matches!(&field_v, Some(Json::Str(s)) if !s.trim().is_empty());
-                if !field_ok {
-                    issues.push(format!("{}.field: 非空字符串", at));
-                } else if let Some(Json::Str(f)) = &field_v {
-                    if !declared_names.contains(f) {
-                        issues.push(format!(
-                            "{}.field: 未声明变量 {}",
-                            at,
-                            pyval::py_repr(&Json::Str(f.clone()))
-                        ));
-                    }
-                }
-                let field = match &field_v {
-                    Some(Json::Str(s)) => s.clone(),
-                    _ => String::new(),
-                };
-                if kind == "finite_phase" || kind == "finite_sequence" {
-                    let ok = match &values_v {
-                        Some(Json::Array(v)) => {
-                            !v.is_empty()
-                                && v.iter()
-                                    .all(|x| matches!(x, Json::Str(s) if !s.trim().is_empty()))
-                        }
-                        _ => false,
-                    };
-                    if !ok {
-                        issues.push(format!("{}.values: {} 需非空字符串数组", at, kind));
-                    }
-                } else if kind == "monotonic" {
-                    let k = declared_kinds
-                        .iter()
-                        .find(|(n, _)| *n == field)
-                        .map(|(_, k)| k.clone())
-                        .unwrap_or_default();
-                    if k != "integer" && k != "number" {
-                        issues.push(format!(
-                            "{}.field: monotonic 只能用于 integer/number 变量",
-                            at
-                        ));
-                    }
-                }
-                if kind == "finite_sequence" {
-                    let k = declared_kinds
-                        .iter()
-                        .find(|(n, _)| *n == field)
-                        .map(|(_, k)| k.clone())
-                        .unwrap_or_default();
-                    if k != "array" {
-                        issues.push(format!("{}.field: finite_sequence 只能用于 array 变量", at));
-                    } else {
-                        let spec = valid_vars
-                            .iter()
-                            .find(|v| matches!(get(v, "name"), Some(Json::Str(n)) if *n == field));
-                        let ik = spec.and_then(|s| get(s, "item_kind"));
-                        if !matches!(ik, None | Some(Json::Null))
-                            && !matches!(&ik, Some(Json::Str(s)) if s == "string")
-                        {
-                            issues.push(format!(
-                                "{}.field: finite_sequence 的 array 元素应为 string",
-                                at
-                            ));
-                        }
-                    }
-                }
+    (declared_names, declared_kinds)
+}
+
+/// 单条 checks 声明核对（kind / field / values / 变量类型适配）。
+fn check_one_check(
+    label: &str,
+    idx: usize,
+    check: &Json,
+    declared_names: &[String],
+    declared_kinds: &[(String, String)],
+    valid_vars: &[Json],
+    issues: &mut Vec<String>,
+) {
+    let at = format!("{}.checks[{}]", label, idx);
+    if !matches!(check, Json::Object(_)) {
+        issues.push(format!("{}: 非对象", at));
+        return;
+    }
+    let kind = match get(check, "kind") {
+        Some(Json::Str(s)) => s,
+        _ => String::new(),
+    };
+    let field_v = get(check, "field");
+    let values_v = get(check, "values");
+    if !["finite_phase", "monotonic", "finite_sequence"].contains(&kind.as_str()) {
+        issues.push(format!(
+            "{}.kind: 非法检查类型 {}",
+            at,
+            pyval::py_repr(&get(check, "kind").unwrap_or(Json::Null))
+        ));
+    }
+    let field_ok = matches!(&field_v, Some(Json::Str(s)) if !s.trim().is_empty());
+    if !field_ok {
+        issues.push(format!("{}.field: 非空字符串", at));
+    } else if let Some(Json::Str(f)) = &field_v {
+        if !declared_names.contains(f) {
+            issues.push(format!(
+                "{}.field: 未声明变量 {}",
+                at,
+                pyval::py_repr(&Json::Str(f.clone()))
+            ));
+        }
+    }
+    let field = match &field_v {
+        Some(Json::Str(s)) => s.clone(),
+        _ => String::new(),
+    };
+    if kind == "finite_phase" || kind == "finite_sequence" {
+        let ok = match &values_v {
+            Some(Json::Array(v)) => {
+                !v.is_empty()
+                    && v.iter()
+                        .all(|x| matches!(x, Json::Str(s) if !s.trim().is_empty()))
+            }
+            _ => false,
+        };
+        if !ok {
+            issues.push(format!("{}.values: {} 需非空字符串数组", at, kind));
+        }
+    } else if kind == "monotonic" {
+        let k = declared_kinds
+            .iter()
+            .find(|(n, _)| *n == field)
+            .map(|(_, k)| k.clone())
+            .unwrap_or_default();
+        if k != "integer" && k != "number" {
+            issues.push(format!(
+                "{}.field: monotonic 只能用于 integer/number 变量",
+                at
+            ));
+        }
+    }
+    if kind == "finite_sequence" {
+        let k = declared_kinds
+            .iter()
+            .find(|(n, _)| *n == field)
+            .map(|(_, k)| k.clone())
+            .unwrap_or_default();
+        if k != "array" {
+            issues.push(format!("{}.field: finite_sequence 只能用于 array 变量", at));
+        } else {
+            let spec = valid_vars
+                .iter()
+                .find(|v| matches!(get(v, "name"), Some(Json::Str(n)) if *n == field));
+            let ik = spec.and_then(|s| get(s, "item_kind"));
+            if !matches!(ik, None | Some(Json::Null))
+                && !matches!(&ik, Some(Json::Str(s)) if s == "string")
+            {
+                issues.push(format!(
+                    "{}.field: finite_sequence 的 array 元素应为 string",
+                    at
+                ));
             }
         }
     }
+}
 
+/// slot 注册面：槽位在册 / kind / item_kind / owner 漂移。
+fn check_slots(
+    label: &str,
+    valid_vars: &[Json],
+    slot_registry: &[(String, Json)],
+    issues: &mut Vec<String>,
+) {
     if !slot_registry.is_empty() {
-        for var in &valid_vars {
+        for var in valid_vars {
             let slot = match get(var, "slot") {
                 Some(Json::Str(s)) if !s.trim().is_empty() => s,
                 _ => continue,
@@ -575,7 +671,6 @@ pub fn validate_contract(wm: &Json, label: &str, slot_registry: &[(String, Json)
             }
         }
     }
-    issues
 }
 
 /// 真源 `scan` → `(issues, stats)`。
@@ -590,80 +685,15 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
     let mut models: Vec<Json> = Vec::new();
 
     for rel in crate::depth_small::module_docs(root) {
-        let text = std::fs::read(root.join(&rel)).map(|b| String::from_utf8_lossy(&b).into_owned());
-        let text = match text {
-            Ok(t) => t,
-            Err(e) => {
-                issues.push(format!("{}: 读取失败 {}", rel, e));
-                continue;
-            }
-        };
-        let parsed = match crate::miniyaml::fence_yaml(&text, "machine_contract") {
-            Some(p) => p,
-            None => continue,
-        };
-        let mc = match obj_get(&parsed, "machine_contract") {
-            Some(m @ Json::Object(_)) => m.clone(),
-            _ => continue,
-        };
-        let Some(wm) = obj_get(&mc, "world_model").cloned() else {
-            continue;
-        };
-        for issue in validate_contract(&wm, &format!("{}.world_model", rel), &slot_registry) {
-            issues.push(issue);
+        if let Some(m) = scan_model(root, &rel, &slot_registry, &mut issues) {
+            modules += 1;
+            variables += m.variables;
+            phases += m.phases;
+            invariants += m.invariants;
+            checks += m.checks;
+            slots += m.slots;
+            models.push(m.row);
         }
-        modules += 1;
-        let abstract_v = get(&wm, "abstract_state").unwrap_or(Json::Null);
-        let transition_v = get(&wm, "transition").unwrap_or(Json::Null);
-        let invs = get(&wm, "invariants").unwrap_or(Json::Null);
-        let check_list = get(&wm, "checks").unwrap_or(Json::Null);
-        let mut model_slots = 0i64;
-        if matches!(abstract_v, Json::Object(_)) {
-            let var_list = arr_of(obj_get(&abstract_v, "variables"));
-            variables += var_list.len() as i64;
-            model_slots = var_list
-                .iter()
-                .filter(|v| pyval::py_truthy(&get(v, "slot").unwrap_or(Json::Null)))
-                .count() as i64;
-            slots += model_slots;
-        }
-        let mut model_phases = 0i64;
-        let mut initial_phase = Json::Null;
-        if matches!(transition_v, Json::Object(_)) {
-            let ps = arr_of(obj_get(&transition_v, "phases"));
-            model_phases = ps.len() as i64;
-            phases += model_phases;
-            initial_phase = get(&transition_v, "initial_phase").unwrap_or(Json::Null);
-        }
-        let model_invs = if matches!(invs, Json::Array(_)) {
-            arr_of(Some(&invs)).len() as i64
-        } else {
-            0
-        };
-        if matches!(invs, Json::Array(_)) {
-            invariants += model_invs;
-        }
-        let model_checks = if matches!(check_list, Json::Array(_)) {
-            arr_of(Some(&check_list)).len() as i64
-        } else {
-            0
-        };
-        if matches!(check_list, Json::Array(_)) {
-            checks += model_checks;
-        }
-        let mid = match obj_get(&mc, "id") {
-            Some(v) if pyval::py_truthy(v) => pyval::plain_str(v),
-            _ => rel.clone(),
-        };
-        models.push(Json::Object(vec![
-            ("module".to_string(), Json::Str(mid)),
-            ("source".to_string(), Json::Str(rel)),
-            ("initial_phase".to_string(), initial_phase),
-            ("phases".to_string(), Json::Int(model_phases)),
-            ("invariants".to_string(), Json::Int(model_invs)),
-            ("checks".to_string(), Json::Int(model_checks)),
-            ("slots".to_string(), Json::Int(model_slots)),
-        ]));
     }
 
     (
@@ -682,6 +712,98 @@ pub fn scan(root: &Path) -> (Vec<String>, Json) {
             ("models".to_string(), Json::Array(models)),
         ]),
     )
+}
+
+/// 单份模块文档的 world_model 段核对结论（一行模型记录 + 各项计数）。
+struct ScannedModel {
+    row: Json,
+    variables: i64,
+    phases: i64,
+    invariants: i64,
+    checks: i64,
+    slots: i64,
+}
+
+/// 核对单份模块文档的 world_model 段；解析缺件 / 非对象即 None（贡献空结论）。
+fn scan_model(
+    root: &Path,
+    rel: &str,
+    slot_registry: &[(String, Json)],
+    issues: &mut Vec<String>,
+) -> Option<ScannedModel> {
+    let text = std::fs::read(root.join(&rel)).map(|b| String::from_utf8_lossy(&b).into_owned());
+    let text = match text {
+        Ok(t) => t,
+        Err(e) => {
+            issues.push(format!("{}: 读取失败 {}", rel, e));
+            return None;
+        }
+    };
+    let parsed = match crate::miniyaml::fence_yaml(&text, "machine_contract") {
+        Some(p) => p,
+        None => return None,
+    };
+    let mc = match obj_get(&parsed, "machine_contract") {
+        Some(m @ Json::Object(_)) => m.clone(),
+        _ => return None,
+    };
+    let Some(wm) = obj_get(&mc, "world_model").cloned() else {
+        return None;
+    };
+    for issue in validate_contract(&wm, &format!("{}.world_model", rel), &slot_registry) {
+        issues.push(issue);
+    }
+    let abstract_v = get(&wm, "abstract_state").unwrap_or(Json::Null);
+    let transition_v = get(&wm, "transition").unwrap_or(Json::Null);
+    let invs = get(&wm, "invariants").unwrap_or(Json::Null);
+    let check_list = get(&wm, "checks").unwrap_or(Json::Null);
+    let mut model_slots = 0i64;
+    let mut model_variables = 0i64;
+    if matches!(abstract_v, Json::Object(_)) {
+        let var_list = arr_of(obj_get(&abstract_v, "variables"));
+        model_variables = var_list.len() as i64;
+        model_slots = var_list
+            .iter()
+            .filter(|v| pyval::py_truthy(&get(v, "slot").unwrap_or(Json::Null)))
+            .count() as i64;
+    }
+    let mut model_phases = 0i64;
+    let mut initial_phase = Json::Null;
+    if matches!(transition_v, Json::Object(_)) {
+        let ps = arr_of(obj_get(&transition_v, "phases"));
+        model_phases = ps.len() as i64;
+        initial_phase = get(&transition_v, "initial_phase").unwrap_or(Json::Null);
+    }
+    let model_invs = if matches!(invs, Json::Array(_)) {
+        arr_of(Some(&invs)).len() as i64
+    } else {
+        0
+    };
+    let model_checks = if matches!(check_list, Json::Array(_)) {
+        arr_of(Some(&check_list)).len() as i64
+    } else {
+        0
+    };
+    let mid = match obj_get(&mc, "id") {
+        Some(v) if pyval::py_truthy(v) => pyval::plain_str(v),
+        _ => rel.to_string(),
+    };
+    Some(ScannedModel {
+        row: Json::Object(vec![
+            ("module".to_string(), Json::Str(mid)),
+            ("source".to_string(), Json::Str(rel.to_string())),
+            ("initial_phase".to_string(), initial_phase),
+            ("phases".to_string(), Json::Int(model_phases)),
+            ("invariants".to_string(), Json::Int(model_invs)),
+            ("checks".to_string(), Json::Int(model_checks)),
+            ("slots".to_string(), Json::Int(model_slots)),
+        ]),
+        variables: model_variables,
+        phases: model_phases,
+        invariants: model_invs,
+        checks: model_checks,
+        slots: model_slots,
+    })
 }
 
 #[cfg(test)]

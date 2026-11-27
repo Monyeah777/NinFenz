@@ -19,12 +19,12 @@ class AuthorOverlayStoreTest {
 
     private fun setup(filesDir: java.io.File): Pair<PackEntry, dev.ninfenz.mobile.model.Project> {
         val projects = java.io.File(filesDir, "projects").apply { mkdirs() }
-        val doc = ProjectFactory.build(
+        val doc = ProjectFactory.build(ProjectBuildSpec(
             id = "p", title = "p", packId = "demo-pack", packVersion = "1.0.0", packTree = hex,
             protocolId = "proto", protocolVersion = "1.0.0", protocolDigest = hex,
             graphId = "graph", graphVersion = "1.0.0", graphDigest = hex, graphSha256 = hex,
             specId = "spec", specVersion = "1.0.0", specDigest = hex, specSha256 = hex
-        )
+        ))
         java.io.File(projects, "p.nfproject.json").writeText(doc.toString(), Charsets.UTF_8)
         val project = ProjectModel.parse(doc.toString())
         val pack = PackEntry("demo-pack", "1.0.0", "示例", "d", 1, hex, java.io.File(filesDir, "pack"))

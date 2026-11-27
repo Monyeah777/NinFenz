@@ -130,6 +130,23 @@ fn check_doc(root: &Path, rel: &str) -> (Vec<String>, DocCheck) {
         ));
     }
 
+    let ok_subs = check_subjects(root, &fm, &mut issues);
+    if py_truthy(get(&fm, "accepted_by").unwrap_or(&Json::Null))
+        && !is_date(&py_str(get(&fm, "accepted_at")))
+    {
+        issues.push("有 accepted_by 但 accepted_at 缺失或格式非法（签收须双要素）".to_string());
+    }
+    (
+        issues,
+        DocCheck {
+            legacy: false,
+            subjects: ok_subs,
+        },
+    )
+}
+
+/// 核对 `subjects` 条目（格式 / 被审对象存在性 / live sha256 与登记值一致）；返回通过条数。
+fn check_subjects(root: &Path, fm: &Json, issues: &mut Vec<String>) -> i64 {
     let subs: Vec<String> = match get(&fm, "subjects") {
         Some(Json::Str(s)) => vec![s.clone()],
         Some(Json::Array(a)) => a.iter().map(plain_str).collect(),
@@ -166,18 +183,7 @@ fn check_doc(root: &Path, rel: &str) -> (Vec<String>, DocCheck) {
         }
         ok_subs += 1;
     }
-    if py_truthy(get(&fm, "accepted_by").unwrap_or(&Json::Null))
-        && !is_date(&py_str(get(&fm, "accepted_at")))
-    {
-        issues.push("有 accepted_by 但 accepted_at 缺失或格式非法（签收须双要素）".to_string());
-    }
-    (
-        issues,
-        DocCheck {
-            legacy: false,
-            subjects: ok_subs,
-        },
-    )
+    ok_subs
 }
 
 pub struct AuditScan {

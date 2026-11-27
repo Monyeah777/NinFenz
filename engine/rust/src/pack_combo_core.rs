@@ -50,6 +50,128 @@ pub fn combine(
     extra_modules: &[String],
     extra_assets: &[String],
 ) -> Json {
+    let (unknown, chosen, mut mods) = collect_selected(ctx, packs, extra_modules);
+    let mut borrowed: Vec<Json> = Vec::new();
+    let mut unresolved_refs: Vec<Json> = Vec::new();
+    collect_references(ctx, &chosen, &mut mods, &mut borrowed, &mut unresolved_refs);
+
+    // 不动点闭包：依赖 inputs ∪ 事件发布方（递归），直到不再新增
+    let core = pc::core_ids();
+    for _round in 0..12 {
+        let mut grew = false;
+        grew |= pull_dependencies(ctx, &core, &mut mods, &mut borrowed);
+        grew |= pull_event_publishers(ctx, &mut mods, &mut borrowed);
+        if !grew {
+            break;
+        }
+    }
+
+    let (missing_contracts, dangling) = collect_dangling(&mods);
+    let (published, unbridged, unpublished) = collect_event_closure(ctx, &mods);
+    let (canon_packs, stack_list) = collect_stacks(packs, &chosen, &mods);
+    let (borrow, mut unresolved) = collect_assets(ctx, &chosen, &mods, extra_assets);
+    let (
+        borrow_sorted,
+        borrowed_sorted,
+        refs_sorted,
+        unknown_sorted,
+        explicit,
+        core_list,
+        extra_sorted,
+        mod_ids,
+    ) = prepare_lists(
+        &borrow,
+        &borrowed,
+        &unresolved_refs,
+        &unknown,
+        &mods,
+        &core,
+        extra_modules,
+    );
+    unresolved.sort();
+
+    let mut cert = Json::Object(vec![
+        ("schema".to_string(), Json::Str("nf-combo/1".to_string())),
+        ("packs".to_string(), str_json(&canon_packs)),
+        ("unknown_packs".to_string(), str_json(&unknown_sorted)),
+        ("extra_modules".to_string(), str_json(&extra_sorted)),
+        ("modules".to_string(), str_json(&mod_ids)),
+        ("module_count".to_string(), Json::Int(mods.len() as i64)),
+        ("layer_stacks".to_string(), Json::Array(stack_list)),
+        (
+            "dependency_closure".to_string(),
+            Json::Object(vec![
+                ("core".to_string(), str_json(&core_list)),
+                ("explicit".to_string(), str_json(&explicit)),
+                ("dangling".to_string(), Json::Array(dangling.clone())),
+            ]),
+        ),
+        (
+            "event_closure".to_string(),
+            Json::Object(vec![
+                (
+                    "published".to_string(),
+                    str_json(&published.iter().cloned().collect::<Vec<_>>()),
+                ),
+                ("unbridged".to_string(), str_json(&unbridged)),
+            ]),
+        ),
+        ("events_unpublished".to_string(), str_json(&unpublished)),
+        ("assets_borrowed".to_string(), Json::Array(borrow_sorted)),
+        ("modules_borrowed".to_string(), Json::Array(borrowed_sorted)),
+        (
+            "references_unresolved".to_string(),
+            Json::Array(refs_sorted),
+        ),
+        ("assets_unresolved".to_string(), str_json(&unresolved)),
+        (
+            "module_missing_contract".to_string(),
+            str_json(&missing_contracts),
+        ),
+    ]);
+    finish_cert(
+        &mut cert,
+        &unknown,
+        &dangling,
+        &unbridged,
+        &missing_contracts,
+        &unresolved,
+        &unresolved_refs,
+    );
+    cert
+}
+
+/// legal 位与证书摘要的收尾写入。
+fn finish_cert(
+    cert: &mut Json,
+    unknown: &[String],
+    dangling: &[Json],
+    unbridged: &[String],
+    missing_contracts: &[String],
+    unresolved: &[String],
+    unresolved_refs: &[Json],
+) {
+    let legal = unknown.is_empty()
+        && dangling.is_empty()
+        && unbridged.is_empty()
+        && missing_contracts.is_empty()
+        && unresolved.is_empty()
+        && unresolved_refs.is_empty();
+    if let Json::Object(o) = &mut *cert {
+        o.push(("legal".to_string(), Json::Bool(legal)));
+    }
+    let dg = pc::digest_of_cert(cert);
+    if let Json::Object(o) = &mut *cert {
+        o.push(("digest".to_string(), Json::Str(dg)));
+    }
+}
+
+/// 选择 packs 对应的画像，并用模块记录 / 额外模块建 mods 表。
+fn collect_selected(
+    ctx: &Ctx,
+    packs: &[String],
+    extra_modules: &[String],
+) -> (Vec<String>, Vec<Json>, Vec<(String, Json)>) {
     let mut unknown: Vec<String> = Vec::new();
     let mut chosen: Vec<Json> = Vec::new();
     for p in packs {
@@ -77,10 +199,18 @@ pub fn combine(
             }
         }
     }
-    let mut borrowed: Vec<Json> = Vec::new();
-    let mut unresolved_refs: Vec<Json> = Vec::new();
+    (unknown, chosen, mods)
+}
 
-    for pr in &chosen {
+/// 各包 references 的模块借用 / 未解析引用归集。
+fn collect_references(
+    ctx: &Ctx,
+    chosen: &[Json],
+    mods: &mut Vec<(String, Json)>,
+    borrowed: &mut Vec<Json>,
+    unresolved_refs: &mut Vec<Json>,
+) {
+    for pr in chosen {
         for r in arr_of(obj_get(pr, "references")) {
             let src = s_of(obj_get(&r, "source_package"));
             let mid = s_of(obj_get(&r, "module_id"));
@@ -116,105 +246,121 @@ pub fn combine(
             }
         }
     }
+}
 
-    // 不动点闭包：依赖 inputs ∪ 事件发布方（递归），直到不再新增
-    let core = pc::core_ids();
-    for _round in 0..12 {
-        let mut grew = false;
-        let snapshot: Vec<(String, Json)> = mods.clone();
-        for (m, r) in &snapshot {
-            for dep in str_list(obj_get(r, "inputs")) {
-                let tail = dep.rsplit(':').next().unwrap_or(&dep).to_string();
-                if core.contains(&dep)
-                    || core.contains(&tail)
-                    || mods.iter().any(|(k, _)| *k == dep)
-                {
-                    continue;
-                }
-                if let Some(rec) = find_rec(&ctx.by_id, &dep) {
-                    let id = s_of(obj_get(&rec, "id"));
-                    if !mods.iter().any(|(k, _)| *k == id) {
-                        // 真源 `_add(rec, why, by)`：`from = rec["pack"]`，`by = by or "<组件级>"`
-                        // ⚠️ 必须在 `mods.push` **之前**取 pack —— push 会把 rec 移走。
-                        let from_pack = s_of(obj_get(&rec, "pack"));
-                        mods.push((id.clone(), rec));
-                        let by = if m.is_empty() {
-                            "<组件级>".to_string()
-                        } else {
-                            m.clone()
-                        };
-                        borrowed.push(Json::Object(vec![
-                            ("module".to_string(), Json::Str(id)),
-                            ("from".to_string(), Json::Str(from_pack)),
-                            ("by".to_string(), Json::Str(by)),
-                            ("mode".to_string(), Json::Str("closure_pull".to_string())),
-                            (
-                                "why".to_string(),
-                                Json::Str(format!("依赖 {} 的 inputs 需要 {}", m, dep)),
-                            ),
-                        ]));
-                        grew = true;
-                    }
+/// 不动点一轮：依赖 inputs 递归拉入；返回是否新增。
+fn pull_dependencies(
+    ctx: &Ctx,
+    core: &BTreeSet<String>,
+    mods: &mut Vec<(String, Json)>,
+    borrowed: &mut Vec<Json>,
+) -> bool {
+let mut grew = false;
+    let snapshot: Vec<(String, Json)> = mods.clone();
+    for (m, r) in &snapshot {
+        for dep in str_list(obj_get(r, "inputs")) {
+            let tail = dep.rsplit(':').next().unwrap_or(&dep).to_string();
+            if core.contains(&dep)
+                || core.contains(&tail)
+                || mods.iter().any(|(k, _)| *k == dep)
+            {
+                continue;
+            }
+            if let Some(rec) = find_rec(&ctx.by_id, &dep) {
+                let id = s_of(obj_get(&rec, "id"));
+                if !mods.iter().any(|(k, _)| *k == id) {
+                    // 真源 `_add(rec, why, by)`：`from = rec["pack"]`，`by = by or "<组件级>"`
+                    // ⚠️ 必须在 `mods.push` **之前**取 pack —— push 会把 rec 移走。
+                    let from_pack = s_of(obj_get(&rec, "pack"));
+                    mods.push((id.clone(), rec));
+                    let by = if m.is_empty() {
+                        "<组件级>".to_string()
+                    } else {
+                        m.clone()
+                    };
+                    borrowed.push(Json::Object(vec![
+                        ("module".to_string(), Json::Str(id)),
+                        ("from".to_string(), Json::Str(from_pack)),
+                        ("by".to_string(), Json::Str(by)),
+                        ("mode".to_string(), Json::Str("closure_pull".to_string())),
+                        (
+                            "why".to_string(),
+                            Json::Str(format!("依赖 {} 的 inputs 需要 {}", m, dep)),
+                        ),
+                    ]));
+                    grew = true;
                 }
             }
-        }
-        let mut published_now: BTreeSet<String> = ctx.core_pub.clone();
-        for (_, x) in &mods {
-            for e in str_list(obj_get(x, "publish")) {
-                published_now.insert(e);
-            }
-        }
-        let snapshot2: Vec<(String, Json)> = mods.clone();
-        for (m, r) in &snapshot2 {
-            for ev in str_list(obj_get(r, "subscribe")) {
-                if published_now.contains(&ev) {
-                    continue;
-                }
-                let Some(recs) = ctx
-                    .pub_index
-                    .iter()
-                    .find(|(k, _)| *k == ev)
-                    .map(|(_, v)| v.clone())
-                else {
-                    continue;
-                };
-                for rec in recs {
-                    let id = s_of(obj_get(&rec, "id"));
-                    if !mods.iter().any(|(k, _)| *k == id) {
-                        let from_pack = s_of(obj_get(&rec, "pack"));
-                        mods.push((id.clone(), rec));
-                        let by = if m.is_empty() {
-                            "<组件级>".to_string()
-                        } else {
-                            m.clone()
-                        };
-                        borrowed.push(Json::Object(vec![
-                            ("module".to_string(), Json::Str(id)),
-                            ("from".to_string(), Json::Str(from_pack)),
-                            ("by".to_string(), Json::Str(by)),
-                            ("mode".to_string(), Json::Str("closure_pull".to_string())),
-                            (
-                                "why".to_string(),
-                                Json::Str(format!("事件 {} 需要发布方（{} 订阅）", ev, m)),
-                            ),
-                        ]));
-                        grew = true;
-                    }
-                }
-            }
-        }
-        if !grew {
-            break;
         }
     }
+grew
+}
 
+/// 不动点一轮：事件订阅无发布方时递归拉入发布方；返回是否新增。
+fn pull_event_publishers(
+    ctx: &Ctx,
+    mods: &mut Vec<(String, Json)>,
+    borrowed: &mut Vec<Json>,
+) -> bool {
+let mut grew = false;
+    let mut published_now: BTreeSet<String> = ctx.core_pub.clone();
+    for (_, x) in mods.iter() {
+        for e in str_list(obj_get(x, "publish")) {
+            published_now.insert(e);
+        }
+    }
+    let snapshot2: Vec<(String, Json)> = mods.clone();
+    for (m, r) in &snapshot2 {
+        for ev in str_list(obj_get(r, "subscribe")) {
+            if published_now.contains(&ev) {
+                continue;
+            }
+            let Some(recs) = ctx
+                .pub_index
+                .iter()
+                .find(|(k, _)| *k == ev)
+                .map(|(_, v)| v.clone())
+            else {
+                continue;
+            };
+            for rec in recs {
+                let id = s_of(obj_get(&rec, "id"));
+                if !mods.iter().any(|(k, _)| *k == id) {
+                    let from_pack = s_of(obj_get(&rec, "pack"));
+                    mods.push((id.clone(), rec));
+                    let by = if m.is_empty() {
+                        "<组件级>".to_string()
+                    } else {
+                        m.clone()
+                    };
+                    borrowed.push(Json::Object(vec![
+                        ("module".to_string(), Json::Str(id)),
+                        ("from".to_string(), Json::Str(from_pack)),
+                        ("by".to_string(), Json::Str(by)),
+                        ("mode".to_string(), Json::Str("closure_pull".to_string())),
+                        (
+                            "why".to_string(),
+                            Json::Str(format!("事件 {} 需要发布方（{} 订阅）", ev, m)),
+                        ),
+                    ]));
+                    grew = true;
+                }
+            }
+        }
+    }
+grew
+}
+
+/// 缺契约模块表 + 悬空 inputs。
+fn collect_dangling(mods: &[(String, Json)]) -> (Vec<String>, Vec<Json>) {
+    let core = pc::core_ids();
     let mut missing_contracts: Vec<String> = mods
         .iter()
         .filter(|(_, r)| s_of(obj_get(r, "path")).is_empty())
         .map(|(k, _)| k.clone())
         .collect();
     missing_contracts.sort();
-    let mut sorted_mods = mods.clone();
+    let mut sorted_mods = mods.to_vec();
     sorted_mods.sort_by(|a, b| a.0.cmp(&b.0));
     let mut dangling: Vec<Json> = Vec::new();
     for (m, r) in &sorted_mods {
@@ -229,8 +375,16 @@ pub fn combine(
             ]));
         }
     }
+    (missing_contracts, dangling)
+}
+
+/// 事件面：已发布集 / 未桥接 / 无发布方。
+fn collect_event_closure(
+    ctx: &Ctx,
+    mods: &[(String, Json)],
+) -> (BTreeSet<String>, Vec<String>, Vec<String>) {
     let mut published: BTreeSet<String> = BTreeSet::new();
-    for (_, r) in &mods {
+    for (_, r) in mods {
         for e in str_list(obj_get(r, "publish")) {
             published.insert(e);
         }
@@ -254,7 +408,17 @@ pub fn combine(
     .into_iter()
     .collect();
     unpublished.sort();
+    (published, unbridged, unpublished)
+}
 
+/// 层栈：按包序与模块层位归并去重。
+fn collect_stacks(
+    packs: &[String],
+    chosen: &[Json],
+    mods: &[(String, Json)],
+) -> (Vec<String>, Vec<Json>) {
+    let mut sorted_mods = mods.to_vec();
+    sorted_mods.sort_by(|a, b| a.0.cmp(&b.0));
     let mut canon_packs: Vec<String> = packs.to_vec();
     canon_packs.sort();
     canon_packs.dedup();
@@ -264,7 +428,7 @@ pub fn combine(
         .map(|(i, p)| (p.clone(), i))
         .collect();
     let mut stacks: BTreeMap<String, Vec<String>> = BTreeMap::new();
-    for pr in &chosen {
+    for pr in chosen {
         if let Some(Json::Object(ls)) = obj_get(pr, "layers") {
             for (lay, ms) in ls {
                 let entry = stacks.entry(lay.clone()).or_default();
@@ -312,7 +476,16 @@ pub fn combine(
             ])
         })
         .collect();
+    (canon_packs, stack_list)
+}
 
+/// 资产借阅面：按包内资产与额外资产声明归集。
+fn collect_assets(
+    ctx: &Ctx,
+    chosen: &[Json],
+    mods: &[(String, Json)],
+    extra_assets: &[String],
+) -> (Vec<Json>, Vec<String>) {
     // 资产：借阅面
     let mut asset_index: Vec<((String, String), Json)> = Vec::new();
     for (pn, pr) in &ctx.prof {
@@ -322,7 +495,7 @@ pub fn combine(
     }
     let mut borrow: Vec<Json> = Vec::new();
     let mut unresolved: Vec<String> = Vec::new();
-    for pr in &chosen {
+    for pr in chosen {
         for a in arr_of(obj_get(pr, "assets")) {
             let m = s_of(obj_get(&a, "module"));
             if !m.is_empty() && !mods.iter().any(|(k, _)| *k == m) {
@@ -351,14 +524,36 @@ pub fn combine(
             unresolved.push(spec.clone());
         }
     }
-    let mut borrow_sorted = borrow.clone();
+    (borrow, unresolved)
+}
+
+/// 各输出列表的排序与派生（借阅表 / 引用 / 未知包 / 依赖与模块 id）。
+#[allow(clippy::type_complexity)]
+fn prepare_lists(
+    borrow: &[Json],
+    borrowed: &[Json],
+    unresolved_refs: &[Json],
+    unknown: &[String],
+    mods: &[(String, Json)],
+    core: &BTreeSet<String>,
+    extra_modules: &[String],
+) -> (
+    Vec<Json>,
+    Vec<Json>,
+    Vec<Json>,
+    Vec<String>,
+    Vec<String>,
+    Vec<String>,
+    Vec<String>,
+    Vec<String>,
+) {
+    let mut borrow_sorted = borrow.to_vec();
     borrow_sorted.sort_by_key(|x| (s_of(obj_get(x, "from")), s_of(obj_get(x, "key"))));
-    let mut borrowed_sorted = borrowed.clone();
+    let mut borrowed_sorted = borrowed.to_vec();
     borrowed_sorted.sort_by_key(|x| (s_of(obj_get(x, "by")), s_of(obj_get(x, "module"))));
-    let mut refs_sorted = unresolved_refs.clone();
+    let mut refs_sorted = unresolved_refs.to_vec();
     refs_sorted.sort_by_key(|x| (s_of(obj_get(x, "by")), s_of(obj_get(x, "module_id"))));
-    unresolved.sort();
-    let mut unknown_sorted = unknown.clone();
+    let mut unknown_sorted = unknown.to_vec();
     unknown_sorted.sort();
 
     let explicit: Vec<String> = BTreeSet::from_iter(
@@ -375,60 +570,16 @@ pub fn combine(
     extra_sorted.dedup();
     let mut mod_ids: Vec<String> = mods.iter().map(|(k, _)| k.clone()).collect();
     mod_ids.sort();
-
-    let mut cert = Json::Object(vec![
-        ("schema".to_string(), Json::Str("nf-combo/1".to_string())),
-        ("packs".to_string(), str_json(&canon_packs)),
-        ("unknown_packs".to_string(), str_json(&unknown_sorted)),
-        ("extra_modules".to_string(), str_json(&extra_sorted)),
-        ("modules".to_string(), str_json(&mod_ids)),
-        ("module_count".to_string(), Json::Int(mods.len() as i64)),
-        ("layer_stacks".to_string(), Json::Array(stack_list)),
-        (
-            "dependency_closure".to_string(),
-            Json::Object(vec![
-                ("core".to_string(), str_json(&core_list)),
-                ("explicit".to_string(), str_json(&explicit)),
-                ("dangling".to_string(), Json::Array(dangling.clone())),
-            ]),
-        ),
-        (
-            "event_closure".to_string(),
-            Json::Object(vec![
-                (
-                    "published".to_string(),
-                    str_json(&published.iter().cloned().collect::<Vec<_>>()),
-                ),
-                ("unbridged".to_string(), str_json(&unbridged)),
-            ]),
-        ),
-        ("events_unpublished".to_string(), str_json(&unpublished)),
-        ("assets_borrowed".to_string(), Json::Array(borrow_sorted)),
-        ("modules_borrowed".to_string(), Json::Array(borrowed_sorted)),
-        (
-            "references_unresolved".to_string(),
-            Json::Array(refs_sorted),
-        ),
-        ("assets_unresolved".to_string(), str_json(&unresolved)),
-        (
-            "module_missing_contract".to_string(),
-            str_json(&missing_contracts),
-        ),
-    ]);
-    let legal = unknown.is_empty()
-        && dangling.is_empty()
-        && unbridged.is_empty()
-        && missing_contracts.is_empty()
-        && unresolved.is_empty()
-        && unresolved_refs.is_empty();
-    if let Json::Object(o) = &mut cert {
-        o.push(("legal".to_string(), Json::Bool(legal)));
-    }
-    let dg = pc::digest_of_cert(&cert);
-    if let Json::Object(o) = &mut cert {
-        o.push(("digest".to_string(), Json::Str(dg)));
-    }
-    cert
+    (
+        borrow_sorted,
+        borrowed_sorted,
+        refs_sorted,
+        unknown_sorted,
+        explicit,
+        core_list,
+        extra_sorted,
+        mod_ids,
+    )
 }
 
 fn str_json(v: &[String]) -> Json {
@@ -510,39 +661,12 @@ pub fn breadth(
     };
     let mut names: Vec<String> = ctx.prof.iter().map(|(k, _)| k.clone()).collect();
     names.sort();
-    let (mut pairs, mut pairs_legal) = (0i64, 0i64);
     let mut failures: Vec<Json> = Vec::new();
-    for i in 0..names.len() {
-        for j in (i + 1)..names.len() {
-            let combo = vec![names[i].clone(), names[j].clone()];
-            let (legal, dangling, unbridged) = verdict(&combo);
-            pairs += 1;
-            if legal {
-                pairs_legal += 1;
-            } else if failures.len() < 10 {
-                failures.push(Json::Object(vec![
-                    ("combo".to_string(), str_json(&combo)),
-                    ("dangling".to_string(), Json::Array(dangling)),
-                    ("unbridged".to_string(), Json::Array(unbridged)),
-                ]));
-            }
-        }
-    }
+    let (pairs, pairs_legal) = count_pairs(&names, &verdict, &mut failures);
     let _ = root;
     let mut rnd = crate::pyrandom::PyRandom::new(seed);
-    let draw = |r: &mut crate::pyrandom::PyRandom, size: usize, want: usize| -> Vec<Vec<String>> {
-        let mut picks: BTreeSet<Vec<String>> = BTreeSet::new();
-        if names.len() >= size {
-            while picks.len() < std::cmp::min(want, 5000) {
-                let mut s = r.sample(&names, size);
-                s.sort();
-                picks.insert(s);
-            }
-        }
-        picks.into_iter().collect()
-    };
     let (mut triples, mut triples_legal) = (0i64, 0i64);
-    for t in draw(&mut rnd, 3, triple_sample) {
+    for t in draw_samples(&mut rnd, &names, 3, triple_sample) {
         let (legal, _, _) = verdict(&t);
         triples += 1;
         if legal {
@@ -550,7 +674,7 @@ pub fn breadth(
         }
     }
     let (mut quads, mut quads_legal) = (0i64, 0i64);
-    for q in draw(&mut rnd, 4, quad_sample) {
+    for q in draw_samples(&mut rnd, &names, 4, quad_sample) {
         let (legal, _, _) = verdict(&q);
         quads += 1;
         if legal {
@@ -558,7 +682,7 @@ pub fn breadth(
         }
     }
     let (mut quints, mut quints_legal) = (0i64, 0i64);
-    for p in draw(&mut rnd, 5, quint_sample) {
+    for p in draw_samples(&mut rnd, &names, 5, quint_sample) {
         let (legal, _, _) = verdict(&p);
         quints += 1;
         if legal {
@@ -566,7 +690,7 @@ pub fn breadth(
         }
     }
     let (mut sexts, mut sexts_legal) = (0i64, 0i64);
-    for p in draw(&mut rnd, 6, sext_sample) {
+    for p in draw_samples(&mut rnd, &names, 6, sext_sample) {
         let (legal, dangling, unbridged) = verdict(&p);
         sexts += 1;
         if legal {
@@ -599,6 +723,51 @@ pub fn breadth(
         ("failures".to_string(), Json::Array(failures)),
         ("all_legal".to_string(), Json::Bool(all_legal)),
     ])
+}
+
+/// 两两组合的合法性计数（失败样本最多记 10 条）。
+fn count_pairs(
+    names: &[String],
+    verdict: &dyn Fn(&[String]) -> (bool, Vec<Json>, Vec<Json>),
+    failures: &mut Vec<Json>,
+) -> (i64, i64) {
+    let mut pairs = 0i64;
+    let mut pairs_legal = 0i64;
+    for i in 0..names.len() {
+        for j in (i + 1)..names.len() {
+            let combo = vec![names[i].clone(), names[j].clone()];
+            let (legal, dangling, unbridged) = verdict(&combo);
+            pairs += 1;
+            if legal {
+                pairs_legal += 1;
+            } else if failures.len() < 10 {
+                failures.push(Json::Object(vec![
+                    ("combo".to_string(), str_json(&combo)),
+                    ("dangling".to_string(), Json::Array(dangling)),
+                    ("unbridged".to_string(), Json::Array(unbridged)),
+                ]));
+            }
+        }
+    }
+    (pairs, pairs_legal)
+}
+
+/// 无放回抽样：按 size 抽 want 组（去重后排序输出）。
+fn draw_samples(
+    r: &mut crate::pyrandom::PyRandom,
+    names: &[String],
+    size: usize,
+    want: usize,
+) -> Vec<Vec<String>> {
+    let mut picks: BTreeSet<Vec<String>> = BTreeSet::new();
+    if names.len() >= size {
+        while picks.len() < std::cmp::min(want, 5000) {
+            let mut s = r.sample(names, size);
+            s.sort();
+            picks.insert(s);
+        }
+    }
+    picks.into_iter().collect()
 }
 
 /// 真源 `declared`。

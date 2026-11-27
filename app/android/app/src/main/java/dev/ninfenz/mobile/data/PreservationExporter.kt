@@ -9,6 +9,13 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 
+/** 长期保存包的可选输入（参数对象化，避免超长参数表）。 */
+data class PreservationOptions(
+    val contractJson: String? = null,
+    val grantJson: String? = null,
+    val predecessorSha256: String? = null
+)
+
 /** 长期保存包：原文 + nf-doc + OAIS 风格信息包；固定 Zip 时间以便复算。 */
 object PreservationExporter {
     data class Created(val file: File)
@@ -16,7 +23,16 @@ object PreservationExporter {
     private fun sha(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }
 
-    fun export(markdown: String, title: String, projectId: String, outDir: File, contractJson: String? = null, grantJson: String? = null, predecessorSha256: String? = null): Created {
+    fun export(
+        markdown: String,
+        title: String,
+        projectId: String,
+        outDir: File,
+        options: PreservationOptions = PreservationOptions()
+    ): Created {
+        val contractJson = options.contractJson
+        val grantJson = options.grantJson
+        val predecessorSha256 = options.predecessorSha256
         val safe = projectId.replace(Regex("[^A-Za-z0-9._-]"), "_").ifBlank { "project" }
         outDir.mkdirs()
         val md = markdown.toByteArray(Charsets.UTF_8)

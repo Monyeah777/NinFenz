@@ -62,11 +62,13 @@ def apply_delta(state: dict[str, Any], move_id: str, delta: dict[str, Any]) -> N
                             "digest": str(delta["after_digest"])}
         state["open_questions"].append({"kind": "restated", "changed_terms":
                                         list(delta["changed_terms"])})
-    elif kind == "assumption_suspended":
+        return
+    if kind == "assumption_suspended":
         state["assumptions"].append({"id": str(delta["assumption_id"]),
                                      "status": "suspended",
                                      "reason": str(delta["reason"])})
-    elif kind == "assumption_revived":
+        return
+    if kind == "assumption_revived":
         for item in state["assumptions"]:
             if item["id"] == delta["assumption_id"]:
                 item["status"] = "active"
@@ -76,13 +78,16 @@ def apply_delta(state: dict[str, Any], move_id: str, delta: dict[str, Any]) -> N
             state["assumptions"].append({"id": str(delta["assumption_id"]),
                                          "status": "active",
                                          "reason": str(delta["reason"])})
-    elif kind == "concept_clarified":
+        return
+    if kind == "concept_clarified":
         state["open_questions"].append({"kind": "concept", "concept": str(delta["concept"]),
                                         "distinctions": list(delta["distinctions"])})
-    elif kind == "tension_added":
+        return
+    if kind == "tension_added":
         state["tensions"].append({"between": list(delta["between"]),
                                   "statement": str(delta["statement"])})
-    elif kind in ("hypothesis_proposed", "boundary_added", "counterexample_found",
+        return
+    if kind in ("hypothesis_proposed", "boundary_added", "counterexample_found",
                   "objection_strengthened"):
         item = {"kind": kind}
         for key in ("hypothesis", "expected_observation", "case", "near_miss",
@@ -90,30 +95,36 @@ def apply_delta(state: dict[str, Any], move_id: str, delta: dict[str, Any]) -> N
             if key in delta:
                 item[key] = delta[key]
         state["open_questions"].append(item)
-    elif kind == "mapping_added":
+        return
+    if kind == "mapping_added":
         state["open_questions"].append({"kind": "analogy", "source": str(delta["source"]),
                                         "target": str(delta["target"]),
                                         "preserved": list(delta["preserved"]),
                                         "broken": list(delta["broken"])})
-    elif kind == "stakeholder_added":
+        return
+    if kind == "stakeholder_added":
         state["open_questions"].append({"kind": "perspective",
                                         "perspective": str(delta["perspective"]),
                                         "obligations": list(delta["obligations"])})
-    elif kind == "provenance_added":
+        return
+    if kind == "provenance_added":
         state["open_questions"].append({"kind": "genealogy", "origin": str(delta["origin"]),
                                         "lineage": list(delta["lineage"])})
-    elif kind == "subquestions_added":
+        return
+    if kind == "subquestions_added":
         state["open_questions"].append({"kind": "decomposition",
                                         "subquestions": list(delta["subquestions"])})
-    elif kind == "commitment_formed":
+        return
+    if kind == "commitment_formed":
         state["open_questions"].append({"kind": "commitment", "claim": str(delta["claim"]),
                                         "evidence_standard": str(delta["evidence_standard"])})
-    elif kind == "evidence_standard":
+        return
+    if kind == "evidence_standard":
         state["open_questions"].append({"kind": "evidence_standard",
                                         "claim_kind": str(delta["claim_kind"]),
                                         "required": list(delta["required"])})
-    else:  # pragma: no cover - DELTA_KINDS 已限定
-        raise ValueError("未知 frame_delta.kind：" + kind + "（" + GUIDE + "见 moves.DELTA_KINDS）")
+        return
+    raise ValueError("未知 frame_delta.kind：" + kind + "（" + GUIDE + "见 moves.DELTA_KINDS）")
 
 
 def validate(state: Any) -> list[str]:

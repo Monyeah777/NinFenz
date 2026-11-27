@@ -192,8 +192,6 @@ pub fn compare(
     tolerance: f64,
     exceptions: &[(String, String)],
 ) -> Json {
-    const EPS: f64 = 1e-9;
-
     let base_sig: Vec<(String, f64)> = arr_items(get(baseline, "signals"))
         .iter()
         .map(|s| (plain_str_opt(get(s, "name")), f64_of(get(s, "value"))))
@@ -212,34 +210,7 @@ pub fn compare(
     names.sort();
     names.dedup();
 
-    let mut regressed: Vec<Json> = Vec::new();
-    let mut exempted: Vec<Json> = Vec::new();
-    for name in &names {
-        let b = base_sig
-            .iter()
-            .find(|(n, _)| n == name)
-            .map(|(_, v)| *v)
-            .unwrap_or(0.0);
-        let c = cur_sig
-            .iter()
-            .find(|(n, _)| n == name)
-            .map(|(_, v)| *v)
-            .unwrap_or(0.0);
-        if c < b - EPS {
-            let mut pairs = vec![
-                ("signal".to_string(), Json::Str(name.clone())),
-                ("from".to_string(), Json::Float(pyfloat::round_to(b, 4))),
-                ("to".to_string(), Json::Float(pyfloat::round_to(c, 4))),
-                ("drop".to_string(), Json::Float(pyfloat::round_to(b - c, 4))),
-            ];
-            if let Some((_, reason)) = exceptions.iter().find(|(s, _)| s == name) {
-                pairs.push(("reason".to_string(), Json::Str(reason.clone())));
-                exempted.push(Json::Object(pairs));
-            } else {
-                regressed.push(Json::Object(pairs));
-            }
-        }
-    }
+    let (regressed, exempted) = split_regressions(&names, &base_sig, &cur_sig, exceptions);
 
     let base_score = f64_of(get(baseline, "score"));
     let cur_score = current.score;
@@ -296,6 +267,45 @@ pub fn compare(
         ("exempted".to_string(), Json::Array(exempted)),
         ("verdict".to_string(), Json::Str(verdict)),
     ])
+}
+
+/// 信号回落的分类（`regressed` / 审计例外 `exempted`）。
+fn split_regressions(
+    names: &[String],
+    base_sig: &[(String, f64)],
+    cur_sig: &[(String, f64)],
+    exceptions: &[(String, String)],
+) -> (Vec<Json>, Vec<Json>) {
+    const EPS: f64 = 1e-9;
+    let mut regressed: Vec<Json> = Vec::new();
+    let mut exempted: Vec<Json> = Vec::new();
+    for name in names {
+        let b = base_sig
+            .iter()
+            .find(|(n, _)| n == name)
+            .map(|(_, v)| *v)
+            .unwrap_or(0.0);
+        let c = cur_sig
+            .iter()
+            .find(|(n, _)| n == name)
+            .map(|(_, v)| *v)
+            .unwrap_or(0.0);
+        if c < b - EPS {
+            let mut pairs = vec![
+                ("signal".to_string(), Json::Str(name.clone())),
+                ("from".to_string(), Json::Float(pyfloat::round_to(b, 4))),
+                ("to".to_string(), Json::Float(pyfloat::round_to(c, 4))),
+                ("drop".to_string(), Json::Float(pyfloat::round_to(b - c, 4))),
+            ];
+            if let Some((_, reason)) = exceptions.iter().find(|(s, _)| s == name) {
+                pairs.push(("reason".to_string(), Json::Str(reason.clone())));
+                exempted.push(Json::Object(pairs));
+            } else {
+                regressed.push(Json::Object(pairs));
+            }
+        }
+    }
+    (regressed, exempted)
 }
 
 /// `nf score --json` 的输出字节（`print` 的换行也含在内）。

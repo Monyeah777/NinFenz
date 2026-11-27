@@ -12,8 +12,8 @@ class PreservationExporterTest {
     fun bundleHasManifestAndIsReproducible() {
         val dir = Files.createTempDirectory("preserve").toFile()
         val contract = "{\"schema\":\"nf-contract-signoff/1\"}"
-        val a = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", dir, contract)
-        val b = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", File(dir, "b").apply { mkdirs() }, contract)
+        val a = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", dir, PreservationOptions(contract))
+        val b = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", File(dir, "b").apply { mkdirs() }, PreservationOptions(contract))
         assertTrue(a.file.isFile)
         assertTrue(a.file.readBytes().contentEquals(b.file.readBytes()))
         ZipFile(a.file).use { zip ->
@@ -26,7 +26,7 @@ class PreservationExporterTest {
             assertTrue(manifest.contains("grant.json"))
             val grant = zip.getInputStream(zip.getEntry("grant.json")).readBytes().decodeToString()
             assertTrue(grant.contains("nf-capability/1"))
-            val lineage = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", File(dir, "lineage").apply { mkdirs() }, null, null, "b".repeat(64))
+            val lineage = PreservationExporter.export("# 标题\n\n正文", "标题", "p1", File(dir, "lineage").apply { mkdirs() }, PreservationOptions(null, null, "b".repeat(64)))
             ZipFile(lineage.file).use { z ->
                 assertTrue(z.getInputStream(z.getEntry("preservation.json")).readBytes().decodeToString().contains("predecessor_sha256"))
             }

@@ -28,6 +28,21 @@ class ExportProfileStore(private val filesDir: File) {
         val pdfIncludeTitle: Boolean?
     )
 
+    /** 保存入参（参数对象化，避免超长参数表）。 */
+    data class ProfileInput(
+        val name: String,
+        val styles: String? = null,
+        val sectPr: String? = null,
+        val theme: String? = null,
+        val numbering: String? = null,
+        val header: String? = null,
+        val footer: String? = null,
+        val epubAuthor: String? = null,
+        val epubLanguage: String? = null,
+        val pdfPageSize: String? = null,
+        val pdfIncludeTitle: Boolean? = null
+    )
+
     private fun file(): File = File(filesDir, "export-profiles.json")
 
     fun load(): List<Profile> {
@@ -55,33 +70,21 @@ class ExportProfileStore(private val filesDir: File) {
         }.getOrElse { emptyList() }
     }
 
-    fun save(
-        name: String,
-        styles: String?,
-        sectPr: String?,
-        theme: String?,
-        numbering: String?,
-        header: String?,
-        footer: String?,
-        epubAuthor: String? = null,
-        epubLanguage: String? = null,
-        pdfPageSize: String? = null,
-        pdfIncludeTitle: Boolean? = null
-    ): List<Profile> {
+    fun save(request: ProfileInput): List<Profile> {
         val p = Profile(
             id = "e" + System.currentTimeMillis().toString(36),
-            name = name.trim().ifBlank { "Export" },
+            name = request.name.trim().ifBlank { "Export" },
             at = System.currentTimeMillis(),
-            styles = styles,
-            sectPr = sectPr,
-            theme = theme,
-            numbering = numbering,
-            header = header,
-            footer = footer,
-            epubAuthor = epubAuthor,
-            epubLanguage = epubLanguage,
-            pdfPageSize = pdfPageSize,
-            pdfIncludeTitle = pdfIncludeTitle
+            styles = request.styles,
+            sectPr = request.sectPr,
+            theme = request.theme,
+            numbering = request.numbering,
+            header = request.header,
+            footer = request.footer,
+            epubAuthor = request.epubAuthor,
+            epubLanguage = request.epubLanguage,
+            pdfPageSize = request.pdfPageSize,
+            pdfIncludeTitle = request.pdfIncludeTitle
         )
         val next = (listOf(p) + load()).take(20)
         write(next)

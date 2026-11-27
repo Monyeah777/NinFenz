@@ -103,19 +103,22 @@ internal fun rememberCcosPickers(
     }
 }
 
-internal suspend fun performCcosReview(
-    context: Context,
-    result: CcosResult,
-    rawTask: JsonObject?,
-    task: CcosTask?,
-    reviewer: String,
-    note: String,
-    approve: Boolean,
-    onOutcome: (String?) -> Unit,
-    onBusy: (Boolean) -> Unit,
-    onError: (CoreError?) -> Unit,
-    onResult: (CcosResult) -> Unit
-) {
+internal data class PerformCcosReviewArgs(
+    val context: Context,
+    val result: CcosResult,
+    val rawTask: JsonObject?,
+    val task: CcosTask?,
+    val reviewer: String,
+    val note: String,
+    val approve: Boolean,
+    val onOutcome: (String?) -> Unit,
+    val onBusy: (Boolean) -> Unit,
+    val onError: (CoreError?) -> Unit,
+    val onResult: (CcosResult) -> Unit,
+)
+
+internal suspend fun performCcosReview(args: PerformCcosReviewArgs) {
+    with(args) {
     val who = reviewer.trim()
     val why = note.trim()
     val decision = CcosModel.review(result, approve, who, why)
@@ -149,6 +152,8 @@ internal suspend fun performCcosReview(
         }
     } finally {
         onBusy(false)
+    }
+
     }
 }
 

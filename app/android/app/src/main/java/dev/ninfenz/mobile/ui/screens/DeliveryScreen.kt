@@ -1518,16 +1518,20 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                     val lineage = dev.ninfenz.mobile.data.PreservationLineageStore(context.filesDir)
                                     val created = dev.ninfenz.mobile.data.PreservationExporter.export(
                                         md, project.title, project.id, dir,
-                                        dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id),
-                                        grant.toJson().toString(),
-                                        lineage.load(project.id)
+                                        dev.ninfenz.mobile.data.PreservationOptions(
+                                            dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id),
+                                            grant.toJson().toString(),
+                                            lineage.load(project.id)
+                                        )
                                     )
                                     val reproDir = File(context.cacheDir, "repro-preserve-batch").apply { deleteRecursively(); mkdirs() }
                                     val second = dev.ninfenz.mobile.data.PreservationExporter.export(
                                         md, project.title, project.id, reproDir,
-                                        dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id),
-                                        grant.toJson().toString(),
-                                        lineage.load(project.id)
+                                        dev.ninfenz.mobile.data.PreservationOptions(
+                                            dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id),
+                                            grant.toJson().toString(),
+                                            lineage.load(project.id)
+                                        )
                                     )
                                     val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
                                     reproDir.deleteRecursively()
@@ -1572,7 +1576,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                 }
                 exportBatchNote?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(horizontal = NfSpacing.page)) }
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    ExportButton("md", "text/markdown", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, manifest, report ->
+                    ExportButton(ExportButtonArgs("md", "text/markdown", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, onDone = { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -1592,8 +1596,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                                 is StatusAdvanceResult.Failure -> statusNote = context.getString(dev.ninfenz.mobile.R.string.delivery_status_fail, advanced.message)
                             }
                         }
-                    }
-                    ExportButton("zip", "application/zip", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, manifest, report ->
+                    }))
+                    ExportButton(ExportButtonArgs("zip", "application/zip", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, onDone = { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -1603,8 +1607,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
                         }
                         recordExport("zip", file, manifest)
-                    }
-                    ExportButton("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, docxStyles = docxStyles, docxSectPr = docxSectPr, docxTheme = docxTheme, docxNumbering = docxNumbering, docxHeader = docxHeader, docxFooter = docxFooter) { file, manifest, report ->
+                    }))
+                    ExportButton(ExportButtonArgs("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, docxStyles = docxStyles, docxSectPr = docxSectPr, docxTheme = docxTheme, docxNumbering = docxNumbering, docxHeader = docxHeader, docxFooter = docxFooter, onDone = { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -1618,11 +1622,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             docxStyles?.let { applied -> docxStyleAudit = DocxStyleAudit.check(applied, exported) }
                             docxHeadingAudit = DocxHeadingAudit.check(exportMarkdown.orEmpty(), exported)
                         }
-                    }
+                    }))
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_data), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    ExportButton("json", "application/json", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, manifest, report ->
+                    ExportButton(ExportButtonArgs("json", "application/json", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, onDone = { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -1632,8 +1636,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
                         }
                         recordExport("json", file, manifest)
-                    }
-                    ExportButton("skill", "application/zip", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, manifest, report ->
+                    }))
+                    ExportButton(ExportButtonArgs("skill", "application/zip", exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked, onDone = { file, manifest, report ->
                         exportedFile = file
                         manifestText = manifest
                         reproOk = report?.stable
@@ -1643,11 +1647,11 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             else -> context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
                         }
                         recordExport("skill", file, manifest)
-                    }
+                    }))
                 }
                 Text(stringResource(dev.ninfenz.mobile.R.string.delivery_export_group_reading), style = NfType.label, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.s))
                 FlowRow(modifier = Modifier.padding(horizontal = NfSpacing.page), horizontalArrangement = Arrangement.spacedBy(NfSpacing.s), verticalArrangement = Arrangement.spacedBy(NfSpacing.xs)) {
-                    EpubExportButton(exportMarkdown, project, epubAuthor, epubLanguage, context, scope, { busy = it }, { error = it }, exportBlocked, outputTemplate = selectedOutputTemplate) { file, report ->
+                    EpubExportButton(EpubExportButtonArgs(exportMarkdown, project, epubAuthor, epubLanguage, context, scope, { busy = it }, { error = it }, exportBlocked, outputTemplate = selectedOutputTemplate, onDone = { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1657,8 +1661,8 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
                         }
                         recordExport("epub", file, null)
-                    }
-                    PdfExportButton(exportMarkdown, project, pdfPageSize, pdfIncludeTitle, context, scope, { busy = it }, { error = it }, exportBlocked, outputTemplate = selectedOutputTemplate) { file, report ->
+                    }))
+                    PdfExportButton(PdfExportButtonArgs(exportMarkdown, project, pdfPageSize, pdfIncludeTitle, context, scope, { busy = it }, { error = it }, exportBlocked, outputTemplate = selectedOutputTemplate, onDone = { file, report ->
                         exportedFile = file
                         manifestText = null
                         reproOk = report.stable
@@ -1668,7 +1672,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
                             context.getString(dev.ninfenz.mobile.R.string.repro_diff, report.firstDiff ?: -1)
                         }
                         recordExport("pdf", file, null)
-                    }
+                    }))
                     if (audit) PdfUaExportButton(exportMarkdown, project, context, scope, { busy = it }, { error = it }, exportBlocked) { file, report ->
                         exportedFile = file
                         manifestText = null
@@ -2131,7 +2135,7 @@ fun DeliveryScreen(project: Project, pack: PackEntry?, onBack: () -> Unit, onOpe
             },
             confirmButton = {
                 TextButton(enabled = exportProfileName.isNotBlank(), onClick = {
-                    exportProfiles = exportProfileStore.save(exportProfileName, docxStyles, docxSectPr, docxTheme, docxNumbering, docxHeader, docxFooter, epubAuthor, epubLanguage, pdfPageSize, pdfIncludeTitle)
+                    exportProfiles = exportProfileStore.save(dev.ninfenz.mobile.data.ExportProfileStore.ProfileInput(exportProfileName, docxStyles, docxSectPr, docxTheme, docxNumbering, docxHeader, docxFooter, epubAuthor, epubLanguage, pdfPageSize, pdfIncludeTitle))
                     exportProfileName = ""
                     showSaveExportProfile = false
                 }) { Text(stringResource(android.R.string.ok)) }
@@ -3495,25 +3499,27 @@ private fun statusText(context: Context, status: ProjectStatus): String = when (
     ProjectStatus.REVIEWED -> context.getString(dev.ninfenz.mobile.R.string.delivery_status_reviewed)
 }
 
+internal data class ExportButtonArgs(
+    val format: String,
+    val mime: String,
+    val markdown: String?,
+    val project: Project,
+    val context: android.content.Context,
+    val scope: kotlinx.coroutines.CoroutineScope,
+    val setBusy: (Boolean) -> Unit,
+    val setError: (CoreError?) -> Unit,
+    val busy: Boolean,
+    val docxStyles: String? = null,
+    val docxSectPr: String? = null,
+    val docxTheme: String? = null,
+    val docxNumbering: String? = null,
+    val docxHeader: String? = null,
+    val docxFooter: String? = null,
+    val onDone: (File?, String?, dev.ninfenz.mobile.data.ReproChecker.Report?) -> Unit,
+)
+
 @Composable
-private fun ExportButton(
-    format: String,
-    mime: String,
-    markdown: String?,
-    project: Project,
-    context: android.content.Context,
-    scope: kotlinx.coroutines.CoroutineScope,
-    setBusy: (Boolean) -> Unit,
-    setError: (CoreError?) -> Unit,
-    busy: Boolean,
-    docxStyles: String? = null,
-    docxSectPr: String? = null,
-    docxTheme: String? = null,
-    docxNumbering: String? = null,
-    docxHeader: String? = null,
-    docxFooter: String? = null,
-    onDone: (File?, String?, dev.ninfenz.mobile.data.ReproChecker.Report?) -> Unit
-) {
+private fun ExportButton(args: ExportButtonArgs) = with(args) {
     Button(
         enabled = markdown != null && !busy,
         onClick = {
@@ -3522,8 +3528,8 @@ private fun ExportButton(
             setError(null)
             scope.launch {
                 try {
-                    runDeliveryExport(format, md, project, context, setError, onDone,
-                        docxStyles, docxSectPr, docxTheme, docxNumbering, docxHeader, docxFooter)
+                    runDeliveryExport(RunDeliveryExportArgs(format, md, project, context, setError, onDone,
+                        docxStyles, docxSectPr, docxTheme, docxNumbering, docxHeader, docxFooter))
                 } finally {
                     setBusy(false)
                 }
@@ -3555,9 +3561,9 @@ private fun PreservationExportButton(
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
                     val lineageStore = dev.ninfenz.mobile.data.PreservationLineageStore(context.filesDir)
                     val predecessor = lineageStore.load(project.id)
-                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, outDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id), grant.toJson().toString(), predecessor)
+                    val created = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, outDir, dev.ninfenz.mobile.data.PreservationOptions(dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id), grant.toJson().toString(), predecessor))
                     val reproDir = File(context.cacheDir, "repro-preserve").apply { deleteRecursively(); mkdirs() }
-                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, reproDir, dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id), grant.toJson().toString(), predecessor)
+                    val second = dev.ninfenz.mobile.data.PreservationExporter.export(md, project.title, project.id, reproDir, dev.ninfenz.mobile.data.PreservationOptions(dev.ninfenz.mobile.data.ContractStore(context.filesDir).raw(project.id), grant.toJson().toString(), predecessor))
                     val report = dev.ninfenz.mobile.data.ReproChecker.check(created.file, second.file)
                     reproDir.deleteRecursively()
                     val digest = java.security.MessageDigest.getInstance("SHA-256")
@@ -3611,20 +3617,22 @@ private fun NfDocExportButton(
     ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "nf-doc")) }
 }
 
+internal data class EpubExportButtonArgs(
+    val markdown: String?,
+    val project: Project,
+    val author: String,
+    val language: String,
+    val context: android.content.Context,
+    val scope: kotlinx.coroutines.CoroutineScope,
+    val setBusy: (Boolean) -> Unit,
+    val setError: (CoreError?) -> Unit,
+    val busy: Boolean,
+    val outputTemplate: String? = null,
+    val onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit,
+)
+
 @Composable
-private fun EpubExportButton(
-    markdown: String?,
-    project: Project,
-    author: String,
-    language: String,
-    context: android.content.Context,
-    scope: kotlinx.coroutines.CoroutineScope,
-    setBusy: (Boolean) -> Unit,
-    setError: (CoreError?) -> Unit,
-    busy: Boolean,
-    outputTemplate: String? = null,
-    onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
-) {
+private fun EpubExportButton(args: EpubExportButtonArgs) = with(args) {
     Button(
         enabled = markdown != null && !busy,
         onClick = {
@@ -3651,20 +3659,22 @@ private fun EpubExportButton(
     ) { Text(context.getString(dev.ninfenz.mobile.R.string.delivery_export, "epub")) }
 }
 
+internal data class PdfExportButtonArgs(
+    val markdown: String?,
+    val project: Project,
+    val pageSize: String,
+    val includeTitle: Boolean,
+    val context: android.content.Context,
+    val scope: kotlinx.coroutines.CoroutineScope,
+    val setBusy: (Boolean) -> Unit,
+    val setError: (CoreError?) -> Unit,
+    val busy: Boolean,
+    val outputTemplate: String? = null,
+    val onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit,
+)
+
 @Composable
-private fun PdfExportButton(
-    markdown: String?,
-    project: Project,
-    pageSize: String,
-    includeTitle: Boolean,
-    context: android.content.Context,
-    scope: kotlinx.coroutines.CoroutineScope,
-    setBusy: (Boolean) -> Unit,
-    setError: (CoreError?) -> Unit,
-    busy: Boolean,
-    outputTemplate: String? = null,
-    onDone: (File, dev.ninfenz.mobile.data.ReproChecker.Report) -> Unit
-) {
+private fun PdfExportButton(args: PdfExportButtonArgs) = with(args) {
     Button(
         enabled = markdown != null && !busy,
         onClick = {
@@ -3675,11 +3685,11 @@ private fun PdfExportButton(
                 try {
                     val outDir = File(File(context.filesDir, "exports"), "delivery").apply { mkdirs() }
                     val fileName = dev.ninfenz.mobile.data.OutputNaming.resolve(outputTemplate, project.title, "pdf")
-                    val rich = dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, outDir, if (pageSize.equals("Letter", true)) 612 else 595, if (pageSize.equals("Letter", true)) 792 else 842, fileName)
+                    val rich = dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, outDir, dev.ninfenz.mobile.data.WebPdfExporter.PageOptions(if (pageSize.equals("Letter", true)) 612 else 595, if (pageSize.equals("Letter", true)) 792 else 842, fileName))
                     val createdFile: File = rich?.file ?: PdfExporter.export(md, project.title, outDir, pageSize, includeTitle, fileName).file
                     val reproDir = File(context.cacheDir, "repro-pdf").apply { deleteRecursively(); mkdirs() }
                     val secondFile: File = if (rich != null) {
-                        dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, reproDir, if (pageSize.equals("Letter", true)) 612 else 595, if (pageSize.equals("Letter", true)) 792 else 842, fileName)?.file
+                        dev.ninfenz.mobile.data.WebPdfExporter.export(context, md, project.title, reproDir, dev.ninfenz.mobile.data.WebPdfExporter.PageOptions(if (pageSize.equals("Letter", true)) 612 else 595, if (pageSize.equals("Letter", true)) 792 else 842, fileName))?.file
                             ?: PdfExporter.export(md, project.title, reproDir, pageSize, includeTitle, fileName).file
                     } else {
                         PdfExporter.export(md, project.title, reproDir, pageSize, includeTitle, fileName).file
@@ -3787,20 +3797,23 @@ private fun mimeFor(format: String): String = when (format) {
 }
 
 
-private suspend fun runDeliveryExport(
-    format: String,
-    md: String,
-    project: Project,
-    context: android.content.Context,
-    setError: (CoreError?) -> Unit,
-    onDone: (File?, String?, dev.ninfenz.mobile.data.ReproChecker.Report?) -> Unit,
-    docxStyles: String?,
-    docxSectPr: String?,
-    docxTheme: String?,
-    docxNumbering: String?,
-    docxHeader: String?,
-    docxFooter: String?
-) {
+internal data class RunDeliveryExportArgs(
+    val format: String,
+    val md: String,
+    val project: Project,
+    val context: android.content.Context,
+    val setError: (CoreError?) -> Unit,
+    val onDone: (File?, String?, dev.ninfenz.mobile.data.ReproChecker.Report?) -> Unit,
+    val docxStyles: String?,
+    val docxSectPr: String?,
+    val docxTheme: String?,
+    val docxNumbering: String?,
+    val docxHeader: String?,
+    val docxFooter: String?,
+)
+
+private suspend fun runDeliveryExport(args: RunDeliveryExportArgs) {
+    with(args) {
     fun payloadFor(dir: File) = buildJsonObject {
         put("markdown", md)
         put("format", format)
@@ -3841,5 +3854,7 @@ private suspend fun runDeliveryExport(
         onDone(file, manifest?.toString(), report)
     } else {
         setError(response.error)
+    }
+
     }
 }

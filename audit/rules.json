@@ -660,14 +660,7 @@
           "app/cli/**/*.py"
         ],
         "limit": 800,
-        "allow_files": [
-          "desktop/src/core/asset_contract.py",
-          "desktop/src/core/conformance_scan.py",
-          "desktop/src/core/daemon.py",
-          "desktop/src/core/interop_export.py",
-          "desktop/src/core/output_forms.py",
-          "desktop/src/core/pack_combo.py"
-        ]
+        "allow_files": []
       },
       "penalty": 2,
       "source": "项目惯例"

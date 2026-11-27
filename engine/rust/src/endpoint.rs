@@ -119,96 +119,8 @@ pub fn scan(root: &Path) -> EndpointScan {
     let mut ids: BTreeSet<String> = BTreeSet::new();
     let mut paths: BTreeSet<String> = BTreeSet::new();
     for ep in &endpoints {
-        let eid = py_str(get(ep, "id"));
-        if ids.contains(&eid) {
-            issues.push(format!("端点 id 重复：{}", eid));
-        }
-        ids.insert(eid.clone());
-        let method = py_str(get(ep, "method"));
-        let path = py_str(get(ep, "path"));
-        if !METHODS.contains(&method.as_str()) {
-            issues.push(format!("{} 的 method 越词表：{}", eid, method));
-        }
-        let key = format!("{} {}", method, path);
-        if paths.contains(&key) {
-            issues.push(format!("端点 method+path 重复：{}", key));
-        }
-        paths.insert(key);
-        if py_truthy(get(ep, "streaming").unwrap_or(&Json::Null))
-            && !py_truthy(get(&conv, "streaming").unwrap_or(&Json::Null))
-        {
-            issues.push(format!(
-                "{} 声明 streaming 但 conventions 未定义 SSE 约定",
-                eid
-            ));
-        }
-        let maps = py_str(get(ep, "maps_to"));
-        if let Some(c) = mcp_re().captures(&maps) {
-            if !tools.contains(&c[1]) {
-                issues.push(format!(
-                    "{} 的 maps_to 指向不存在的 MCP 工具：{}",
-                    eid, &c[1]
-                ));
-            }
-        } else {
-            match cli_re().captures(&maps) {
-                Some(c) if cmds.contains(&c[1]) => {}
-                _ => issues.push(format!(
-                    "{} 的 maps_to 无法解析为现存 CLI 子命令或 MCP 工具：{}（修复指引：改正，或先实现该能力）",
-                    eid, maps
-                )),
-            }
-        }
-
-        // 弃用/日落语义（OpenAPI deprecated + RFC 8594 Sunset）：有标志就必须有出口
-        let dep = get(ep, "deprecated");
-        if let Some(d) = dep {
-            if !is_bool(d) {
-                issues.push(format!("{} 的 deprecated 应为布尔：{}", eid, py_repr(d)));
-            }
-        }
-        if py_truthy(dep.unwrap_or(&Json::Null)) {
-            if status != "implemented" {
-                issues.push(format!(
-                    "{} 声明 deprecated 但契约 status={}——未实装的能力没有可弃用的东西（修复指引：先落 implemented 再谈弃用）",
-                    eid, status
-                ));
-            }
-            if !py_truthy(get(&conv, "deprecation").unwrap_or(&Json::Null)) {
-                issues.push(format!(
-                    "{} 声明 deprecated 但 conventions 未定义弃用约定",
-                    eid
-                ));
-            }
-            let sunset = py_str(get(ep, "sunset"));
-            if !dated_re().is_match(&sunset) {
-                issues.push(format!(
-                    "{} 声明 deprecated 但缺合规 sunset（YYYY-MM-DD）：{}（修复指引：按 RFC 8594 给出日落日期）",
-                    eid,
-                    py_repr(get(ep, "sunset").unwrap_or(&Json::Null))
-                ));
-            }
-            if get(ep, "replacement").is_none() {
-                issues.push(format!(
-                    "{} 声明 deprecated 但缺 replacement（无替代写 null，不许省略）",
-                    eid
-                ));
-            } else {
-                let rep = get(ep, "replacement").cloned().unwrap_or(Json::Null);
-                if !matches!(rep, Json::Null) && !all_ids.contains(&crate::pyval::plain_str(&rep)) {
-                    issues.push(format!(
-                        "{} 的 replacement 指向契约内不存在的端点：{}（修复指引：改为契约内端点 id，或写 null 表示无替代）",
-                        eid,
-                        py_repr(&rep)
-                    ));
-                }
-            }
-        } else if get(ep, "sunset").is_some() || get(ep, "replacement").is_some() {
-            issues.push(format!(
-                "{} 未声明 deprecated 却带 sunset/replacement（悬空弃用字段）",
-                eid
-            ));
-        }
+        check_endpoint_route(ep, &conv, &tools, &cmds, &mut ids, &mut paths, &mut issues);
+        check_endpoint_deprecation(ep, &all_ids, &conv, &status, &mut issues);
     }
 
     // 幂等声明面（RFC 9110 §9.2.2）：默认幂等，例外须登记且非幂等端点须给幂等键策略
@@ -222,49 +134,7 @@ pub fn scan(root: &Path) -> EndpointScan {
         Some(Json::Array(a)) => a.clone(),
         _ => Vec::new(),
     };
-    let mut seen_exc: BTreeSet<String> = BTreeSet::new();
-    for exc in &exceptions {
-        let xid = py_str(get(exc, "id"));
-        if !ids.contains(&xid) {
-            issues.push(format!(
-                "幂等例外指向契约内不存在的端点：{}（修复指引：改为契约内端点 id，或删除该例外）",
-                py_repr(&Json::Str(xid))
-            ));
-            continue;
-        }
-        if seen_exc.contains(&xid) {
-            issues.push(format!("幂等例外重复登记端点：{}", xid));
-        }
-        seen_exc.insert(xid.clone());
-        let mode = py_str(get(exc, "mode"));
-        if !IDEMPOTENCY_MODES.contains(&mode.as_str()) {
-            issues.push(format!(
-                "幂等例外 mode 越词表：{} = {}（允许 {}）",
-                xid,
-                py_repr(&Json::Str(mode)),
-                IDEMPOTENCY_MODES.join("/")
-            ));
-        } else if mode == "non-idempotent" {
-            let key = py_str(get(exc, "key"));
-            if !IDEMPOTENCY_KEY.contains(&key.as_str()) {
-                issues.push(format!(
-                    "非幂等端点 {} 缺幂等键策略（修复指引：key ∈ {}——required = 须幂等键去重；none = 明示不可重放并写 why）",
-                    xid,
-                    IDEMPOTENCY_KEY.join("/")
-                ));
-            } else if key == "required"
-                && !py_truthy(get(&conv, "idempotency").unwrap_or(&Json::Null))
-            {
-                issues.push(format!(
-                    "幂等例外要求幂等键但 conventions 未定义幂等语义：{}",
-                    xid
-                ));
-            }
-        }
-        if py_str(get(exc, "why")).trim().is_empty() {
-            issues.push("幂等例外缺 why（修复指引：写明为何非幂等、重放会发生什么）".to_string());
-        }
-    }
+    check_idempotency_exceptions(&exceptions, &ids, &conv, &mut issues);
 
     let streaming = endpoints
         .iter()
@@ -285,6 +155,170 @@ pub fn scan(root: &Path) -> EndpointScan {
         ),
     ]);
     EndpointScan { issues, stats }
+}
+
+/// 单端点路由面：id 唯一 / method 词表 / method+path 唯一 / maps_to 可解析。
+fn check_endpoint_route(
+    ep: &Json,
+    conv: &Json,
+    tools: &BTreeSet<&str>,
+    cmds: &BTreeSet<String>,
+    ids: &mut BTreeSet<String>,
+    paths: &mut BTreeSet<String>,
+    issues: &mut Vec<String>,
+) {
+    let eid = py_str(get(ep, "id"));
+    if ids.contains(&eid) {
+        issues.push(format!("端点 id 重复：{}", eid));
+    }
+    ids.insert(eid.clone());
+    let method = py_str(get(ep, "method"));
+    let path = py_str(get(ep, "path"));
+    if !METHODS.contains(&method.as_str()) {
+        issues.push(format!("{} 的 method 越词表：{}", eid, method));
+    }
+    let key = format!("{} {}", method, path);
+    if paths.contains(&key) {
+        issues.push(format!("端点 method+path 重复：{}", key));
+    }
+    paths.insert(key);
+    if py_truthy(get(ep, "streaming").unwrap_or(&Json::Null))
+        && !py_truthy(get(&conv, "streaming").unwrap_or(&Json::Null))
+    {
+        issues.push(format!(
+            "{} 声明 streaming 但 conventions 未定义 SSE 约定",
+            eid
+        ));
+    }
+    let maps = py_str(get(ep, "maps_to"));
+    if let Some(c) = mcp_re().captures(&maps) {
+        if !tools.contains(&c[1]) {
+            issues.push(format!(
+                "{} 的 maps_to 指向不存在的 MCP 工具：{}",
+                eid, &c[1]
+            ));
+        }
+    } else {
+        match cli_re().captures(&maps) {
+            Some(c) if cmds.contains(&c[1]) => {}
+            _ => issues.push(format!(
+                "{} 的 maps_to 无法解析为现存 CLI 子命令或 MCP 工具：{}（修复指引：改正，或先实现该能力）",
+                eid, maps
+            )),
+        }
+    }
+}
+
+/// 单端点弃用面：deprecated / sunset / replacement 三件套自洽。
+fn check_endpoint_deprecation(
+    ep: &Json,
+    all_ids: &[String],
+    conv: &Json,
+    status: &str,
+    issues: &mut Vec<String>,
+) {
+let eid = py_str(get(ep, "id"));
+    // 弃用/日落语义（OpenAPI deprecated + RFC 8594 Sunset）：有标志就必须有出口
+    let dep = get(ep, "deprecated");
+    if let Some(d) = dep {
+        if !is_bool(d) {
+            issues.push(format!("{} 的 deprecated 应为布尔：{}", eid, py_repr(d)));
+        }
+    }
+    if py_truthy(dep.unwrap_or(&Json::Null)) {
+        if status != "implemented" {
+            issues.push(format!(
+                "{} 声明 deprecated 但契约 status={}——未实装的能力没有可弃用的东西（修复指引：先落 implemented 再谈弃用）",
+                eid, status
+            ));
+        }
+        if !py_truthy(get(&conv, "deprecation").unwrap_or(&Json::Null)) {
+            issues.push(format!(
+                "{} 声明 deprecated 但 conventions 未定义弃用约定",
+                eid
+            ));
+        }
+        let sunset = py_str(get(ep, "sunset"));
+        if !dated_re().is_match(&sunset) {
+            issues.push(format!(
+                "{} 声明 deprecated 但缺合规 sunset（YYYY-MM-DD）：{}（修复指引：按 RFC 8594 给出日落日期）",
+                eid,
+                py_repr(get(ep, "sunset").unwrap_or(&Json::Null))
+            ));
+        }
+        if get(ep, "replacement").is_none() {
+            issues.push(format!(
+                "{} 声明 deprecated 但缺 replacement（无替代写 null，不许省略）",
+                eid
+            ));
+        } else {
+            let rep = get(ep, "replacement").cloned().unwrap_or(Json::Null);
+            if !matches!(rep, Json::Null) && !all_ids.contains(&crate::pyval::plain_str(&rep)) {
+                issues.push(format!(
+                    "{} 的 replacement 指向契约内不存在的端点：{}（修复指引：改为契约内端点 id，或写 null 表示无替代）",
+                    eid,
+                    py_repr(&rep)
+                ));
+            }
+        }
+    } else if get(ep, "sunset").is_some() || get(ep, "replacement").is_some() {
+        issues.push(format!(
+            "{} 未声明 deprecated 却带 sunset/replacement（悬空弃用字段）",
+            eid
+        ));
+    }
+}
+
+/// 幂等例外面：指向在册端点 / 不重复 / mode 词表 / 非幂等须给幂等键策略。
+fn check_idempotency_exceptions(
+    exceptions: &[Json],
+    ids: &BTreeSet<String>,
+    conv: &Json,
+    issues: &mut Vec<String>,
+) {
+let mut seen_exc: BTreeSet<String> = BTreeSet::new();
+for exc in exceptions {
+    let xid = py_str(get(exc, "id"));
+    if !ids.contains(&xid) {
+        issues.push(format!(
+            "幂等例外指向契约内不存在的端点：{}（修复指引：改为契约内端点 id，或删除该例外）",
+            py_repr(&Json::Str(xid))
+        ));
+        continue;
+    }
+    if seen_exc.contains(&xid) {
+        issues.push(format!("幂等例外重复登记端点：{}", xid));
+    }
+    seen_exc.insert(xid.clone());
+    let mode = py_str(get(exc, "mode"));
+    if !IDEMPOTENCY_MODES.contains(&mode.as_str()) {
+        issues.push(format!(
+            "幂等例外 mode 越词表：{} = {}（允许 {}）",
+            xid,
+            py_repr(&Json::Str(mode)),
+            IDEMPOTENCY_MODES.join("/")
+        ));
+    } else if mode == "non-idempotent" {
+        let key = py_str(get(exc, "key"));
+        if !IDEMPOTENCY_KEY.contains(&key.as_str()) {
+            issues.push(format!(
+                "非幂等端点 {} 缺幂等键策略（修复指引：key ∈ {}——required = 须幂等键去重；none = 明示不可重放并写 why）",
+                xid,
+                IDEMPOTENCY_KEY.join("/")
+            ));
+        } else if key == "required"
+            && !py_truthy(get(&conv, "idempotency").unwrap_or(&Json::Null))
+        {
+            issues.push(format!(
+                "幂等例外要求幂等键但 conventions 未定义幂等语义：{}",
+                xid
+            ));
+        }
+    }
+    if py_str(get(exc, "why")).trim().is_empty() {
+        issues.push("幂等例外缺 why（修复指引：写明为何非幂等、重放会发生什么）".to_string());
+    }
+}
 }
 
 #[cfg(test)]

@@ -21,12 +21,12 @@ class ProjectStatusStoreTest {
 
     private fun setup(filesDir: File): dev.ninfenz.mobile.model.Project {
         val projects = File(filesDir, "projects").apply { mkdirs() }
-        val doc = ProjectFactory.build(
+        val doc = ProjectFactory.build(ProjectBuildSpec(
             id = "p", title = "p", packId = "demo-pack", packVersion = "1.0.0", packTree = hex,
             protocolId = "proto", protocolVersion = "1.0.0", protocolDigest = hex,
             graphId = "graph", graphVersion = "1.0.0", graphDigest = hex, graphSha256 = hex,
             specId = "spec", specVersion = "1.0.0", specDigest = hex, specSha256 = hex
-        )
+        ))
         File(projects, "p.nfproject.json").writeText(doc.toString(), Charsets.UTF_8)
         return ProjectModel.parse(doc.toString())
     }

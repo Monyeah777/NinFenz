@@ -134,6 +134,49 @@ pub fn scan(root: &Path) -> KnowledgeScan {
     if py_str(get(&decl, "schema")) != SCHEMA {
         issues.push(format!("知识源声明 schema 不匹配（期望 {}）", SCHEMA));
     }
+    check_vocabularies(&decl, &mut issues);
+
+    let rows = sources(&decl);
+    if rows.is_empty() {
+        issues.push(format!("未声明任何知识源（{}.sources 为空）", DECL_REL));
+    }
+    let mut seen: BTreeSet<String> = BTreeSet::new();
+    for s in &rows {
+        let sid = py_str(get(s, "id"));
+        if seen.contains(&sid) {
+            issues.push(format!("源 id 重复：{}", sid));
+        }
+        seen.insert(sid.clone());
+        check_source_fields(s, &sid, root, &mut issues);
+        check_source_authority(s, &sid, &mut issues);
+    }
+
+    let order = check_query_order(&decl, &rows, &mut issues);
+    check_sections(&decl, root, &mut issues);
+
+    let transforms = match load_transforms(root, &mut issues) {
+        Ok(n) => n,
+        Err(e) => {
+            return KnowledgeScan {
+                status: Some("error"),
+                issues: vec![e],
+                warns,
+                stats: empty_stats(),
+            }
+        }
+    };
+
+    let stats = knowledge_stats(&rows, &order, transforms);
+    KnowledgeScan {
+        status: None,
+        issues,
+        warns,
+        stats,
+    }
+}
+
+/// 三个词表声明须与判据常量逐字一致。
+fn check_vocabularies(decl: &Json, issues: &mut Vec<String>) {
     for (key, vocab) in [
         ("authority_vocabulary", AUTHORITIES.to_vec()),
         ("kind_vocabulary", KINDS.to_vec()),
@@ -148,110 +191,110 @@ pub fn scan(root: &Path) -> KnowledgeScan {
             ));
         }
     }
+}
 
-    let rows = sources(&decl);
-    if rows.is_empty() {
-        issues.push(format!("未声明任何知识源（{}.sources 为空）", DECL_REL));
+/// 知识源必填字段 / 词表 / locator 在场性核对。
+fn check_source_fields(s: &Json, sid: &str, root: &Path, issues: &mut Vec<String>) {
+    for k in REQUIRED_SRC {
+        if get(s, k).is_none() {
+            issues.push(format!(
+                "源 {} 缺必填字段：{}",
+                if sid.is_empty() {
+                    "(无名)"
+                } else {
+                    sid
+                },
+                k
+            ));
+        }
+}
+let auth = py_str(get(s, "authority"));
+    let kind = py_str(get(s, "kind"));
+    if !AUTHORITIES.contains(&auth.as_str()) {
+        issues.push(format!("源 {} authority 越词表：{}", sid, auth));
     }
-    let mut seen: BTreeSet<String> = BTreeSet::new();
-    for s in &rows {
-        let sid = py_str(get(s, "id"));
-        for k in REQUIRED_SRC {
-            if get(s, k).is_none() {
-                issues.push(format!(
-                    "源 {} 缺必填字段：{}",
-                    if sid.is_empty() {
-                        "(无名)"
-                    } else {
-                        sid.as_str()
-                    },
-                    k
-                ));
+    if !KINDS.contains(&kind.as_str()) {
+        issues.push(format!("源 {} kind 越词表：{}", sid, kind));
+    }
+    let vis = py_str(get(s, "visibility"));
+    if !VISIBILITIES.contains(&vis.as_str()) {
+        issues.push(format!("源 {} visibility 越词表：{}", sid, vis));
+    }
+    let loc = py_str(get(s, "locator"));
+    if !loc.is_empty() && !root.join(&loc).exists() {
+        issues.push(format!("源 {} 的 locator 不存在：{}（防纸面源）", sid, loc));
+    }
+}
+
+/// 知识源 authority 级差与时效策略核对。
+fn check_source_authority(s: &Json, sid: &str, issues: &mut Vec<String>) {
+let auth = py_str(get(s, "authority"));
+let kind = py_str(get(s, "kind"));
+let fresh = get(s, "freshness")
+    .filter(|f| matches!(f, Json::Object(_)))
+    .cloned()
+    .unwrap_or_else(empty_stats);
+let pol = py_str(get(&fresh, "policy"));
+let labelled = py_truthy(get(s, "requires_source_label").unwrap_or(&Json::Null));
+    if auth == "reference" {
+        if kind != "external-retrieval" {
+            issues.push(format!(
+                "源 {} 为 reference 级但 kind 非 external-retrieval",
+                sid
+            ));
+        }
+        if !labelled {
+            issues.push(format!(
+                "源 {} 为 reference 级但未要求标注来源（外部数据不得写死；修复指引：requires_source_label: true）",
+                sid
+            ));
+        }
+        if !FRESH_REFERENCE.contains(&pol.as_str()) {
+            issues.push(format!(
+                "源 {} 为 reference 级但时效策略非法：{}（需 {}）",
+                sid,
+                if pol.is_empty() {
+                    "(缺)".to_string()
+                } else {
+                    pol.clone()
+                },
+                FRESH_REFERENCE.join(" / ")
+            ));
+        } else if pol == "ttl" {
+            let ok = matches!(get(&fresh, "ttl_days"), Some(Json::Int(n)) if *n > 0);
+            if !ok {
+                issues.push(format!("源 {} 声明 ttl 但 ttl_days 非正整数", sid));
             }
         }
-        if seen.contains(&sid) {
-            issues.push(format!("源 id 重复：{}", sid));
+    } else if auth == "contract" {
+        if kind != "local-compiled" {
+            issues.push(format!(
+                "源 {} 为 contract 级但 kind 非 local-compiled",
+                sid
+            ));
         }
-        seen.insert(sid.clone());
-        let auth = py_str(get(s, "authority"));
-        let kind = py_str(get(s, "kind"));
-        if !AUTHORITIES.contains(&auth.as_str()) {
-            issues.push(format!("源 {} authority 越词表：{}", sid, auth));
+        if labelled {
+            issues.push(format!(
+                "源 {} 为 contract 级却要求外部来源标注（合同级即本地真源）",
+                sid
+            ));
         }
-        if !KINDS.contains(&kind.as_str()) {
-            issues.push(format!("源 {} kind 越词表：{}", sid, kind));
-        }
-        let vis = py_str(get(s, "visibility"));
-        if !VISIBILITIES.contains(&vis.as_str()) {
-            issues.push(format!("源 {} visibility 越词表：{}", sid, vis));
-        }
-        let loc = py_str(get(s, "locator"));
-        if !loc.is_empty() && !root.join(&loc).exists() {
-            issues.push(format!("源 {} 的 locator 不存在：{}（防纸面源）", sid, loc));
-        }
-        let fresh = get(s, "freshness")
-            .filter(|f| matches!(f, Json::Object(_)))
-            .cloned()
-            .unwrap_or_else(empty_stats);
-        let pol = py_str(get(&fresh, "policy"));
-        let labelled = py_truthy(get(s, "requires_source_label").unwrap_or(&Json::Null));
-        if auth == "reference" {
-            if kind != "external-retrieval" {
-                issues.push(format!(
-                    "源 {} 为 reference 级但 kind 非 external-retrieval",
-                    sid
-                ));
-            }
-            if !labelled {
-                issues.push(format!(
-                    "源 {} 为 reference 级但未要求标注来源（外部数据不得写死；修复指引：requires_source_label: true）",
-                    sid
-                ));
-            }
-            if !FRESH_REFERENCE.contains(&pol.as_str()) {
-                issues.push(format!(
-                    "源 {} 为 reference 级但时效策略非法：{}（需 {}）",
-                    sid,
-                    if pol.is_empty() {
-                        "(缺)".to_string()
-                    } else {
-                        pol.clone()
-                    },
-                    FRESH_REFERENCE.join(" / ")
-                ));
-            } else if pol == "ttl" {
-                let ok = matches!(get(&fresh, "ttl_days"), Some(Json::Int(n)) if *n > 0);
-                if !ok {
-                    issues.push(format!("源 {} 声明 ttl 但 ttl_days 非正整数", sid));
+        if !FRESH_CONTRACT.contains(&pol.as_str()) {
+            issues.push(format!(
+                "源 {} 为 contract 级但时效策略非法：{}（需 stale_after）",
+                sid,
+                if pol.is_empty() {
+                    "(缺)".to_string()
+                } else {
+                    pol.clone()
                 }
-            }
-        } else if auth == "contract" {
-            if kind != "local-compiled" {
-                issues.push(format!(
-                    "源 {} 为 contract 级但 kind 非 local-compiled",
-                    sid
-                ));
-            }
-            if labelled {
-                issues.push(format!(
-                    "源 {} 为 contract 级却要求外部来源标注（合同级即本地真源）",
-                    sid
-                ));
-            }
-            if !FRESH_CONTRACT.contains(&pol.as_str()) {
-                issues.push(format!(
-                    "源 {} 为 contract 级但时效策略非法：{}（需 stale_after）",
-                    sid,
-                    if pol.is_empty() {
-                        "(缺)".to_string()
-                    } else {
-                        pol.clone()
-                    }
-                ));
-            }
+            ));
         }
     }
+}
 
+/// query_order 与 sources 同集合 + 合同级须排参考级之前；返回 order 供 stats。
+fn check_query_order(decl: &Json, rows: &[Json], issues: &mut Vec<String>) -> Vec<String> {
     let order: Vec<String> = crate::pyval::str_list(get(&decl, "query_order"));
     let ids: Vec<String> = rows.iter().map(|s| py_str(get(s, "id"))).collect();
     let order_sorted: BTreeSet<String> = order.iter().cloned().collect();
@@ -298,7 +341,11 @@ pub fn scan(root: &Path) -> KnowledgeScan {
             }
         }
     }
+    order
+}
 
+/// promotion / review / cognition 三段声明的成文性核对。
+fn check_sections(decl: &Json, root: &Path, issues: &mut Vec<String>) {
     let sub = |k: &str| -> Json {
         get(&decl, k)
             .filter(|v| matches!(v, Json::Object(_)))
@@ -340,18 +387,14 @@ pub fn scan(root: &Path) -> KnowledgeScan {
     } else if !module_ids(root).contains(&fid) {
         issues.push(format!("cognition.filter_module 指向不在册模块：{}", fid));
     }
+}
 
+/// 消化记录读取 + schema 核对；返回条目数。IO 错误按调用方约定上抛。
+fn load_transforms(root: &Path, issues: &mut Vec<String>) -> Result<usize, String> {
     let log = match read_json(root, LOG_REL) {
         Ok(Some(l)) => Some(l),
         Ok(None) => None,
-        Err(e) => {
-            return KnowledgeScan {
-                status: Some("error"),
-                issues: vec![e],
-                warns,
-                stats: empty_stats(),
-            }
-        }
+        Err(e) => return Err(e),
     };
     let transforms = match &log {
         None => {
@@ -368,8 +411,12 @@ pub fn scan(root: &Path) -> KnowledgeScan {
             arr_items(get(l, "entries")).len()
         }
     };
+    Ok(transforms)
+}
 
-    let stats = Json::Object(vec![
+/// scan 的 stats 结构。
+fn knowledge_stats(rows: &[Json], order: &[String], transforms: usize) -> Json {
+    Json::Object(vec![
         ("sources".to_string(), Json::Int(rows.len() as i64)),
         (
             "contract".to_string(),
@@ -389,16 +436,10 @@ pub fn scan(root: &Path) -> KnowledgeScan {
         ),
         (
             "order".to_string(),
-            Json::Array(order.into_iter().map(Json::Str).collect()),
+            Json::Array(order.iter().cloned().map(Json::Str).collect()),
         ),
         ("transforms".to_string(), Json::Int(transforms as i64)),
-    ]);
-    KnowledgeScan {
-        status: None,
-        issues,
-        warns,
-        stats,
-    }
+    ])
 }
 
 /// Python `str(list[str])`。

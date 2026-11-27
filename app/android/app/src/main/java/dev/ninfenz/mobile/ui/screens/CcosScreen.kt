@@ -183,8 +183,8 @@ internal class CcosUiState(context: android.content.Context, restored: RestoredC
     ) {
         val current = result ?: return
         scope.launch {
-            performCcosReview(context, current, rawTask, task, reviewer, note, approve,
-                onOutcome = { outcome = it }, onBusy = { busy = it }, onError = { error = it }, onResult = { result = it })
+            performCcosReview(PerformCcosReviewArgs(context, current, rawTask, task, reviewer, note, approve,
+                onOutcome = { outcome = it }, onBusy = { busy = it }, onError = { error = it }, onResult = { result = it }))
         }
     }
 }

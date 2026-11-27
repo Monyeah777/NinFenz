@@ -12,7 +12,7 @@ class ProjectFactoryTest {
 
     private val hex = "0123456789abcdef".repeat(4)
 
-    private fun build() = ProjectFactory.build(
+    private fun build() = ProjectFactory.build(ProjectBuildSpec(
         id = "my-project",
         title = "我的项目",
         packId = "demo-pack",
@@ -29,7 +29,7 @@ class ProjectFactoryTest {
         specVersion = "1.0.0",
         specDigest = hex,
         specSha256 = hex
-    )
+    ))
 
     @Test
     fun buildsSchemaValidProjectDocument() {

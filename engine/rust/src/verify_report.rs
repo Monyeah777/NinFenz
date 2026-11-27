@@ -272,8 +272,24 @@ fn status_of(issues: &[String], warns: &[String]) -> String {
 }
 
 /// 本线**已自主算出**的判据；未移植的返回 `None`（由 `--results` 喂入）。
+/// 本线**已自主算出**的判据；未移植的返回 \`None\`（由 \`--results\` 喂入）。
 fn native(spec: &Spec, root: &Path) -> Option<Called> {
     match spec.id {
+        "schema" | "doc_markers" | "baseline" | "code_metrics" | "conformance_report" => {
+            native_a(spec.id, root)
+        }
+        "purity" | "receipts" | "drill_fidelity" | "conformance" => native_b(spec.id, root),
+        "knowledge" | "contract" | "license" | "coupling" | "judgement_coverage" | "audit"
+        | "workflow_policy" | "rating_decided" | "rating" => native_c(spec.id, root),
+        "library" | "library_projection" | "key_naming" | "intake" | "payload"
+        | "assets_ledger" | "instruction" | "self_stats" => native_d(spec.id, root),
+        _ => None,
+    }
+}
+
+/// 本线自算（第一组）：schema / doc_markers / baseline / code_metrics / conformance_report。
+fn native_a(id: &str, root: &Path) -> Option<Called> {
+    match id {
         "schema" => {
             let (issues, stats) = crate::schema_lint::scan(root);
             Some(Called {
@@ -331,6 +347,13 @@ fn native(spec: &Spec, root: &Path) -> Option<Called> {
                 stats,
             })
         }
+        _ => None,
+    }
+}
+
+/// 本线自算（第二组）：purity / receipts / drill_fidelity / conformance。
+fn native_b(id: &str, root: &Path) -> Option<Called> {
+    match id {
         "purity" => {
             let (issues, stats) = crate::purity::scan(root);
             Some(Called {
@@ -383,6 +406,13 @@ fn native(spec: &Spec, root: &Path) -> Option<Called> {
                 stats: c.stats,
             })
         }
+        _ => None,
+    }
+}
+
+/// 本线自算（第三组）：knowledge / contract / license / coupling / 审计面。
+fn native_c(id: &str, root: &Path) -> Option<Called> {
+    match id {
         "knowledge" => {
             let k = crate::knowledge::scan(root);
             Some(Called {
@@ -469,6 +499,13 @@ fn native(spec: &Spec, root: &Path) -> Option<Called> {
                 stats: r.stats,
             })
         }
+        _ => None,
+    }
+}
+
+/// 本线自算（第四组）：library / projection / key_naming / intake / payload / 账本面。
+fn native_d(id: &str, root: &Path) -> Option<Called> {
+    match id {
         "library" => {
             let l = crate::library::verify(root);
             Some(Called {

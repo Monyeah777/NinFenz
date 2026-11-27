@@ -126,6 +126,32 @@ fun PackCenterScreen(
         }
     }
 
+    fun verifyPackLocal(pack: PackEntry) {
+                                        verifyingId = pack.id
+                                        scope.launch {
+                                            val response = PackVerifier().verify(pack)
+                                            val verdict = response.resultObject()?.get("verdict")?.toString()?.trim('"')
+                                            if (response.ok) {
+                                                results = results + (pack.id to (context.getString(dev.ninfenz.mobile.R.string.packcenter_verify_pass, verdict ?: "pass")))
+                                            } else {
+                                                val err = response.error
+                                                errors = errors + (pack.id to ("[" + (err?.code ?: "NF-VAL-001") + "] " + (err?.message ?: context.getString(dev.ninfenz.mobile.R.string.validate_failed)) + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + (err?.fix ?: context.getString(dev.ninfenz.mobile.R.string.view_diagnostics))))
+                                            }
+                                            verifyingId = null
+                                        }
+    }
+    fun requestUninstallLocal(pack: PackEntry) {
+                                        val inUse = projects.count {
+                                            it.project.refs.basePackId == pack.id && it.project.refs.basePackVersion == pack.version
+                                        }
+                                        if (inUse > 0) {
+                                            uninstallErrors = uninstallErrors + (pack.id to context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.packcenter_uninstall_in_use, inUse, inUse))
+                                        } else {
+                                            uninstallErrors = uninstallErrors - pack.id
+                                            pendingUninstall = pack
+                                        }
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
         NfTopAppBar(
             title = stringResource(dev.ninfenz.mobile.R.string.packcenter_title),
@@ -178,75 +204,21 @@ fun PackCenterScreen(
                 val filteredPacks = packs.filter { packQuery.isBlank() || it.title.contains(packQuery, true) || it.id.contains(packQuery, true) }
                 items(filteredPacks.size) { index ->
                     val pack = filteredPacks[index]
-                    NfCard(modifier = Modifier.fillMaxWidth()) {
-                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(pack.title, style = NfType.itemTitle)
-                                    Text(
-                                        pack.id + " · " + pack.version + " · " + context.getString(dev.ninfenz.mobile.R.string.pack_item_count, pack.itemCount),
-                                        style = NfType.meta,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                                NfStatusChip(stringResource(dev.ninfenz.mobile.R.string.packcenter_installed))
-                            }
-                            Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_tree, pack.tree.take(16)), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text(
-                                stringResource(dev.ninfenz.mobile.R.string.packcenter_installed_at, formatInstalledAt(pack.installedAt)),
-                                style = NfType.meta,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            val pinned = trust[pack.id + "@" + pack.version]?.tree
-                            if (audit && pinned != null && pinned != pack.tree) {
-                                Text(
-                                    stringResource(dev.ninfenz.mobile.R.string.packcenter_trust_mismatch),
-                                    style = NfType.meta,
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                            }
-                            Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
-                                if (audit) OutlinedButton(
-                                    enabled = verifyingId == null,
-                                    onClick = {
-                                        verifyingId = pack.id
-                                        scope.launch {
-                                            val response = PackVerifier().verify(pack)
-                                            val verdict = response.resultObject()?.get("verdict")?.toString()?.trim('"')
-                                            if (response.ok) {
-                                                results = results + (pack.id to (context.getString(dev.ninfenz.mobile.R.string.packcenter_verify_pass, verdict ?: "pass")))
-                                            } else {
-                                                val err = response.error
-                                                errors = errors + (pack.id to ("[" + (err?.code ?: "NF-VAL-001") + "] " + (err?.message ?: context.getString(dev.ninfenz.mobile.R.string.validate_failed)) + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + (err?.fix ?: context.getString(dev.ninfenz.mobile.R.string.view_diagnostics))))
-                                            }
-                                            verifyingId = null
-                                        }
-                                    }
-                                ) { Text(if (verifyingId == pack.id) stringResource(dev.ninfenz.mobile.R.string.packcenter_verifying) else stringResource(dev.ninfenz.mobile.R.string.packcenter_verify)) }
-                                Button(onClick = { onOpenPack(pack) }) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_detail)) }
-                                TextButton(
-                                    onClick = {
-                                        val inUse = projects.count {
-                                            it.project.refs.basePackId == pack.id && it.project.refs.basePackVersion == pack.version
-                                        }
-                                        if (inUse > 0) {
-                                            uninstallErrors = uninstallErrors + (pack.id to context.resources.getQuantityString(dev.ninfenz.mobile.R.plurals.packcenter_uninstall_in_use, inUse, inUse))
-                                        } else {
-                                            uninstallErrors = uninstallErrors - pack.id
-                                            pendingUninstall = pack
-                                        }
-                                    }
-                                ) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_uninstall)) }
-                            }
-                            results[pack.id]?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
-                            uninstallErrors[pack.id]?.let { message ->
-                                Text(message, style = NfType.meta, color = MaterialTheme.colorScheme.error)
-                            }
-                            errors[pack.id]?.let { message ->
-                                NfErrorCard("NF-VAL-001", message, context.getString(dev.ninfenz.mobile.R.string.view_diag_or_reinstall))
-                            }
-                        }
-                    }
+                    PackCenterCard(
+                        PackCenterCardModel(
+                            pack = pack,
+                            audit = audit,
+                            pinned = trust[pack.id + "@" + pack.version]?.tree,
+                            verifying = verifyingId == pack.id,
+                            result = results[pack.id],
+                            error = errors[pack.id],
+                            uninstallError = uninstallErrors[pack.id]
+                        ),
+                        context = context,
+                        onOpenPack = onOpenPack,
+                        onVerify = { verifyPackLocal(it) },
+                        onUninstall = { requestUninstallLocal(it) }
+                    )
                 }
             }
             }
@@ -281,4 +253,65 @@ fun PackCenterScreen(
             )
         }
     }
+}
+
+internal data class PackCenterCardModel(
+    val pack: PackEntry,
+    val audit: Boolean,
+    val pinned: String?,
+    val verifying: Boolean,
+    val result: String?,
+    val error: String?,
+    val uninstallError: String?,
+)
+
+@Composable
+private fun PackCenterCard(
+    model: PackCenterCardModel,
+    context: android.content.Context,
+    onOpenPack: (PackEntry) -> Unit,
+    onVerify: (PackEntry) -> Unit,
+    onUninstall: (PackEntry) -> Unit
+) {
+                    NfCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(verticalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(model.pack.title, style = NfType.itemTitle)
+                                    Text(
+                                        model.pack.id + " · " + model.pack.version + " · " + context.getString(dev.ninfenz.mobile.R.string.pack_item_count, model.pack.itemCount),
+                                        style = NfType.meta,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                NfStatusChip(stringResource(dev.ninfenz.mobile.R.string.packcenter_installed))
+                            }
+                            Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_tree, model.pack.tree.take(16)), style = NfType.meta, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                stringResource(dev.ninfenz.mobile.R.string.packcenter_installed_at, formatInstalledAt(model.pack.installedAt)),
+                                style = NfType.meta,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            val pinned = model.pinned
+                            if (model.audit && pinned != null && pinned != model.pack.tree) {
+                                Text(
+                                    stringResource(dev.ninfenz.mobile.R.string.packcenter_trust_mismatch),
+                                    style = NfType.meta,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                            Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {
+                                if (model.audit) OutlinedButton(enabled = !model.verifying, onClick = { onVerify(model.pack) }) { Text(if (model.verifying) stringResource(dev.ninfenz.mobile.R.string.packcenter_verifying) else stringResource(dev.ninfenz.mobile.R.string.packcenter_verify)) }
+                                Button(onClick = { onOpenPack(model.pack) }) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_detail)) }
+                                TextButton(onClick = { onUninstall(model.pack) }) { Text(stringResource(dev.ninfenz.mobile.R.string.packcenter_uninstall)) }
+                            }
+                            model.result?.let { Text(it, style = NfType.meta, color = MaterialTheme.colorScheme.primary) }
+                            model.uninstallError?.let { message ->
+                                Text(message, style = NfType.meta, color = MaterialTheme.colorScheme.error)
+                            }
+                            model.error?.let { message ->
+                                NfErrorCard("NF-VAL-001", message, context.getString(dev.ninfenz.mobile.R.string.view_diag_or_reinstall))
+                            }
+                        }
+                    }
 }

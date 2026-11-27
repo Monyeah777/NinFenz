@@ -23,9 +23,7 @@ object PreservationUpgrader {
             title,
             "upgrade-" + predecessor.take(12),
             outDir,
-            contract,
-            null,
-            predecessor
+            PreservationOptions(contract, null, predecessor)
         )
         return Result(created.file, predecessor)
     }

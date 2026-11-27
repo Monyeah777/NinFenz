@@ -215,7 +215,7 @@ private fun ExtensionsList(
                         " · " + pluralStringResource(R.plurals.extensions_contributions, ext.contributions.size, ext.contributions.size),
                     style = NfType.meta
                 )
-                ExtensionTrustSection(ext, digest, trustedEntry, trusted, store, trustStore, trustNonce, onTrustNonceChange, onError)
+                ExtensionTrustSection(ExtensionTrustSectionArgs(ext, digest, trustedEntry, trusted, store, trustStore, trustNonce, onTrustNonceChange, onError))
                 if (ext.targets.isNotEmpty()) Text(ext.targets.joinToString(" · "), style = NfType.meta)
                 if (ext.warnings.isNotEmpty()) {
                     Text(ext.warnings.joinToString("; "), style = NfType.meta, color = MaterialTheme.colorScheme.error)
@@ -235,18 +235,21 @@ private fun ExtensionsList(
     }
 }
 
+internal data class ExtensionTrustSectionArgs(
+    val ext: ExtensionStore.Installed,
+    val digest: String?,
+    val trustedEntry: ExtensionTrustStore.Entry?,
+    val trusted: Boolean,
+    val store: ExtensionStore,
+    val trustStore: ExtensionTrustStore,
+    val trustNonce: Int,
+    val onTrustNonceChange: (Int) -> Unit,
+    val onError: (String?) -> Unit,
+)
+
 @Composable
-private fun ExtensionTrustSection(
-    ext: ExtensionStore.Installed,
-    digest: String?,
-    trustedEntry: ExtensionTrustStore.Entry?,
-    trusted: Boolean,
-    store: ExtensionStore,
-    trustStore: ExtensionTrustStore,
-    trustNonce: Int,
-    onTrustNonceChange: (Int) -> Unit,
-    onError: (String?) -> Unit
-) {
+private fun ExtensionTrustSection(args: ExtensionTrustSectionArgs) {
+    with(args) {
     if (!ext.signed) return
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -290,5 +293,7 @@ private fun ExtensionTrustSection(
                 }
             }
         }) { Text(stringResource(R.string.extensions_trust)) }
+    }
+
     }
 }

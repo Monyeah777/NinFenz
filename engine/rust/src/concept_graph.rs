@@ -306,88 +306,8 @@ pub fn problems(graph: &Json) -> Vec<String> {
         _ => Vec::new(),
     };
     let strength = provenance_strength(graph);
-    if strength.is_empty() {
-        issues.push(format!(
-            "图缺 provenance_strength 声明（修复指引：在机读块声明取值 {}——证据强度须显式，不得默认按强证据理解）",
-            PROVENANCE_STRENGTHS.join(" / ")
-        ));
-    } else if !PROVENANCE_STRENGTHS.contains(&strength.as_str()) {
-        issues.push(format!(
-            "provenance_strength 越词表：{}（取值 {}）",
-            strength,
-            PROVENANCE_STRENGTHS.join(" / ")
-        ));
-    } else {
-        let (covered, total) = external_coverage(graph);
-        let ratio = if total != 0 {
-            covered as f64 / total as f64
-        } else {
-            0.0
-        };
-        if strength == "external" && ratio < 1.0 {
-            issues.push(format!(
-                "provenance_strength=external 但外部覆盖仅 {}/{}（修复指引：补齐每节点的外部来源锚，或按实况降为 mixed / domain-logic）",
-                covered, total
-            ));
-        } else if strength == "mixed" && !(ratio > 0.0 && ratio < 1.0) {
-            issues.push(format!(
-                "provenance_strength=mixed 但外部覆盖 = {}/{}（修复指引：全覆盖用 external；无外部锚用 domain-logic / inferred）",
-                covered, total
-            ));
-        } else if (strength == "domain-logic" || strength == "inferred") && ratio > 0.0 {
-            issues.push(format!(
-                "provenance_strength={} 但已有 {}/{} 节点挂外部来源键（修复指引：按实况升为 mixed / external）",
-                strength, covered, total
-            ));
-        }
-    }
-    let mut seen_nodes: Vec<String> = Vec::new();
-    for node in arr_of(obj_get(graph, "nodes")) {
-        let Json::Object(_) = &node else { continue };
-        let idv = obj_get(&node, "id").cloned().unwrap_or(Json::Null);
-        if !pyval::py_truthy(&idv) {
-            issues.push("节点缺 id（修复指引：每个节点须有 Cxx 编号）".to_string());
-            continue;
-        }
-        let nid = s(&idv);
-        if seen_nodes.contains(&nid) {
-            issues.push(format!("节点 id 重复：{}（编号须唯一）", nid));
-        }
-        seen_nodes.push(nid.clone());
-        let name = obj_get(&node, "name").cloned().unwrap_or(Json::Null);
-        if s(&name).trim().is_empty() {
-            issues.push(format!(
-                "节点 {} 缺 name（修复指引：每个概念须有可读名）",
-                nid
-            ));
-        }
-        let prov = arr_of(obj_get(&node, "provenance"));
-        if prov.is_empty() {
-            issues.push(format!("节点 {} 缺 provenance（边无溯源即不可复核）", nid));
-        } else {
-            for key in &prov {
-                if !legend.contains(&s(key)) {
-                    issues.push(format!(
-                        "节点 {} 的 provenance 键 {} 不在 provenance_legend 中（修复指引：补图例键，防图例漂移静默）",
-                        nid,
-                        pyval::py_repr(key)
-                    ));
-                }
-            }
-        }
-        let layer = match obj_get(&node, "layer") {
-            Some(Json::Null) | None => String::new(),
-            Some(v) => s(v),
-        };
-        if !layer.is_empty() && !LAYERS.contains(&layer.as_str()) {
-            issues.push(format!(
-                "节点 {} 层位越界：{}（取值 {}）",
-                nid,
-                layer,
-                LAYERS.join("/")
-            ));
-        }
-    }
+    check_provenance_strength(graph, &strength, &mut issues);
+    check_nodes(graph, &legend, &mut issues);
     let mut sorted_prereqs = prereqs.clone();
     sorted_prereqs.sort_by(|a, b| a.0.cmp(&b.0));
     for (nid, ps) in &sorted_prereqs {
@@ -442,6 +362,96 @@ pub fn problems(graph: &Json) -> Vec<String> {
         issues.push(e);
     }
     issues
+}
+
+/// provenance_strength 声明与外部覆盖率的自洽核对。
+fn check_provenance_strength(graph: &Json, strength: &str, issues: &mut Vec<String>) {
+    if strength.is_empty() {
+        issues.push(format!(
+            "图缺 provenance_strength 声明（修复指引：在机读块声明取值 {}——证据强度须显式，不得默认按强证据理解）",
+            PROVENANCE_STRENGTHS.join(" / ")
+        ));
+    } else if !PROVENANCE_STRENGTHS.contains(&strength) {
+        issues.push(format!(
+            "provenance_strength 越词表：{}（取值 {}）",
+            strength,
+            PROVENANCE_STRENGTHS.join(" / ")
+        ));
+    } else {
+        let (covered, total) = external_coverage(graph);
+        let ratio = if total != 0 {
+            covered as f64 / total as f64
+        } else {
+            0.0
+        };
+        if strength == "external" && ratio < 1.0 {
+            issues.push(format!(
+                "provenance_strength=external 但外部覆盖仅 {}/{}（修复指引：补齐每节点的外部来源锚，或按实况降为 mixed / domain-logic）",
+                covered, total
+            ));
+        } else if strength == "mixed" && !(ratio > 0.0 && ratio < 1.0) {
+            issues.push(format!(
+                "provenance_strength=mixed 但外部覆盖 = {}/{}（修复指引：全覆盖用 external；无外部锚用 domain-logic / inferred）",
+                covered, total
+            ));
+        } else if (strength == "domain-logic" || strength == "inferred") && ratio > 0.0 {
+            issues.push(format!(
+                "provenance_strength={} 但已有 {}/{} 节点挂外部来源键（修复指引：按实况升为 mixed / external）",
+                strength, covered, total
+            ));
+        }
+    }
+}
+
+/// 节点面的 id / name / provenance / layer 核对。
+fn check_nodes(graph: &Json, legend: &[String], issues: &mut Vec<String>) {
+    let mut seen_nodes: Vec<String> = Vec::new();
+    for node in arr_of(obj_get(graph, "nodes")) {
+        let Json::Object(_) = &node else { continue };
+        let idv = obj_get(&node, "id").cloned().unwrap_or(Json::Null);
+        if !pyval::py_truthy(&idv) {
+            issues.push("节点缺 id（修复指引：每个节点须有 Cxx 编号）".to_string());
+            continue;
+        }
+        let nid = s(&idv);
+        if seen_nodes.contains(&nid) {
+            issues.push(format!("节点 id 重复：{}（编号须唯一）", nid));
+        }
+        seen_nodes.push(nid.clone());
+        let name = obj_get(&node, "name").cloned().unwrap_or(Json::Null);
+        if s(&name).trim().is_empty() {
+            issues.push(format!(
+                "节点 {} 缺 name（修复指引：每个概念须有可读名）",
+                nid
+            ));
+        }
+        let prov = arr_of(obj_get(&node, "provenance"));
+        if prov.is_empty() {
+            issues.push(format!("节点 {} 缺 provenance（边无溯源即不可复核）", nid));
+        } else {
+            for key in &prov {
+                if !legend.contains(&s(key)) {
+                    issues.push(format!(
+                        "节点 {} 的 provenance 键 {} 不在 provenance_legend 中（修复指引：补图例键，防图例漂移静默）",
+                        nid,
+                        pyval::py_repr(key)
+                    ));
+                }
+            }
+        }
+        let layer = match obj_get(&node, "layer") {
+            Some(Json::Null) | None => String::new(),
+            Some(v) => s(v),
+        };
+        if !layer.is_empty() && !LAYERS.contains(&layer.as_str()) {
+            issues.push(format!(
+                "节点 {} 层位越界：{}（取值 {}）",
+                nid,
+                layer,
+                LAYERS.join("/")
+            ));
+        }
+    }
 }
 
 /// 真源 `scan` → `(issues, stats)`。

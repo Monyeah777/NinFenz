@@ -193,11 +193,69 @@ pub fn registry_verify(root: &Path) -> (Vec<String>, Json) {
     let mut per_tier: Vec<(String, i64)> = Vec::new();
     let mut per_status: Vec<(String, i64)> = Vec::new();
     let mut unreachable = 0i64;
-    let bump = |v: &mut Vec<(String, i64)>, k: String| match v.iter_mut().find(|(n, _)| *n == k) {
-        Some(e) => e.1 += 1,
-        None => v.push((k, 1)),
-    };
-    for f in &forms {
+    verify_forms(
+        &forms,
+        &cat_ids,
+        &mut issues,
+        &mut seen,
+        &mut per_cat,
+        &mut per_tier,
+        &mut per_status,
+        &mut unreachable,
+    );
+    let stats = Json::Object(vec![
+        ("forms".to_string(), Json::Int(forms.len() as i64)),
+        ("categories".to_string(), Json::Int(cat_ids.len() as i64)),
+        (
+            "by_category".to_string(),
+            Json::Object(
+                per_cat
+                    .into_iter()
+                    .map(|(k, v)| (k, Json::Int(v)))
+                    .collect(),
+            ),
+        ),
+        (
+            "by_tier".to_string(),
+            Json::Object(
+                per_tier
+                    .into_iter()
+                    .map(|(k, v)| (k, Json::Int(v)))
+                    .collect(),
+            ),
+        ),
+        (
+            "by_status".to_string(),
+            Json::Object(
+                per_status
+                    .into_iter()
+                    .map(|(k, v)| (k, Json::Int(v)))
+                    .collect(),
+            ),
+        ),
+        ("unreachable".to_string(), Json::Int(unreachable)),
+    ]);
+    (issues, stats)
+}
+
+/// 形态条目的 id / 类别 / 档位 / 状态 / 规范入口 / 可达性实证核对。
+fn verify_forms(
+    forms: &[Json],
+    cat_ids: &[String],
+    issues: &mut Vec<String>,
+    seen: &mut Vec<String>,
+    per_cat: &mut Vec<(String, i64)>,
+    per_tier: &mut Vec<(String, i64)>,
+    per_status: &mut Vec<(String, i64)>,
+    unreachable: &mut i64,
+) {
+    fn bump(v: &mut Vec<(String, i64)>, k: String) {
+        match v.iter_mut().find(|(n, _)| *n == k) {
+            Some(e) => e.1 += 1,
+            None => v.push((k, 1)),
+        }
+    }
+    for f in forms {
         if !matches!(f, Json::Object(_)) {
             issues.push(format!("forms 条目非对象：{}", pyval::py_repr(f)));
             continue;
@@ -245,46 +303,13 @@ pub fn registry_verify(root: &Path) -> (Vec<String>, Json) {
                 fid
             ));
         } else if matches!(obj_get(&ev, "reachable"), Some(Json::Bool(false))) {
-            unreachable += 1;
+            *unreachable += 1;
         }
         let cat_key = pyval::plain_str(&cat);
-        bump(&mut per_cat, cat_key);
-        bump(&mut per_tier, format!("{}", pyval::py_str(Some(&tier))));
-        bump(&mut per_status, format!("{}", pyval::py_str(Some(&status))));
+        bump(per_cat, cat_key);
+        bump(per_tier, format!("{}", pyval::py_str(Some(&tier))));
+        bump(per_status, format!("{}", pyval::py_str(Some(&status))));
     }
-    let stats = Json::Object(vec![
-        ("forms".to_string(), Json::Int(forms.len() as i64)),
-        ("categories".to_string(), Json::Int(cat_ids.len() as i64)),
-        (
-            "by_category".to_string(),
-            Json::Object(
-                per_cat
-                    .into_iter()
-                    .map(|(k, v)| (k, Json::Int(v)))
-                    .collect(),
-            ),
-        ),
-        (
-            "by_tier".to_string(),
-            Json::Object(
-                per_tier
-                    .into_iter()
-                    .map(|(k, v)| (k, Json::Int(v)))
-                    .collect(),
-            ),
-        ),
-        (
-            "by_status".to_string(),
-            Json::Object(
-                per_status
-                    .into_iter()
-                    .map(|(k, v)| (k, Json::Int(v)))
-                    .collect(),
-            ),
-        ),
-        ("unreachable".to_string(), Json::Int(unreachable)),
-    ]);
-    (issues, stats)
 }
 
 // ---------------------------------------------------------------- 形态识别

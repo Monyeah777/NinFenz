@@ -23,12 +23,12 @@ class ProjectReviewStoreTest {
 
     private fun setup(filesDir: File): dev.ninfenz.mobile.model.Project {
         val projects = File(filesDir, "projects").apply { mkdirs() }
-        val doc = ProjectFactory.build(
+        val doc = ProjectFactory.build(ProjectBuildSpec(
             id = "p", title = "p", packId = "demo-pack", packVersion = "1.0.0", packTree = hex,
             protocolId = "proto", protocolVersion = "1.0.0", protocolDigest = hex,
             graphId = "graph", graphVersion = "1.0.0", graphDigest = hex, graphSha256 = hex,
             specId = "spec", specVersion = "1.0.0", specDigest = hex, specSha256 = hex
-        ).toMutableMap()
+        )).toMutableMap()
         doc["status"] = JsonPrimitive("validated")
         File(projects, "p.nfproject.json").writeText(kotlinx.serialization.json.JsonObject(doc).toString(), Charsets.UTF_8)
         return ProjectModel.parse(File(projects, "p.nfproject.json").readText())

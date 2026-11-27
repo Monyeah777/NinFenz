@@ -84,13 +84,12 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                 textStyle = NfType.meta
             )
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            PatchActionButtons(json, markdown, entries, history, projectId, filesDir,
+            PatchActionButtons(PatchActionButtonsArgs(json, markdown, entries, history, projectId, filesDir,
                 onEntriesChange = { entries = it }, onError = { error = it }, onMarkdownChange = { markdown = it },
                 onHistoryChange = { history = it }, onResult = { result = it }, onValidation = { validation = it },
-                onValidationIssues = { validationIssues = it })
+                onValidationIssues = { validationIssues = it }))
             PatchEntryRows(entries = entries, onEntriesChange = { entries = it })
-            PatchResultSection(
-                result = result,
+            PatchResultSection(PatchResultSectionArgs(result = result,
                 validation = validation,
                 validationIssues = validationIssues,
                 history = history,
@@ -100,8 +99,7 @@ fun PatchScreen(filesDir: File, projectId: String?, onBack: () -> Unit) {
                 onMarkdownChange = { markdown = it },
                 onHistoryChange = { history = it },
                 onResult = { result = it },
-                onError = { error = it }
-            )
+                onError = { error = it }))
         }
     }
 }
@@ -125,20 +123,22 @@ private fun PatchEntryRows(
     }
 }
 
+internal data class PatchResultSectionArgs(
+    val result: NfPatchModel.Result?,
+    val validation: String?,
+    val validationIssues: List<dev.ninfenz.mobile.model.ReportIssue>,
+    val history: List<String>,
+    val store: DeliveryDraftStore?,
+    val projectId: String?,
+    val filesDir: File,
+    val onMarkdownChange: (String) -> Unit,
+    val onHistoryChange: (List<String>) -> Unit,
+    val onResult: (NfPatchModel.Result?) -> Unit,
+    val onError: (String?) -> Unit,
+)
+
 @Composable
-private fun PatchResultSection(
-    result: NfPatchModel.Result?,
-    validation: String?,
-    validationIssues: List<dev.ninfenz.mobile.model.ReportIssue>,
-    history: List<String>,
-    store: DeliveryDraftStore?,
-    projectId: String?,
-    filesDir: File,
-    onMarkdownChange: (String) -> Unit,
-    onHistoryChange: (List<String>) -> Unit,
-    onResult: (NfPatchModel.Result?) -> Unit,
-    onError: (String?) -> Unit
-) {
+private fun PatchResultSection(args: PatchResultSectionArgs) = with(args) {
     result?.let { r ->
         PatchResultDetails(
             r = r,
@@ -159,22 +159,24 @@ private fun PatchResultSection(
     }
 }
 
+internal data class PatchActionButtonsArgs(
+    val json: String,
+    val markdown: String,
+    val entries: List<Pair<NfPatchModel.Op, Boolean>>,
+    val history: List<String>,
+    val projectId: String?,
+    val filesDir: File,
+    val onEntriesChange: (List<Pair<NfPatchModel.Op, Boolean>>) -> Unit,
+    val onError: (String?) -> Unit,
+    val onMarkdownChange: (String) -> Unit,
+    val onHistoryChange: (List<String>) -> Unit,
+    val onResult: (NfPatchModel.Result?) -> Unit,
+    val onValidation: (String?) -> Unit,
+    val onValidationIssues: (List<dev.ninfenz.mobile.model.ReportIssue>) -> Unit,
+)
+
 @Composable
-private fun PatchActionButtons(
-    json: String,
-    markdown: String,
-    entries: List<Pair<NfPatchModel.Op, Boolean>>,
-    history: List<String>,
-    projectId: String?,
-    filesDir: File,
-    onEntriesChange: (List<Pair<NfPatchModel.Op, Boolean>>) -> Unit,
-    onError: (String?) -> Unit,
-    onMarkdownChange: (String) -> Unit,
-    onHistoryChange: (List<String>) -> Unit,
-    onResult: (NfPatchModel.Result?) -> Unit,
-    onValidation: (String?) -> Unit,
-    onValidationIssues: (List<dev.ninfenz.mobile.model.ReportIssue>) -> Unit
-) {
+private fun PatchActionButtons(args: PatchActionButtonsArgs) = with(args) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     Row(horizontalArrangement = Arrangement.spacedBy(NfSpacing.s)) {

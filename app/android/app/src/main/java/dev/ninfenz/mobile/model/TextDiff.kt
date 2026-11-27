@@ -19,6 +19,15 @@ data class TextDiffReport(
     val changed: Int get() = added + removed
 }
 
+private data class DiffWindow(
+    val oldLines: List<String>,
+    val newLines: List<String>,
+    val oldMid: List<String>,
+    val newMid: List<String>,
+    val prefix: Int,
+    val suffix: Int
+)
+
 object TextDiff {
     private const val MAX_CELLS = 1_000_000
 
@@ -36,7 +45,7 @@ object TextDiff {
         }
 
         if (oldMid.size.toLong() * newMid.size.toLong() > MAX_CELLS) {
-            appendDegraded(oldLines, newLines, oldMid, newMid, prefix, suffix, out)
+            appendDegraded(DiffWindow(oldLines, newLines, oldMid, newMid, prefix, suffix), out)
             return report(out, degraded = true)
         }
 
@@ -64,28 +73,20 @@ object TextDiff {
         return suffix
     }
 
-    private fun appendDegraded(
-        oldLines: List<String>,
-        newLines: List<String>,
-        oldMid: List<String>,
-        newMid: List<String>,
-        prefix: Int,
-        suffix: Int,
-        out: MutableList<DiffLine>
-    ) {
-        val oldSet = oldMid.toSet()
-        val newSet = newMid.toSet()
-        var oldNo = prefix + 1
-        var newNo = prefix + 1
-        oldMid.filter { it !in newSet }.forEach { line ->
+    private fun appendDegraded(window: DiffWindow, out: MutableList<DiffLine>) {
+        val oldSet = window.oldMid.toSet()
+        val newSet = window.newMid.toSet()
+        var oldNo = window.prefix + 1
+        var newNo = window.prefix + 1
+        window.oldMid.filter { it !in newSet }.forEach { line ->
             out += DiffLine(DiffKind.REMOVE, oldNo, null, line)
             oldNo++
         }
-        newMid.filter { it !in oldSet }.forEach { line ->
+        window.newMid.filter { it !in oldSet }.forEach { line ->
             out += DiffLine(DiffKind.ADD, null, newNo, line)
             newNo++
         }
-        appendSuffix(oldLines, newLines, suffix, out)
+        appendSuffix(window.oldLines, window.newLines, window.suffix, out)
     }
 
     private fun lcsTable(oldMid: List<String>, newMid: List<String>, n: Int, m: Int): Array<IntArray> {

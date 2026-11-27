@@ -3,10 +3,10 @@
     "app": 1512,
     "entry": 26,
     "floor": 5,
-    "prod": 1069,
+    "prod": 1071,
     "projection": 542,
-    "support": 1926,
-    "verify": 1498
+    "support": 2023,
+    "verify": 1496
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5773,7 +5773,7 @@
     {
       "function": "数字资产契约层：三面验证（数据 / 代码 / 脚本组合 · 声明即契约）。",
       "path": "desktop/src/core/asset_contract.py",
-      "role": "verify",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -5989,7 +5989,7 @@
     {
       "function": "43 A2 —— Conformance 一致性分级扫描（声明 ≤ 可证级别，防虚标）。",
       "path": "desktop/src/core/conformance_scan.py",
-      "role": "verify",
+      "role": "prod",
       "rule": "auto:R-core"
     },
     {
@@ -14015,7 +14015,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "[cfg(test)]",
+      "function": "[allow(clippy::type_complexity)]",
       "path": "engine/rust/src/pack_combo_core.rs",
       "role": "verify",
       "rule": "R-verify"
@@ -15444,10 +15444,10 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "1dd4982c60ce022147324cb7d21ef41690c195cb38856c3771c43d016b638c51",
+  "root_digest": "7fd11cd23f5d803c9e5f16912964af2d7d780eb5aac61821455473df1dfdee28",
   "rule_counts": {
     "R-app": 1512,
-    "R-catch": 1764,
+    "R-catch": 1861,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,

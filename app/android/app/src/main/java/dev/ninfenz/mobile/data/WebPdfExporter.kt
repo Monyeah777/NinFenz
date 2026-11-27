@@ -43,6 +43,13 @@ object WebPdfExporter {
         allowContentAccess = false
     )
 
+    /** 导出页面选项（参数对象化，避免超长参数表）。 */
+    data class PageOptions(
+        val pageWidth: Int = 595,
+        val pageHeight: Int = 842,
+        val fileName: String = "result.pdf"
+    )
+
     fun pageCount(contentHeight: Int, width: Int, pageWidth: Int = 595, pageHeight: Int = 842): Int {
         require(width > 0) { "width 必须为正" }
         if (contentHeight <= 0) return 1
@@ -56,10 +63,11 @@ object WebPdfExporter {
         markdown: String,
         title: String,
         outDir: File,
-        pageWidth: Int = 595,
-        pageHeight: Int = 842,
-        fileName: String = "result.pdf"
+        options: PageOptions = PageOptions()
     ): Created? = withContext(Dispatchers.Main) {
+        val pageWidth = options.pageWidth
+        val pageHeight = options.pageHeight
+        val fileName = options.fileName
         var web: WebView? = null
         try {
             val html = HtmlExporter.html(markdown, title)

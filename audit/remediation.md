@@ -165,22 +165,26 @@
 - 新挂 OPEN-F003-CS：F-003（C# sync-over-async `.Result` 2 处）本机无 .NET SDK（dotnet host 有、SDK 缺失），改后无法构建校验，暂不动，等有 SDK 的环境修并验证。
 
 
-## 状态汇总（2026-11-28 收口）
+## 状态汇总（2026-11-28 二次收口）
 
 | 项 | 状态 | 证据/说明 |
 |---|---|---|
-| P0 / P1 | 全部清零 | audit/evidence/6878a19f4：P0=0、P1=0 |
-| 审计总分 | **98.70**（基线 92.1 → +6.60） | trend.md；C 82→87，D/E/F 回 100 |
-| 门禁 | PASS（exit 0） | `bash audit/ci/gate.sh --evidence audit/evidence/6878a19f4` |
-| 规则库 | 166 条（A–N 全覆盖） | 校准 28 条均附证据/owner/到期（calibration.md） |
-| 测试面 | Rust 249/249、app/core 全绿；Android 全量单测；C# 3 工程 0 warn/0 error；Python 分层 327 passed + 2 skipped | 本轮复跑 |
-| B-004（UI 平台 IO） | DONE | 7 处 contentResolver 收口 data/UriIo；规则改为 UI 不做 IO |
-| C-002 / C-003 / C-013 | DONE | 18 个 Composable + 84 个 Kotlin 函数 + 7 个 C# 大文件拆分；规则命中 0 |
-| C-001 / C-005 / C-007 / C-008 / C-009 / C-012 / C-010 | IN_PROGRESS（后续批次） | C-001 98 文件 / C-005 792 函数 / C-007 88 / C-008 14 / C-009 9（含生成块）/ C-012 63 / C-010 剩 6 模块 allow_files |
+| P0 / P1 | 全部清零 | 本轮证据包：P0=0、P1=0 |
+| 审计总分 | **98.80**（基线 92.1 → +6.70） | C=88，其余 13 维 100 |
+| 门禁 | PASS（exit 0） | `bash audit/ci/gate.sh --evidence audit/evidence/<本轮 commit>` |
+| 规则库 | 166 条（A–N 全覆盖） | 校准 27 条均附证据/owner/到期（calibration.md；C-010 条目已随清零删除） |
+| 测试面 | Rust 249/249、app/core 全绿；Android 全量单测 667/0；C# 3 工程 0 warn/0 error；Python 分层 478 passed + 7 条既存红 | 本轮复跑 |
+| B-004（UI 平台 IO） | DONE | 7 处 contentResolver 收口 data/UriIo |
+| C-002 / C-003 / C-013 | DONE | Composable/Kotlin 函数/C# 大文件拆分，规则命中 0 |
+| C-010 | DONE（规则回归原判据） | 10 个 Python 真源模块全部拆分，`allow_files` 清空，≤800 无豁免仍 0 |
+| C-008 | IN_PROGRESS | 14 → 1，仅 DeliveryScreen（与 C-001 同处） |
+| C-007 | IN_PROGRESS | 88 → 59；Kotlin 已清零，Python 59 处待做 |
+| C-012 | IN_PROGRESS | 63 → 16；生产路径 47 处已清零，剩 16 条在生成区/测试函数（需生成器分块） |
+| C-001 / C-009 / C-005 | IN_PROGRESS | C-001 82（kt1/rs46/py35）；C-009 10 个 Rust 大文件（生成块）；C-005 800 函数 |
 | D-005（测试样板重复） | DONE（校准） | 22 个 workflow helper 去重；阈值 15→40 守住真复制用例 |
-| F-003（C# `.Result`） | DONE（检测器精度修正） | 2 处均为嵌套 record 类型名；修正后真实 sync-over-async 仍命中；.NET SDK 8.0.428 已可用于构建校验 |
-| Python 基线红 | OPEN（rebind 批次） | reverse_coupling/style_ratchet/json_shape_contracts/freshness/dead_code 等存量漂移，非本轮引入 |
-| Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | macrobenchmark 代码/APK/脚本就绪，等设备接入 ADB；Play 无账号；OCR 待 URI 授权 |
+| F-003（C# `.Result`） | DONE（检测器精度修正） | 2 处均为嵌套 record 类型名；修正后真实 sync-over-async 仍命中 |
+| Python 基线红 | OPEN（rebind 批次） | reverse_coupling/style_ratchet/json_shape_contracts/freshness/dead_code + sast/style/coupling baseline 需按官方入口重冻 |
+| Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | macrobenchmark 代码/APK/脚本就绪，等设备接入 ADB |
 
 
 ## 第十一轮：B-004 UI 直连 IO 收口（2026-11-27）
@@ -205,6 +209,20 @@
 - 处理：file_line_limit 检查器加 allow_files 支持；C-010 改为「存量 10 件豁免 + 棘轮」——豁免清单外任何新文件超 800 行立即命中。避免把「已存在的真源大模块」当成持续扣分项，同时保留回归保护。
 - 结果：总分 97.88 → 98.08；C 80→82；C-010 10→0。
 - 说明：这是棘轮而非阈值放宽（豁免精确到路径，新文件照抓）；0.4 拆分时删除对应 allow_files 条目即可恢复全量判据。
+
+## 第十五轮：Kotlin/Python 结构收口第二批（C-010 清零、C-001/C-008 逼近）（2026-11-28）
+
+- **C-010 清零（规则回归原判据）**：`asset_contract` / `conformance_scan` / `daemon` / `interop_export` / `output_forms` / `pack_combo` 六个 Python 真源模块继续拆成门面 + 私有子包（新增 `_asset_contract/_conformance/_daemon/_interop/_output_forms/_pack_combo`，每文件 ≤557 行）；`allow_files` 6 条全部删除，Python 单文件 ≤800 无豁免仍 0 命中。calibration 里 C-010 这一条随之删除（不再有放宽）。
+- **C-001（98 → 82）**：Kotlin 12 文件里 11 个拆到 ≤400（NfMobileApp 1168→61 + 7 文件、AuthorScreen 2006→387、ImportScreen 2285→393、TopLevelScreens 1962→300、SettingsScreen 699→161、PackUpdateScreen 468→116、SearchScreen 423→264、PackBuilderScreen 486→249、GraphScreen 401→282、PrefsStore 421→284、NfComponents 402→299）；Python 40→35（本轮 6 模块拆分减少，新增子模块仅 2 个 >400）；Rust 46 未动。剩余 Kotlin 1 = DeliveryScreen 3861 行。
+- **C-008（14 → 1）**：Python 6 文件全清零（互斥 if/elif 链改独立 if + 提前 return/查表）；Kotlin 7 文件清零；仅剩 DeliveryScreen（嵌套 14，与 C-001 同一处）。
+- **C-007（88 → 59）**：Kotlin 29 处全部参数对象化（Args data class/Preset 对象，调用点含 10 个单测同改）；Python 59 处未动。
+- **C-012（63 → 16）**：生产路径 47 处 >100 行函数全部抽到 ≤100（+116 个模块级私有 helper，pub 签名 0 变化）；剩余 16 条全部是 `#[cfg(test)]` 与 `// >>> GENERATED` 区里的真源差分判据（需改生成器分块，下一批）。另有 7 处「裸花括号模式串」被 C-012 朴素括号计数误报，已把该模式串提为模块级 const（值逐字不变、测试与生成区逐字一致）。
+- **C-009（9 → 10）**：拆分后部分文件行数略增（extraction helper），仍待生成器分块批次处理（output_forms 13280 / pyrandom 6903 / output_forms_checks 6349 / xmlmini 3910 等 4 个生成块巨件 + 6 个生产件）。
+- **过程中引入并当轮修掉的回归**：B-007（2 个新文件小写命名）→ 改名 PascalCase；C-011（Import 拆分文件里 40 处 `!!`）→ 改 `?: return` 守卫；D-003（两个 Python 门面重复 8 行块）→ 去重。修后 B=100、D=100、C-011=0。
+- **结果**：总分 98.70 → **98.80**；C 87→88（C-010 2 分已在本轮前生效，本轮规则回归不改变分数；C-011 回归修复抵消后净 +0.10）；P0=0/P1=0，error=0，no_targets=0。
+- **测试**：engine/rust 249 passed；app/core 全绿；Android 全量单测 667/0；Python 分层 478 passed + 既有红 7 条（与本轮前 known-red 同集）。
+- **遗留**：DeliveryScreen 单文件（C-001 1 / C-008 1）；Python C-007 59 处；Rust C-001 46 文件；C-009/C-012 生成块分块（需改 4+ 个生成器）；C-005 800 函数。
+
 
 ## 第十四轮：C 维度结构拆分第一批 + 检测器修正 + macrobenchmark 推进（2026-11-28）
 

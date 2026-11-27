@@ -31,6 +31,9 @@ pub struct BaselineStats {
     pub checks: i64,
 }
 
+// check 定义行正则（与真源 `re_check` 同款）。模式串含裸花括号，提为常量以免被朴素括号计数误判。
+const CHECK_DEF_PAT: &str = r"(?m)^check(\d+)\(\)\{";
+
 /// 真源 `scan` → `(issues, stats)`。`stats = None` 对应真源返回的空字典 `{}`。
 pub fn scan(root: &Path) -> (Vec<String>, Option<BaselineStats>) {
     let mut issues: Vec<String> = Vec::new();
@@ -53,9 +56,8 @@ pub fn scan(root: &Path) -> (Vec<String>, Option<BaselineStats>) {
         .unwrap_or_default();
 
     static CRE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let cre = CRE.get_or_init(|| {
-        regex::Regex::new(r"(?m)^check(\d+)\(\)\{").expect("check 定义正则固定合法")
-    });
+    let cre =
+        CRE.get_or_init(|| regex::Regex::new(CHECK_DEF_PAT).expect("check 定义正则固定合法"));
     let mut nums: Vec<i64> = cre
         .captures_iter(&verify_text)
         .filter_map(|c| c[1].parse::<i64>().ok())

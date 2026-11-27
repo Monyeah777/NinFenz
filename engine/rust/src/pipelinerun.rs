@@ -163,6 +163,46 @@ fn graph_with(
     index: &BTreeMap<String, Rec>,
     core: &[String],
 ) -> Result<Graph, String> {
+    let pl = load_graph_pipeline(root, pipeline_path)?;
+    let mut st = PipeState {
+        issues: Vec::new(),
+        notes: 0,
+        modules_count: 0,
+        tokens: Vec::new(),
+        done: BTreeSet::new(),
+        published: Vec::new(),
+        subscribed: Vec::new(),
+        layer_of: BTreeMap::new(),
+        executed: Vec::new(),
+    };
+    seed_core(core, index, &mut st);
+    run_layers(&pl, index, &mut st);
+    check_event_closure(&mut st);
+    check_types(index, &st.executed, &mut st.issues);
+
+    let _ = st.modules_count; // 真源 stats.modules 只进 advisory 汇总，契约不读
+    Ok(Graph {
+        pipeline_id: pl.id.clone(),
+        issues: st.issues,
+        notes: st.notes,
+    })
+}
+
+/// graph_with 的累积状态（token 池 / 已执行集 / 发布订阅表 / 层位表）。
+struct PipeState {
+    issues: Vec<String>,
+    notes: usize,
+    modules_count: usize,
+    tokens: Vec<String>,
+    done: BTreeSet<String>,
+    published: Vec<(String, String)>,
+    subscribed: Vec<(String, Vec<String>)>,
+    layer_of: BTreeMap<String, usize>,
+    executed: Vec<String>,
+}
+
+/// 载入管线文档；解析失败给带指路的错误。
+fn load_graph_pipeline(root: &Path, pipeline_path: &str) -> Result<Pipeline, String> {
     let pl: Pipeline = match load_pipeline_file(&root.join(pipeline_path)) {
         Some(p) => p,
         None => {
@@ -172,39 +212,35 @@ fn graph_with(
             ))
         }
     };
+    Ok(pl)
+}
 
-    let mut issues: Vec<String> = Vec::new();
-    let mut notes = 0usize;
-    let mut modules_count = 0usize;
-    let mut tokens: Vec<String> = Vec::new();
-    let mut done: BTreeSet<String> = BTreeSet::new();
+/// 基座先跑：官方核心的产出/事件进入池。
+fn seed_core(core: &[String], index: &BTreeMap<String, Rec>, st: &mut PipeState) {
     for x in core {
-        done.insert(x.clone());
-        done.insert(fid_key(x));
-        done.insert(bare(x).to_string());
+        st.done.insert(x.clone());
+        st.done.insert(fid_key(x));
+        st.done.insert(bare(x).to_string());
     }
-    let mut published: Vec<(String, String)> = Vec::new();
-    let mut subscribed: Vec<(String, Vec<String>)> = Vec::new();
-    let mut layer_of: BTreeMap<String, usize> = BTreeMap::new();
-    let mut executed: Vec<String> = Vec::new();
-
-    // 基座先跑：官方核心的产出/事件进入池
     for r in core {
         if let Some(rec) = resolve(r, index) {
             for tok in &rec.outputs {
-                if !tokens.contains(tok) {
-                    tokens.push(tok.clone());
+                if !st.tokens.contains(tok) {
+                    st.tokens.push(tok.clone());
                 }
             }
             for ev in &rec.publish {
-                set_default(&mut published, ev, &rec.cat_id);
+                set_default(&mut st.published, ev, &rec.cat_id);
             }
             for ev in &rec.subscribe {
-                append_sub(&mut subscribed, ev, &rec.cat_id);
+                append_sub(&mut st.subscribed, ev, &rec.cat_id);
             }
         }
     }
+}
 
+/// 逐层执行：解析模块、记录依赖序 / 类型面所需状态。
+fn run_layers(pl: &Pipeline, index: &BTreeMap<String, Rec>, st: &mut PipeState) {
     for (idx0, layer) in pl.layers.iter().enumerate() {
         let idx = idx0 + 1;
         // 真源 `overrides` 在 sweep 下恒为 None ⇒ 取 `layer.default_modules`
@@ -212,75 +248,82 @@ fn graph_with(
         let same_layer: BTreeSet<String> = refs.iter().cloned().collect();
         for r in &refs {
             let Some(rec) = resolve(r, index) else {
-                issues.push(format!(
+                st.issues.push(format!(
                     "模块未在仓库找到：{}（层 {}）（修复指引：核对 04_模块库/community/*/modules 的文件名与类别限定）",
                     r, layer.id
                 ));
                 continue;
             };
             let mid = rec.cat_id.clone();
-            executed.push(mid.clone());
-            modules_count += 1;
-            layer_of.insert(mid.clone(), idx);
+            st.executed.push(mid.clone());
+            st.modules_count += 1;
+            st.layer_of.insert(mid.clone(), idx);
             for dep in &rec.inputs {
                 let dep_id = match resolve(dep, index) {
                     Some(d) => d.cat_id.clone(),
                     None => dep.clone(),
                 };
                 let bare_dep = bare(&dep_id).to_string();
-                let dep_layer = layer_of
+                let dep_layer = st
+                    .layer_of
                     .get(&dep_id)
-                    .or_else(|| layer_of.get(&bare_dep))
+                    .or_else(|| st.layer_of.get(&bare_dep))
                     .copied();
-                if done.contains(&dep_id) || done.contains(dep) || done.contains(&bare_dep) {
+                if st.done.contains(&dep_id) || st.done.contains(dep) || st.done.contains(&bare_dep) {
                     // 真源在此记一条 edge；`sweep` 不消费 edge ⇒ 本线不计
                 } else if same_layer.contains(dep)
                     || same_layer.contains(&dep_id)
                     || same_layer.contains(&bare_dep)
                 {
-                    notes += 1; // 真源：category=同层依赖序
+                    st.notes += 1; // 真源：category=同层依赖序
                 } else if dep_layer.is_some_and(|dl| dl > idx) {
-                    issues.push(format!(
+                    st.issues.push(format!(
                         "依赖序违约：{} 依赖 {}，但 {} 未在其之前执行（修复指引：前移提供方层位，或把该模块移出本层 default）",
                         mid, dep_id, dep_id
                     ));
                 } else {
-                    notes += 1; // 真源：category=跨包/外部依赖
+                    st.notes += 1; // 真源：category=跨包/外部依赖
                 }
             }
-            done.insert(mid.clone());
-            done.insert(fid_key(&mid));
-            done.insert(bare(&mid).to_string());
-            done.insert(rec.id.clone());
+            st.done.insert(mid.clone());
+            st.done.insert(fid_key(&mid));
+            st.done.insert(bare(&mid).to_string());
+            st.done.insert(rec.id.clone());
             for tok in &rec.outputs {
-                if !tokens.contains(tok) {
-                    tokens.push(tok.clone());
+                if !st.tokens.contains(tok) {
+                    st.tokens.push(tok.clone());
                 }
             }
             for ev in &rec.publish {
-                set_default(&mut published, ev, &mid);
+                set_default(&mut st.published, ev, &mid);
             }
             for ev in &rec.subscribe {
-                append_sub(&mut subscribed, ev, &mid);
+                append_sub(&mut st.subscribed, ev, &mid);
             }
         }
     }
+}
 
+/// 事件面：订阅方在本执行集内无发布方 ⇒ advisory。
+fn check_event_closure(st: &mut PipeState) {
     // 事件面：订阅方在本执行集内无发布方 ⇒ advisory
-    let mut subs_sorted: Vec<&(String, Vec<String>)> = subscribed.iter().collect();
+    let mut subs_sorted: Vec<&(String, Vec<String>)> = st.subscribed.iter().collect();
     subs_sorted.sort_by(|a, b| a.0.cmp(&b.0));
     for (ev, subs) in subs_sorted {
-        if !published.iter().any(|(e, _)| e == ev) {
+        if !st.published.iter().any(|(e, _)| e == ev) {
             let mut uniq: Vec<String> = subs.clone();
             uniq.sort();
             uniq.dedup();
-            notes += 1; // 真源：category=跨包/外部事件
+            st.notes += 1; // 真源：category=跨包/外部事件
         }
     }
+}
 
+/// 类型面（io_types）：仅在本执行集内判可证事项。
+fn check_types(index: &BTreeMap<String, Rec>, executed: &[String], issues: &mut Vec<String>) {
     // 类型面（io_types）：仅在本执行集内判**可证**事项（未收窄不判死）
     let mut kind_of_token: Vec<(String, String)> = Vec::new();
-    for mid in &executed {
+    for mid in executed {
         let Some(rec) = resolve(mid, index) else {
             continue;
         };
@@ -306,7 +349,7 @@ fn graph_with(
             }
         }
     }
-    for mid in &executed {
+    for mid in executed {
         let Some(rec) = resolve(mid, index) else {
             continue;
         };
@@ -345,13 +388,6 @@ fn graph_with(
             }
         }
     }
-
-    let _ = modules_count; // 真源 stats.modules 只进 advisory 汇总，契约不读
-    Ok(Graph {
-        pipeline_id: pl.id.clone(),
-        issues,
-        notes,
-    })
 }
 
 /// Python `sorted(list)` 的 `%s` 形态：`['a', 'b']`。

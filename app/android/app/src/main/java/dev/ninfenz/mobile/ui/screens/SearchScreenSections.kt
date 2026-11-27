@@ -122,26 +122,28 @@ internal fun SearchQueryField(
     )
 }
 
+internal data class SearchFilterAreaArgs(
+    val query: String,
+    val results: List<SearchHit>,
+    val all: List<SearchHit>,
+    val filterKind: SearchKind?,
+    val filterName: String?,
+    val packIds: List<String>,
+    val selectedPackId: String?,
+    val projects: List<ProjectEntry>,
+    val selectedProjectId: String?,
+    val favoritesOnly: Boolean,
+    val scopeTag: String?,
+    val metaStore: LibraryMetaStore,
+    val onFilterNameChange: (String?) -> Unit,
+    val onPackChange: (String?) -> Unit,
+    val onProjectChange: (String?) -> Unit,
+    val onFavoritesChange: (Boolean) -> Unit,
+    val onScopeTagChange: (String?) -> Unit,
+)
+
 @Composable
-internal fun SearchFilterArea(
-    query: String,
-    results: List<SearchHit>,
-    all: List<SearchHit>,
-    filterKind: SearchKind?,
-    filterName: String?,
-    packIds: List<String>,
-    selectedPackId: String?,
-    projects: List<ProjectEntry>,
-    selectedProjectId: String?,
-    favoritesOnly: Boolean,
-    scopeTag: String?,
-    metaStore: LibraryMetaStore,
-    onFilterNameChange: (String?) -> Unit,
-    onPackChange: (String?) -> Unit,
-    onProjectChange: (String?) -> Unit,
-    onFavoritesChange: (Boolean) -> Unit,
-    onScopeTagChange: (String?) -> Unit
-) {
+internal fun SearchFilterArea(args: SearchFilterAreaArgs) = with(args) {
     if (query.isNotBlank() && results.isNotEmpty()) {
         SearchFilterRow(filterKind) { kind ->
             onFilterNameChange(kind?.name)
@@ -222,24 +224,26 @@ private fun SearchNoResult(
     }
 }
 
+internal data class SearchResultsAreaArgs(
+    val query: String,
+    val filtered: List<SearchHit>,
+    val history: List<String>,
+    val all: List<SearchHit>,
+    val rows: List<SearchRow>,
+    val selected: Int,
+    val visibleCount: Int,
+    val listState: LazyListState,
+    val showClearFilters: Boolean,
+    val onQueryChange: (String) -> Unit,
+    val onOpenHit: (SearchHit) -> Unit,
+    val onPickHistory: (String) -> Unit,
+    val onClearHistory: () -> Unit,
+    val onVisibleCountChange: (Int) -> Unit,
+    val onClearFilters: () -> Unit,
+)
+
 @Composable
-internal fun SearchResultsArea(
-    query: String,
-    filtered: List<SearchHit>,
-    history: List<String>,
-    all: List<SearchHit>,
-    rows: List<SearchRow>,
-    selected: Int,
-    visibleCount: Int,
-    listState: LazyListState,
-    showClearFilters: Boolean,
-    onQueryChange: (String) -> Unit,
-    onOpenHit: (SearchHit) -> Unit,
-    onPickHistory: (String) -> Unit,
-    onClearHistory: () -> Unit,
-    onVisibleCountChange: (Int) -> Unit,
-    onClearFilters: () -> Unit
-) {
+internal fun SearchResultsArea(args: SearchResultsAreaArgs) = with(args) {
     LaunchedEffect(selected, rows) {
         val itemIndex = rows.indexOfFirst { it.hit != null && it.flatIndex == selected }
         if (itemIndex >= 0) listState.animateScrollToItem(itemIndex)

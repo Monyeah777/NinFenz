@@ -352,11 +352,13 @@ fn verify_contracts(root: &Path) -> (Vec<String>, usize) {
     (issues, seen.len())
 }
 
+// check 定义行正则。模式串含裸花括号，提为常量以免被朴素括号计数误判。
+const CHECK_DEF_PAT: &str = r"(?m)^check(\d+)\(\)\{";
+
 fn check_ids(root: &Path) -> BTreeSet<String> {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| {
-        regex::Regex::new(r"(?m)^check(\d+)\(\)\{").expect("check 定义正则固定合法")
-    });
+    let re =
+        RE.get_or_init(|| regex::Regex::new(CHECK_DEF_PAT).expect("check 定义正则固定合法"));
     std::fs::read_to_string(root.join("verify.sh"))
         .map(|t| re.captures_iter(&t).map(|c| c[1].to_string()).collect())
         .unwrap_or_default()

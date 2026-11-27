@@ -301,20 +301,10 @@ pub fn scan(root: &Path) -> CouplingScan {
 
     let mut known_cyc: BTreeSet<Vec<String>> = BTreeSet::new();
     let mut known_sdp: BTreeSet<(String, String)> = BTreeSet::new();
-    if base_present {
-        let b = base.as_ref().unwrap();
-        for c in arr_items(get(b, "cycles")) {
-            let mut v: Vec<String> = arr_items(Some(c)).iter().map(|x| plain_str(x)).collect();
-            v.sort();
-            known_cyc.insert(v);
-        }
-        // SDP 有**方向**——不排序，按 (依赖方, 被依赖方) 精确比对
-        for p in arr_items(get(b, "sdp")) {
-            let pair: Vec<String> = arr_items(Some(p)).iter().map(|x| plain_str(x)).collect();
-            if pair.len() == 2 {
-                known_sdp.insert((pair[0].clone(), pair[1].clone()));
-            }
-        }
+    if let Some(b) = base.as_ref().filter(|_| base_present) {
+        let (kc, ks) = registered_sets(b);
+        known_cyc = kc;
+        known_sdp = ks;
     }
 
     let mut issues: Vec<String> = Vec::new();
@@ -391,6 +381,25 @@ pub fn scan(root: &Path) -> CouplingScan {
         warns,
         stats,
     }
+}
+
+/// 基线里登记的已知环 / 已知 SDP 违例（SDP 有方向——不排序，按 (依赖方, 被依赖方) 精确比对）。
+fn registered_sets(base: &Json) -> (BTreeSet<Vec<String>>, BTreeSet<(String, String)>) {
+    let mut known_cyc: BTreeSet<Vec<String>> = BTreeSet::new();
+    let mut known_sdp: BTreeSet<(String, String)> = BTreeSet::new();
+        for c in arr_items(get(base, "cycles")) {
+            let mut v: Vec<String> = arr_items(Some(c)).iter().map(|x| plain_str(x)).collect();
+            v.sort();
+            known_cyc.insert(v);
+        }
+        // SDP 有**方向**——不排序，按 (依赖方, 被依赖方) 精确比对
+        for p in arr_items(get(base, "sdp")) {
+            let pair: Vec<String> = arr_items(Some(p)).iter().map(|x| plain_str(x)).collect();
+            if pair.len() == 2 {
+                known_sdp.insert((pair[0].clone(), pair[1].clone()));
+            }
+        }
+    (known_cyc, known_sdp)
 }
 
 #[cfg(test)]

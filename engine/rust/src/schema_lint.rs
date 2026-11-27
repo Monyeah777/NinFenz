@@ -160,142 +160,9 @@ pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String
     }
     let name = plain_str(stype.unwrap());
     match name.as_str() {
-        "object" => {
-            let Json::Object(inst) = instance else {
-                return vec![format!(
-                    "{}: 应为 object，实为 {}",
-                    path,
-                    py_type_name(instance)
-                )];
-            };
-            let props: Vec<(String, Json)> = match get(schema, "properties") {
-                Some(Json::Object(p)) => p.clone(),
-                _ => Vec::new(),
-            };
-            for req in crate::pyval::arr_items(get(schema, "required")) {
-                let key = plain_str(req);
-                if !inst.iter().any(|(k, _)| *k == key) {
-                    out.push(format!("{}: 缺必填字段 {}", path, key));
-                }
-            }
-            if let Some(pn) = get(schema, "propertyNames") {
-                if matches!(pn, Json::Object(_)) {
-                    for (key, _) in inst {
-                        out.extend(subset_validate(
-                            &Json::Str(key.clone()),
-                            pn,
-                            &format!("{}/{}（键名）", path, key),
-                        ));
-                    }
-                }
-            }
-            for (key, sub) in &props {
-                if let Some((_, v)) = inst.iter().find(|(k, _)| k == key) {
-                    out.extend(subset_validate(v, sub, &format!("{}/{}", path, key)));
-                }
-            }
-            let extra = get(schema, "additionalProperties");
-            for (key, v) in inst {
-                if props.iter().any(|(k, _)| k == key) {
-                    continue;
-                }
-                match extra {
-                    Some(Json::Bool(false)) => out.push(format!(
-                        "{}: 未知字段 {}（不在该 schema 词表内）",
-                        path, key
-                    )),
-                    Some(e) if matches!(e, Json::Object(_)) => {
-                        out.extend(subset_validate(v, e, &format!("{}/{}", path, key)));
-                    }
-                    _ => {}
-                }
-            }
-            out
-        }
-        "array" => {
-            let Json::Array(items) = instance else {
-                return vec![format!(
-                    "{}: 应为 array，实为 {}",
-                    path,
-                    py_type_name(instance)
-                )];
-            };
-            if let Some(m) = get(schema, "minItems") {
-                if let Some(n) = as_int(m) {
-                    if (items.len() as i64) < n {
-                        out.push(format!(
-                            "{}: 数组长度 {} < minItems {}",
-                            path,
-                            items.len(),
-                            n
-                        ));
-                    }
-                }
-            }
-            if let Some(m) = get(schema, "maxItems") {
-                if let Some(n) = as_int(m) {
-                    if (items.len() as i64) > n {
-                        out.push(format!(
-                            "{}: 数组长度 {} > maxItems {}",
-                            path,
-                            items.len(),
-                            n
-                        ));
-                    }
-                }
-            }
-            let sub = get(schema, "items");
-            for (i, item) in items.iter().enumerate() {
-                if let Some(s) = sub {
-                    out.extend(subset_validate(item, s, &format!("{}[{}]", path, i)));
-                } else {
-                    out.extend(subset_validate(
-                        item,
-                        &Json::Null,
-                        &format!("{}[{}]", path, i),
-                    ));
-                }
-            }
-            out
-        }
-        "string" => {
-            let Json::Str(s) = instance else {
-                return vec![format!(
-                    "{}: 应为 string，实为 {}",
-                    path,
-                    py_type_name(instance)
-                )];
-            };
-            if let Some(m) = get(schema, "minLength") {
-                if let Some(n) = as_int(m) {
-                    let len = s.chars().count() as i64;
-                    if len < n {
-                        out.push(format!("{}: 字符串过短 {} < minLength {}", path, len, n));
-                    }
-                }
-            }
-            if let Some(Json::Str(pat)) = get(schema, "pattern") {
-                match cached_regex(pat) {
-                    Some(re) => {
-                        if !re.is_match(s) {
-                            out.push(format!(
-                                "{}: 值 {} 不匹配 pattern {}",
-                                path,
-                                py_repr(instance),
-                                pat
-                            ));
-                        }
-                    }
-                    None => out.push(format!(
-                        "{}: 值 {} 不匹配 pattern {}",
-                        path,
-                        py_repr(instance),
-                        pat
-                    )),
-                }
-            }
-            out
-        }
+        "object" => validate_object(instance, schema, path, out),
+        "array" => validate_array(instance, schema, path, out),
+        "string" => validate_string(instance, schema, path, out),
         "integer" => {
             let ok = matches!(instance, Json::Int(_));
             if !ok {
@@ -319,29 +186,7 @@ pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String
             }
             out
         }
-        "number" => {
-            let ok = matches!(instance, Json::Int(_) | Json::Float(_));
-            if !ok {
-                return vec![format!(
-                    "{}: 应为 number，实为 {}",
-                    path,
-                    py_type_name(instance)
-                )];
-            }
-            if let Some(m) = get(schema, "minimum") {
-                if let (Some(v), Some(n)) = (as_f64(instance), as_f64(m)) {
-                    if v < n {
-                        out.push(format!(
-                            "{}: 值 {} < minimum {}",
-                            path,
-                            plain_str(instance),
-                            plain_str(m)
-                        ));
-                    }
-                }
-            }
-            out
-        }
+        "number" => validate_number(instance, schema, path, out),
         "boolean" => {
             if !matches!(instance, Json::Bool(_)) {
                 return vec![format!(
@@ -358,6 +203,193 @@ pub fn subset_validate(instance: &Json, schema: &Json, path: &str) -> Vec<String
             py_repr(stype.unwrap())
         )],
     }
+}
+
+/// subset_validate 的 object 分支（枚举消息由调用方以 out 传入）。
+fn validate_object(
+    instance: &Json,
+    schema: &Json,
+    path: &str,
+    mut out: Vec<String>,
+) -> Vec<String> {
+    let Json::Object(inst) = instance else {
+        return vec![format!(
+            "{}: 应为 object，实为 {}",
+            path,
+            py_type_name(instance)
+        )];
+    };
+    let props: Vec<(String, Json)> = match get(schema, "properties") {
+        Some(Json::Object(p)) => p.clone(),
+        _ => Vec::new(),
+    };
+    for req in crate::pyval::arr_items(get(schema, "required")) {
+        let key = plain_str(req);
+        if !inst.iter().any(|(k, _)| *k == key) {
+            out.push(format!("{}: 缺必填字段 {}", path, key));
+        }
+    }
+    if let Some(pn) = get(schema, "propertyNames") {
+        if matches!(pn, Json::Object(_)) {
+            for (key, _) in inst {
+                out.extend(subset_validate(
+                    &Json::Str(key.clone()),
+                    pn,
+                    &format!("{}/{}（键名）", path, key),
+                ));
+            }
+        }
+    }
+    for (key, sub) in &props {
+        if let Some((_, v)) = inst.iter().find(|(k, _)| k == key) {
+            out.extend(subset_validate(v, sub, &format!("{}/{}", path, key)));
+        }
+    }
+    let extra = get(schema, "additionalProperties");
+    for (key, v) in inst {
+        if props.iter().any(|(k, _)| k == key) {
+            continue;
+        }
+        match extra {
+            Some(Json::Bool(false)) => out.push(format!(
+                "{}: 未知字段 {}（不在该 schema 词表内）",
+                path, key
+            )),
+            Some(e) if matches!(e, Json::Object(_)) => {
+                out.extend(subset_validate(v, e, &format!("{}/{}", path, key)));
+            }
+            _ => {}
+        }
+    }
+    out
+}
+
+/// subset_validate 的 array 分支（枚举消息由调用方以 out 传入）。
+fn validate_array(
+    instance: &Json,
+    schema: &Json,
+    path: &str,
+    mut out: Vec<String>,
+) -> Vec<String> {
+    let Json::Array(items) = instance else {
+        return vec![format!(
+            "{}: 应为 array，实为 {}",
+            path,
+            py_type_name(instance)
+        )];
+    };
+    if let Some(m) = get(schema, "minItems") {
+        if let Some(n) = as_int(m) {
+            if (items.len() as i64) < n {
+                out.push(format!(
+                    "{}: 数组长度 {} < minItems {}",
+                    path,
+                    items.len(),
+                    n
+                ));
+            }
+        }
+    }
+    if let Some(m) = get(schema, "maxItems") {
+        if let Some(n) = as_int(m) {
+            if (items.len() as i64) > n {
+                out.push(format!(
+                    "{}: 数组长度 {} > maxItems {}",
+                    path,
+                    items.len(),
+                    n
+                ));
+            }
+        }
+    }
+    let sub = get(schema, "items");
+    for (i, item) in items.iter().enumerate() {
+        if let Some(s) = sub {
+            out.extend(subset_validate(item, s, &format!("{}[{}]", path, i)));
+        } else {
+            out.extend(subset_validate(
+                item,
+                &Json::Null,
+                &format!("{}[{}]", path, i),
+            ));
+        }
+    }
+    out
+}
+
+/// subset_validate 的 string 分支（枚举消息由调用方以 out 传入）。
+fn validate_string(
+    instance: &Json,
+    schema: &Json,
+    path: &str,
+    mut out: Vec<String>,
+) -> Vec<String> {
+    let Json::Str(s) = instance else {
+        return vec![format!(
+            "{}: 应为 string，实为 {}",
+            path,
+            py_type_name(instance)
+        )];
+    };
+    if let Some(m) = get(schema, "minLength") {
+        if let Some(n) = as_int(m) {
+            let len = s.chars().count() as i64;
+            if len < n {
+                out.push(format!("{}: 字符串过短 {} < minLength {}", path, len, n));
+            }
+        }
+    }
+    if let Some(Json::Str(pat)) = get(schema, "pattern") {
+        match cached_regex(pat) {
+            Some(re) => {
+                if !re.is_match(s) {
+                    out.push(format!(
+                        "{}: 值 {} 不匹配 pattern {}",
+                        path,
+                        py_repr(instance),
+                        pat
+                    ));
+                }
+            }
+            None => out.push(format!(
+                "{}: 值 {} 不匹配 pattern {}",
+                path,
+                py_repr(instance),
+                pat
+            )),
+        }
+    }
+    out
+}
+
+/// subset_validate 的 number 分支（枚举消息由调用方以 out 传入）。
+fn validate_number(
+    instance: &Json,
+    schema: &Json,
+    path: &str,
+    mut out: Vec<String>,
+) -> Vec<String> {
+    let ok = matches!(instance, Json::Int(_) | Json::Float(_));
+    if !ok {
+        return vec![format!(
+            "{}: 应为 number，实为 {}",
+            path,
+            py_type_name(instance)
+        )];
+    }
+    if let Some(m) = get(schema, "minimum") {
+        if let (Some(v), Some(n)) = (as_f64(instance), as_f64(m)) {
+            if v < n {
+                out.push(format!(
+                    "{}: 值 {} < minimum {}",
+                    path,
+                    plain_str(instance),
+                    plain_str(m)
+                ));
+            }
+        }
+    }
+    out
 }
 
 fn as_int(j: &Json) -> Option<i64> {
@@ -560,23 +592,7 @@ pub fn scan(root: &Path) -> (Vec<String>, LintStats) {
     let protocol_schema = pick("protocol.schema.json");
     let asset_schema = pick("asset.schema.json");
 
-    let mut contract_covered = 0usize;
-    for rel in &module_docs {
-        let Ok(text) = read_text(root, rel) else {
-            issues.push(format!("{}: 读取失败（本线不复制 Python 异常文本）", rel));
-            continue;
-        };
-        let msgs = lint_doc(
-            &text,
-            "machine_contract",
-            contract_schema.as_ref(),
-            &format!("{} machine_contract", rel),
-            "",
-        );
-        let Some(msgs) = msgs else { continue };
-        contract_covered += 1;
-        issues.extend(msgs);
-    }
+    let contract_covered = lint_module_docs(root, &module_docs, contract_schema.as_ref(), &mut issues);
 
     let reg_modules: Vec<Json> = match jsonread::read_file(root, "desktop/src/core/registry.json") {
         Some(reg) => crate::pyval::arr_items(get(&reg, "modules"))
@@ -594,43 +610,9 @@ pub fn scan(root: &Path) -> (Vec<String>, LintStats) {
         }
     }
 
-    for rel in &pipeline_docs {
-        let Ok(text) = read_text(root, rel) else {
-            issues.push(format!("{}: 读取失败（本线不复制 Python 异常文本）", rel));
-            continue;
-        };
-        let msgs = lint_doc(
-            &text,
-            "Pipeline:",
-            pipeline_schema.as_ref(),
-            &format!("{} Pipeline", rel),
-            "Pipeline",
-        );
-        match msgs {
-            Some(m) => issues.extend(m),
-            None => issues.push(format!("{}: Pipeline yaml 缺失/解析失败", rel)),
-        }
-    }
+    lint_pipeline_docs(root, &pipeline_docs, pipeline_schema.as_ref(), &mut issues);
 
-    for rel in &protocol_files {
-        let text = match read_text(root, rel) {
-            Ok(t) => t,
-            Err(_) => {
-                issues.push(format!(
-                    "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
-                    rel
-                ));
-                continue;
-            }
-        };
-        match miniyaml::parse(&text) {
-            Ok(data) => issues.extend(lint_obj(&data, protocol_schema.as_ref(), rel)),
-            Err(_) => issues.push(format!(
-                "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
-                rel
-            )),
-        }
-    }
+    lint_protocol_files(root, &protocol_files, protocol_schema.as_ref(), &mut issues);
 
     let prov_entries: Vec<Json> = match jsonread::read_file(root, "05_资产库/provenance.json") {
         Some(prov) => crate::pyval::arr_items(get(&prov, "assets"))
@@ -663,6 +645,87 @@ pub fn scan(root: &Path) -> (Vec<String>, LintStats) {
             asset_entries: prov_entries.len(),
         },
     )
+}
+
+/// 模块文档的 machine_contract schema 核对；返回命中覆盖的文档数。
+fn lint_module_docs(
+    root: &Path,
+    module_docs: &[String],
+    contract_schema: Option<&Json>,
+    issues: &mut Vec<String>,
+) -> usize {
+    let mut contract_covered = 0usize;
+    for rel in module_docs {
+        let Ok(text) = read_text(root, rel) else {
+            issues.push(format!("{}: 读取失败（本线不复制 Python 异常文本）", rel));
+            continue;
+        };
+        let msgs = lint_doc(
+            &text,
+            "machine_contract",
+            contract_schema,
+            &format!("{} machine_contract", rel),
+            "",
+        );
+        let Some(msgs) = msgs else { continue };
+        contract_covered += 1;
+        issues.extend(msgs);
+    }
+    contract_covered
+}
+
+/// 管线文档的 Pipeline 段 schema 核对。
+fn lint_pipeline_docs(
+    root: &Path,
+    pipeline_docs: &[String],
+    pipeline_schema: Option<&Json>,
+    issues: &mut Vec<String>,
+) {
+    for rel in pipeline_docs {
+        let Ok(text) = read_text(root, rel) else {
+            issues.push(format!("{}: 读取失败（本线不复制 Python 异常文本）", rel));
+            continue;
+        };
+        let msgs = lint_doc(
+            &text,
+            "Pipeline:",
+            pipeline_schema,
+            &format!("{} Pipeline", rel),
+            "Pipeline",
+        );
+        match msgs {
+            Some(m) => issues.extend(m),
+            None => issues.push(format!("{}: Pipeline yaml 缺失/解析失败", rel)),
+        }
+    }
+}
+
+/// 领域包 protocol.yaml 的整份 schema 核对。
+fn lint_protocol_files(
+    root: &Path,
+    protocol_files: &[String],
+    protocol_schema: Option<&Json>,
+    issues: &mut Vec<String>,
+) {
+    for rel in protocol_files {
+        let text = match read_text(root, rel) {
+            Ok(t) => t,
+            Err(_) => {
+                issues.push(format!(
+                    "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
+                    rel
+                ));
+                continue;
+            }
+        };
+        match miniyaml::parse(&text) {
+            Ok(data) => issues.extend(lint_obj(&data, protocol_schema, rel)),
+            Err(_) => issues.push(format!(
+                "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
+                rel
+            )),
+        }
+    }
 }
 
 // `protocol.yaml` 是**整份** YAML（不是围栏块）——真源走 `load_yaml_cached`，本线走 `miniyaml::parse`。

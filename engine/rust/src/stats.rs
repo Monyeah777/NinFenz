@@ -324,29 +324,7 @@ pub fn compute(root: &Path) -> (Stats, Vec<String>) {
     s.pack_assets = count_suffix_in_subdirs(&root.join("community"), "assets", ".md");
     s.concept_graphs = count_in_subdirs(&root.join("community"), "assets", "CONCEPT_GRAPH.md");
 
-    let cat = jsonread::read_file(root, "protocol/standards_catalog.json")
-        .unwrap_or(Json::Object(Vec::new()));
-    let cov = obj_get(&cat, "coverage")
-        .cloned()
-        .unwrap_or(Json::Object(Vec::new()));
-    for key in [
-        "standards",
-        "reachable",
-        "unreachable",
-        "bodies",
-        "depends_edges",
-        "by_layer",
-    ] {
-        if obj_get(&cov, key).is_none() {
-            issues.push(format!("标准目录 coverage 缺 {}（口径不完整）", key));
-        }
-    }
-    s.standards_total = int_of(obj_get(&cov, "standards"));
-    s.standards_reachable = int_of(obj_get(&cov, "reachable"));
-    s.standards_unreachable = int_of(obj_get(&cov, "unreachable"));
-    s.standards_bodies = int_of(obj_get(&cov, "bodies"));
-    s.standards_edges = int_of(obj_get(&cov, "depends_edges"));
-    s.standards_by_layer = layer_of(obj_get(&cov, "by_layer"));
+    fill_standards_coverage(root, &mut s, &mut issues);
 
     let bind = jsonread::read_file(root, "protocol/standards_binding.json")
         .unwrap_or(Json::Object(Vec::new()));
@@ -401,6 +379,33 @@ pub fn compute(root: &Path) -> (Stats, Vec<String>) {
     }
 
     (s, issues)
+}
+
+/// 标准目录 coverage 的齐全性检查与计数（缺键即报）。
+fn fill_standards_coverage(root: &Path, s: &mut Stats, issues: &mut Vec<String>) {
+    let cat = jsonread::read_file(root, "protocol/standards_catalog.json")
+        .unwrap_or(Json::Object(Vec::new()));
+    let cov = obj_get(&cat, "coverage")
+        .cloned()
+        .unwrap_or(Json::Object(Vec::new()));
+    for key in [
+        "standards",
+        "reachable",
+        "unreachable",
+        "bodies",
+        "depends_edges",
+        "by_layer",
+    ] {
+        if obj_get(&cov, key).is_none() {
+            issues.push(format!("标准目录 coverage 缺 {}（口径不完整）", key));
+        }
+    }
+    s.standards_total = int_of(obj_get(&cov, "standards"));
+    s.standards_reachable = int_of(obj_get(&cov, "reachable"));
+    s.standards_unreachable = int_of(obj_get(&cov, "unreachable"));
+    s.standards_bodies = int_of(obj_get(&cov, "bodies"));
+    s.standards_edges = int_of(obj_get(&cov, "depends_edges"));
+    s.standards_by_layer = layer_of(obj_get(&cov, "by_layer"));
 }
 
 /// 真源 `check`：compute + 生成区比对 + 在盘记录比对（**全只读**）。

@@ -32,6 +32,9 @@ fn fence_re() -> Option<&'static regex::Regex> {
         .as_ref()
 }
 
+// 流式映射的起始字符（与流式序列的 `[` 配对）。
+const FLOW_MAP_OPEN: char = '{';
+
 /// 真源 `_fence_yaml(text, marker)`：取**含 marker 的第一个** ```yaml 块并解析；
 /// 未命中 / 解析失败 / 顶层不是映射 → `None`（等价于"本件无该块"）。
 pub fn fence_yaml(text: &str, marker: &str) -> Option<Json> {
@@ -145,7 +148,7 @@ fn parse_seq(lines: &[(usize, String)], i: &mut usize, indent: usize) -> Result<
             }
             continue;
         }
-        if rest.starts_with('{') || rest.starts_with('[') {
+        if rest.starts_with(FLOW_MAP_OPEN) || rest.starts_with('[') {
             // ⚠️ **流式**项必须直接走 `parse_inline`：否则 `split_key` 会把 `{id: C01, ...}`
             // 当成"块式映射项"（键 `id`、值 `C01, branch: compute, ...`），整条节点被压成一个字符串。
             // 实测（2026-10-04）：概念图资产里节点就写成 `- {id: C01, branch: compute, …}`，

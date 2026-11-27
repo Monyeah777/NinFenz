@@ -123,6 +123,45 @@ pub(super) fn rfc_scan(root: &Path) -> (Vec<String>, RfcStats) {
     let mut seen: Vec<(String, String)> = Vec::new(); // rfc → rel（真源 dict：按 rfc 去重）
     let mut supby: Vec<(String, String)> = Vec::new(); // rfc → 被取代者
 
+    check_rfc_docs(root, &idx, &vocab, &mut issues, &mut seen, &mut supby);
+
+    for (rfc, target) in &supby {
+        if !seen.iter().any(|(r, _)| r == target) {
+            issues.push(format!(
+                "{} 的 Superseded by 指向不在册的编号：{}",
+                rfc, target
+            ));
+            continue;
+        }
+        let mut cur = target.clone();
+        let mut hops = 0usize;
+        while let Some((_, next)) = supby.iter().find(|(r, _)| r == &cur) {
+            if hops >= supby.len() + 1 {
+                break;
+            }
+            cur = next.clone();
+            hops += 1;
+            if cur == *rfc {
+                issues.push(format!("supersede 链成环：{} → … → {}", rfc, rfc));
+                break;
+            }
+        }
+    }
+
+    stats.docs = seen.len();
+    stats.chains = supby.len();
+    (issues, stats)
+}
+
+/// 逐条核对 RFC 索引项与文档头部（编号 / 类目 / 状态 / 日期 / 取代关系）。
+fn check_rfc_docs(
+    root: &Path,
+    idx: &crate::pyjson::Json,
+    vocab: &[String],
+    issues: &mut Vec<String>,
+    seen: &mut Vec<(String, String)>,
+    supby: &mut Vec<(String, String)>,
+) {
     for item in arr_items(get(&idx, "docs")) {
         let rel = py_str(get(item, "path"));
         let rfc = py_str(get(item, "rfc"));
@@ -193,31 +232,5 @@ pub(super) fn rfc_scan(root: &Path) -> (Vec<String>, RfcStats) {
             }
         }
     }
-
-    for (rfc, target) in &supby {
-        if !seen.iter().any(|(r, _)| r == target) {
-            issues.push(format!(
-                "{} 的 Superseded by 指向不在册的编号：{}",
-                rfc, target
-            ));
-            continue;
-        }
-        let mut cur = target.clone();
-        let mut hops = 0usize;
-        while let Some((_, next)) = supby.iter().find(|(r, _)| r == &cur) {
-            if hops >= supby.len() + 1 {
-                break;
-            }
-            cur = next.clone();
-            hops += 1;
-            if cur == *rfc {
-                issues.push(format!("supersede 链成环：{} → … → {}", rfc, rfc));
-                break;
-            }
-        }
-    }
-
-    stats.docs = seen.len();
-    stats.chains = supby.len();
-    (issues, stats)
 }
+

@@ -68,6 +68,9 @@ pub struct Proto {
     pub references: Vec<(String, String)>,
 }
 
+// 分层清单行正则。模式串含裸花括号，提为常量以免被朴素括号计数误判。
+const LAYER_DECL_PAT: &str = r"(?m)^\s*(P\d{2})\s*[^:]*:\s*\{default:\s*\[([^\]]*)\]";
+
 /// 真源 `_parse_protocol`。
 pub fn parse_protocol(path: &Path) -> Proto {
     let text = std::fs::read(path)
@@ -122,8 +125,7 @@ pub fn parse_protocol(path: &Path) -> Proto {
         }
     }
     out.module_ids = ids;
-    let re_layer = regex::Regex::new(r"(?m)^\s*(P\d{2})\s*[^:]*:\s*\{default:\s*\[([^\]]*)\]")
-        .expect("固定合法");
+    let re_layer = regex::Regex::new(LAYER_DECL_PAT).expect("固定合法");
     for c in re_layer.captures_iter(&text) {
         let mods: Vec<String> = c[2]
             .split(',')
@@ -335,30 +337,7 @@ pub fn profiles(root: &Path) -> Vec<(String, Json)> {
     let mut out: Vec<(String, Json)> = Vec::new();
     for d in pack_dirs(root) {
         let proto = parse_protocol(&root.join("community").join(&d).join("protocol.yaml"));
-        let mut own: Vec<Json> = Vec::new();
-        for mid in &proto.module_ids {
-            let rec = contracts
-                .iter()
-                .find(|(k, _)| k == mid)
-                .map(|(_, v)| v.clone())
-                .or_else(|| {
-                    let tail = mid.rsplit(':').next().unwrap_or(mid);
-                    contracts
-                        .iter()
-                        .find(|(k, _)| k == tail)
-                        .map(|(_, v)| v.clone())
-                });
-            own.push(rec.unwrap_or_else(|| {
-                Json::Object(vec![
-                    ("id".to_string(), Json::Str(mid.clone())),
-                    ("layer".to_string(), Json::Str(String::new())),
-                    ("inputs".to_string(), Json::Array(vec![])),
-                    ("publish".to_string(), Json::Array(vec![])),
-                    ("subscribe".to_string(), Json::Array(vec![])),
-                    ("pack".to_string(), Json::Str(proto.id.clone())),
-                ])
-            }));
-        }
+        let own = profile_modules(&proto, &contracts);
         let mut layers: Vec<(String, Vec<String>)> = Vec::new();
         for rec in &own {
             let lay = s_of(obj_get(rec, "layer"));
@@ -435,6 +414,35 @@ pub fn profiles(root: &Path) -> Vec<(String, Json)> {
         out.push((proto.id, rec));
     }
     out
+}
+
+/// 单包的模块记录（契约查不到时给空壳，真源同款）。
+fn profile_modules(proto: &Proto, contracts: &[(String, Json)]) -> Vec<Json> {
+    let mut own: Vec<Json> = Vec::new();
+    for mid in &proto.module_ids {
+        let rec = contracts
+            .iter()
+            .find(|(k, _)| k == mid)
+            .map(|(_, v)| v.clone())
+            .or_else(|| {
+                let tail = mid.rsplit(':').next().unwrap_or(mid);
+                contracts
+                    .iter()
+                    .find(|(k, _)| k == tail)
+                    .map(|(_, v)| v.clone())
+            });
+        own.push(rec.unwrap_or_else(|| {
+            Json::Object(vec![
+                ("id".to_string(), Json::Str(mid.clone())),
+                ("layer".to_string(), Json::Str(String::new())),
+                ("inputs".to_string(), Json::Array(vec![])),
+                ("publish".to_string(), Json::Array(vec![])),
+                ("subscribe".to_string(), Json::Array(vec![])),
+                ("pack".to_string(), Json::Str(proto.id.clone())),
+            ])
+        }));
+    }
+    own
 }
 
 type Index = (

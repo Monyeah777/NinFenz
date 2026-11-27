@@ -8,6 +8,7 @@ import androidx.compose.ui.test.performScrollTo
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import dev.ninfenz.mobile.data.LibraryStore
+import dev.ninfenz.mobile.data.ProjectBuildSpec
 import dev.ninfenz.mobile.data.ProjectFactory
 import dev.ninfenz.mobile.model.ProjectModel
 import dev.ninfenz.mobile.ui.screens.AssemblyScreen
@@ -80,12 +81,12 @@ class EnglishBodyLocaleTest {
     fun authorMissingPackUsesEnglishBody() {
         val hex = "0123456789abcdef".repeat(4)
         val project = ProjectModel.parse(
-            ProjectFactory.build(
+            ProjectFactory.build(ProjectBuildSpec(
                 id = "p", title = "P", packId = "demo-pack", packVersion = "1.0.0", packTree = hex,
                 protocolId = "proto", protocolVersion = "1.0.0", protocolDigest = hex,
                 graphId = "graph", graphVersion = "1.0.0", graphDigest = hex, graphSha256 = hex,
                 specId = "spec", specVersion = "1.0.0", specDigest = hex, specSha256 = hex
-            ).toString()
+            )).toString()
         )
         compose.setContent { NfTheme { AuthorScreen(project = project, pack = null, onBack = {}, onAssembly = {}) } }
         compose.onNodeWithText("Bound pack is not on this device").assertIsDisplayed()
@@ -95,12 +96,12 @@ class EnglishBodyLocaleTest {
     fun deliveryMissingPackUsesEnglishBody() {
         val hex = "0123456789abcdef".repeat(4)
         val project = ProjectModel.parse(
-            ProjectFactory.build(
+            ProjectFactory.build(ProjectBuildSpec(
                 id = "p", title = "P", packId = "demo-pack", packVersion = "1.0.0", packTree = hex,
                 protocolId = "proto", protocolVersion = "1.0.0", protocolDigest = hex,
                 graphId = "graph", graphVersion = "1.0.0", graphDigest = hex, graphSha256 = hex,
                 specId = "spec", specVersion = "1.0.0", specDigest = hex, specSha256 = hex
-            ).toString()
+            )).toString()
         )
         compose.setContent { NfTheme { DeliveryScreen(project = project, pack = null, onBack = {}) } }
         compose.onNodeWithText("Bound pack is not on this device").assertIsDisplayed()

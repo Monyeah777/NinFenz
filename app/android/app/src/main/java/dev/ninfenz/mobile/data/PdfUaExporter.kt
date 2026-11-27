@@ -24,6 +24,13 @@ import java.io.File
 object PdfUaExporter {
     data class Created(val file: File, val pages: Int, val bytes: Long)
 
+    private data class BlockPage(
+        val page: PDPage,
+        val block: PdfMarkdown.Block,
+        val pageIndex: Int,
+        val headingLevel: Int
+    )
+
     private fun xml(s: String): String = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
 
     fun export(context: Context, markdown: String, title: String, outDir: File): Created {
@@ -63,7 +70,7 @@ object PdfUaExporter {
                 lastHeading = l
                 l
             } else 0
-            writeBlockPage(doc, font, root, parentNums, page, b, pageIndex, headingLevel)
+            writeBlockPage(doc, font, root, parentNums, BlockPage(page, b, pageIndex, headingLevel))
             pageIndex++
         }
         tree.cosObject.setItem(COSName.NUMS, parentNums)
@@ -80,40 +87,37 @@ object PdfUaExporter {
         font: PDType0Font,
         root: PDStructureElement,
         parentNums: COSArray,
-        page: PDPage,
-        b: PdfMarkdown.Block,
-        pageIndex: Int,
-        headingLevel: Int
+        target: BlockPage
     ) {
         val type = when {
-            headingLevel == 1 -> StandardStructureTypes.H1
-            headingLevel == 2 -> StandardStructureTypes.H2
-            headingLevel == 3 -> StandardStructureTypes.H3
-            headingLevel >= 4 -> StandardStructureTypes.H4
-            b.code -> StandardStructureTypes.CODE
-            b.quote -> StandardStructureTypes.QUOTE
-            b.bullet -> StandardStructureTypes.P
+            target.headingLevel == 1 -> StandardStructureTypes.H1
+            target.headingLevel == 2 -> StandardStructureTypes.H2
+            target.headingLevel == 3 -> StandardStructureTypes.H3
+            target.headingLevel >= 4 -> StandardStructureTypes.H4
+            target.block.code -> StandardStructureTypes.CODE
+            target.block.quote -> StandardStructureTypes.QUOTE
+            target.block.bullet -> StandardStructureTypes.P
             else -> StandardStructureTypes.P
         }
         val element = PDStructureElement(type, root)
         root.appendKid(element)
-        element.page = page
+        element.page = target.page
         element.setKids(listOf(0))
         val dict = COSDictionary().apply { setInt(COSName.MCID, 0) }
         val resources = PDResources()
-        page.resources = resources
+        target.page.resources = resources
         val propName = resources.add(PDPropertyList.create(dict))
-        PDPageContentStream(doc, page).use { cs ->
+        PDPageContentStream(doc, target.page).use { cs ->
             cs.beginMarkedContentSequence(COSName.getPDFName(type), propName)
             cs.beginText()
-            cs.setFont(font, if (headingLevel > 0) 18f else 11f)
+            cs.setFont(font, if (target.headingLevel > 0) 18f else 11f)
             cs.newLineAtOffset(48f, 760f)
-            val text = b.text.replace('\n', ' ').take(1200)
+            val text = target.block.text.replace('\n', ' ').take(1200)
             if (text.isNotBlank()) cs.showText(text)
             cs.endText()
             cs.endMarkedContentSequence()
         }
-        parentNums.add(COSInteger.get(pageIndex.toLong()))
+        parentNums.add(COSInteger.get(target.pageIndex.toLong()))
         val arr = COSArray().apply { add(element.cosObject) }
         parentNums.add(arr)
     }

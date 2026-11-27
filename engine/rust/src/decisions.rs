@@ -53,11 +53,13 @@ fn re_dated() -> &'static regex::Regex {
     RE.get_or_init(|| regex::Regex::new(r"^\d{4}-\d{2}-\d{2}$").expect("日期正则固定合法"))
 }
 
+// check 定义行正则。模式串含裸花括号，提为常量以免被朴素括号计数误判。
+const CHECK_DEF_PAT: &str = r"(?m)^check(\d+)\(\)\{";
+
 fn check_ids(root: &Path) -> BTreeSet<String> {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    let re = RE.get_or_init(|| {
-        regex::Regex::new(r"(?m)^check(\d+)\(\)\{").expect("check 定义正则固定合法")
-    });
+    let re =
+        RE.get_or_init(|| regex::Regex::new(CHECK_DEF_PAT).expect("check 定义正则固定合法"));
     std::fs::read_to_string(root.join("verify.sh"))
         .map(|t| re.captures_iter(&t).map(|c| c[1].to_string()).collect())
         .unwrap_or_default()
@@ -115,95 +117,16 @@ pub fn scan(root: &Path) -> (Vec<String>, usize, usize, usize) {
     let mut ids: Vec<(String, String)> = Vec::new(); // id → file（真源 dict：同 id 覆盖）
     let mut supby: Vec<(String, String)> = Vec::new();
     for e in &rows {
-        let fm = &e.fm;
-        let name = &e.file;
-        let did = py_str(get(fm, "id"));
-        let tag = if did.is_empty() {
-            name.clone()
-        } else {
-            did.clone()
-        };
-        if did.is_empty() {
-            issues.push(format!("{} 缺 frontmatter id", name));
-            continue;
-        }
-        if !re_id().is_match(&did) {
-            issues.push(format!("{} 的 id 不合法（须 ADR-四位数字）：{}", name, did));
-        }
-        match re_file_id().captures(name) {
-            Some(c) if format!("ADR-{}", &c[1]) == did => {}
-            _ => issues.push(format!("{} 的 id 与文件名不一致：{}", name, did)),
-        }
-        if let Some((_, prev)) = ids.iter().find(|(i, _)| *i == did) {
-            issues.push(format!("ADR 编号重复：{}（{} 与 {}）", did, prev, name));
-            if let Some(slot) = ids.iter_mut().find(|(i, _)| *i == did) {
-                slot.1 = name.clone();
-            }
-        } else {
-            ids.push((did.clone(), name.clone()));
-        }
-        for k in ["title", "status", "date", "evidence"] {
-            if !py_truthy(get(fm, k).unwrap_or(&Json::Null)) {
-                issues.push(format!("{} 缺必填字段：{}", tag, k));
-            }
-        }
-        let st = py_str(get(fm, "status"));
-        if !st.is_empty() && !STATUSES.contains(&st.as_str()) {
-            issues.push(format!(
-                "{} 的 status 越词表：{}（{}）",
-                tag,
-                st,
-                STATUSES.join("/")
-            ));
-        }
-        let date = py_str(get(fm, "date"));
-        if !date.is_empty() && !re_dated().is_match(&date) {
-            issues.push(format!("{} 的 date 非 YYYY-MM-DD：{}", tag, date));
-        }
-        for sec in SECTIONS {
-            if !e.body.contains(sec) {
-                issues.push(format!("{} 正文缺段落：{}", tag, sec));
-            }
-        }
-        for ev in arr_items(get(fm, "evidence")) {
-            let s = plain_str(ev).trim().to_string();
-            if s.is_empty() {
-                issues.push(format!("{} 的 evidence 有空项", tag));
-                continue;
-            }
-            if let Some(c) = re_check().captures(&s) {
-                if !checks.contains(&c[1]) {
-                    issues.push(format!("{} 的 evidence 指向不存在的 check：{}", tag, s));
-                }
-                continue;
-            }
-            if re_adr().is_match(&s) {
-                continue;
-            }
-            if !root.join(s.replace('\\', "/")).exists() {
-                issues.push(format!(
-                    "{} 的 evidence 无法解析：{}（修复指引：改为真实件路径，或 checkN，或 ADR-N）",
-                    tag, s
-                ));
-            }
-        }
-        if st == "accepted" && has_receipts && !receipts.contains(&e.path) {
-            issues.push(format!(
-                "{} 已 accepted 但未被协议回执锚定（修复指引：nf receipts --write）——未锚定的 accepted 等于可被偷改",
-                tag
-            ));
-        }
-        let sb = py_str(get(fm, "superseded_by")).trim().to_string();
-        if st == "superseded" && DASHES.contains(&sb.as_str()) {
-            issues.push(format!("{} 标 superseded 但缺 superseded_by", tag));
-        }
-        if !DASHES.contains(&sb.as_str()) {
-            if let Some(slot) = supby.iter_mut().find(|(i, _)| *i == did) {
-                slot.1 = sb;
-            } else {
-                supby.push((did.clone(), sb));
-            }
-        }
+        decision_entry_issue(
+            e,
+            &checks,
+            &receipts,
+            has_receipts,
+            root,
+            &mut issues,
+            &mut ids,
+            &mut supby,
+        );
     }
 
     for (did, target) in &supby {
@@ -246,6 +169,108 @@ pub fn scan(root: &Path) -> (Vec<String>, usize, usize, usize) {
         .filter(|e| plain_str_opt(get(&e.fm, "status")) == "accepted")
         .count();
     (issues, ids.len(), accepted, supby.len())
+}
+
+/// 逐条 ADR 的前置面核对（字段 / 状态 / 段落 / evidence / 回执锚定 / 取代关系）。
+fn decision_entry_issue(
+    e: &Entry,
+    checks: &BTreeSet<String>,
+    receipts: &BTreeSet<String>,
+    has_receipts: bool,
+    root: &Path,
+    issues: &mut Vec<String>,
+    ids: &mut Vec<(String, String)>,
+    supby: &mut Vec<(String, String)>,
+) {
+    let fm = &e.fm;
+    let name = &e.file;
+    let did = py_str(get(fm, "id"));
+    let tag = if did.is_empty() {
+        name.clone()
+    } else {
+        did.clone()
+    };
+    if did.is_empty() {
+        issues.push(format!("{} 缺 frontmatter id", name));
+        return;
+    }
+    if !re_id().is_match(&did) {
+        issues.push(format!("{} 的 id 不合法（须 ADR-四位数字）：{}", name, did));
+    }
+    match re_file_id().captures(name) {
+        Some(c) if format!("ADR-{}", &c[1]) == did => {}
+        _ => issues.push(format!("{} 的 id 与文件名不一致：{}", name, did)),
+    }
+    if let Some((_, prev)) = ids.iter().find(|(i, _)| *i == did) {
+        issues.push(format!("ADR 编号重复：{}（{} 与 {}）", did, prev, name));
+        if let Some(slot) = ids.iter_mut().find(|(i, _)| *i == did) {
+            slot.1 = name.clone();
+        }
+    } else {
+        ids.push((did.clone(), name.clone()));
+    }
+    for k in ["title", "status", "date", "evidence"] {
+        if !py_truthy(get(fm, k).unwrap_or(&Json::Null)) {
+            issues.push(format!("{} 缺必填字段：{}", tag, k));
+        }
+    }
+    let st = py_str(get(fm, "status"));
+    if !st.is_empty() && !STATUSES.contains(&st.as_str()) {
+        issues.push(format!(
+            "{} 的 status 越词表：{}（{}）",
+            tag,
+            st,
+            STATUSES.join("/")
+        ));
+    }
+    let date = py_str(get(fm, "date"));
+    if !date.is_empty() && !re_dated().is_match(&date) {
+        issues.push(format!("{} 的 date 非 YYYY-MM-DD：{}", tag, date));
+    }
+    for sec in SECTIONS {
+        if !e.body.contains(sec) {
+            issues.push(format!("{} 正文缺段落：{}", tag, sec));
+        }
+    }
+    for ev in arr_items(get(fm, "evidence")) {
+        let s = plain_str(ev).trim().to_string();
+        if s.is_empty() {
+            issues.push(format!("{} 的 evidence 有空项", tag));
+            continue;
+        }
+        if let Some(c) = re_check().captures(&s) {
+            if !checks.contains(&c[1]) {
+                issues.push(format!("{} 的 evidence 指向不存在的 check：{}", tag, s));
+            }
+            continue;
+        }
+        if re_adr().is_match(&s) {
+            continue;
+        }
+        if !root.join(s.replace('\\', "/")).exists() {
+            issues.push(format!(
+                "{} 的 evidence 无法解析：{}（修复指引：改为真实件路径，或 checkN，或 ADR-N）",
+                tag, s
+            ));
+        }
+    }
+    if st == "accepted" && has_receipts && !receipts.contains(&e.path) {
+        issues.push(format!(
+            "{} 已 accepted 但未被协议回执锚定（修复指引：nf receipts --write）——未锚定的 accepted 等于可被偷改",
+            tag
+        ));
+    }
+    let sb = py_str(get(fm, "superseded_by")).trim().to_string();
+    if st == "superseded" && DASHES.contains(&sb.as_str()) {
+        issues.push(format!("{} 标 superseded 但缺 superseded_by", tag));
+    }
+    if !DASHES.contains(&sb.as_str()) {
+        if let Some(slot) = supby.iter_mut().find(|(i, _)| *i == did) {
+            slot.1 = sb;
+        } else {
+            supby.push((did.clone(), sb));
+        }
+    }
 }
 
 /// 真源 `render_index`：投影表。

@@ -77,46 +77,57 @@ def _apply_effect(state: dict[str, Any], op_id: str, payload: dict[str, Any],
         state["last_observation"] = {"reading": payload["reading"],
                                      "observation": payload["observation"]}
         effect["last_observation"] = state["last_observation"]
-    elif op_id == "estimate":
+        return effect
+    if op_id == "estimate":
         state["estimate"] = {"claim": payload["claim"], "value": payload["value"],
                              "basis": payload["basis"], "digest": digest_of(payload)}
         effect["estimate"] = state["estimate"]
-    elif op_id == "detect":
+        return effect
+    if op_id == "detect":
         state["detected"].append({"anomaly": payload["anomaly"],
                                   "evidence": payload["evidence"]})
         effect["detected"] = len(state["detected"])
-    elif op_id == "calibrate":
+        return effect
+    if op_id == "calibrate":
         state["calibration"].append({"estimate_ref": payload["estimate_ref"],
                                      "actual": payload["actual"], "gap": payload["gap"]})
         effect["calibration"] = state["calibration"][-1]
-    elif op_id == "allocate":
+        return effect
+    if op_id == "allocate":
         if discourse is not None:
             discourse["budget"]["steps_max"] = int(payload["to"])
         effect["budget"] = {"from": payload["from"], "to": payload["to"]}
-    elif op_id == "switch":
+        return effect
+    if op_id == "switch":
         state["strategy"] = str(payload["to"])
         effect["strategy"] = state["strategy"]
-    elif op_id == "stop":
+        return effect
+    if op_id == "stop":
         state["status"] = "stopped"
         effect["status"] = "stopped"
-    elif op_id == "abstain":
+        return effect
+    if op_id == "abstain":
         state["abstained"].append({"question": payload["question"],
                                    "missing": payload["missing"],
                                    "searched": payload["searched"]})
         state["status"] = "abstained"
         effect["abstained"] = state["abstained"][-1]
-    elif op_id == "revise":
+        return effect
+    if op_id == "revise":
         state["revision"] = {"target": payload["target"], "before": payload["before"],
                              "after": payload["after"]}
         effect["revision"] = state["revision"]
-    elif op_id == "request_context":
+        return effect
+    if op_id == "request_context":
         state["context_request"] = {"missing": payload["missing"],
                                     "needed_for": payload["needed_for"]}
         effect["context_request"] = state["context_request"]
-    elif op_id == "audit":
+        return effect
+    if op_id == "audit":
         state["audit"].append({"target": payload["target"],
                                "finding": payload["finding"]})
         effect["audit"] = state["audit"][-1]
+        return effect
     return effect
 
 

@@ -10,7 +10,7 @@ class ExportProfileStoreTest {
     fun savesAppliesAndRemoves() {
         val dir = Files.createTempDirectory("nf-export-profile").toFile()
         val store = ExportProfileStore(dir)
-        store.save("brand", "<styles/>", "<sectPr/>", "<theme/>", null, null, null, "作者", "en", "Letter", false)
+        store.save(ExportProfileStore.ProfileInput("brand", "<styles/>", "<sectPr/>", "<theme/>", null, null, null, "作者", "en", "Letter", false))
         val profiles = store.load()
         assertEquals(1, profiles.size)
         assertEquals("brand", profiles.first().name)

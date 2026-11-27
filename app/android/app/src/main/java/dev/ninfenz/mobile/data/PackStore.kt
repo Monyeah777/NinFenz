@@ -68,20 +68,7 @@ object PackRegistry {
                     database.rawQuery("SELECT COUNT(*) FROM pack_registry", null).use { c ->
                         if (c.moveToFirst()) count = c.getLong(0)
                     }
-                    if (count == 0L) {
-                        jsonLoad(filesDir).forEach { (key, entry) ->
-                            val at = key.lastIndexOf('@')
-                            if (at > 0) {
-                                val values = ContentValues().apply {
-                                    put("id", key.substring(0, at))
-                                    put("version", key.substring(at + 1))
-                                    put("installed_at", entry.installedAt)
-                                    put("source", entry.source)
-                                }
-                                database.insertWithOnConflict("pack_registry", null, values, SQLiteDatabase.CONFLICT_REPLACE)
-                            }
-                        }
-                    }
+                    if (count == 0L) migrateJsonEntries(database, filesDir)
                     database.setTransactionSuccessful()
                 } finally {
                     database.endTransaction()
@@ -160,6 +147,21 @@ object PackRegistry {
     }
 
     private fun dbFile(filesDir: File): File = File(filesDir, "library/pack-registry.db")
+
+    private fun migrateJsonEntries(database: SQLiteDatabase, filesDir: File) {
+        jsonLoad(filesDir).forEach { (key, entry) ->
+            val at = key.lastIndexOf('@')
+            if (at > 0) {
+                val values = ContentValues().apply {
+                    put("id", key.substring(0, at))
+                    put("version", key.substring(at + 1))
+                    put("installed_at", entry.installedAt)
+                    put("source", entry.source)
+                }
+                database.insertWithOnConflict("pack_registry", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+            }
+        }
+    }
 
     private fun sqliteLoad(filesDir: File): Map<String, PackRegistryEntry>? {
         return try {

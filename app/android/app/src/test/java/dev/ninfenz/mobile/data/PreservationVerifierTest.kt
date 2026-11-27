@@ -27,9 +27,9 @@ class PreservationVerifierTest {
         val first = PreservationExporter.export("# 一\n\n甲", "一", "p1", dir)
         val sha = java.security.MessageDigest.getInstance("SHA-256").digest(first.file.readBytes())
             .joinToString("") { "%02x".format(it.toInt() and 0xff) }
-        val second = PreservationExporter.export("# 二\n\n乙", "二", "p1", dir, null, null, sha)
+        val second = PreservationExporter.export("# 二\n\n乙", "二", "p1", dir, PreservationOptions(null, null, sha))
         assertTrue(PreservationVerifier.chain(first.file, second.file).errors.toString(), PreservationVerifier.chain(first.file, second.file).ok)
-        val bad = PreservationExporter.export("# 三\n\n丙", "三", "p1", dir, null, null, "0".repeat(64))
+        val bad = PreservationExporter.export("# 三\n\n丙", "三", "p1", dir, PreservationOptions(null, null, "0".repeat(64)))
         assertFalse(PreservationVerifier.chain(first.file, bad.file).ok)
     }
 

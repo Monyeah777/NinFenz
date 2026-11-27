@@ -101,9 +101,9 @@ fun ProtocolScreen(onBack: () -> Unit) {
                 onEnabledChange = { enabled = it }
             )
 
-            ProtocolRenderCard(rawPack, values, explainRules, busy, rendered, renderError, explainLines,
+            ProtocolRenderCard(ProtocolRenderCardArgs(rawPack, values, explainRules, busy, rendered, renderError, explainLines,
                 onBusyChange = { busy = it }, onRenderError = { renderError = it }, onRendered = { rendered = it },
-                onExplainLines = { explainLines = it }, onExplainRulesChange = { explainRules = it })
+                onExplainLines = { explainLines = it }, onExplainRulesChange = { explainRules = it }))
         }
     }
 }
@@ -197,21 +197,23 @@ private fun ProtocolClauseCards(
         }
     }
 }
+internal data class ProtocolRenderCardArgs(
+    val rawPack: JsonObject?,
+    val values: Map<String, String>,
+    val explainRules: Boolean,
+    val busy: Boolean,
+    val rendered: List<String>?,
+    val renderError: CoreError?,
+    val explainLines: List<String>,
+    val onBusyChange: (Boolean) -> Unit,
+    val onRenderError: (CoreError?) -> Unit,
+    val onRendered: (List<String>?) -> Unit,
+    val onExplainLines: (List<String>) -> Unit,
+    val onExplainRulesChange: (Boolean) -> Unit,
+)
+
 @Composable
-private fun ProtocolRenderCard(
-    rawPack: JsonObject?,
-    values: Map<String, String>,
-    explainRules: Boolean,
-    busy: Boolean,
-    rendered: List<String>?,
-    renderError: CoreError?,
-    explainLines: List<String>,
-    onBusyChange: (Boolean) -> Unit,
-    onRenderError: (CoreError?) -> Unit,
-    onRendered: (List<String>?) -> Unit,
-    onExplainLines: (List<String>) -> Unit,
-    onExplainRulesChange: (Boolean) -> Unit
-) {
+private fun ProtocolRenderCard(args: ProtocolRenderCardArgs) = with(args) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     CardBox(title = stringResource(dev.ninfenz.mobile.R.string.protocol_render)) {

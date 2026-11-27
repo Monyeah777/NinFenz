@@ -180,34 +180,7 @@ fn classification(rows: &[Row]) -> Result<Json, String> {
         .iter()
         .map(|l| *cm.get(&(l.clone(), l.clone())).unwrap_or(&0))
         .sum();
-    let per: Vec<(String, Json)> = labels
-        .iter()
-        .map(|l| {
-            let tp = *cm.get(&(l.clone(), l.clone())).unwrap_or(&0);
-            let fp: i64 = labels
-                .iter()
-                .filter(|g| *g != l)
-                .map(|g| *cm.get(&(g.clone(), l.clone())).unwrap_or(&0))
-                .sum();
-            let fnn: i64 = labels
-                .iter()
-                .filter(|p| p != &l)
-                .map(|p| *cm.get(&(l.clone(), p.clone())).unwrap_or(&0))
-                .sum();
-            let p = safe_div(tp as f64, (tp + fp) as f64);
-            let rc = safe_div(tp as f64, (tp + fnn) as f64);
-            let f1 = safe_div(2.0 * p * rc, p + rc);
-            (
-                l.clone(),
-                Json::Object(vec![
-                    ("precision".to_string(), jnum(r6(p))),
-                    ("recall".to_string(), jnum(r6(rc))),
-                    ("f1".to_string(), jnum(r6(f1))),
-                    ("support".to_string(), Json::Int(tp + fnn)),
-                ]),
-            )
-        })
-        .collect();
+    let per = per_label_metrics(&labels, &cm);
     let macro_of = |k: &str| -> f64 {
         let s: f64 = per
             .iter()
@@ -268,6 +241,41 @@ fn classification(rows: &[Row]) -> Result<Json, String> {
         out.push(("roc_auc".to_string(), jnum(r6(auc(&pairs)))));
     }
     Ok(Json::Object(out))
+}
+
+/// 逐标签 precision / recall / f1 / support（真源 `classification` 的 `per` 段）。
+fn per_label_metrics(
+    labels: &[String],
+    cm: &BTreeMap<(String, String), i64>,
+) -> Vec<(String, Json)> {
+    labels
+        .iter()
+        .map(|l| {
+            let tp = *cm.get(&(l.clone(), l.clone())).unwrap_or(&0);
+            let fp: i64 = labels
+                .iter()
+                .filter(|g| *g != l)
+                .map(|g| *cm.get(&(g.clone(), l.clone())).unwrap_or(&0))
+                .sum();
+            let fnn: i64 = labels
+                .iter()
+                .filter(|p| p != &l)
+                .map(|p| *cm.get(&(l.clone(), p.clone())).unwrap_or(&0))
+                .sum();
+            let p = safe_div(tp as f64, (tp + fp) as f64);
+            let rc = safe_div(tp as f64, (tp + fnn) as f64);
+            let f1 = safe_div(2.0 * p * rc, p + rc);
+            (
+                l.clone(),
+                Json::Object(vec![
+                    ("precision".to_string(), jnum(r6(p))),
+                    ("recall".to_string(), jnum(r6(rc))),
+                    ("f1".to_string(), jnum(r6(f1))),
+                    ("support".to_string(), Json::Int(tp + fnn)),
+                ]),
+            )
+        })
+        .collect()
 }
 
 /// 真源 `retrieval`。

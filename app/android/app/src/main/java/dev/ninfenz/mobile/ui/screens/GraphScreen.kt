@@ -1,5 +1,4 @@
 package dev.ninfenz.mobile.ui.screens
-
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -110,10 +109,10 @@ fun GraphScreen(store: LibraryStore, onBack: () -> Unit) {
                 onEdgeToChange = { edgeTo = it }, onEdgeFromPortChange = { edgeFromPort = it },
                 onEdgeToPortChange = { edgeToPort = it }, onInvalidate = { report = null; planSummary = null })
             GraphLocalCheckCard(g, context)
-            GraphCoreCards(g, store, busy, savedPath, report, planSummary, compileRepro,
+            GraphCoreCards(GraphCoreCardsArgs(g, store, busy, savedPath, report, planSummary, compileRepro,
                 onBusyChange = { busy = it }, onError = { error = it }, onReport = { report = it },
                 onPlanSummary = { planSummary = it }, onCompileRepro = { compileRepro = it },
-                onSavedPath = { savedPath = it })
+                onSavedPath = { savedPath = it }))
         }
     }
 }
@@ -279,123 +278,5 @@ private fun GraphEdgesCard(
             onGraphChange(GraphModel.withEdge(g, edge))
             onInvalidate()
         }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_add_edge)) }
-    }
-}
-
-@Composable
-private fun GraphCoreCards(
-    g: PipelineGraph,
-    store: LibraryStore,
-    busy: Boolean,
-    savedPath: String?,
-    report: ValidateReport?,
-    planSummary: String?,
-    compileRepro: String?,
-    onBusyChange: (Boolean) -> Unit,
-    onError: (CoreError?) -> Unit,
-    onReport: (ValidateReport?) -> Unit,
-    onPlanSummary: (String?) -> Unit,
-    onCompileRepro: (String?) -> Unit,
-    onSavedPath: (String?) -> Unit
-) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_core)) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Button(enabled = !busy, onClick = {
-                scope.launch { runGraphValidate(context, g, onBusyChange, onError, onReport) }
-            }) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.graph_calling) else "core graph-validate") }
-            Button(enabled = !busy, onClick = {
-                scope.launch { runGraphCompile(context, g, onBusyChange, onError, onPlanSummary, onCompileRepro) }
-            }) { Text(if (busy) context.getString(dev.ninfenz.mobile.R.string.graph_calling) else "core graph-compile") }
-        }
-        report?.let { r ->
-            KeyValue(context.getString(dev.ninfenz.mobile.R.string.graph_validate_label), ReportModel.line(r))
-            for (issue in r.issues) Notice(issue.code + " " + (issue.path ?: "-") + "：" + issue.message + context.getString(dev.ninfenz.mobile.R.string.error_fix_suffix) + issue.fix,
-                if (issue.severity == "error") Tone.ERROR else Tone.WARN)
-        }
-        planSummary?.let { MonoText(it) }
-        compileRepro?.let { MonoText(it) }
-    }
-
-    CardBox(title = stringResource(dev.ninfenz.mobile.R.string.graph_save)) {
-        Button(onClick = {
-            val path = store.saveDraft("graph-" + g.id, GraphModel.toJson(g).toString())
-            onSavedPath(path.absolutePath)
-        }) { Text(stringResource(dev.ninfenz.mobile.R.string.graph_save_draft)) }
-        savedPath?.let { Notice(context.getString(dev.ninfenz.mobile.R.string.graph_saved_prefix, it), Tone.INFO) }
-    }
-}
-
-private suspend fun runGraphValidate(
-    context: android.content.Context,
-    g: PipelineGraph,
-    onBusyChange: (Boolean) -> Unit,
-    onError: (CoreError?) -> Unit,
-    onReport: (ValidateReport?) -> Unit
-) {
-    onBusyChange(true)
-    onError(null)
-    onReport(null)
-    try {
-        val payload = buildJsonObject { put("graph", GraphModel.toJson(g)) }
-        val response = safeCall("graph-validate", payload)
-        if (response.ok) {
-            response.resultObject()?.let { onReport(ReportModel.parse(it)) }
-        } else if (response.exit == 1 && response.result != null) {
-            (response.result as? JsonObject)?.let { onReport(ReportModel.parse(it)) }
-            onError(response.error)
-        } else {
-            onError(response.error)
-        }
-    } finally {
-        onBusyChange(false)
-    }
-}
-
-private suspend fun runGraphCompile(
-    context: android.content.Context,
-    g: PipelineGraph,
-    onBusyChange: (Boolean) -> Unit,
-    onError: (CoreError?) -> Unit,
-    onPlanSummary: (String?) -> Unit,
-    onCompileRepro: (String?) -> Unit
-) {
-    onBusyChange(true)
-    onError(null)
-    onPlanSummary(null)
-    onCompileRepro(null)
-    try {
-        val payload = buildJsonObject { put("graph", GraphModel.toJson(g)) }
-        val response = safeCall("graph-compile", payload)
-        if (response.ok) {
-            val result = response.resultObject()
-            if (result != null) {
-                val second = safeCall("graph-compile", payload)
-                val secondResult = second.resultObject()
-                if (second.ok && secondResult != null) {
-                    val offset = dev.ninfenz.mobile.data.ReproChecker.firstDifference(
-                        result.toString().toByteArray(Charsets.UTF_8),
-                        secondResult.toString().toByteArray(Charsets.UTF_8)
-                    )
-                    onCompileRepro(if (offset == null) {
-                        context.getString(dev.ninfenz.mobile.R.string.repro_stable)
-                    } else {
-                        context.getString(dev.ninfenz.mobile.R.string.repro_diff, offset)
-                    })
-                }
-            }
-            onPlanSummary(if (result == null) context.getString(dev.ninfenz.mobile.R.string.graph_core_no_plan) else
-                context.getString(
-                    dev.ninfenz.mobile.R.string.graph_plan_summary,
-                    J.optString(result, "digest") ?: context.getString(dev.ninfenz.mobile.R.string.graph_none),
-                    J.optArray(result, "steps").size,
-                    J.optStringList(result, "slots").joinToString(",")
-                ))
-        } else {
-            onError(response.error)
-        }
-    } finally {
-        onBusyChange(false)
     }
 }

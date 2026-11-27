@@ -24,6 +24,15 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 
+private data class AuthorRefUpdate(
+    val kind: String,
+    val id: String,
+    val version: String,
+    val digest: String,
+    val relative: String,
+    val sha: String
+)
+
 sealed interface SaveArtifactResult {
     data class Saved(val project: Project, val path: String, val sha256: String) : SaveArtifactResult
     data class Failure(val code: String, val message: String, val fix: String) : SaveArtifactResult
@@ -74,7 +83,7 @@ class AuthorArtifactStore(
                 val sha = sha256(bytes)
 
                 val raw = Json.parseToJsonElement(projectFile.readText(Charsets.UTF_8)).jsonObject
-                val updated = updatedProject(raw, kind, id, version, digest, relative, sha)
+                val updated = updatedProject(raw, AuthorRefUpdate(kind, id, version, digest, relative, sha))
                 val validate = core.call("project-validate", buildJsonObject { put("project", updated) })
                 if (!validate.ok) {
                     val e = validate.error
@@ -89,25 +98,17 @@ class AuthorArtifactStore(
             }
         }
 
-    private fun updatedProject(
-        raw: JsonObject,
-        kind: String,
-        id: String,
-        version: String,
-        digest: String,
-        relative: String,
-        sha: String
-    ): JsonObject {
+    private fun updatedProject(raw: JsonObject, ref: AuthorRefUpdate): JsonObject {
         val refs = raw["refs"]!!.jsonObject
         val newRefs = buildJsonObject {
             for ((key, value) in refs) {
-                if (key == kind) {
-                    putJsonObject(kind) {
-                        put("id", id)
-                        put("version", version)
-                        put("digest", digest)
-                        put("path", relative)
-                        put("sha256", sha)
+                if (key == ref.kind) {
+                    putJsonObject(ref.kind) {
+                        put("id", ref.id)
+                        put("version", ref.version)
+                        put("digest", ref.digest)
+                        put("path", ref.relative)
+                        put("sha256", ref.sha)
                     }
                 } else {
                     put(key, value)
@@ -120,8 +121,8 @@ class AuthorArtifactStore(
         val newHistory = buildJsonArray {
             for (entry in history) add(entry)
             add(buildJsonObject {
-                put("op", kind + ":save")
-                put("digest", sha)
+                put("op", ref.kind + ":save")
+                put("digest", ref.sha)
             })
         }
         return buildJsonObject {

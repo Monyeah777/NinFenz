@@ -25,9 +25,12 @@ pub const ASSERTIONS_REL: &str = "protocol/assertions.json";
 pub const MARK_BEGIN: &str = "<!-- nf:layers:begin -->";
 pub const MARK_END: &str = "<!-- nf:layers:end -->";
 
+// check 定义行正则。模式串含裸花括号，提为常量以免被朴素括号计数误判。
+const CHECK_DEF_PAT: &str = r"(?m)^check(\d+)\(\)\{";
+
 fn check_def_re() -> &'static regex::Regex {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    RE.get_or_init(|| regex::Regex::new(r"(?m)^check(\d+)\(\)\{").expect("check 定义正则固定合法"))
+    RE.get_or_init(|| regex::Regex::new(CHECK_DEF_PAT).expect("check 定义正则固定合法"))
 }
 
 fn judge_check_re() -> &'static regex::Regex {
@@ -125,7 +128,52 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
     let tier_ids = ids_of(&tiers);
 
     // ---- L1 真源在位
-    for tier in &tiers {
+    l1_issues(root, doc, &tiers, &tier_ids, &mut ctx, &mut issues);
+
+    // ---- 派生物（L2/L3 已扣除）
+    l2l3_issues(doc, &tiers, &tier_ids, &mut ctx, &mut issues);
+
+    // ---- L4 依赖向下无环
+    l4_issues(&tiers, &tier_ids, &mut issues);
+
+    // ---- L5 入口面只登记角色
+    l5_issues(doc, &tier_ids, &mut issues);
+
+    // ---- L6 引擎不反向 import 入口面
+    l6_issues(root, &mut ctx, &mut issues);
+
+    // ---- L7 退役阶不被依赖
+    l7_issues(doc, &tiers, &mut issues);
+
+    // ---- L8 judged_by 可解析
+    l8_issues(root, doc, &tiers, &mut issues);
+
+    // ---- L9 豁免诚实
+    for pattern in arr_items(get(doc, "derived")) {
+        if ctx.one(&plain_str(pattern)).is_empty() {
+            issues.push(format!(
+                "L9 derived 条目命中零文件：{}（修复指引：删掉该豁免或修正 glob）",
+                plain_str(pattern)
+            ));
+        }
+    }
+
+    // ---- L10 生成区 == 实时渲染
+    l10_issues(root, doc, &mut issues);
+
+    issues
+}
+
+/// L1：真源面 / 资产子级 / 入口面 / 纵切件在位。
+fn l1_issues(
+    root: &Path,
+    doc: &Json,
+    tiers: &[&Json],
+    tier_ids: &[String],
+    ctx: &mut GlobCtx,
+    issues: &mut Vec<String>,
+) {
+    for tier in tiers {
         let src = get(tier, "source");
         let globs = src.and_then(|s| get(s, "globs"));
         let face = ctx.many(globs);
@@ -178,13 +226,21 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
             ));
         }
     }
+}
 
-    // ---- 派生物（L2/L3 已扣除）
+/// L2 归属互斥（派生物已扣除）+ L3 接口面须为真源面子集。
+fn l2l3_issues(
+    doc: &Json,
+    tiers: &[&Json],
+    tier_ids: &[String],
+    ctx: &mut GlobCtx,
+    issues: &mut Vec<String>,
+) {
     let derived = ctx.many(get(doc, "derived"));
 
     // ---- L2 归属互斥（派生物已扣除）
     let mut faces: HashMap<String, BTreeSet<String>> = HashMap::new();
-    for tier in &tiers {
+    for tier in tiers {
         let tid = plain_str_opt(get(tier, "id"));
         let face = ctx.many(get(tier, "source").and_then(|s| get(s, "globs")));
         let diff: BTreeSet<String> = face.difference(&derived).cloned().collect();
@@ -210,7 +266,7 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
     }
 
     // ---- L3 接口面 ⊆ 真源面
-    for tier in &tiers {
+    for tier in tiers {
         let tid = plain_str_opt(get(tier, "id"));
         let iface = ctx.many(get(tier, "interface").and_then(|s| get(s, "globs")));
         if iface.is_empty() {
@@ -235,17 +291,19 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
             ));
         }
     }
+}
 
-    // ---- L4 依赖向下无环
+/// L4：依赖方向向下且无环。
+fn l4_issues(tiers: &[&Json], tier_ids: &[String], issues: &mut Vec<String>) {
     let mut order: HashMap<String, i64> = HashMap::new();
-    for t in &tiers {
+    for t in tiers {
         let o = match get(t, "order") {
             Some(Json::Int(i)) => *i,
             _ => 99,
         };
         order.insert(plain_str_opt(get(t, "id")), o);
     }
-    for tier in &tiers {
+    for tier in tiers {
         let tid = plain_str_opt(get(tier, "id"));
         for dep in arr_items(get(tier, "depends_on")) {
             let dep = plain_str(dep);
@@ -267,7 +325,7 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
         }
     }
     let mut graph: HashMap<String, Vec<String>> = HashMap::new();
-    for t in &tiers {
+    for t in tiers {
         graph.insert(
             plain_str_opt(get(t, "id")),
             arr_items(get(t, "depends_on"))
@@ -281,13 +339,15 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
         graph: &graph,
         walked: HashSet::new(),
         reported: HashSet::new(),
-        issues: &mut issues,
+        issues,
     };
-    for tid in &tier_ids {
+    for tid in tier_ids {
         walker.walk(tid, &[]);
     }
+}
 
-    // ---- L5 入口面只登记角色
+/// L5：入口面只登记角色（is_source_of_truth 恒 false；serves 指向在册阶）。
+fn l5_issues(doc: &Json, tier_ids: &[String], issues: &mut Vec<String>) {
     for sf in arr_items(get(doc, "surfaces")) {
         if !matches!(get(sf, "is_source_of_truth"), Some(Json::Bool(false))) {
             issues.push(format!(
@@ -305,8 +365,10 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
             }
         }
     }
+}
 
-    // ---- L6 引擎不反向 import 入口面
+/// L6：引擎阶不反向 import 入口面。
+fn l6_issues(root: &Path, ctx: &mut GlobCtx, issues: &mut Vec<String>) {
     for rel in ctx.one("desktop/src/core/*.py") {
         let Ok(src) = std::fs::read_to_string(root.join(&rel)) else {
             continue;
@@ -318,15 +380,17 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
             ));
         }
     }
+}
 
-    // ---- L7 退役阶不被依赖
+/// L7：退役阶不被在役阶依赖；status 须在词表内。
+fn l7_issues(doc: &Json, tiers: &[&Json], issues: &mut Vec<String>) {
     let retired: HashSet<String> = tiers
         .iter()
         .filter(|t| plain_str_opt(get(t, "status")) == "retired")
         .map(|t| plain_str_opt(get(t, "id")))
         .collect();
     let status_vocab = str_list(get(doc, "vocabulary").and_then(|v| get(v, "status")));
-    for tier in &tiers {
+    for tier in tiers {
         let status = plain_str_opt(get(tier, "status"));
         if status == "retired" {
             continue;
@@ -348,8 +412,10 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
             ));
         }
     }
+}
 
-    // ---- L8 judged_by 可解析
+/// L8：judged_by 须解析为现存 check 或已登记 assertion。
+fn l8_issues(root: &Path, doc: &Json, tiers: &[&Json], issues: &mut Vec<String>) {
     let checks: HashSet<String> = if root.join(VERIFY_REL).exists() {
         std::fs::read_to_string(root.join(VERIFY_REL))
             .map(|t| {
@@ -375,7 +441,7 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
         HashSet::new()
     };
     let mut refs: Vec<(String, String)> = Vec::new();
-    for tier in &tiers {
+    for tier in tiers {
         for r in arr_items(get(tier, "judged_by")) {
             refs.push((plain_str_opt(get(tier, "id")), plain_str(r)));
         }
@@ -412,18 +478,10 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
             ));
         }
     }
+}
 
-    // ---- L9 豁免诚实
-    for pattern in arr_items(get(doc, "derived")) {
-        if ctx.one(&plain_str(pattern)).is_empty() {
-            issues.push(format!(
-                "L9 derived 条目命中零文件：{}（修复指引：删掉该豁免或修正 glob）",
-                plain_str(pattern)
-            ));
-        }
-    }
-
-    // ---- L10 生成区 == 实时渲染
+/// L10：生成区须与实时渲染一致。
+fn l10_issues(root: &Path, doc: &Json, issues: &mut Vec<String>) {
     if !root.join(DOC_REL).exists() {
         issues.push(format!(
             "L10 缺阶梯文档 {}（修复指引：补件并跑 nf layers --write）",
@@ -445,8 +503,6 @@ fn rule_issues(root: &Path, doc: &Json) -> Vec<String> {
             Some(_) => {}
         }
     }
-
-    issues
 }
 
 /// 真源 `_walk` 的等价物（含 `walked` / `reported_cycles` 两个集合与后序标脏）。

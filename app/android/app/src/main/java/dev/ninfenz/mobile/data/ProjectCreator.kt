@@ -24,58 +24,63 @@ sealed interface CreateProjectResult {
     data class Failure(val code: String, val message: String, val fix: String) : CreateProjectResult
 }
 
+/** nf-project/1 构造参数对象（参数对象化，避免超长参数表）。 */
+data class ProjectBuildSpec(
+    val id: String,
+    val title: String,
+    val packId: String,
+    val packVersion: String,
+    val packTree: String,
+    val protocolId: String,
+    val protocolVersion: String,
+    val protocolDigest: String,
+    val graphId: String,
+    val graphVersion: String,
+    val graphDigest: String,
+    val graphSha256: String,
+    val specId: String,
+    val specVersion: String,
+    val specDigest: String,
+    val specSha256: String
+)
+
 /** 纯构造器（可 JVM 单测）：只负责 nf-project/1 文档形状，摘要由调用方传入。 */
 object ProjectFactory {
-    fun build(
-        id: String,
-        title: String,
-        packId: String,
-        packVersion: String,
-        packTree: String,
-        protocolId: String,
-        protocolVersion: String,
-        protocolDigest: String,
-        graphId: String,
-        graphVersion: String,
-        graphDigest: String,
-        graphSha256: String,
-        specId: String,
-        specVersion: String,
-        specDigest: String,
-        specSha256: String
-    ): JsonObject = buildJsonObject {
-        put("schema", "nf-project/1")
-        put("id", id)
-        put("title", title)
-        putJsonObject("refs") {
-            putJsonObject("base_pack") {
-                put("id", packId)
-                put("version", packVersion)
-                put("tree", packTree)
+    fun build(spec: ProjectBuildSpec): JsonObject = with(spec) {
+        buildJsonObject {
+            put("schema", "nf-project/1")
+            put("id", id)
+            put("title", title)
+            putJsonObject("refs") {
+                putJsonObject("base_pack") {
+                    put("id", packId)
+                    put("version", packVersion)
+                    put("tree", packTree)
+                }
+                putJsonObject("protocol") {
+                    put("id", protocolId)
+                    put("version", protocolVersion)
+                    put("digest", protocolDigest)
+                }
+                putJsonObject("graph") {
+                    put("id", graphId)
+                    put("version", graphVersion)
+                    put("digest", graphDigest)
+                    put("path", "pack/pipeline/main.nfg.json")
+                    put("sha256", graphSha256)
+                }
+                putJsonObject("spec") {
+                    put("id", specId)
+                    put("version", specVersion)
+                    put("digest", specDigest)
+                    put("path", "pack/spec/main.nfspec.json")
+                    put("sha256", specSha256)
+                }
             }
-            putJsonObject("protocol") {
-                put("id", protocolId)
-                put("version", protocolVersion)
-                put("digest", protocolDigest)
-            }
-            putJsonObject("graph") {
-                put("id", graphId)
-                put("version", graphVersion)
-                put("digest", graphDigest)
-                put("path", "pack/pipeline/main.nfg.json")
-                put("sha256", graphSha256)
-            }
-            putJsonObject("spec") {
-                put("id", specId)
-                put("version", specVersion)
-                put("digest", specDigest)
-                put("path", "pack/spec/main.nfspec.json")
-                put("sha256", specSha256)
-            }
+            put("status", "draft")
+            putJsonObject("review") { put("state", "none") }
+            put("history", buildJsonArray {})
         }
-        put("status", "draft")
-        putJsonObject("review") { put("state", "none") }
-        put("history", buildJsonArray {})
     }
 }
 
@@ -84,6 +89,20 @@ object ProjectFactory {
  * core project-validate（fail-closed）→ 原子写 projects/<id>.nfproject.json。
  * 核心不可用时返回 NF-E-005，不写半成品。
  */
+private data class PackArtifactInput(
+    val pack: PackEntry,
+    val title: String,
+    val projectId: String,
+    val protocol: JsonObject,
+    val graph: JsonObject,
+    val spec: JsonObject,
+    val protocolDigest: String,
+    val graphDigest: String,
+    val specDigest: String,
+    val graphFile: File,
+    val specFile: File
+)
+
 class ProjectCreator(
     private val filesDir: File,
     private val injectedBridge: CoreBridge? = null
@@ -118,17 +137,19 @@ class ProjectCreator(
 
                 val projectId = uniqueId(preferredId ?: slug(title))
                 val document = newProjectJson(
-                    pack = pack,
-                    title = title,
-                    projectId = projectId,
-                    protocol = protocol,
-                    graph = graph,
-                    spec = spec,
-                    protocolDigest = protocolDigest,
-                    graphDigest = graphDigest,
-                    specDigest = specDigest,
-                    graphFile = graphFile,
-                    specFile = specFile
+                    PackArtifactInput(
+                        pack = pack,
+                        title = title,
+                        projectId = projectId,
+                        protocol = protocol,
+                        graph = graph,
+                        spec = spec,
+                        protocolDigest = protocolDigest,
+                        graphDigest = graphDigest,
+                        specDigest = specDigest,
+                        graphFile = graphFile,
+                        specFile = specFile
+                    )
                 )
                 validateProject(core, document)?.let { return@withContext it }
 
@@ -146,36 +167,28 @@ class ProjectCreator(
             }
         }
 
-    private fun newProjectJson(
-        pack: PackEntry,
-        title: String,
-        projectId: String,
-        protocol: JsonObject,
-        graph: JsonObject,
-        spec: JsonObject,
-        protocolDigest: String,
-        graphDigest: String,
-        specDigest: String,
-        graphFile: File,
-        specFile: File
-    ): JsonObject = ProjectFactory.build(
-        id = projectId,
-        title = title.ifBlank { "未命名项目" },
-        packId = pack.id,
-        packVersion = pack.version,
-        packTree = pack.tree,
-        protocolId = text(protocol, "id"),
-        protocolVersion = text(protocol, "version"),
-        protocolDigest = protocolDigest,
-        graphId = text(graph, "id"),
-        graphVersion = text(graph, "version"),
-        graphDigest = graphDigest,
-        graphSha256 = sha256(graphFile.readBytes()),
-        specId = text(spec, "id"),
-        specVersion = text(spec, "version"),
-        specDigest = specDigest,
-        specSha256 = sha256(specFile.readBytes())
-    )
+    private fun newProjectJson(input: PackArtifactInput): JsonObject = with(input) {
+        ProjectFactory.build(
+            ProjectBuildSpec(
+                id = projectId,
+                title = title.ifBlank { "未命名项目" },
+                packId = pack.id,
+                packVersion = pack.version,
+                packTree = pack.tree,
+                protocolId = text(protocol, "id"),
+                protocolVersion = text(protocol, "version"),
+                protocolDigest = protocolDigest,
+                graphId = text(graph, "id"),
+                graphVersion = text(graph, "version"),
+                graphDigest = graphDigest,
+                graphSha256 = sha256(graphFile.readBytes()),
+                specId = text(spec, "id"),
+                specVersion = text(spec, "version"),
+                specDigest = specDigest,
+                specSha256 = sha256(specFile.readBytes())
+            )
+        )
+    }
 
     private suspend fun validateProject(core: CoreBridge, document: JsonObject): CreateProjectResult.Failure? {
         val validate = core.call("project-validate", buildJsonObject { put("project", document) })

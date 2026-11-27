@@ -26,489 +26,131 @@
 边界：本模块**只加速、不改语义**；不写仓库文件（状态只落 NF_HOME）；杀掉守护进程即回到
 原来的「每命令一次启动」路径（`scripts/nf` 会静默回退）。
 """
+
+# 读点：请求体解析在 _daemon._proto 里仍走 json_doc.loads（N11）。
+
 from __future__ import annotations
 
+# ruff: noqa: F401 — 门面按原模块面重新导出（re-export 是职责，不是未使用）
+import sys as _sys
+import types as _types
 import contextlib
 import hmac
 import io
 import json
 import os
-import secrets
-import socket
 import sys
-import threading
-import time
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
 
-PROTO = 1
-#: 监听地址：**只允许回环**（与 scripts/serve_decision_model.py 同一条纪律；本模块不提供
-#: 「显式放行外网」的开关——守护进程能执行任意 nf 命令，绝不能出回环）。
-BIND_HOST = "127.0.0.1"
-#: 请求体上限（1 MiB）：一条命令的 argv 远小于此；设上限防「自称超长」的无界读。
-MAX_REQUEST_BYTES = 1 << 20
-#: 单次响应载荷上限（16 MiB，与 Rust worker 同口径）：防止客户端按伪造/失控长度分配内存。
-MAX_RESPONSE_BYTES = 16 << 20
-#: 单条 argv 上限（字符）：参数是「命令 + 选项 + 标识符」，不是正文载荷。
-MAX_ARGV_CHARS = 8192
-#: argv 合计上限（字符）：防「一条 1 MB 请求 → CLI 回吐 200 KB 用法」这类放大。
-MAX_ARGV_TOTAL = 65536
-#: 工作目录上限（字符）；cwd 只是定位参数，不应成为超长内存/路径解析载荷。
-MAX_CWD_CHARS = 32768
-
-
-def _configure_server_socket(sock: socket.socket) -> None:
-    """Windows 用独占绑定；SO_REUSEADDR 在该平台允许别的本机进程抢绑同一端口。"""
-    if os.name == "nt" and hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
-    elif os.name != "nt":
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-
-def _check_argv_size(argv) -> None:
-    """argv 体量上限 → 越界抛 ValueError（上层归「请求不可读」，exit 2）。
-
-    修复前实测：单条 **200 KB** 的 argv 会被照单执行——CLI 回吐 200 KB 的 argparse 用法，
-    请求体最大 1 MB 也兜不住这种放大。参数只该是命令/选项/标识符；正文请落盘后传路径。
-    """
-    if not isinstance(argv, list):
-        return
-    for a in argv:
-        if isinstance(a, str) and len(a) > MAX_ARGV_CHARS:
-            raise ValueError("单个参数超过上限 %d 字符（修复指引：正文/长文本先落盘，改传路径）"
-                             % MAX_ARGV_CHARS)
-    total = sum(len(a) for a in argv if isinstance(a, str))
-    if total > MAX_ARGV_TOTAL:
-        raise ValueError("参数合计超过上限 %d 字符（修复指引：减少参数，或改传文件路径）"
-                         % MAX_ARGV_TOTAL)
-#: 守护内**拒跑**的命令：长驻（`serve` / `shell` / `terminal` / `lsp`）与自指（`daemon`）。
-#:
-# : 为什么是这五个（2026-10-01 修）：此前只有 `serve` / `shell` / `daemon`，于是**别名与常驻面漏网**
-# ——
-#: `nf terminal`（`shell` 的 argparse 别名）与 `nf lsp`（常驻 stdio 服务）会进守护在进程内执行，
-#: 而守护把 stdin 设成空串 ⇒ `lsp` 立刻读到 EOF 后**以 0 退出且零输出**，调用方（编辑器 / agent）
-#: 把「静默无事发生」当成成功，直跑却会真的起服务：**同一条命令两条路径两种结果**。
-#: 口径：凡是会占住前台的命令，守护一律拒跑（集合与 `core.terminal.BLOCKED_IN_SHELL` 相等，
-#: 由 `desktop/tests/test_daemon_parity.py` 的集合判据钉住；别名闭合同件）。
-REFUSED_COMMANDS = ("serve", "shell", "terminal", "lsp", "daemon")
-#: 连接读写超时（秒）：客户端卡住不得拖死守护。
-SOCKET_TIMEOUT = 30.0
-#: 帧接收超时（秒）：未认证连接最多占住串行 accept 这么久，随后即断开。
-HANDSHAKE_TIMEOUT = 5.0
-STATE_NAME = "daemon.json"
-_STATE_WRITE_LOCK = threading.Lock()
+# 依赖面：逐字保留原模块 import 面（含函数内 core import 的边）——
+# 耦合图/纯度面按模块级 import 计算，勿删（见 re-export 说明）。
 #: bash 快路模板（`nf daemon shell-init bash` 原样输出，供 `eval "$(…)"` 装进交互 shell）。
 #: 关键点：**全部用 bash 内建**（/dev/tcp + printf + read -N），因此 `nf …` 是当前 shell 里的
 #: 一次函数调用 + 一次套接字往返——没有子进程、没有解释器启动，这才是真正的毫秒级客户端。
 #: 长驻/自指命令（见 `REFUSED_COMMANDS`）与「无参」一律直落 python 入口（与守护拒绝面一致）。
 # 兼容转发面：CLI 与测试读 dm.SHELL_INIT_BASH（模板真源已迁 core.daemon_shell，见其 docstring）。
 from core.daemon_shell import SHELL_INIT_BASH  # noqa: E402,F401
-
-
-def state_path() -> Path:
-    """守护状态文件落点：`<NF_HOME>/daemon.json`（NF_HOME 约定只在 storage 里定义一次）。
-
-    **不提供落点覆盖**（2026-10-17 实测结论）：曾尝试加 `NARRATIVE_FORGE_DAEMON_STATE`
-    让并行 worker 各自隔离守护单例，三种粒度（整个 NF_HOME / 只 cache 共享 / 只状态文件）
-    **全部与既有测试契约冲突**：
-    - 切整个 NF_HOME ⇒ 丢 cache 预热，`quality_depth` 扫描器调用 8→9（判据红）；
-    - 只切状态文件 ⇒ `test_daemon` / `test_launcher` / `test_daemon_parity` 里
-      **断言 `daemon.json` 位置**的用例直接红（它们自设 NF_HOME 并期望状态就落在里面）。
-    ⇒ 守护单例**不可隔离**，并行只能靠「把打守护的模块排到独占串行段」。
-    """
-    from core import storage
-    return Path(storage.default_home()) / STATE_NAME
-
-
-def read_state() -> Optional[Dict[str, Any]]:
-    """读守护状态；文件缺失/不可解析/版本不符 → None（一律按「没有守护」处理）。"""
-    from core import atomic_write
-    try:
-        with _STATE_WRITE_LOCK, atomic_write.lock_file(state_path(), what="守护状态读取"):
-            doc = json.loads(atomic_write.read_text(state_path(), encoding="utf-8"))
-    except (OSError, ValueError):  # 无状态文件/坏件 ⇒ None（调用方回退直跑）
-        return None
-    if not isinstance(doc, dict) or doc.get("proto") != PROTO:
-        return None
-    if not isinstance(doc.get("port"), int) or not doc.get("token"):
-        return None
-    return doc
-
-
-def write_state(doc: Dict[str, Any]) -> None:
-    """写状态文件（UTF-8 + LF；父目录按需创建）。空表 = 已停用标记。
-
-    **权限**（2026-09-30 补）：状态文件里带**一次性令牌**，而令牌就是本守护的信任边界
-    （module docstring：回环不是信任边界）。POSIX 上把它收紧到 `0600`（只给属主读写）——
-    否则在多用户主机上，同机另一个用户读到令牌即可连回环口、以属主身份执行命令。
-    Windows 上 ACL 随用户目录继承（`chmod` 无对应语义），故只在 posix 分支收紧。
-
-    **并发安全**（2026-10-10 审计 N1，P1）：固定名两段写在 1200 次并发实测中失败 868 次、
-    读者 12.9% 撕裂；现统一原子写（唯一临时名 + fsync + `replace` + 短重试）。
-    下面再显式收紧一次兜底。
-    """
-    p = state_path()
-    from core import atomic_write
-    with _STATE_WRITE_LOCK, atomic_write.lock_file(p, what="守护状态"):
-        atomic_write.write_text(p, json.dumps(doc, ensure_ascii=False, sort_keys=True) + "\n")
-    _harden_perms(p)
-
-
-def _harden_perms(path: Path) -> None:
-    """POSIX：把含令牌的状态文件收紧到仅属主可读写；Windows 交回 ACL 继承。"""
-    if os.name != "posix":
-        return
-    try:
-        os.chmod(path, 0o600)
-    except OSError:  # 尽力而为：权限收紧失败不阻断守护（文件系统可能不支持）
-        pass
-
-
-def clear_state() -> None:
-    """停用标记：写入空表（不删文件——本仓删除面要过纯度登记，保持零新增 sink）。"""
-    write_state({})
-
-
-def reset_process_caches() -> None:
-    """清空**按路径/根键**的进程缓存（内容键缓存保留，见模块 docstring 的「新鲜度」）。
-
-    只在守护进程里逐请求调用——让热进程与「新起进程」看到同一份仓库事实。
-    """
-    try:
-        from core import pack_combo
-        pack_combo.cache_clear()
-    except Exception:                                    # noqa: BLE001 - 缓存清理不得影响命令
-        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
-    try:
-        from core import registry_loader
-        registry_loader.load_registry.cache_clear()
-    except Exception:                                    # noqa: BLE001
-        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
-    try:
-        from core import asset_contract
-        asset_contract.clear_repo_files_cache()
-    except Exception:                                    # noqa: BLE001
-        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
-
-
-class _LineReader:
-    """带缓冲的逐行读（明文请求是多行的，不能用「recv 一次当一行」）。"""
-
-    def __init__(self, sock: socket.socket) -> None:
-        self._sock = sock
-        self._buf = b""
-        self._total = 0
-
-    def readline(self, limit: int = MAX_REQUEST_BYTES) -> bytes:
-        while True:
-            line, sep, rest = self._buf.partition(b"\n")
-            if sep:
-                self._buf = rest
-                return line
-            if len(self._buf) > limit:
-                raise ValueError(f"单行请求超过上限 {limit} 字节")
-            chunk = self._sock.recv(65536)
-            if not chunk:
-                line, self._buf = self._buf, b""
-                return line
-            self._total += len(chunk)
-            if self._total > MAX_REQUEST_BYTES:
-                raise ValueError(f"请求总计超过上限 {MAX_REQUEST_BYTES} 字节")
-            self._buf += chunk
-
-
-class _BoundedBytesIO(io.BytesIO):
-    """内存采集硬上限：越界立即失败，不先分配再事后检查。"""
-
-    def __init__(self, cap: int) -> None:
-        super().__init__()
-        self._cap = int(cap)
-
-    def write(self, data) -> int:
-        size = len(data)
-        if self.tell() + size > self._cap:
-            raise ValueError(f"输出超过上限 {self._cap} 字节"
-                             "（修复指引：收窄查询范围，或改用 --write 落盘）")
-        return super().write(data)
-
-
-def _decode_frame(raw: bytes, what: str) -> str:
-    """协议文本一律严格 UTF-8；非法字节不得被替换字符静默洗白。"""
-    try:
-        return raw.decode()
-    except UnicodeDecodeError as exc:
-        raise ValueError(
-            f"{what}不是合法 UTF-8：{exc}（修复指引：客户端须发送 UTF-8 协议帧）"
-        ) from exc
-
-
-def _validated_cwd(root: Path, cwd: str | None) -> str | None:
-    """规范化客户端 cwd；空值表示使用守护自身 cwd。"""
-    if cwd is None:
-        return None
-    if not isinstance(cwd, str) or not cwd:
-        raise ValueError("cwd 必须是非空字符串（修复指引：客户端传绝对目录，或省略 cwd）")
-    if len(cwd) > MAX_CWD_CHARS:
-        raise ValueError(f"cwd 超过上限 {MAX_CWD_CHARS} 字符（修复指引：缩短路径或省略 cwd）")
-    if any(ord(ch) < 32 or ord(ch) == 127 for ch in cwd):
-        raise ValueError("cwd 含控制字符（修复指引：路径里不得含 \x00-\x1f）")
-    if os.name == "nt":
-        # Git Bash/MSYS 的原生客户端会送 `/d/repo`；显式映射，避免 isdir 失败后静默回退。
-        import re
-        match = re.match(r"^/([A-Za-z])/(.*)$", cwd)
-        if match:
-            tail = match.group(2).replace("/", "\\")
-            cwd = f"{match.group(1).upper()}:\\{tail}"
-    safe = os.path.realpath(cwd)
-    if not os.path.isdir(safe):
-        raise ValueError(f"cwd 不是现存目录：{safe}（修复指引：传仓库根的绝对路径，或省略 cwd）")
-    return safe
-
-
-def _check_json_nesting(text: str, limit: int = 32) -> None:
-    """JSON 请求只承载扁平控制字段；解析前先做线性深度闸，避开 RecursionError。"""
-    depth = 0
-    quoted = escaped = False
-    for ch in text:
-        if quoted:
-            if escaped:
-                escaped = False
-            elif ch == "\\":
-                escaped = True
-            elif ch == '"':
-                quoted = False
-            continue
-        if ch == '"':
-            quoted = True
-        elif ch in "[{":
-            depth += 1
-            if depth > limit:
-                raise ValueError(
-                    f"JSON 嵌套超过上限 {limit}（修复指引：请求体扁平化，嵌套不超过协议上限）"
-                )
-        elif ch in "]}":
-            depth -= 1
-
-
-def _strict_json_object(pairs):
-    out = {}
-    for key, value in pairs:
-        if key in out:
-            raise ValueError(f"JSON 重复键：{key}（修复指引：请求体里每个键只写一次）")
-        out[key] = value
-    return out
-
-
-def _parse_json_request(text: str):
-    from core import json_doc
-    _check_json_nesting(text)
-    try:
-        return json_doc.loads(text, dict, what="守护请求",
-                              strict_constants=True, pairs_hook=_strict_json_object)
-    except RecursionError as exc:
-        raise ValueError("JSON 嵌套过深（修复指引：请求体扁平化，嵌套不超过协议上限）") from exc
-
-
-def _parse_request(reader: "_LineReader") -> Dict[str, Any]:
-    """解析请求框——两种形态，一种语义：
-
-    - **JSON**（程序客户端用，argv 可含任意字符，含换行）；
-    - **NFREQ 明文**（shell 客户端用：`NFREQ 1 <token>` / cwd / 条数 / 逐行 argv）——
-      纯 bash 无需 JSON 编解码器即可发请求。明文框的 argv **不能含换行**（路径与命令参数
-      的常规取值都不含；需要精确传递请走 JSON 框）。
-    """
-    head = _decode_frame(reader.readline(), "请求头")
-    if head.startswith("NFREQ"):
-        parts = head.split()
-        if len(parts) != 3 or parts[1] != str(PROTO):
-            raise ValueError("NFREQ 头格式错（期望 `NFREQ %d <token>`）" % PROTO)
-        cwd = _decode_frame(reader.readline(), "NFREQ cwd")
-        try:
-            n = int(_decode_frame(reader.readline(), "NFREQ 条数").strip() or "0")
-        except ValueError as exc:
-            raise ValueError("NFREQ argv 条数不可解析：%s" % exc) from exc
-        if n < 0 or n > 4096:
-            raise ValueError("NFREQ argv 条数越界：%d" % n)
-        argv = [_decode_frame(reader.readline(), "NFREQ argv") for _ in range(n)]
-        _check_argv_size(argv)
-        return {"proto": PROTO, "token": parts[2], "cwd": cwd, "argv": argv}
-    req = _parse_json_request(head or "{}")
-    if not isinstance(req, dict):
-        raise ValueError("请求不是 JSON 对象")
-    if "argv" in req:
-        _check_argv_size(req.get("argv"))
-    return req
-
-
-def send_framed(sock: socket.socket, exit_code: int, out: bytes, err: bytes) -> None:
-    """按协议写响应：三行头 + 原始载荷。"""
-    if len(out) + len(err) > MAX_RESPONSE_BYTES:
-        exit_code = 1
-        out = b""
-        err = (f"响应超过上限 {MAX_RESPONSE_BYTES} 字节"
-               "（修复指引：收窄查询范围，或改用 --write 落盘）\n").encode()
-    head = f"{int(exit_code)}\n{len(out)}\n{len(err)}\n".encode()
-    sock.sendall(head + out + err)
-
-
-def read_framed(sock: socket.socket) -> Tuple[int, bytes, bytes]:
-    """按协议读响应（客户端侧）：返回 (exit, stdout 字节, stderr 字节)。"""
-    fh = sock.makefile("rb")
-    def _length_line(label: str) -> int:
-        raw = fh.readline(64)
-        if not raw or not raw.endswith(b"\n"):
-            raise ValueError(f"响应帧 {label} 缺失或超长")
-        try:
-            value = int(raw.strip())
-        except ValueError as exc:
-            raise ValueError(f"响应帧 {label} 不是整数") from exc
-        if value < 0 or value > MAX_RESPONSE_BYTES:
-            raise ValueError(f"响应帧 {label} 越界：{value}")
-        return value
-
-    def _exact(n: int) -> bytes:
-        chunks, left = [], n
-        while left:
-            chunk = fh.read(left)
-            if not chunk:
-                raise ValueError(f"响应载荷提前结束（缺 {left} 字节）")
-            chunks.append(chunk)
-            left -= len(chunk)
-        return b"".join(chunks)
-
-    try:
-        code = _length_line("exit")
-        out_len = _length_line("stdout 长度")
-        err_len = _length_line("stderr 长度")
-        if out_len + err_len > MAX_RESPONSE_BYTES:
-            raise ValueError(f"响应载荷越界：{out_len} + {err_len} 字节")
-        out = _exact(out_len) if out_len else b""
-        err = _exact(err_len) if err_len else b""
-    finally:
-        fh.close()
-    return code, out, err
-
-
-def run_request(doc: Dict[str, Any], argv: List[str], cwd: Optional[str] = None,
-                timeout: float = SOCKET_TIMEOUT) -> Tuple[int, bytes, bytes]:
-    """客户端：把一条命令交给守护执行 → (exit, stdout 字节, stderr 字节)。
-
-    任何连接层失败都**抛异常**——调用方（CLI / 启动器）据此静默回退到进程内执行。
-    """
-    req = json.dumps({"proto": PROTO, "token": doc["token"], "argv": [str(a) for a in argv],
-                      "cwd": cwd or os.getcwd()}, ensure_ascii=False).encode("utf-8") + b"\n"
-    if len(req) > MAX_REQUEST_BYTES:
-        raise ValueError("请求超过上限 %d 字节" % MAX_REQUEST_BYTES)
-    with socket.create_connection((BIND_HOST, int(doc["port"])), timeout=timeout) as sock:
-        sock.settimeout(timeout)
-        sock.sendall(req)
-        return read_framed(sock)
-
-
-def _cli_module(root: Path):
-    """加载 CLI 真源 `scripts/nf.py`（与单测同一手法：按路径 import，不走包导入）。"""
-    import importlib.util
-    spec = importlib.util.spec_from_file_location("nfcli_daemon", Path(root) / "scripts" / "nf.py")
-    if spec is None:
-        raise RuntimeError("scripts/nf.py 路径无法构造加载规格（修复指引：确认 --root 指向 NF 仓库"
-            "根，且 scripts/nf.py 在场）")
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)          # type: ignore[union-attr]
-    return mod
-
-
-#: CLI 模块缓存（含源码指纹）：守护最怕「代码改了还在跑旧逻辑」——见 `_sync_code`。
-_CLI_CACHE: Dict[str, Any] = {}
-#: `start()` 拉起的子进程句柄（回收它，避免解释器退出时的 ResourceWarning）。
-_CHILD: Optional[Any] = None
-
 #: 响应缓存（**只在守护进程内、只在树没变时**复用整条命令的 stdout/stderr/退出码）。
 #: 判据与账本在 `core.response_cache`（会话 `session_watch` 与守护共用同一套 ⇒ 只有一种说法）。
-from core import response_cache as _rc  # noqa: E402 - 与下面的常量一组，便于阅读
-
-_CACHE_STATS = _rc.STATS
-#: 当前监听件（`serve_forever(watch=True)` 装；单测可注入假件）。
-_WATCHER: Optional[Any] = None
-#: `_WATCHER` 的**唯一写入口**（2026-10-10 审计 N8，P2）：此前 `session_watch._install` 直接写
-#: `daemon._WATCHER`——跨模块可变全局没有所有权，谁都能改、没人能断言。现在写只走 `set_watcher`
-#: （进程内 mutex 保证换手原子）；读仍无锁（CPython 引用读写原子，换手期间读到旧/新都是完整
-#: 对象，健康判据由 `_watch_generation` 的 `healthy` 兜住）。
-_WATCH_LOCK = threading.Lock()
-
-
-def set_watcher(watcher: Optional[Any]) -> None:
-    """登记/注销本进程的树代际来源（**唯一写入口**）。"""
-    global _WATCHER
-    with _WATCH_LOCK:
-        _WATCHER = watcher
-#: 关闭「常驻语料层」的开关（诊断/对照用）：设了就整批作废且不再收录，退回每次重读。
-RESIDENT_ENV_OFF = "NF_NO_RESIDENT"
+from core import (
+    response_cache as _rc,
+    storage,
+    atomic_write,
+    json_doc,
+    conformance_scan as csc,
+    conformance_scan as _csc,
+    disk_cache as _dc,
+    pack_combo,
+    registry_loader,
+    asset_contract,
+    disk_cache,
+    import_graph as _igr,
+    conformance_scan as _csc_old,
+    watch as _watch,
+    conformance_scan as _csc_new,
+)
 #: 观测计数由 `response_cache.STATS` 提供（上面 `_CACHE_STATS` 即同一个字典对象）。
 
 # 兼容转发面：测试读 dm.CACHEABLE_COMMANDS / dm._WRITE_FLAG_PREFIXES；cacheable 本模块自用。
 # 真源已迁 core.response_cache（准入表 + 闸门旗标前缀），此处只做对外再导出。
-from core.response_cache import (CACHEABLE_COMMANDS, _WRITE_FLAG_PREFIXES,  # noqa: F401
-                                 cacheable)
+from core.response_cache import CACHEABLE_COMMANDS, _WRITE_FLAG_PREFIXES, cacheable
+
+from pathlib import Path
+
+from ._daemon._const import (
+    BIND_HOST,
+    HANDSHAKE_TIMEOUT,
+    MAX_ARGV_CHARS,
+    MAX_ARGV_TOTAL,
+    MAX_CWD_CHARS,
+    MAX_REQUEST_BYTES,
+    MAX_RESPONSE_BYTES,
+    PROTO,
+    REFUSED_COMMANDS,
+    RESIDENT_ENV_OFF,
+    SOCKET_TIMEOUT,
+    STATE_NAME,
+)
+from ._daemon._state import (
+    _STATE_WRITE_LOCK,
+    _harden_perms,
+    clear_state,
+    read_state,
+    state_path,
+    write_state,
+)
+from ._daemon._proto import (
+    _BoundedBytesIO,
+    _LineReader,
+    _check_argv_size,
+    _check_json_nesting,
+    _configure_server_socket,
+    _decode_frame,
+    _parse_json_request,
+    _parse_request,
+    _strict_json_object,
+    _validated_cwd,
+    read_framed,
+    run_request,
+    send_framed,
+)
+from ._daemon._cli import (
+    _cli_module,
+)
+from ._daemon._cache import (
+    _CACHE_STATS,
+    _CLI_CACHE,
+    _WATCH_LOCK,
+    _load_cli,
+    _sync_resident,
+    _watch_generation,
+    cache_stats,
+    reset_process_caches,
+    reset_response_cache,
+    set_watcher,
+)
+from ._daemon._server import (
+    _internal_error_frame,
+    _reap_child,
+    _serve_conn,
+    main,
+    ping,
+    query_stats,
+    serve_forever,
+    start,
+    stop,
+)
+
+from ._daemon import _cache, _server
+
+# 活状态/可 patch 面：读取与赋值一律转发到真实持有模块（实现见 core/_facades）。
+from core._facades import install as _install_live_facade
 
 
-def _watch_generation() -> Optional[int]:
-    """当前「树代际」；**None ＝ 不可用**（没有监听件 / 不健康）→ 一律不缓存、不命中。"""
-    w = _WATCHER
-    if w is None or not getattr(w, "healthy", False):
-        return None
-    return int(w.generation)
+_install_live_facade(__name__, {
+    "_WATCHER": _cache,
+    "_CHILD": _server,
+})
 
-
-def _sync_resident(root: Path) -> None:
-    """按监听给出的**确知变更**维护常驻语料层（`conformance_scan._RESIDENT`）。
-
-    fail-closed 三条：① 没有监听 / 监听不健康 → 常驻层整批作废且不安装；② 监听说不清变了什么
-    （缓冲溢出、路径解不出、只跳代际）→ 整批作废重建；③ 只有「确知哪些路径变了」才做精确失效。
-
-    依据（2026-09-29 实测）：不加这一层，改一个文件之后守护的第一条重命令要 **1.6–2.0 s**
-    （整棵语料重新枚举 + 重读，而真正变了的只有一件）；加上之后只失效被改的那几件。
-    """
-    from core import conformance_scan as csc
-    if os.environ.get(RESIDENT_ENV_OFF):
-        if csc.resident_active():        # 显式关闭：整批作废且不再收录（诊断/对照用）
-            csc.clear_resident()
-        return
-    w = _WATCHER
-    if w is None or not getattr(w, "healthy", False):
-        if csc.resident_active():
-            csc.clear_resident()
-        return
-    if not csc.resident_active():
-        csc.install_resident(root)
-    take = getattr(w, "take_changes", None)
-    if take is None:                     # 不提供「确知变更面」的监听件 → 当说不清（整批作废）
-        csc.clear_resident()
-        csc.install_resident(root)
-        return
-    paths, unknown = take()
-    if unknown:
-        csc.clear_resident()
-        csc.install_resident(root)
-    elif paths:
-        csc.drop_resident(paths)
-
-
-def cache_stats() -> Dict[str, Any]:
-    """响应缓存观测面（供 `nf daemon status` 与单测）。"""
-    gen = _watch_generation()
-    from core import conformance_scan as _csc
-    from core import disk_cache as _dc
-    return {"enabled": gen is not None, "generation": gen,
-            "entries": _rc.entries(), **dict(_CACHE_STATS),
-            # 持久缓存的写失败观测（审计 N7）：缓存写不进是降级，须可判别而不是静默吞掉。
-            "disk_cache": _dc.store_failures(),
-            # 常驻语料层的规模也一并报出来：它是「不重读」的账本，出问题时第一个要看的就是它。
-            "resident": _csc.resident_stats()}
-
-
-def reset_response_cache() -> None:
-    """清空响应缓存（监听件报溢出/不可用时调用——宁可全废，不可错答）。"""
-    _rc.clear()
 
 
 def _code_fingerprint(root: Path) -> Tuple:
@@ -571,14 +213,6 @@ def _sync_code(root: Path) -> None:
             pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
 
 
-def _load_cli(root: Path):
-    mod = _CLI_CACHE.get("mod")
-    if mod is None:
-        mod = _cli_module(root)
-        _CLI_CACHE["mod"] = mod
-    return mod
-
-
 def execute(argv: List[str], root: Path, cwd: Optional[str] = None
             ) -> Tuple[int, bytes, bytes]:
     """在**本进程内**执行一条 nf 命令，并把 stdout/stderr 原样抓成字节。"""
@@ -636,21 +270,6 @@ def execute(argv: List[str], root: Path, cwd: Optional[str] = None
     # `note_uncacheable` 里：脚本里 `nf conformance --write; nf score` 连跑曾吃到写之前的旧响应）。
     _rc.note_uncacheable(allowed, code, gen)
     return code, out, err
-
-
-def _internal_error_frame(exc: BaseException) -> bytes:
-    """一条**请求级**内部异常 → 结构化错误帧载荷（退出码由调用方置 1）。
-
-    为什么留这一层（2026-10-10 审计 X0，P0）：CLI 面已有兜底（`nf.guarded_main`），但守护在
-    「进 CLI 之前 / 出 CLI 之后」还有一段自己的活（常驻语料层同步、响应缓存查找、源码重载、
-    结果落盘）。那段里的任何异常此前都会顺着 `_handle_conn` → `serve_forever` 冒出去，
-    **整条守护进程退出**——而客户端只会看到 rc=1 与零输出（与「命令本身失败」不可区分）。
-
-    口径与 `nf` 的内层错误面同源：一句「内部错误 + 修复指引」，不吐 traceback；`NF_DEBUG=1`
-    时调用方改为上抛（排障），本函数不自行决定是否吞掉。
-    """
-    return ("  ✗ 守护内部错误：%s（修复指引：重跑同一条命令；若仍复现，请带着这条消息提 issue"
-            "——该异常已被单条请求隔离，守护未退出）\n" % exc).encode("utf-8")
 
 
 def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
@@ -721,224 +340,6 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     except Exception:                                    # noqa: BLE001 - 落盘尽力而为
         pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
     return False
-
-
-def _serve_conn(conn: socket.socket, token: str, root: Path) -> bool:
-    """处理一条连接并做**连接级隔离**（2026-10-10 审计 X0 同族）。
-
-    为何单独成函数：主循环的圈复杂度/长度有棘轮上限，而这段是纯错误面——客户端中途断开
-    （`send_framed` 抛 BrokenPipeError/ConnectionResetError）此前会让整个 `serve_forever` 退出，
-    一条被中断的请求就带走常驻进程。现在记一行、继续 accept。
-    """
-    conn.settimeout(HANDSHAKE_TIMEOUT)
-    try:
-        return _handle_conn(conn, token, root)
-    except OSError as exc:
-        print("  [warn] 连接中断（守护继续）：%s" % exc, file=sys.stderr)
-        return False
-    except Exception as exc:                       # noqa: BLE001 - 最后一道隔离网
-        if os.environ.get("NF_DEBUG"):
-            raise                                  # 排障：显式要求时透出堆栈
-        print("  [warn] 单条连接失败（守护继续）：%s" % exc, file=sys.stderr)
-        return False
-
-
-def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = None,
-                  force: bool = False, watch: bool = False) -> int:
-    """守护主循环（单线程串行）：直到收到 shutdown / 空闲超时 / 被中断。
-
-    **一个 NF_HOME 只允许一个守护**（缺省 fail-closed）：状态文件只登记一个端口/令牌，若第二个
-    守护直接起，它会覆盖状态、让先起的那个「失联」（CI 实测踩过：同一 NF_HOME 下先后起两个
-    服务，后者的 `clear_state()` 把前者的广告位抹掉）。确需另起用 `force=True`。
-
-    `watch=True` 时装上目录监听 → 开「只读命令的响应缓存」（树没变就整条复用）。监听不可用
-    或中途失效时**自动降级**：缓存不命中、不复用，行为与今天一致。
-    """
-    if not force and ping(timeout=1.0):
-        print("已有守护在运行（修复指引：先 `nf daemon stop`，或显式 force 另起）", file=sys.stderr)
-        return 2
-    # 确定性输出（2026-10-15）：守护与直跑必须**逐字节**同输出（test_daemon_parity 守门）。
-    # 但有些命令的人读面默认带墙钟耗时，而两条路径的耗时必然不同 ⇒ 值必然分叉。
-    # 故守护侧统一声明「不要不确定性面」，各命令按此关闭耗时字段（当前是 nf verify）。
-    os.environ["NF_VERIFY_QUIET_TIME"] = "1"
-    global _WATCHER
-    watcher = None
-    if watch:
-        from core import watch as _watch
-        watcher = _watch.DirWatcher(root)
-        if watcher.start():
-            set_watcher(watcher)
-        else:
-            set_watcher(None)
-            watcher = None
-            print("目录监听不可用（平台未实现或打开失败）→ 不启用响应缓存，"
-                  "行为与常规守护一致", file=sys.stderr)
-    token = secrets.token_hex(32)
-    srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    _configure_server_socket(srv)
-    srv.bind((BIND_HOST, 0))              # 端口 0 = 内核分配（不抢占固定端口）
-    srv.listen(8)
-    port = int(srv.getsockname()[1])
-    write_state({"proto": PROTO, "pid": os.getpid(), "port": port, "token": token,
-                 "root": str(root), "started": int(time.time())})
-    if ready is not None:
-        ready(port)
-    srv.settimeout(1.0)
-    last = time.time()
-    try:
-        while True:
-            if idle_timeout and (time.time() - last) > idle_timeout:
-                break
-            try:
-                conn, _addr = srv.accept()
-            except socket.timeout:  # 空闲 accept 超时属正常循环（继续等下一条连接）
-                continue
-            except KeyboardInterrupt:
-                break
-            last = time.time()
-            with conn:
-                shutdown = _serve_conn(conn, token, root)
-            if shutdown:
-                break
-    finally:
-        # 先清状态再关端口：客户端「连不上」与「看不到登记」才是同一时刻的真相，
-        # 否则中间会有一个「端口已死但状态还在」的窗口（CI 实测：就是这样让 stop() 报
-        # 「守护未响应」而不是「没有守护」）。
-        if watcher is not None:
-            watcher.stop()
-        set_watcher(None)
-        from core import conformance_scan as _csc
-        _csc.clear_resident()      # 常驻语料层随守护一起消失（进程内起服务的测试不留残影）
-        reset_response_cache()
-        clear_state()
-        srv.close()
-    return 0
-
-
-def query_stats(doc: Optional[Dict[str, Any]] = None,
-                timeout: float = 2.0) -> Optional[Dict[str, Any]]:
-    """问守护要它的响应缓存/监听状态（**必须在守护进程内取**，见 `_handle_conn` 的 stats op）。"""
-    doc = doc or read_state()
-    if not doc:
-        return None
-    try:
-        req = json.dumps({"proto": PROTO, "token": doc["token"], "op": "stats"}).encode("utf-8")
-        with socket.create_connection((BIND_HOST, int(doc["port"])), timeout=timeout) as sock:
-            sock.settimeout(timeout)
-            sock.sendall(req + b"\n")
-            code, out, _err = read_framed(sock)
-        if code != 0:
-            return None
-        got = json.loads(out.decode("utf-8"))
-        return got if isinstance(got, dict) else None
-    except Exception:                                    # noqa: BLE001 - 查不到就如实说查不到
-        return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
-
-
-def ping(doc: Optional[Dict[str, Any]] = None, timeout: float = 2.0) -> bool:
-    """守护是否在线（带令牌发一次 `--version`）。"""
-    doc = doc or read_state()
-    if not doc:
-        return False
-    try:
-        code, _out, _err = run_request(doc, ["--version"], timeout=timeout)
-        return code == 0
-    except Exception:                                    # noqa: BLE001 - 探测失败即「不在线」
-        return False
-
-
-def start(root: Path, idle_timeout: float = float(os.environ.get("NF_DAEMON_IDLE", 3600.0)),
-          wait: float = 30.0,
-          watch: bool = False) -> Tuple[bool, str]:
-    """拉起守护（后台子进程）→ (是否成功, 说明)。已在跑则直接返回 True。"""
-    if ping():
-        return True, "守护已在运行"
-    global _CHILD
-    import subprocess
-    env = dict(os.environ)
-    env["PYTHONPATH"] = str(Path(root) / "desktop" / "src") + os.pathsep \
-        + env.get("PYTHONPATH", "")
-    args = [sys.executable, "-m", "core.daemon", "--serve",
-            "--root", str(root), "--idle", str(int(idle_timeout))]
-    if watch:
-        args.append("--watch")
-    kwargs: Dict[str, Any] = {"cwd": str(root), "env": env,
-                              "stdout": subprocess.DEVNULL, "stderr": subprocess.DEVNULL}
-    if os.name == "nt":                                  # Windows：脱离控制台、不闪窗
-        kwargs["creationflags"] = getattr(subprocess, "DETACHED_PROCESS", 0) \
-            | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
-    else:
-        kwargs["start_new_session"] = True
-    _CHILD = subprocess.Popen(args, **kwargs)             # noqa: S603 - argv 列表，无 shell
-    deadline = time.time() + wait
-    while time.time() < deadline:
-        if ping():
-            return True, "守护已启动"
-        time.sleep(0.05)
-    return False, "守护启动超时（修复指引：手动跑 python -m core.daemon --serve 看报错）"
-
-
-def _reap_child() -> None:
-    """回收 `start()` 拉起的子进程（否则解释器退出时报 ResourceWarning）。"""
-    global _CHILD
-    if _CHILD is None:
-        return
-    try:
-        _CHILD.wait(timeout=5)
-    except Exception:                                    # noqa: BLE001 - 回收失败不影响结果
-        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
-    _CHILD = None
-
-
-def stop(timeout: float = 8.0) -> Tuple[bool, str]:
-    """请守护自行退出（协议级 shutdown，不发信号、不删文件）。"""
-    doc = read_state()
-    if not doc:
-        return False, "没有守护在运行"
-    try:
-        with socket.create_connection((BIND_HOST, int(doc["port"])), timeout=timeout) as sock:
-            sock.settimeout(timeout)
-            sock.sendall(json.dumps({"proto": PROTO, "token": doc["token"],
-                                     "op": "shutdown"}).encode("utf-8") + b"\n")
-            read_framed(sock)
-    except (ConnectionRefusedError, ConnectionResetError):
-        # 登记在、端口却拒连 = 守护早已不在（登记过期）。这不是「停不下来」，而是「没有守护」：
-        # 如实报这一条并清除过期登记，才能让下一次 stop 得到确定的答案。
-        clear_state()
-        return False, "没有守护在运行（状态登记已过期：%s:%s 拒连，已清除）" \
-            % (BIND_HOST, doc["port"])
-    except Exception as exc:                             # noqa: BLE001
-        clear_state()
-        return False, "守护未响应（已标记停用）：%s" % exc
-    deadline = time.time() + timeout
-    while time.time() < deadline:
-        if not ping(doc, timeout=0.5):
-            _reap_child()
-            return True, "守护已停止"
-        time.sleep(0.05)
-    return False, "守护仍在运行"
-
-
-def main(argv: Optional[List[str]] = None) -> int:
-    """`python -m core.daemon --serve --root <repo> [--idle S]`（内部入口）。"""
-    import argparse
-    ap = argparse.ArgumentParser(prog="core.daemon",
-                                 description="NF 执行层常驻守护（内部入口）")
-    ap.add_argument("--serve", action="store_true", help="前台跑守护循环（供 start 拉起）")
-    ap.add_argument("--root", default=str(Path(__file__).resolve().parents[3]))
-    ap.add_argument("--idle", type=float, default=float(os.environ.get("NF_DAEMON_IDLE", 3600.0)),
-                    help="空闲多少秒后自动退出（0=不退出）")
-    ap.add_argument("--force", action="store_true",
-                    help="已有守护在运行时仍另起一个（会顶掉先起者的状态登记，默认拒绝）")
-    ap.add_argument("--watch", action="store_true",
-                    help="启用目录监听 + 只读命令响应缓存（树没变即整条复用；不可用自动降级）")
-    args = ap.parse_args(argv)
-    if not args.serve:
-        ap.print_help()
-        return 2
-    return serve_forever(Path(args.root).resolve(), idle_timeout=args.idle,
-                         force=args.force, watch=args.watch)
-
 
 if __name__ == "__main__":                                # pragma: no cover - 进程入口
     raise SystemExit(main())

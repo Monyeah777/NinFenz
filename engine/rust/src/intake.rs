@@ -97,48 +97,7 @@ pub fn scan(root: &Path) -> IntakeScan {
     let mut sorted = channels.clone();
     sorted.sort_by(|a, b| a.0.cmp(&b.0));
     for (name, ch) in &sorted {
-        let ch = if matches!(ch, Json::Object(_)) {
-            ch.clone()
-        } else {
-            Json::Object(Vec::new())
-        };
-        let mode = py_str(get(&ch, "mode"));
-        if !MODES.contains(&mode.as_str()) {
-            // 真源是 `%r`（带引号）：`通道 bad-mode mode 非法：'sometimes'（取值 …）`
-            issues.push(format!(
-                "通道 {} mode 非法：{}（取值 {}）",
-                name,
-                crate::pyval::py_repr(&Json::Str(mode.clone())),
-                MODES.join(" / ")
-            ));
-        }
-        if mode == "author_only" {
-            let allow: Vec<String> = crate::pyval::arr_items(get(&ch, "allowlist"))
-                .iter()
-                .map(|x| plain_str(x).trim().to_lowercase())
-                .filter(|x| !x.is_empty())
-                .collect();
-            if allow.is_empty() {
-                issues.push(format!(
-                    "通道 {} 为 author_only 但 allowlist 为空（修复指引：给白名单，或改为 open / paused）",
-                    name
-                ));
-            }
-        }
-        let label = py_str(get(&ch, "index_label"));
-        if label.is_empty() {
-            issues.push(format!(
-                "通道 {} 缺 index_label（修复指引：给须在 {} 出现的措辞）",
-                name, INDEX_REL
-            ));
-        } else if !index_text.is_empty() && !index_text.contains(&label) {
-            issues.push(format!(
-                "通道 {} 的 index_label 未出现在 {}：{}（修复指引：同步投稿须知措辞，防闸门与须知漂移）",
-                name,
-                INDEX_REL,
-                crate::pyval::py_repr(&Json::Str(label))
-            ));
-        }
+        channel_issues(name, ch, &index_text, &mut issues);
     }
 
     for rel in BOTS {
@@ -173,6 +132,52 @@ pub fn scan(root: &Path) -> IntakeScan {
                 Json::Array(modes.into_iter().map(Json::Str).collect()),
             ),
         ]),
+    }
+}
+
+/// 单条接收通道的 mode / allowlist / index_label 核对。
+fn channel_issues(name: &str, ch: &Json, index_text: &str, issues: &mut Vec<String>) {
+let ch = if matches!(ch, Json::Object(_)) {
+    ch.clone()
+} else {
+    Json::Object(Vec::new())
+};
+    let mode = py_str(get(&ch, "mode"));
+    if !MODES.contains(&mode.as_str()) {
+        // 真源是 `%r`（带引号）：`通道 bad-mode mode 非法：'sometimes'（取值 …）`
+        issues.push(format!(
+            "通道 {} mode 非法：{}（取值 {}）",
+            name,
+            crate::pyval::py_repr(&Json::Str(mode.clone())),
+            MODES.join(" / ")
+        ));
+    }
+    if mode == "author_only" {
+        let allow: Vec<String> = crate::pyval::arr_items(get(&ch, "allowlist"))
+            .iter()
+            .map(|x| plain_str(x).trim().to_lowercase())
+            .filter(|x| !x.is_empty())
+            .collect();
+        if allow.is_empty() {
+            issues.push(format!(
+                "通道 {} 为 author_only 但 allowlist 为空（修复指引：给白名单，或改为 open / paused）",
+                name
+            ));
+        }
+    }
+    let label = py_str(get(&ch, "index_label"));
+    if label.is_empty() {
+        issues.push(format!(
+            "通道 {} 缺 index_label（修复指引：给须在 {} 出现的措辞）",
+            name, INDEX_REL
+        ));
+    } else if !index_text.is_empty() && !index_text.contains(&label) {
+        issues.push(format!(
+            "通道 {} 的 index_label 未出现在 {}：{}（修复指引：同步投稿须知措辞，防闸门与须知漂移）",
+            name,
+            INDEX_REL,
+            crate::pyval::py_repr(&Json::Str(label))
+        ));
     }
 }
 

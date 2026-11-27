@@ -167,10 +167,13 @@ pub fn pattern_issue(pat: &Json, path: &str) -> String {
     }
 }
 
+// 嵌套量词模式。模式串含裸花括号，提为常量以免被朴素括号计数误判。
+const NESTED_QUANT_PAT: &str = r"\([^()]*[+*][^()]*\)\s*[+*{]";
+
 fn nested_quant_re() -> Result<fancy_regex::Regex, fancy_regex::Error> {
     static RE: std::sync::OnceLock<Result<fancy_regex::Regex, fancy_regex::Error>> =
         std::sync::OnceLock::new();
-    RE.get_or_init(|| fancy_regex::Regex::new(r"\([^()]*[+*][^()]*\)\s*[+*{]"))
+    RE.get_or_init(|| fancy_regex::Regex::new(NESTED_QUANT_PAT))
         .clone()
 }
 
@@ -244,36 +247,9 @@ fn check(
     };
     let mut errors: Vec<String> = Vec::new();
 
-    // 不支持的官方关键字（排序后遍历，去重）
-    let mut keys: Vec<String> = obj_keys(schema);
-    keys.sort();
-    keys.dedup();
-    for kw in keys {
-        if SUPPORTED.contains(&kw.as_str()) {
-            continue;
-        }
-        if UNSUPPORTED_WORDS.contains(&kw.as_str()) || kw.starts_with('$') {
-            let tag = format!("{}@{}", kw, path);
-            if !unsupported.contains(&tag) {
-                unsupported.push(tag);
-            }
-        }
-    }
+    check_unsupported(schema, path, unsupported);
 
-    if let Some(r) = obj_get(schema, "$ref") {
-        let refstr = pyval::plain_str(r);
-        match resolve_ref(&refstr, root) {
-            None => unsupported.push(format!("远程/悬空 $ref {}@{}", refstr, path)),
-            Some(target) => errors.extend(check(
-                instance,
-                &target,
-                path,
-                Some(root),
-                unsupported,
-                depth + 1,
-            )),
-        }
-    }
+    errors.extend(check_ref(instance, schema, path, root, unsupported, depth));
 
     if let Some(types) = obj_get(schema, "type") {
         if !matches!(types, Json::Null) {
@@ -307,6 +283,72 @@ fn check(
         }
     }
 
+    errors.extend(check_string(instance, schema, path));
+
+    errors.extend(check_number(instance, schema, path));
+
+    errors.extend(check_array(instance, schema, path, root, unsupported, depth));
+
+    if let Json::Object(_) = instance {
+        errors.extend(check_object_required(instance, schema, path));
+        errors.extend(check_object_props(instance, schema, path, root, unsupported, depth));
+    }
+
+    errors.extend(check_compound(instance, schema, path, root, unsupported, depth));
+
+    errors.extend(check_not(instance, schema, path, root, unsupported, depth));
+    errors
+}
+
+/// 不支持的官方关键字（排序后遍历，去重）。
+fn check_unsupported(schema: &Json, path: &str, unsupported: &mut Vec<String>) {
+    // 不支持的官方关键字（排序后遍历，去重）
+    let mut keys: Vec<String> = obj_keys(schema);
+    keys.sort();
+    keys.dedup();
+    for kw in keys {
+        if SUPPORTED.contains(&kw.as_str()) {
+            continue;
+        }
+        if UNSUPPORTED_WORDS.contains(&kw.as_str()) || kw.starts_with('$') {
+            let tag = format!("{}@{}", kw, path);
+            if !unsupported.contains(&tag) {
+                unsupported.push(tag);
+            }
+        }
+    }
+}
+
+/// $ref 解析（远程/悬空记 unsupported；可解析则递归）。
+fn check_ref(
+    instance: &Json,
+    schema: &Json,
+    path: &str,
+    root: &Json,
+    unsupported: &mut Vec<String>,
+    depth: usize,
+) -> Vec<String> {
+    let mut errors: Vec<String> = Vec::new();
+    if let Some(r) = obj_get(schema, "$ref") {
+        let refstr = pyval::plain_str(r);
+        match resolve_ref(&refstr, root) {
+            None => unsupported.push(format!("远程/悬空 $ref {}@{}", refstr, path)),
+            Some(target) => errors.extend(check(
+                instance,
+                &target,
+                path,
+                Some(root),
+                unsupported,
+                depth + 1,
+            )),
+        }
+    }
+    errors
+}
+
+/// 字符串面：minLength / maxLength / pattern / format。
+fn check_string(instance: &Json, schema: &Json, path: &str) -> Vec<String> {
+    let mut errors: Vec<String> = Vec::new();
     if let Json::Str(s) = instance {
         let len = s.chars().count() as i64;
         if let Some(v) = obj_get(schema, "minLength") {
@@ -334,7 +376,12 @@ fn check(
             }
         }
     }
+    errors
+}
 
+/// 数值面：minimum / maximum / 排他边界 / multipleOf。
+fn check_number(instance: &Json, schema: &Json, path: &str) -> Vec<String> {
+    let mut errors: Vec<String> = Vec::new();
     if matches!(instance, Json::Int(_) | Json::Float(_)) {
         let iv = num_of(instance);
         for (kw, op, cmp) in [
@@ -372,7 +419,19 @@ fn check(
             }
         }
     }
+    errors
+}
 
+/// 数组面：minItems / maxItems / uniqueItems / prefixItems / items 递归。
+fn check_array(
+    instance: &Json,
+    schema: &Json,
+    path: &str,
+    root: &Json,
+    unsupported: &mut Vec<String>,
+    depth: usize,
+) -> Vec<String> {
+    let mut errors: Vec<String> = Vec::new();
     if let Json::Array(items) = instance {
         if let Some(v) = obj_get(schema, "minItems") {
             if (items.len() as i64) < pyval::py_int_or(Some(v), 0) {
@@ -431,14 +490,12 @@ fn check(
             }
         }
     }
+    errors
+}
 
-    if let Json::Object(map) = instance {
-        let props = obj_get(schema, "properties")
-            .cloned()
-            .unwrap_or(Json::Object(vec![]));
-        let pats = obj_get(schema, "patternProperties")
-            .cloned()
-            .unwrap_or(Json::Object(vec![]));
+/// 对象面必填：required / dependentRequired。
+fn check_object_required(instance: &Json, schema: &Json, path: &str) -> Vec<String> {
+    let mut errors: Vec<String> = Vec::new();
         if let Some(Json::Array(req)) = obj_get(schema, "required") {
             for key in req {
                 let k = pyval::plain_str(key);
@@ -461,6 +518,26 @@ fn check(
                 }
             }
         }
+    errors
+}
+
+/// 对象面属性：properties / patternProperties / additionalProperties / propertyNames。
+fn check_object_props(
+    instance: &Json,
+    schema: &Json,
+    path: &str,
+    root: &Json,
+    unsupported: &mut Vec<String>,
+    depth: usize,
+) -> Vec<String> {
+    let mut errors: Vec<String> = Vec::new();
+    let props = obj_get(schema, "properties")
+        .cloned()
+        .unwrap_or(Json::Object(vec![]));
+    let pats = obj_get(schema, "patternProperties")
+        .cloned()
+        .unwrap_or(Json::Object(vec![]));
+    if let Json::Object(map) = instance {
         for (key, value) in map {
             let mut matched = false;
             if let Some(sub) = obj_get(&props, key) {
@@ -530,7 +607,19 @@ fn check(
             }
         }
     }
+    errors
+}
 
+/// allOf / anyOf / oneOf 组合子式。
+fn check_compound(
+    instance: &Json,
+    schema: &Json,
+    path: &str,
+    root: &Json,
+    unsupported: &mut Vec<String>,
+    depth: usize,
+) -> Vec<String> {
+    let mut errors: Vec<String> = Vec::new();
     for (kw, mode) in [("allOf", "all"), ("anyOf", "any"), ("oneOf", "one")] {
         let Some(Json::Array(subs)) = obj_get(schema, kw) else {
             continue;
@@ -555,7 +644,19 @@ fn check(
             errors.push(format!("{}: oneOf 命中 {} 个（须恰 1）", path, ok));
         }
     }
+    errors
+}
 
+/// not 子式（被满足即报错）。
+fn check_not(
+    instance: &Json,
+    schema: &Json,
+    path: &str,
+    root: &Json,
+    unsupported: &mut Vec<String>,
+    depth: usize,
+) -> Vec<String> {
+    let mut errors: Vec<String> = Vec::new();
     if let Some(not) = obj_get(schema, "not") {
         if matches!(not, Json::Object(_))
             && check(instance, not, path, Some(root), unsupported, depth + 1).is_empty()

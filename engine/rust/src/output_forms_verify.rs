@@ -272,21 +272,7 @@ pub fn dual_source_check(root: &Path, pkg: &str, path: &str, ds: &Json) -> Vec<S
             f
         }
     };
-    let mut data_keys: Vec<String> = Vec::new();
-    if let Json::Object(o) = &data {
-        for (_, value) in o {
-            let Json::Array(items) = value else { continue };
-            for item in items {
-                let v = obj_get(item, &field).cloned().unwrap_or(Json::Null);
-                if pyval::py_truthy(&v) {
-                    let s = pyval::plain_str(&v);
-                    if !data_keys.contains(&s) {
-                        data_keys.push(s);
-                    }
-                }
-            }
-        }
-    }
+    let data_keys = collect_data_keys(&data, &field);
     let mut only_md: Vec<String> = md_keys
         .iter()
         .filter(|k| !data_keys.contains(k))
@@ -325,6 +311,26 @@ pub fn dual_source_check(root: &Path, pkg: &str, path: &str, ds: &Json) -> Vec<S
         ));
     }
     out
+}
+
+/// 数据面键集（每条 output 的 field 值，去重保序）。
+fn collect_data_keys(data: &Json, field: &str) -> Vec<String> {
+    let mut data_keys: Vec<String> = Vec::new();
+    if let Json::Object(o) = data {
+        for (_, value) in o {
+            let Json::Array(items) = value else { continue };
+            for item in items {
+                let v = obj_get(item, &field).cloned().unwrap_or(Json::Null);
+                if pyval::py_truthy(&v) {
+                    let s = pyval::plain_str(&v);
+                    if !data_keys.contains(&s) {
+                        data_keys.push(s);
+                    }
+                }
+            }
+        }
+    }
+    data_keys
 }
 
 /// 近似 Python `re.findall`：无组 → 整个匹配；**恰好一组** → 该组内容；多组 → 元组 repr。
@@ -386,90 +392,14 @@ pub fn verify_pack(root: &Path, pkg: &str) -> (Vec<String>, Vec<Json>) {
         ));
     }
     for entry in arr_of(obj_get(&idx, "outputs")) {
-        let path = s_of(obj_get(&entry, "path"));
-        let form = s_of(obj_get(&entry, "form"));
-        let tier = s_of(obj_get(&entry, "tier"));
-        if path.is_empty() {
-            issues.push(format!("{}: outputs 条目缺 path", rel));
+        let Some(f) = entry_facts(root, pkg, &rel, &entry, &mut issues) else {
             continue;
-        }
-        if !of::TIERS.contains(&tier.as_str()) {
-            issues.push(format!(
-                "{}: {} 档位非法 {}",
-                rel,
-                path,
-                pyval::py_repr(&Json::Str(tier.clone()))
-            ));
-            continue;
-        }
-        let out_rel = match of::declared_out_rel(root, pkg, &Json::Str(path.clone())) {
-            Ok(v) => v,
-            Err(e) => {
-                issues.push(format!("{}: {}", rel, e));
-                continue;
-            }
         };
-        if !root.join(&out_rel).is_file() {
-            issues.push(format!("{}: 声明产出面不存在 {}", rel, path));
-            continue;
-        }
-        let (got_form, got_tier) = of::detect(root, &out_rel);
-        if !form.is_empty() && form != got_form {
-            issues.push(format!(
-                "{}: {} 声明形态 {}，实测 {}",
-                rel, path, form, got_form
-            ));
-        }
-        let ti = of::TIERS.iter().position(|t| *t == tier).unwrap_or(0);
-        let gi = of::TIERS.iter().position(|t| *t == got_tier).unwrap_or(0);
-        if ti > gi {
-            issues.push(format!(
-                "{}: {} 声明档位 {} 超出本仓可判上限 {}",
-                rel, path, tier, got_tier
-            ));
-        }
-        let form_key = if form.is_empty() {
-            got_form.clone()
-        } else {
-            form.clone()
-        };
-        if let Some(sub) = oc::form_check(&form_key, root, &out_rel) {
-            for s in sub {
-                issues.push(format!("{}: {} {}", rel, path, s));
-            }
-        }
-        let sch_rel = s_of(obj_get(&entry, "schema"));
-        if !sch_rel.is_empty() {
-            let full = match of::declared_out_rel(root, pkg, &Json::Str(sch_rel.clone())) {
-                Ok(v) => v,
-                Err(e) => {
-                    issues.push(format!("{}: {} {}", rel, path, e));
-                    String::new()
-                }
-            };
-            let (schema, serr) = if full.is_empty() {
-                (Json::Null, "schema 路径越界".to_string())
-            } else {
-                oc::read_json(root, &full)
-            };
-            if !serr.is_empty() {
-                issues.push(format!("{}: {} schema {}", rel, path, serr));
-            } else {
-                let (inst, ierr) = oc::read_json(root, &out_rel);
-                if !ierr.is_empty() {
-                    issues.push(format!("{}: {} {}", rel, path, ierr));
-                } else {
-                    let errs = crate::json_schema::json_schema_check(&inst, &schema);
-                    for e in errs.iter().take(8) {
-                        issues.push(format!("{}: {} schema 不符 {}", rel, path, e));
-                    }
-                }
-            }
-        }
+        verify_entry_schema(root, pkg, &f, &entry, &mut issues);
         if let Some(ds) = obj_get(&entry, "dual_source") {
             if matches!(ds, Json::Object(_)) {
-                for m in dual_source_check(root, pkg, &out_rel, ds) {
-                    issues.push(format!("{}: {} {}", rel, path, m));
+                for m in dual_source_check(root, pkg, &f.out_rel, ds) {
+                    issues.push(format!("{}: {} {}", rel, f.path, m));
                 }
             }
         }
@@ -484,24 +414,151 @@ pub fn verify_pack(root: &Path, pkg: &str) -> (Vec<String>, Vec<Json>) {
                     issues.push(format!("{}: {}", rel, s));
                 }
             }
-        } else if tier == "T4" {
+        } else if f.tier == "T4" {
             issues.push(format!(
                 "{}: {} 声明 T4（可复算）却无 recompute 声明",
-                rel, path
+                rel, f.path
             ));
         }
-        rows.push(Json::Object(vec![
-            ("package".to_string(), Json::Str(pkg.to_string())),
-            ("path".to_string(), Json::Str(path)),
-            (
-                "form".to_string(),
-                Json::Str(if form.is_empty() { got_form } else { form }),
-            ),
-            ("tier".to_string(), Json::Str(tier)),
-            ("role".to_string(), Json::Str(s_of(obj_get(&entry, "role")))),
-        ]));
+        push_output_row(pkg, &f, &entry, &mut rows);
     }
     (issues, rows)
+}
+
+/// outputs 条目的前置核对结论（schema / recompute / 行记录复用）。
+struct EntryFacts {
+    rel: String,
+    path: String,
+    form: String,
+    tier: String,
+    out_rel: String,
+    got_form: String,
+}
+
+/// outputs 条目前置核对：path / tier / 产出面在场性 / 形态 / 档位。
+fn entry_facts(
+    root: &Path,
+    pkg: &str,
+    rel: &str,
+    entry: &Json,
+    issues: &mut Vec<String>,
+) -> Option<EntryFacts> {
+    let path = s_of(obj_get(&entry, "path"));
+    let form = s_of(obj_get(&entry, "form"));
+    let tier = s_of(obj_get(&entry, "tier"));
+    if path.is_empty() {
+        issues.push(format!("{}: outputs 条目缺 path", rel));
+        return None;
+    }
+    if !of::TIERS.contains(&tier.as_str()) {
+        issues.push(format!(
+            "{}: {} 档位非法 {}",
+            rel,
+            path,
+            pyval::py_repr(&Json::Str(tier.clone()))
+        ));
+        return None;
+    }
+    let out_rel = match of::declared_out_rel(root, pkg, &Json::Str(path.clone())) {
+        Ok(v) => v,
+        Err(e) => {
+            issues.push(format!("{}: {}", rel, e));
+            return None;
+        }
+    };
+    if !root.join(&out_rel).is_file() {
+        issues.push(format!("{}: 声明产出面不存在 {}", rel, path));
+        return None;
+    }
+    let (got_form, got_tier) = of::detect(root, &out_rel);
+    if !form.is_empty() && form != got_form {
+        issues.push(format!(
+            "{}: {} 声明形态 {}，实测 {}",
+            rel, path, form, got_form
+        ));
+    }
+    let ti = of::TIERS.iter().position(|t| *t == tier).unwrap_or(0);
+    let gi = of::TIERS.iter().position(|t| *t == got_tier).unwrap_or(0);
+    if ti > gi {
+        issues.push(format!(
+            "{}: {} 声明档位 {} 超出本仓可判上限 {}",
+            rel, path, tier, got_tier
+        ));
+    }
+    let form_key = if form.is_empty() {
+        got_form.clone()
+    } else {
+        form.clone()
+    };
+    if let Some(sub) = oc::form_check(&form_key, root, &out_rel) {
+        for s in sub {
+            issues.push(format!("{}: {} {}", rel, path, s));
+        }
+    }
+    Some(EntryFacts {
+        rel: rel.to_string(),
+        path,
+        form,
+        tier,
+        out_rel,
+        got_form,
+    })
+}
+
+/// 条目 schema 在场 + 实例校验。
+fn verify_entry_schema(
+    root: &Path,
+    pkg: &str,
+    f: &EntryFacts,
+    entry: &Json,
+    issues: &mut Vec<String>,
+) {
+    let sch_rel = s_of(obj_get(&entry, "schema"));
+    if !sch_rel.is_empty() {
+        let full = match of::declared_out_rel(root, pkg, &Json::Str(sch_rel.clone())) {
+            Ok(v) => v,
+            Err(e) => {
+                issues.push(format!("{}: {} {}", f.rel, f.path, e));
+                String::new()
+            }
+        };
+        let (schema, serr) = if full.is_empty() {
+            (Json::Null, "schema 路径越界".to_string())
+        } else {
+            oc::read_json(root, &full)
+        };
+        if !serr.is_empty() {
+            issues.push(format!("{}: {} schema {}", f.rel, f.path, serr));
+        } else {
+            let (inst, ierr) = oc::read_json(root, &f.out_rel);
+            if !ierr.is_empty() {
+                issues.push(format!("{}: {} {}", f.rel, f.path, ierr));
+            } else {
+                let errs = crate::json_schema::json_schema_check(&inst, &schema);
+                for e in errs.iter().take(8) {
+                    issues.push(format!("{}: {} schema 不符 {}", f.rel, f.path, e));
+                }
+            }
+        }
+    }
+}
+
+/// 产出面清单行（包 / 相对路径 / 形态 / 档位 / 角色）。
+fn push_output_row(pkg: &str, f: &EntryFacts, entry: &Json, rows: &mut Vec<Json>) {
+    rows.push(Json::Object(vec![
+        ("package".to_string(), Json::Str(pkg.to_string())),
+        ("path".to_string(), Json::Str(f.path.clone())),
+        (
+            "form".to_string(),
+            Json::Str(if f.form.is_empty() {
+            f.got_form.clone()
+        } else {
+            f.form.clone()
+        }),
+        ),
+        ("tier".to_string(), Json::Str(f.tier.clone())),
+        ("role".to_string(), Json::Str(s_of(obj_get(&entry, "role")))),
+    ]));
 }
 
 /// 真源 `index_verify`（缓存层不移植）→ `(issues, stats)`。

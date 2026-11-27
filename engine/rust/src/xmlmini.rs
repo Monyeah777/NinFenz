@@ -106,83 +106,18 @@ pub fn parse(text: &str) -> Result<XNode, String> {
 
     while i < chars.len() {
         if chars[i] != '<' {
-            // 文本/空白
-            let start = i;
-            while i < chars.len() && chars[i] != '<' {
-                i += 1;
-            }
-            let seg: String = chars[start..i].iter().collect();
-            if !seg.trim().is_empty() {
-                if !started {
-                    return Err("内容出现在根元素之前".to_string());
-                }
-                if root_closed {
-                    return Err("内容出现在根元素之后".to_string());
-                }
-            }
+            text_segment(&chars, &mut i, started, root_closed)?;
             continue;
         }
         // 注释 / 声明 / CDATA
-        if chars[i..].starts_with(&['<', '!', '-', '-']) {
-            let mut j = i + 4;
-            while j + 2 < chars.len() && !chars[j..].starts_with(&['-', '-', '>']) {
-                j += 1;
-            }
-            if j + 2 >= chars.len() {
-                return Err("注释未闭合".to_string());
-            }
-            i = j + 3;
-            continue;
-        }
-        if chars[i..].starts_with(&['<', '?']) {
-            let mut j = i + 2;
-            while j + 1 < chars.len() && !chars[j..].starts_with(&['?', '>']) {
-                j += 1;
-            }
-            if j + 1 >= chars.len() {
-                return Err("处理指令未闭合".to_string());
-            }
-            i = j + 2;
-            continue;
-        }
-        if chars[i..].starts_with(&['<', '!', '[', 'C', 'D']) {
-            let mut j = i + 9;
-            while j + 2 < chars.len() && !chars[j..].starts_with(&[']', ']', '>']) {
-                j += 1;
-            }
-            if j + 2 >= chars.len() {
-                return Err("CDATA 未闭合".to_string());
-            }
-            i = j + 3;
+        // 注释 / 声明 / CDATA
+        if skip_meta(&chars, &mut i)? {
             continue;
         }
         // 结束标签
+        // 结束标签
         if chars[i..].starts_with(&['<', '/']) {
-            let mut j = i + 2;
-            while j < chars.len() && chars[j] != '>' {
-                j += 1;
-            }
-            if j >= chars.len() {
-                return Err("结束标签未闭合".to_string());
-            }
-            let name: String = chars[i + 2..j].iter().collect();
-            let name = name.trim().to_string();
-            match stack.pop() {
-                None => return Err(format!("多余的结束标签 </{}>", name)),
-                Some(node) => {
-                    if node.tag != name {
-                        return Err(format!("标签不匹配：<{}> 对 </{}>", node.tag, name));
-                    }
-                    match stack.last_mut() {
-                        Some(parent) => parent.children.push(node),
-                        None => {
-                            root = Some(node);
-                            root_closed = true;
-                        }
-                    }
-                }
-            }
-            i = j + 1;
+            end_tag(&chars, &mut i, &mut stack, &mut root, &mut root_closed)?;
             continue;
         }
         // 开始标签
@@ -252,6 +187,98 @@ pub fn parse(text: &str) -> Result<XNode, String> {
         return Err(format!("标签未闭合：<{}>", stack.last().unwrap().tag));
     }
     root.ok_or_else(|| "空文档".to_string())
+}
+
+/// 纯文本段：判「根之前 / 之后有内容」，并把游标前移到下一个标记。
+fn text_segment(chars: &[char], i: &mut usize, started: bool, root_closed: bool) -> Result<(), String> {
+    let start = *i;
+    while *i < chars.len() && chars[*i] != '<' {
+        *i += 1;
+    }
+    let seg: String = chars[start..*i].iter().collect();
+    if !seg.trim().is_empty() {
+        if !started {
+            return Err("内容出现在根元素之前".to_string());
+        }
+        if root_closed {
+            return Err("内容出现在根元素之后".to_string());
+        }
+    }
+    Ok(())
+}
+
+/// 跳过注释 / 处理指令 / CDATA 段；返回 true 表示已跳过一段。
+fn skip_meta(chars: &[char], i: &mut usize) -> Result<bool, String> {
+        if chars[*i..].starts_with(&['<', '!', '-', '-']) {
+            let mut j = *i + 4;
+            while j + 2 < chars.len() && !chars[j..].starts_with(&['-', '-', '>']) {
+                j += 1;
+            }
+            if j + 2 >= chars.len() {
+                return Err("注释未闭合".to_string());
+            }
+            *i = j + 3;
+            return Ok(true);
+        }
+        if chars[*i..].starts_with(&['<', '?']) {
+            let mut j = *i + 2;
+            while j + 1 < chars.len() && !chars[j..].starts_with(&['?', '>']) {
+                j += 1;
+            }
+            if j + 1 >= chars.len() {
+                return Err("处理指令未闭合".to_string());
+            }
+            *i = j + 2;
+            return Ok(true);
+        }
+        if chars[*i..].starts_with(&['<', '!', '[', 'C', 'D']) {
+            let mut j = *i + 9;
+            while j + 2 < chars.len() && !chars[j..].starts_with(&[']', ']', '>']) {
+                j += 1;
+            }
+            if j + 2 >= chars.len() {
+                return Err("CDATA 未闭合".to_string());
+            }
+            *i = j + 3;
+            return Ok(true);
+        }
+    Ok(false)
+}
+
+/// 解析结束标签：标签匹配、挂到父节点或收根；游标前移。
+fn end_tag(
+    chars: &[char],
+    i: &mut usize,
+    stack: &mut Vec<XNode>,
+    root: &mut Option<XNode>,
+    root_closed: &mut bool,
+) -> Result<(), String> {
+    let mut j = *i + 2;
+    while j < chars.len() && chars[j] != '>' {
+        j += 1;
+    }
+    if j >= chars.len() {
+        return Err("结束标签未闭合".to_string());
+    }
+    let name: String = chars[*i + 2..j].iter().collect();
+    let name = name.trim().to_string();
+    match stack.pop() {
+        None => return Err(format!("多余的结束标签 </{}>", name)),
+        Some(node) => {
+            if node.tag != name {
+                return Err(format!("标签不匹配：<{}> 对 </{}>", node.tag, name));
+            }
+            match stack.last_mut() {
+                Some(parent) => parent.children.push(node),
+                None => {
+                    *root = Some(node);
+                    *root_closed = true;
+                }
+            }
+        }
+    }
+    *i = j + 1;
+    Ok(())
 }
 
 /// 真源 XML 的实体解码：五个预定义实体 + 数字字符引用（`&#NN;` / `&#xHH;`）。

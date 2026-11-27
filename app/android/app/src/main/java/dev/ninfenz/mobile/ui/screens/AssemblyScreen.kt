@@ -84,7 +84,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
         if (p == null || s == null) {
             EmptyState(stringResource(dev.ninfenz.mobile.R.string.assembly_need_plan))
         } else {
-            AssemblyWorkspace(p, ui.rawPlan, ui.rawSpec, ui.inputs, ui.markdown, ui.metaSummary, ui.report,
+            AssemblyWorkspace(AssemblyWorkspaceArgs(p, ui.rawPlan, ui.rawSpec, ui.inputs, ui.markdown, ui.metaSummary, ui.report,
                 ui.manifest, ui.busy, ui.assembleRepro, ui.validateRepro, ui.extraSlots, ui.newSlot,
                 reqSlots, reqAssemble, reqExport,
                 onInputsChange = { ui.inputs = it }, onExtraSlotsChange = { ui.extraSlots = it },
@@ -93,7 +93,7 @@ fun AssemblyScreen(onBack: () -> Unit) {
                 onBusyChange = { ui.busy = it }, onErrorChange = { ui.error = it },
                 onMarkdownChange = { ui.markdown = it }, onMetaSummaryChange = { ui.metaSummary = it },
                 onAssembleReproChange = { ui.assembleRepro = it }, onValidateReproChange = { ui.validateRepro = it },
-                onReportChange = { ui.report = it }, onManifestChange = { ui.manifest = it })
+                onReportChange = { ui.report = it }, onManifestChange = { ui.manifest = it }))
         }
     }
 }

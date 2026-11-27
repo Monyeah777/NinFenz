@@ -309,29 +309,7 @@ pub fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
             live_root.chars().take(16).collect::<String>(),
         ));
     }
-    let mut live_by: Vec<(&str, &str)> = Vec::new();
-    if let Some(Json::Array(le)) = lg("entries") {
-        for e in le {
-            let Json::Object(ep) = e else { continue };
-            let id = ep
-                .iter()
-                .find(|(n, _)| n == "id")
-                .and_then(|(_, v)| match v {
-                    Json::Str(s) => Some(s.as_str()),
-                    _ => None,
-                });
-            let dg = ep
-                .iter()
-                .find(|(n, _)| n == "digest")
-                .and_then(|(_, v)| match v {
-                    Json::Str(s) => Some(s.as_str()),
-                    _ => None,
-                });
-            if let (Some(i), Some(d)) = (id, dg) {
-                live_by.push((i, d));
-            }
-        }
-    }
+    let live_by = live_entries_by(lp);
     for e in entries {
         let Json::Object(ep) = e else { continue };
         let eg = |k: &str| ep.iter().find(|(n, _)| n == k).map(|(_, v)| v);
@@ -364,22 +342,7 @@ pub fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
             Some(Json::Array(a)) => a.as_slice(),
             _ => &[],
         };
-        let mut steps = Vec::with_capacity(proof.len());
-        for st in proof {
-            let Json::Object(sp) = st else { continue };
-            let sg = |k: &str| sp.iter().find(|(n, _)| n == k).map(|(_, v)| v);
-            let (Some(Json::Str(h)), Some(Json::Str(side))) = (sg("hash"), sg("side")) else {
-                continue;
-            };
-            let mut hb = [0u8; 32];
-            if !unhex_into(h, &mut hb) {
-                continue;
-            }
-            steps.push(merkle::ProofStep {
-                sibling_is_left: side == "left",
-                hash: hb,
-            });
-        }
+        let steps = proof_steps(proof);
         if merkle::hex(&merkle::fold_proof(&leaf, &steps)) != committed_root {
             issues.push(format!("包含证明不折叠到根：{}", id));
         }
@@ -389,6 +352,55 @@ pub fn verify_scope(doc: &Json, root: &Path) -> (Vec<String>, Json) {
         ("root".to_string(), Json::Str(live_root)),
     ]);
     (issues, stats)
+}
+
+/// 回执条目按 id → digest 建索引（真源 live 重建的 entries 顺序）。
+fn live_entries_by(lp: &[(String, Json)]) -> Vec<(&str, &str)> {
+let mut live_by: Vec<(&str, &str)> = Vec::new();
+if let Some(Json::Array(le)) = lp.iter().find(|(n, _)| n == "entries").map(|(_, v)| v) {
+    for e in le {
+        let Json::Object(ep) = e else { continue };
+        let id = ep
+            .iter()
+            .find(|(n, _)| n == "id")
+            .and_then(|(_, v)| match v {
+                Json::Str(s) => Some(s.as_str()),
+                _ => None,
+            });
+        let dg = ep
+            .iter()
+            .find(|(n, _)| n == "digest")
+            .and_then(|(_, v)| match v {
+                Json::Str(s) => Some(s.as_str()),
+                _ => None,
+            });
+        if let (Some(i), Some(d)) = (id, dg) {
+            live_by.push((i, d));
+        }
+    }
+}
+live_by
+}
+
+/// 回执条目 proof 的步骤解析（非法 hex / 缺字段的步骤跳过，真源同款）。
+fn proof_steps(proof: &[Json]) -> Vec<merkle::ProofStep> {
+let mut steps = Vec::with_capacity(proof.len());
+    for st in proof {
+        let Json::Object(sp) = st else { continue };
+        let sg = |k: &str| sp.iter().find(|(n, _)| n == k).map(|(_, v)| v);
+        let (Some(Json::Str(h)), Some(Json::Str(side))) = (sg("hash"), sg("side")) else {
+            continue;
+        };
+        let mut hb = [0u8; 32];
+        if !unhex_into(h, &mut hb) {
+            continue;
+        }
+        steps.push(merkle::ProofStep {
+            sibling_is_left: side == "left",
+            hash: hb,
+        });
+}
+steps
 }
 
 fn unhex_into(s: &str, out: &mut [u8; 32]) -> bool {

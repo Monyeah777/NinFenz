@@ -1,5 +1,4 @@
 package dev.ninfenz.mobile.ui.screens
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -90,14 +89,13 @@ fun SearchScreen(
 
     val results = remember(ui.query, ui.all, ui.ftsResults) { if (ui.query.isBlank()) emptyList() else ui.ftsResults }
     val filtered = remember(results, ui.filterName, ui.selectedPackId, ui.selectedProjectId, ui.favoritesOnly, ui.scopeTag) {
-        applySearchFilters(results, filterKind, ui.selectedPackId, ui.selectedProjectId, ui.favoritesOnly, ui.scopeTag, metaStore)
+        applySearchFilters(ApplySearchFiltersArgs(results, filterKind, ui.selectedPackId, ui.selectedProjectId, ui.favoritesOnly, ui.scopeTag, metaStore))
     }
     SearchEffects(ui, index, fts, filterStore, focusRequester, filtered)
     val displayed = remember(filtered, ui.visibleCount) { filtered.take(ui.visibleCount) }
     val rows = remember(displayed) { searchRows(displayed) }
 
-    SearchScreenBody(
-        ui = ui,
+    SearchScreenBody(SearchScreenBodyArgs(ui = ui,
         filterKind = filterKind,
         results = results,
         filtered = filtered,
@@ -111,8 +109,7 @@ fun SearchScreen(
         onOpenPack = onOpenPack,
         onOpenProject = onOpenProject,
         packIds = packIds,
-        projects = projects
-    )
+        projects = projects))
 }
 
 internal class SearchUiState(
@@ -197,24 +194,26 @@ private fun SearchEffects(
     LaunchedEffect(filtered) { ui.selected = 0; ui.visibleCount = 200 }
 }
 
+internal data class SearchScreenBodyArgs(
+    val ui: SearchUiState,
+    val filterKind: SearchKind?,
+    val results: List<SearchHit>,
+    val filtered: List<SearchHit>,
+    val displayed: List<SearchHit>,
+    val rows: List<SearchRow>,
+    val metaStore: LibraryMetaStore,
+    val historyStore: SearchHistoryStore,
+    val focusRequester: FocusRequester,
+    val listState: androidx.compose.foundation.lazy.LazyListState,
+    val onBack: () -> Unit,
+    val onOpenPack: (String, String) -> Unit,
+    val onOpenProject: (String) -> Unit,
+    val packIds: List<String>,
+    val projects: List<ProjectEntry>,
+)
+
 @Composable
-private fun SearchScreenBody(
-    ui: SearchUiState,
-    filterKind: SearchKind?,
-    results: List<SearchHit>,
-    filtered: List<SearchHit>,
-    displayed: List<SearchHit>,
-    rows: List<SearchRow>,
-    metaStore: LibraryMetaStore,
-    historyStore: SearchHistoryStore,
-    focusRequester: FocusRequester,
-    listState: androidx.compose.foundation.lazy.LazyListState,
-    onBack: () -> Unit,
-    onOpenPack: (String, String) -> Unit,
-    onOpenProject: (String) -> Unit,
-    packIds: List<String>,
-    projects: List<ProjectEntry>
-) {
+private fun SearchScreenBody(args: SearchScreenBodyArgs) = with(args) {
     fun openHit(hit: SearchHit) {
         historyStore.record(ui.query)
         ui.history = historyStore.load()
@@ -230,193 +229,36 @@ private fun SearchScreenBody(
             onQueryChange = { ui.query = it },
             onSelect = { ui.selected = SearchKeyboard.move(ui.selected, displayed.size, it) },
             onOpenHit = { openHit(it) })
-        SearchFilterArea(ui.query, results, ui.all, filterKind, ui.filterName, packIds, ui.selectedPackId,
+        SearchFilterArea(SearchFilterAreaArgs(ui.query, results, ui.all, filterKind, ui.filterName, packIds, ui.selectedPackId,
             projects, ui.selectedProjectId, ui.favoritesOnly, ui.scopeTag, metaStore,
             onFilterNameChange = { ui.filterName = it }, onPackChange = { ui.selectedPackId = it },
             onProjectChange = { ui.selectedProjectId = it }, onFavoritesChange = { ui.favoritesOnly = it },
-            onScopeTagChange = { ui.scopeTag = it })
-        SearchResultsArea(ui.query, filtered, ui.history, ui.all, rows, ui.selected, ui.visibleCount, listState,
+            onScopeTagChange = { ui.scopeTag = it }))
+        SearchResultsArea(SearchResultsAreaArgs(ui.query, filtered, ui.history, ui.all, rows, ui.selected, ui.visibleCount, listState,
             showClearFilters = ui.filterName != null || ui.selectedPackId != null || ui.selectedProjectId != null,
             onQueryChange = { ui.query = it }, onOpenHit = { openHit(it) },
             onPickHistory = { ui.query = it }, onClearHistory = { historyStore.clear(); ui.history = emptyList() },
             onVisibleCountChange = { ui.visibleCount = it },
-            onClearFilters = { ui.filterName = null; ui.selectedPackId = null; ui.selectedProjectId = null })
+            onClearFilters = { ui.filterName = null; ui.selectedPackId = null; ui.selectedProjectId = null }))
     }
 }
 
-private fun applySearchFilters(
-    results: List<SearchHit>,
-    filterKind: SearchKind?,
-    selectedPackId: String?,
-    selectedProjectId: String?,
-    favoritesOnly: Boolean,
-    scopeTag: String?,
-    metaStore: LibraryMetaStore
-): List<SearchHit> {
+internal data class ApplySearchFiltersArgs(
+    val results: List<SearchHit>,
+    val filterKind: SearchKind?,
+    val selectedPackId: String?,
+    val selectedProjectId: String?,
+    val favoritesOnly: Boolean,
+    val scopeTag: String?,
+    val metaStore: LibraryMetaStore,
+)
+
+private fun applySearchFilters(args: ApplySearchFiltersArgs): List<SearchHit> {
+    with(args) {
     var scoped = SearchFilter.apply(results, filterKind, selectedPackId, selectedProjectId)
     if (favoritesOnly) scoped = scoped.filter { hit -> hit.projectId?.let { metaStore.isFavorite(it) } == true }
     if (scopeTag != null) scoped = scoped.filter { hit -> hit.projectId?.let { scopeTag in metaStore.tags(it) } == true }
     return scoped
-}
 
-private fun searchRows(displayed: List<SearchHit>): List<SearchRow> {
-    val out = mutableListOf<SearchRow>()
-    var flat = 0
-    SearchKind.entries.forEach { kind ->
-        val hits = displayed.filter { it.kind == kind }
-        if (hits.isNotEmpty()) {
-            out.add(SearchRow(kind = kind))
-            hits.forEach { hit ->
-                out.add(SearchRow(hit = hit, flatIndex = flat))
-                flat++
-            }
-        }
-    }
-    return out
-}
-
-
-internal data class SearchRow(
-    val kind: SearchKind? = null,
-    val hit: SearchHit? = null,
-    val flatIndex: Int = -1
-)
-
-@Composable
-internal fun PackFilterRow(packIds: List<String>, selected: String?, onPick: (String?) -> Unit) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = NfSpacing.page),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item {
-            FilterChip(
-                selected = selected == null,
-                onClick = { onPick(null) },
-                label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_filter_all_packs)) }
-            )
-        }
-        items(packIds) { id ->
-            FilterChip(selected = selected == id, onClick = { onPick(id) }, label = { Text(id) })
-        }
-    }
-}
-
-@Composable
-internal fun ProjectFilterRow(projects: List<ProjectEntry>, selected: String?, onPick: (String?) -> Unit) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = NfSpacing.page),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item {
-            FilterChip(
-                selected = selected == null,
-                onClick = { onPick(null) },
-                label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_filter_all_projects)) }
-            )
-        }
-        items(projects) { entry ->
-            val id = entry.project.id
-            FilterChip(
-                selected = selected == id,
-                onClick = { onPick(id) },
-                label = { Text(entry.project.title.ifBlank { id }, maxLines = 1, overflow = TextOverflow.Ellipsis) }
-            )
-        }
-    }
-}
-
-@Composable
-internal fun kindLabel(kind: SearchKind): String = when (kind) {
-    SearchKind.PROJECT -> stringResource(dev.ninfenz.mobile.R.string.search_kind_project)
-    SearchKind.PACK -> stringResource(dev.ninfenz.mobile.R.string.search_kind_pack)
-    SearchKind.CLAUSE -> stringResource(dev.ninfenz.mobile.R.string.search_kind_clause)
-    SearchKind.FIELD -> stringResource(dev.ninfenz.mobile.R.string.search_kind_field)
-    SearchKind.NODE -> stringResource(dev.ninfenz.mobile.R.string.search_kind_node)
-    SearchKind.SECTION -> stringResource(dev.ninfenz.mobile.R.string.search_kind_section)
-    SearchKind.SLOT -> stringResource(dev.ninfenz.mobile.R.string.search_kind_slot)
-}
-
-
-@Composable
-internal fun SearchHistoryPanel(
-    history: List<String>,
-    total: Int,
-    onPick: (String) -> Unit,
-    onClear: () -> Unit
-) {
-    Column(modifier = Modifier.fillMaxWidth().padding(NfSpacing.page)) {
-        Text(
-            pluralStringResource(dev.ninfenz.mobile.R.plurals.search_hint, total, total),
-            style = NfType.secondary,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        if (history.isNotEmpty()) {
-            androidx.compose.foundation.layout.Row(
-                modifier = Modifier.fillMaxWidth().padding(top = NfSpacing.m),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-            ) {
-                Text(stringResource(dev.ninfenz.mobile.R.string.search_history_title), style = NfType.itemTitle)
-                TextButton(onClick = onClear) { Text(stringResource(dev.ninfenz.mobile.R.string.search_history_clear)) }
-            }
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(history) { q ->
-                    FilterChip(selected = false, onClick = { onPick(q) }, label = { Text(q) })
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-internal fun SearchFilterRow(selected: SearchKind?, onPick: (SearchKind?) -> Unit) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = NfSpacing.page),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        item {
-            FilterChip(
-                selected = selected == null,
-                onClick = { onPick(null) },
-                label = { Text(stringResource(dev.ninfenz.mobile.R.string.search_filter_all)) }
-            )
-        }
-        items(SearchKind.entries) { kind ->
-            FilterChip(
-                selected = selected == kind,
-                onClick = { onPick(kind) },
-                label = { Text(kindLabel(kind)) }
-            )
-        }
-    }
-}
-
-@Composable
-internal fun SectionLabel(text: String) {
-    Text(
-        text,
-        style = NfType.itemTitle,
-        modifier = Modifier.padding(start = NfSpacing.page, end = NfSpacing.page, top = NfSpacing.m, bottom = NfSpacing.xs)
-    )
-}
-
-@Composable
-internal fun ResultRow(hit: SearchHit, selected: Boolean, onClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface)
-            .clickable(onClick = onClick)
-            .padding(horizontal = NfSpacing.page, vertical = 12.dp)
-    ) {
-        Text(hit.title, style = NfType.itemTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        Text(
-            hit.detail,
-            style = NfType.meta,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }

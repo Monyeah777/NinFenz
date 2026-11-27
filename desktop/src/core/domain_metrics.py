@@ -391,13 +391,15 @@ def synthesize(family: str, seed: str, n: int = 0) -> List[Dict[str, str]]:
             rows.append({"case_id": "c%02d" % i, "gold": gold, "pred": pred,
                          "score": "%.4f" % (r.between(0.55, 0.99) if gold == "pos"
                                             else r.between(0.01, 0.45))})
-    elif family == "retrieval":
+        return rows
+    if family == "retrieval":
         for q in range(n or 3):
             rel_idx = {int(r.between(0, 6)), int(r.between(0, 6))}
             for rk in range(6):
                 rows.append({"query_id": "q%d" % q, "rank": str(rk + 1),
                              "relevant": "1" if rk in rel_idx else "0"})
-    elif family == "extraction":
+        return rows
+    if family == "extraction":
         fields = ["品牌", "型号", "价格", "日期", "数量", "单位"]
         for i in range(n or 12):
             gold = sorted({r.pick(fields), r.pick(fields)})
@@ -405,58 +407,66 @@ def synthesize(family: str, seed: str, n: int = 0) -> List[Dict[str, str]]:
             rows.append({"case_id": "e%02d" % i,
                          "gold_fields": json.dumps(gold, ensure_ascii=False),
                          "pred_fields": json.dumps(pred, ensure_ascii=False)})
-    elif family == "generation":
+        return rows
+    if family == "generation":
         words = ["模型", "口径", "评测", "样本", "结论", "边界"]
         for i in range(n or 12):
             ref = "".join(r.pick(words) for _ in range(5))
             out = ref if r.next() < 0.4 else "".join(r.pick(words) for _ in range(5))
             rows.append({"case_id": "g%02d" % i, "reference": ref, "output": out})
-    elif family == "regression":
+        return rows
+    if family == "regression":
         for i in range(n or 16):
             gold = r.between(-2.0, 2.0)
             rows.append({"case_id": "r%02d" % i, "gold": "%.4f" % gold,
                          "pred": "%.4f" % (gold + r.between(-0.25, 0.25))})
-    elif family == "calibration":
+        return rows
+    if family == "calibration":
         for i in range(n or 20):
             p = r.between(0.05, 0.95)
             rows.append({"case_id": "k%02d" % i, "prob": "%.4f" % p,
                          "gold": "1" if r.next() < p else "0"})
-    elif family == "agreement":
+        return rows
+    if family == "agreement":
         for i in range(n or 20):
             a = r.pick(["T", "F"])
             rows.append({"case_id": "a%02d" % i, "a": a,
                          "b": a if r.next() < 0.85 else ("F" if a == "T" else "T")})
-    elif family == "preference":
+        return rows
+    if family == "preference":
         for i in range(n or 16):
             human = r.pick(["a", "b"])
             rows.append({"case_id": "p%02d" % i, "human": human,
                          "judge": human if r.next() < 0.7 else r.pick(["a", "b", "tie"])})
-    elif family == "exact_judgement":
+        return rows
+    if family == "exact_judgement":
         for t in range(n or 4):
             for i in range(4):
                 rows.append({"task_id": "t%d" % t, "sample": str(i + 1),
                              "passed": "1" if r.next() < 0.5 else "0"})
-    elif family == "latency_cost":
+        return rows
+    if family == "latency_cost":
         for i in range(n or 20):
             rows.append({"case_id": "l%02d" % i,
                          "latency_ms": "%.1f" % r.between(120.0, 900.0),
                          "tokens_in": str(int(r.between(200, 1800))),
                          "tokens_out": str(int(r.between(50, 600)))})
-    elif family == "drift":
+        return rows
+    if family == "drift":
         for i in range(n or 8):
             e = r.between(0.05, 0.20)
             rows.append({"bucket": "b%d" % i, "expected": "%.4f" % e,
                          "actual": "%.4f" % max(0.001, e + r.between(-0.03, 0.03))})
-    elif family == "contract_compliance":
+        return rows
+    if family == "contract_compliance":
         fields = ["available_ts", "unit", "currency", "version", "owner"]
         for i in range(n or 20):
             ok = r.next() < 0.8
             miss = "" if ok else "|".join(sorted({r.pick(fields), r.pick(fields)}))
             rows.append({"case_id": "v%02d" % i, "valid": "1" if ok else "0",
                          "missing_fields": miss})
-    else:
-        raise ValueError("未登记夹具族：%r" % family)
-    return rows
+        return rows
+    raise ValueError("未登记夹具族：%r" % family)
 
 
 def rows_to_csv(rows: Sequence[Dict[str, str]]) -> str:

@@ -200,101 +200,10 @@ pub fn scan(root: &Path) -> ScanResult {
         .map(|p| py_str(get(p, "id")))
         .collect();
 
-    let mut modules_mc = 0i64;
     let mut seen_mc_id: Vec<(String, String)> = Vec::new();
-    for rel in crate::module_signature::module_docs(root) {
-        let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
-            issues.push(format!("{}: 读取失败（本线不复制 Python 异常文本）", rel));
-            continue;
-        };
-        let parsed = miniyaml::fence_yaml(&text, "machine_contract")
-            .unwrap_or_else(|| Json::Object(Vec::new()));
-        if get(&parsed, "machine_contract").is_none() {
-            continue;
-        }
-        let mc = get(&parsed, "machine_contract")
-            .cloned()
-            .unwrap_or(Json::Null);
-        let mid = py_str(get(&mc, "id"));
-        if !mid.is_empty() {
-            if let Some((_, prev)) = seen_mc_id.iter().find(|(m, _)| *m == mid) {
-                issues.push(format!(
-                    "{}: 模块 id 与 {} 重复（mc.id={}）——编号是全局寻址面，运行时索引会静默择一，须改号（修复指引：按 01 §1.6.11 换类内段号或 M91-M99 段号）",
-                    rel, prev, mid
-                ));
-            } else {
-                seen_mc_id.push((mid.clone(), rel.clone()));
-            }
-        }
-        modules_mc += 1;
-        let declared = py_str(get(&mc, "conformance"));
-        if !matches!(declared.as_str(), "L1" | "L2" | "L3") {
-            issues.push(format!(
-                "{}: machine_contract 缺/非法 conformance 声明 {}",
-                rel,
-                crate::pyval::py_repr(get(&mc, "conformance").unwrap_or(&Json::Null))
-            ));
-            continue;
-        }
-        let provable = if matches!(get(&mc, "id"), Some(Json::Str(_))) && evidence.contains(&mid) {
-            2
-        } else {
-            1
-        };
-        if order_of(&declared) > provable {
-            issues.push(format!(
-                "{}: conformance 虚标 {} > 可证 L{}（{} 不在装配在册证据）",
-                rel,
-                declared,
-                provable,
-                crate::pyval::py_repr(get(&mc, "id").unwrap_or(&Json::Null))
-            ));
-        }
-    }
+    let modules_mc = scan_module_conformance(root, &evidence, &mut issues, &mut seen_mc_id);
 
-    let mut packages = 0i64;
-    for rel in crate::glob::expand(root, "community/*/protocol.yaml") {
-        let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
-            issues.push(format!(
-                "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
-                rel
-            ));
-            continue;
-        };
-        let data = match miniyaml::parse(&text) {
-            Ok(d) => d,
-            Err(_) => {
-                issues.push(format!(
-                    "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
-                    rel
-                ));
-                continue;
-            }
-        };
-        packages += 1;
-        let pkg = get(&data, "package").cloned().unwrap_or(Json::Null);
-        let declared = py_str(get(&pkg, "conformance"));
-        let pid = py_str(get(&pkg, "id"));
-        if !matches!(declared.as_str(), "L1" | "L2" | "L3") {
-            issues.push(format!(
-                "{}: package 缺/非法 conformance 声明 {}",
-                rel,
-                crate::pyval::py_repr(get(&pkg, "conformance").unwrap_or(&Json::Null))
-            ));
-            continue;
-        }
-        let provable = if matches!(get(&pkg, "id"), Some(Json::Str(_))) && reg_ids.contains(&pid) {
-            2
-        } else {
-            1
-        };
-        if order_of(&declared) > provable {
-            issues.push(format!(
-                "{}: conformance 虚标 {} > 可证 L{}（包不在 registry protocols[]）",
-                rel, declared, provable
-            ));
-        }
-    }
+    let packages = scan_package_conformance(root, &reg_ids, &mut issues);
 
     let (manifest, err) = read_json(root, "protocol/export_conformance.json");
     let mut export_items = 0i64;
@@ -321,6 +230,118 @@ pub fn scan(root: &Path) -> ScanResult {
         ("export_items".to_string(), Json::Int(export_items)),
     ]);
     ScanResult { issues, stats }
+}
+
+/// 模块文档的 conformance 声明核对；返回已扫模块数。
+fn scan_module_conformance(
+    root: &Path,
+    evidence: &BTreeSet<String>,
+    issues: &mut Vec<String>,
+    seen_mc_id: &mut Vec<(String, String)>,
+) -> i64 {
+let mut modules_mc = 0i64;
+for rel in crate::module_signature::module_docs(root) {
+    let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
+        issues.push(format!("{}: 读取失败（本线不复制 Python 异常文本）", rel));
+        continue;
+    };
+    let parsed = miniyaml::fence_yaml(&text, "machine_contract")
+        .unwrap_or_else(|| Json::Object(Vec::new()));
+    if get(&parsed, "machine_contract").is_none() {
+        continue;
+    }
+    let mc = get(&parsed, "machine_contract")
+        .cloned()
+        .unwrap_or(Json::Null);
+    let mid = py_str(get(&mc, "id"));
+    if !mid.is_empty() {
+        if let Some((_, prev)) = seen_mc_id.iter().find(|(m, _)| *m == mid) {
+            issues.push(format!(
+                "{}: 模块 id 与 {} 重复（mc.id={}）——编号是全局寻址面，运行时索引会静默择一，须改号（修复指引：按 01 §1.6.11 换类内段号或 M91-M99 段号）",
+                rel, prev, mid
+            ));
+        } else {
+            seen_mc_id.push((mid.clone(), rel.clone()));
+        }
+    }
+    modules_mc += 1;
+    let declared = py_str(get(&mc, "conformance"));
+    if !matches!(declared.as_str(), "L1" | "L2" | "L3") {
+        issues.push(format!(
+            "{}: machine_contract 缺/非法 conformance 声明 {}",
+            rel,
+            crate::pyval::py_repr(get(&mc, "conformance").unwrap_or(&Json::Null))
+        ));
+        continue;
+    }
+    let provable = if matches!(get(&mc, "id"), Some(Json::Str(_))) && evidence.contains(&mid) {
+        2
+    } else {
+        1
+    };
+    if order_of(&declared) > provable {
+        issues.push(format!(
+            "{}: conformance 虚标 {} > 可证 L{}（{} 不在装配在册证据）",
+            rel,
+            declared,
+            provable,
+            crate::pyval::py_repr(get(&mc, "id").unwrap_or(&Json::Null))
+        ));
+    }
+}
+modules_mc
+}
+
+/// 领域包 protocol.yaml 的 conformance 声明核对；返回已扫包数。
+fn scan_package_conformance(
+    root: &Path,
+    reg_ids: &BTreeSet<String>,
+    issues: &mut Vec<String>,
+) -> i64 {
+let mut packages = 0i64;
+for rel in crate::glob::expand(root, "community/*/protocol.yaml") {
+    let Ok(text) = std::fs::read_to_string(root.join(&rel)) else {
+        issues.push(format!(
+            "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
+            rel
+        ));
+        continue;
+    };
+    let data = match miniyaml::parse(&text) {
+        Ok(d) => d,
+        Err(_) => {
+            issues.push(format!(
+                "{}: protocol.yaml 解析失败（本线不复制 Python 异常文本）",
+                rel
+            ));
+            continue;
+        }
+    };
+    packages += 1;
+    let pkg = get(&data, "package").cloned().unwrap_or(Json::Null);
+    let declared = py_str(get(&pkg, "conformance"));
+    let pid = py_str(get(&pkg, "id"));
+    if !matches!(declared.as_str(), "L1" | "L2" | "L3") {
+        issues.push(format!(
+            "{}: package 缺/非法 conformance 声明 {}",
+            rel,
+            crate::pyval::py_repr(get(&pkg, "conformance").unwrap_or(&Json::Null))
+        ));
+        continue;
+    }
+    let provable = if matches!(get(&pkg, "id"), Some(Json::Str(_))) && reg_ids.contains(&pid) {
+        2
+    } else {
+        1
+    };
+    if order_of(&declared) > provable {
+        issues.push(format!(
+            "{}: conformance 虚标 {} > 可证 L{}（包不在 registry protocols[]）",
+            rel, declared, provable
+        ));
+    }
+}
+packages
 }
 
 /// 供 `nf score` 的 `conformance_clean` 信号使用（真源 `_count(root,"conformance_scan","scan")`）。

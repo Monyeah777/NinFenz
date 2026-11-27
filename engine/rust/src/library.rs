@@ -95,110 +95,8 @@ pub fn verify(root: &Path) -> LibVerify {
     ids.dedup();
 
     for e in &rows {
-        let fm = &e.fm;
-        let eid = &e.id;
-        if !e.decode_issue.is_empty() {
-            issues.push(format!("编码：{}（{}）", eid, e.decode_issue));
-        }
-        if crate::pyval::obj_is_empty(fm) {
-            issues.push(format!(
-                "{} 缺 YAML frontmatter（真源要求：type/id/title 起）",
-                eid
-            ));
-            continue;
-        }
-        for k in REQUIRED_KEYS {
-            if py_str(get(fm, k)).trim().is_empty() {
-                issues.push(format!("{} frontmatter 缺必填键：{}", eid, k));
-            }
-        }
-        if py_str(get(fm, "id")) != *eid {
-            issues.push(format!(
-                "{} frontmatter id 与文件名不一致：{}",
-                eid,
-                plain_str(get(fm, "id").unwrap_or(&Json::Null))
-            ));
-        }
-        let lic = py_str(get(fm, "license"));
-        if !lic.is_empty() && !ALLOWED.contains(&lic.as_str()) {
-            issues.push(format!("{} license 不在词表：{}", eid, lic));
-        }
-        let st = {
-            let s = py_str(get(fm, "status"));
-            if s.is_empty() {
-                "active".to_string()
-            } else {
-                s
-            }
-        };
-        if !STATUSES.contains(&st.as_str()) {
-            issues.push(format!(
-                "{} status 不在词表：{}（{}）",
-                eid,
-                st,
-                STATUSES.join("/")
-            ));
-        }
-        if st == "superseded" && py_str(get(fm, "superseded_by")).trim().is_empty() {
-            issues.push(format!("{} status=superseded 但缺 superseded_by", eid));
-        }
-        let sb = py_str(get(fm, "superseded_by")).trim().to_string();
-        if !sb.is_empty() && !ids.contains(&sb) {
-            issues.push(format!("{} superseded_by 指向不存在的条目：{}", eid, sb));
-        }
-        if sb == *eid {
-            issues.push(format!("{} superseded_by 指向自身（取代链成环）", eid));
-        }
-        if !crate::pyval::py_truthy(get(fm, "sources").unwrap_or(&Json::Null)) {
-            warns.push(format!("{} 缺 sources（provenance 未声明）", eid));
-        }
-        for date_key in ["generated", "verified", "stale_after"] {
-            let v = py_str(get(fm, date_key)).trim().to_string();
-            if !v.is_empty() && !is_date(&v) {
-                issues.push(format!("{} {} 非 YYYY-MM-DD：{}", eid, date_key, v));
-            }
-        }
-
-        let att = py_str(get(fm, "attestation")).trim().to_string();
-        if !att.is_empty() {
-            let mut drifted = false;
-            if !is_hex64(&att) {
-                let head: String = att.chars().take(16).collect();
-                issues.push(format!(
-                    "{} attestation 非 64 位十六进制摘要：{}",
-                    eid, head
-                ));
-            } else {
-                let live = library_entries::entry_digest(root, &e.path);
-                drifted = live != att.to_lowercase();
-            }
-            let scheme = py_str(get(fm, "anchor_scheme")).trim().to_string();
-            if drifted {
-                if !scheme.is_empty() {
-                    issues.push(format!(
-                        "{} 签名锚已不覆盖当前内容（落锚后内容被改）（修复指引：重新 nf library attest <编号> 并分发新回执）",
-                        eid
-                    ));
-                } else {
-                    warns.push(format!(
-                        "{} attestation 与当前内容不符（内容已改，需重签）",
-                        eid
-                    ));
-                }
-            }
-            if !scheme.is_empty() {
-                // fail-closed：本线未移植 attest，**不当作通过**
-                issues.push(format!(
-                    "{} 带签名锚 scheme={}，但本线未移植 core.attest.verify_digest_anchor（修复指引：该条须由 Python 侧 `nf library verify` 核；本线不冒充通过）",
-                    eid, scheme
-                ));
-            }
-        }
-
-        for k in RECOMMENDED_KEYS {
-            if !library_entries::has_key(fm, k) {
-                warns.push(format!("{} 缺推荐键：{}", eid, k));
-            }
+        if check_entry_basics(e, &ids, &mut issues, &mut warns) {
+            check_entry_attestation(e, root, &mut issues, &mut warns);
         }
     }
 
@@ -229,6 +127,131 @@ pub fn verify(root: &Path) -> LibVerify {
         issues,
         warns,
         stats,
+    }
+}
+
+/// 条目 frontmatter 的字段面核对（缺键 / id 一致 / 许可 / 状态 / 取代 / 日期）。
+fn check_entry_basics(
+    e: &Entry,
+    ids: &[String],
+    issues: &mut Vec<String>,
+    warns: &mut Vec<String>,
+) -> bool {
+    let fm = &e.fm;
+    let eid = &e.id;
+    if !e.decode_issue.is_empty() {
+        issues.push(format!("编码：{}（{}）", eid, e.decode_issue));
+    }
+    if crate::pyval::obj_is_empty(fm) {
+        issues.push(format!(
+            "{} 缺 YAML frontmatter（真源要求：type/id/title 起）",
+            eid
+        ));
+        return false;
+    }
+    for k in REQUIRED_KEYS {
+        if py_str(get(fm, k)).trim().is_empty() {
+            issues.push(format!("{} frontmatter 缺必填键：{}", eid, k));
+        }
+    }
+    if py_str(get(fm, "id")) != *eid {
+        issues.push(format!(
+            "{} frontmatter id 与文件名不一致：{}",
+            eid,
+            plain_str(get(fm, "id").unwrap_or(&Json::Null))
+        ));
+    }
+    let lic = py_str(get(fm, "license"));
+    if !lic.is_empty() && !ALLOWED.contains(&lic.as_str()) {
+        issues.push(format!("{} license 不在词表：{}", eid, lic));
+    }
+    let st = {
+        let s = py_str(get(fm, "status"));
+        if s.is_empty() {
+            "active".to_string()
+        } else {
+            s
+        }
+    };
+    if !STATUSES.contains(&st.as_str()) {
+        issues.push(format!(
+            "{} status 不在词表：{}（{}）",
+            eid,
+            st,
+            STATUSES.join("/")
+        ));
+    }
+    if st == "superseded" && py_str(get(fm, "superseded_by")).trim().is_empty() {
+        issues.push(format!("{} status=superseded 但缺 superseded_by", eid));
+    }
+    let sb = py_str(get(fm, "superseded_by")).trim().to_string();
+    if !sb.is_empty() && !ids.contains(&sb) {
+        issues.push(format!("{} superseded_by 指向不存在的条目：{}", eid, sb));
+    }
+    if sb == *eid {
+        issues.push(format!("{} superseded_by 指向自身（取代链成环）", eid));
+    }
+    if !crate::pyval::py_truthy(get(fm, "sources").unwrap_or(&Json::Null)) {
+        warns.push(format!("{} 缺 sources（provenance 未声明）", eid));
+    }
+    for date_key in ["generated", "verified", "stale_after"] {
+        let v = py_str(get(fm, date_key)).trim().to_string();
+        if !v.is_empty() && !is_date(&v) {
+            issues.push(format!("{} {} 非 YYYY-MM-DD：{}", eid, date_key, v));
+        }
+    }
+    true
+}
+
+/// 条目 attestation 面核对（摘要 / 内容漂移 / 签名锚未移植）+ 推荐键提示。
+fn check_entry_attestation(
+    e: &Entry,
+    root: &Path,
+    issues: &mut Vec<String>,
+    warns: &mut Vec<String>,
+) {
+    let fm = &e.fm;
+    let eid = &e.id;
+    let att = py_str(get(fm, "attestation")).trim().to_string();
+    if !att.is_empty() {
+        let mut drifted = false;
+        if !is_hex64(&att) {
+            let head: String = att.chars().take(16).collect();
+            issues.push(format!(
+                "{} attestation 非 64 位十六进制摘要：{}",
+                eid, head
+            ));
+        } else {
+            let live = library_entries::entry_digest(root, &e.path);
+            drifted = live != att.to_lowercase();
+        }
+        let scheme = py_str(get(fm, "anchor_scheme")).trim().to_string();
+        if drifted {
+            if !scheme.is_empty() {
+                issues.push(format!(
+                    "{} 签名锚已不覆盖当前内容（落锚后内容被改）（修复指引：重新 nf library attest <编号> 并分发新回执）",
+                    eid
+                ));
+            } else {
+                warns.push(format!(
+                    "{} attestation 与当前内容不符（内容已改，需重签）",
+                    eid
+                ));
+            }
+        }
+        if !scheme.is_empty() {
+            // fail-closed：本线未移植 attest，**不当作通过**
+            issues.push(format!(
+                "{} 带签名锚 scheme={}，但本线未移植 core.attest.verify_digest_anchor（修复指引：该条须由 Python 侧 `nf library verify` 核；本线不冒充通过）",
+                eid, scheme
+            ));
+        }
+    }
+
+    for k in RECOMMENDED_KEYS {
+        if !library_entries::has_key(fm, k) {
+            warns.push(format!("{} 缺推荐键：{}", eid, k));
+        }
     }
 }
 

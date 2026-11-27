@@ -1,8 +1,8 @@
 {
   "schema": "nf-meta-runtime-manifest/1",
   "version": "1.0",
-  "machine_digest": "58e208bf37460b0294a5234aad38c29e050c367ca676a87f76af4e20c9f8c45a",
-  "runtime_digest": "58e208bf37460b0294a5234aad38c29e050c367ca676a87f76af4e20c9f8c45a",
+  "machine_digest": "c83591f9a0d5caccd2993095d334257a6037fbf3d18194b063d4396fd8a6caf3",
+  "runtime_digest": "c83591f9a0d5caccd2993095d334257a6037fbf3d18194b063d4396fd8a6caf3",
   "task_profile_digest": "0ddb101eb028a0f631a40d8efbc687cd3951528f6fc3f95ff4c4fbd98ed989c1",
   "atom_contracts_digest": "f6a79934733595db4ac7dcec4db6f17ebd9f39f8d557eca5f8aea79aca8428e1",
   "file_digests": {
@@ -40,7 +40,7 @@
     "cognition_method.schema.json": "cf9c129a1f26bb38a8cd44953e96e71af741b0450035a96e8facbb3b20dd164d",
     "cognition_pipeline.json": "0cc1482807e9da79b6ff45decf97edfa03aa44bc1f7752b1cf17b98758eb6093",
     "cognition_pipeline.schema.json": "ea9b2728281fb2279ce9af4a77cfede699defd3464877c9ed90071306c5a2341",
-    "cognitive_cockpit.py": "a3f43c43ebe50516a46ad80531605a10682ad548d39b2aafc6a4aa8212f44412",
+    "cognitive_cockpit.py": "5576954428cfe91101da3bffced0da8c5f353724cae0f5ecdf09d5fe93d97179",
     "coherence.py": "687a7ceea503eab1e32d11f12d0cca45b4944d130213e67a32862f35dfbd7123",
     "comparison_fixture.py": "51322b9d3e6f679a80589b9811e337aa11432f75964e96561ed9b205551c2a09",
     "constrained_candidates.schema.json": "d3ad153d8ce60e221b214317824b7bf58d0c4c73db6f9e085be39e34529576ef",
@@ -125,5 +125,5 @@
   },
   "human_review": "PENDING",
   "no_scoring": true,
-  "digest": "bd0df917fdd8ec944b0b8f0a3f4f354887397d7741ca90d3cb1d042e537a64ed"
+  "digest": "ed610e85df38f59b5026c9f1df1e1b622cb069eaa8121bdd3e407f7dd58fd454"
 }

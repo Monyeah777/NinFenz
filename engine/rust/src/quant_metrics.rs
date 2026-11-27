@@ -434,12 +434,6 @@ pub fn performance_report(series: &Json, params: &[(String, Json)]) -> Result<Js
     // ⚠️ `benchmark` / `excess` 先在占位处写 `null`，真有值时**必须覆盖**（真源是
     // `doc["benchmark"] = {...}`）。append 会让同一份 JSON 出现**两个同名键**——
     // 实测（2026-10-04）由此整份报告对不上。
-    fn set_key(doc: &mut Vec<(String, Json)>, k: &str, v: Json) {
-        match doc.iter_mut().find(|(kk, _)| kk == k) {
-            Some(slot) => slot.1 = v,
-            None => doc.push((k.to_string(), v)),
-        }
-    }
     let mut doc: Vec<(String, Json)> = vec![
         ("kind".to_string(), Json::Str("nf-performance/1".to_string())),
         ("as_of".to_string(), Json::Str(effective_as_of)),
@@ -473,65 +467,102 @@ pub fn performance_report(series: &Json, params: &[(String, Json)]) -> Result<Js
         ),
         (
             "disclosures".to_string(),
-            Json::Array(
-                vec![
-                    format!(
-                        "收益口径 = {}；年化因子 = {}（{}）；无风险利率年化 = {}",
-                        return_basis, af, frequency, rf_txt
-                    ),
-                    format!(
-                        "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee={} bps, slippage={} bps）",
-                        fee_txt, slip_txt
-                    ),
-                    format!(
-                        "成交价假设 = {}（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）",
-                        fill_rule
-                    ),
-                    "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间".to_string(),
-                    GIPS_ALIGNMENT.to_string(),
-                ]
-                .into_iter()
-                .map(Json::Str)
-                .collect(),
-            ),
+            disclosures(&return_basis, af, &frequency, &rf_txt, &fee_txt, &slip_txt, &fill_rule),
         ),
     ];
-    if has_bench {
-        let mut bblock: Vec<(String, Json)> = vec![(
-            "id".to_string(),
-            Json::Str(if benchmark_id.is_empty() {
-                "UNSPECIFIED".to_string()
-            } else {
-                benchmark_id
-            }),
-        )];
-        if let Json::Object(o) = block(&bench, af, rf, &return_basis)? {
-            bblock.extend(o);
-        }
-        let gross_ann = match obj_num(&gross, "annualized") {
-            v => v,
-        };
-        let bench_ann = obj_num(&Json::Object(bblock.clone()), "annualized");
-        let rets = returns(&equity, &return_basis)?;
-        let brets = returns(&bench, &return_basis)?;
-        set_key(&mut doc, "benchmark", Json::Object(bblock));
-        set_key(
-            &mut doc,
-            "excess",
-            Json::Object(vec![
-                ("annualized".to_string(), r6(gross_ann - bench_ann)),
-                (
-                    "tracking_error".to_string(),
-                    r6(tracking_error(&rets, &brets, af)),
-                ),
-                (
-                    "information_ratio".to_string(),
-                    r6(information_ratio(&rets, &brets, af)),
-                ),
-            ]),
-        );
-    }
+    apply_benchmark(&mut doc, has_bench, &bench, af, rf, &return_basis, &benchmark_id, &equity, &gross)?;
     Ok(Json::Object(doc))
+}
+
+/// 同名键覆盖写入（真源 dict 语义；append 会产生重复键）。
+fn set_key(doc: &mut Vec<(String, Json)>, k: &str, v: Json) {
+    match doc.iter_mut().find(|(kk, _)| kk == k) {
+        Some(slot) => slot.1 = v,
+        None => doc.push((k.to_string(), v)),
+    }
+}
+
+/// 报告的口径披露文本（收益口径 / 年化因子 / 成本 / 成交价假设 / GIPS）。
+fn disclosures(
+    return_basis: &str,
+    af: i64,
+    frequency: &str,
+    rf_txt: &str,
+    fee_txt: &str,
+    slip_txt: &str,
+    fill_rule: &str,
+) -> Json {
+    Json::Array(
+        vec![
+            format!(
+                "收益口径 = {}；年化因子 = {}（{}）；无风险利率年化 = {}",
+                return_basis, af, frequency, rf_txt
+            ),
+            format!(
+                "绩效为**毛口径**（未扣费）；费用与滑点按申报值计（fee={} bps, slippage={} bps）",
+                fee_txt, slip_txt
+            ),
+            format!(
+                "成交价假设 = {}（须晚于信号时点；前视偏差口径见 DATA_CONTRACT §7）",
+                fill_rule
+            ),
+            "最大回撤 / 卡尔玛按净值序列口径；卡尔玛分子分母同区间".to_string(),
+            GIPS_ALIGNMENT.to_string(),
+        ]
+        .into_iter()
+        .map(Json::Str)
+        .collect(),
+    )
+}
+
+/// 基准面（benchmark / excess）覆盖写入；无基准或长度不符时不动。
+fn apply_benchmark(
+    doc: &mut Vec<(String, Json)>,
+    has_bench: bool,
+    bench: &[f64],
+    af: i64,
+    rf: f64,
+    return_basis: &str,
+    benchmark_id: &str,
+    equity: &[f64],
+    gross: &Json,
+) -> Result<(), String> {
+if has_bench {
+    let mut bblock: Vec<(String, Json)> = vec![(
+        "id".to_string(),
+        Json::Str(if benchmark_id.is_empty() {
+            "UNSPECIFIED".to_string()
+        } else {
+            benchmark_id.to_string()
+        }),
+    )];
+    if let Json::Object(o) = block(bench, af, rf, &return_basis)? {
+        bblock.extend(o);
+    }
+    let gross_ann = match obj_num(&gross, "annualized") {
+        v => v,
+    };
+    let bench_ann = obj_num(&Json::Object(bblock.clone()), "annualized");
+    let rets = returns(equity, &return_basis)?;
+    let brets = returns(bench, &return_basis)?;
+    set_key(doc, "benchmark", Json::Object(bblock));
+    set_key(
+        doc,
+        "excess",
+        Json::Object(vec![
+            ("annualized".to_string(), r6(gross_ann - bench_ann)),
+            (
+                "tracking_error".to_string(),
+                r6(tracking_error(&rets, &brets, af)),
+            ),
+            (
+                "information_ratio".to_string(),
+                r6(information_ratio(&rets, &brets, af)),
+            ),
+        ]),
+    );
+}
+Ok(())
 }
 
 fn obj_num(v: &Json, k: &str) -> f64 {

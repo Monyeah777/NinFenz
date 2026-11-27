@@ -13,52 +13,14 @@ use std::process::ExitCode;
 ///
 /// `--signals` 提供**尚未移植**的 4 个扫描器计数；缺键 = 扫描器不可用（真源 `_count` 的哨兵语义）。
 pub(crate) fn run_score(args: &[String]) -> Result<ExitCode, String> {
-    let mut root: Option<PathBuf> = None;
-    let mut signals: Option<PathBuf> = None;
-    let mut baseline_rel: Option<String> = None;
-    let mut exceptions_path: Option<PathBuf> = None;
-    let mut tolerance = 0.0f64;
-    let mut out: Option<PathBuf> = None;
-    let mut i = 0;
-    while i < args.len() {
-        match args[i].as_str() {
-            "--root" => {
-                i += 1;
-                root = Some(PathBuf::from(args.get(i).ok_or("--root 后缺路径")?));
-            }
-            "--signals" => {
-                i += 1;
-                signals = Some(PathBuf::from(args.get(i).ok_or("--signals 后缺路径")?));
-            }
-            "--baseline" => {
-                i += 1;
-                baseline_rel = Some(args.get(i).ok_or("--baseline 后缺值")?.clone());
-            }
-            "--exceptions" => {
-                i += 1;
-                exceptions_path =
-                    Some(PathBuf::from(args.get(i).ok_or("--exceptions 后缺路径")?));
-            }
-            "--tolerance" => {
-                i += 1;
-                tolerance = args
-                    .get(i)
-                    .ok_or("--tolerance 后缺值")?
-                    .parse::<f64>()
-                    .map_err(|e| format!("--tolerance 不是数字：{}", e))?;
-            }
-            "--json" => {}
-            "--write-baseline" => {
-                return Err("本线不实现 --write-baseline（写面仍在 Python 侧；修复指引：`python scripts/nf.py score --write-baseline`）".into())
-            }
-            "--out" => {
-                i += 1;
-                out = Some(PathBuf::from(args.get(i).ok_or("--out 后缺路径")?));
-            }
-            other => return Err(format!("未知参数：{}", other)),
-        }
-        i += 1;
-    }
+    let ScoreArgs {
+        root,
+        signals,
+        baseline_rel,
+        exceptions_path,
+        tolerance,
+        out,
+    } = parse_score_args(args)?;
     let root = root.ok_or("缺 --root（修复指引：传仓库根目录）")?;
     require_dir(&root)?;
 
@@ -127,6 +89,74 @@ pub(crate) fn run_score(args: &[String]) -> Result<ExitCode, String> {
     } else {
         Ok(ExitCode::from(1))
     }
+}
+
+/// `run_score` 的参数面（缺省即 `None` / `0.0`）。
+struct ScoreArgs {
+    root: Option<PathBuf>,
+    signals: Option<PathBuf>,
+    baseline_rel: Option<String>,
+    exceptions_path: Option<PathBuf>,
+    tolerance: f64,
+    out: Option<PathBuf>,
+}
+
+/// 解析 `run_score` 参数（`--json` 只影响输出面，此处忽略）。
+fn parse_score_args(args: &[String]) -> Result<ScoreArgs, String> {
+    let mut root: Option<PathBuf> = None;
+    let mut signals: Option<PathBuf> = None;
+    let mut baseline_rel: Option<String> = None;
+    let mut exceptions_path: Option<PathBuf> = None;
+    let mut tolerance = 0.0f64;
+    let mut out: Option<PathBuf> = None;
+    let mut i = 0;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--root" => {
+                i += 1;
+                root = Some(PathBuf::from(args.get(i).ok_or("--root 后缺路径")?));
+            }
+            "--signals" => {
+                i += 1;
+                signals = Some(PathBuf::from(args.get(i).ok_or("--signals 后缺路径")?));
+            }
+            "--baseline" => {
+                i += 1;
+                baseline_rel = Some(args.get(i).ok_or("--baseline 后缺值")?.clone());
+            }
+            "--exceptions" => {
+                i += 1;
+                exceptions_path =
+                    Some(PathBuf::from(args.get(i).ok_or("--exceptions 后缺路径")?));
+            }
+            "--tolerance" => {
+                i += 1;
+                tolerance = args
+                    .get(i)
+                    .ok_or("--tolerance 后缺值")?
+                    .parse::<f64>()
+                    .map_err(|e| format!("--tolerance 不是数字：{}", e))?;
+            }
+            "--json" => {}
+            "--write-baseline" => {
+                return Err("本线不实现 --write-baseline（写面仍在 Python 侧；修复指引：`python scripts/nf.py score --write-baseline`）".into())
+            }
+            "--out" => {
+                i += 1;
+                out = Some(PathBuf::from(args.get(i).ok_or("--out 后缺路径")?));
+            }
+            other => return Err(format!("未知参数：{}", other)),
+        }
+        i += 1;
+    }
+    Ok(ScoreArgs {
+        root,
+        signals,
+        baseline_rel,
+        exceptions_path,
+        tolerance,
+        out,
+    })
 }
 
 // ---------------------------------------------------------------- layers 面

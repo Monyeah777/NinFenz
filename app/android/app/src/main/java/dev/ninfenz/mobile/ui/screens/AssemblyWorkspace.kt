@@ -103,25 +103,27 @@ internal fun AssemblySlotsCard(
     }
 }
 
+internal data class AssemblyAssembleCardArgs(
+    val rawPlan: JsonObject?,
+    val rawSpec: JsonObject?,
+    val inputs: Map<String, String>,
+    val busy: Boolean,
+    val markdown: String?,
+    val metaSummary: String?,
+    val assembleRepro: String?,
+    val validateRepro: String?,
+    val modifier: Modifier = Modifier,
+    val onBusyChange: (Boolean) -> Unit,
+    val onErrorChange: (CoreError?) -> Unit,
+    val onMarkdownChange: (String?) -> Unit,
+    val onMetaSummaryChange: (String?) -> Unit,
+    val onAssembleReproChange: (String?) -> Unit,
+    val onValidateReproChange: (String?) -> Unit,
+    val onReportChange: (ValidateReport?) -> Unit,
+)
+
 @Composable
-internal fun AssemblyAssembleCard(
-    rawPlan: JsonObject?,
-    rawSpec: JsonObject?,
-    inputs: Map<String, String>,
-    busy: Boolean,
-    markdown: String?,
-    metaSummary: String?,
-    assembleRepro: String?,
-    validateRepro: String?,
-    modifier: Modifier = Modifier,
-    onBusyChange: (Boolean) -> Unit,
-    onErrorChange: (CoreError?) -> Unit,
-    onMarkdownChange: (String?) -> Unit,
-    onMetaSummaryChange: (String?) -> Unit,
-    onAssembleReproChange: (String?) -> Unit,
-    onValidateReproChange: (String?) -> Unit,
-    onReportChange: (ValidateReport?) -> Unit
-) {
+internal fun AssemblyAssembleCard(args: AssemblyAssembleCardArgs) = with(args) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     CardBox(title = stringResource(dev.ninfenz.mobile.R.string.assembly_assemble), modifier = modifier) {
@@ -181,47 +183,49 @@ internal fun AssemblyExportCard(
     }
 }
 
+internal data class AssemblyWorkspaceArgs(
+    val plan: AssemblyPlan,
+    val rawPlan: JsonObject?,
+    val rawSpec: JsonObject?,
+    val inputs: Map<String, String>,
+    val markdown: String?,
+    val metaSummary: String?,
+    val report: ValidateReport?,
+    val manifest: String?,
+    val busy: Boolean,
+    val assembleRepro: String?,
+    val validateRepro: String?,
+    val extraSlots: List<String>,
+    val newSlot: String,
+    val reqSlots: BringIntoViewRequester,
+    val reqAssemble: BringIntoViewRequester,
+    val reqExport: BringIntoViewRequester,
+    val onInputsChange: (Map<String, String>) -> Unit,
+    val onExtraSlotsChange: (List<String>) -> Unit,
+    val onNewSlotChange: (String) -> Unit,
+    val onRemoveSlot: (String) -> Unit,
+    val onBusyChange: (Boolean) -> Unit,
+    val onErrorChange: (CoreError?) -> Unit,
+    val onMarkdownChange: (String?) -> Unit,
+    val onMetaSummaryChange: (String?) -> Unit,
+    val onAssembleReproChange: (String?) -> Unit,
+    val onValidateReproChange: (String?) -> Unit,
+    val onReportChange: (ValidateReport?) -> Unit,
+    val onManifestChange: (String?) -> Unit,
+)
+
 @Composable
-internal fun AssemblyWorkspace(
-    plan: AssemblyPlan,
-    rawPlan: JsonObject?,
-    rawSpec: JsonObject?,
-    inputs: Map<String, String>,
-    markdown: String?,
-    metaSummary: String?,
-    report: ValidateReport?,
-    manifest: String?,
-    busy: Boolean,
-    assembleRepro: String?,
-    validateRepro: String?,
-    extraSlots: List<String>,
-    newSlot: String,
-    reqSlots: BringIntoViewRequester,
-    reqAssemble: BringIntoViewRequester,
-    reqExport: BringIntoViewRequester,
-    onInputsChange: (Map<String, String>) -> Unit,
-    onExtraSlotsChange: (List<String>) -> Unit,
-    onNewSlotChange: (String) -> Unit,
-    onRemoveSlot: (String) -> Unit,
-    onBusyChange: (Boolean) -> Unit,
-    onErrorChange: (CoreError?) -> Unit,
-    onMarkdownChange: (String?) -> Unit,
-    onMetaSummaryChange: (String?) -> Unit,
-    onAssembleReproChange: (String?) -> Unit,
-    onValidateReproChange: (String?) -> Unit,
-    onReportChange: (ValidateReport?) -> Unit,
-    onManifestChange: (String?) -> Unit
-) {
+internal fun AssemblyWorkspace(args: AssemblyWorkspaceArgs) = with(args) {
     AssemblySlotsCard(plan, inputs, extraSlots, newSlot,
         modifier = Modifier.bringIntoViewRequester(reqSlots),
         onInputsChange = onInputsChange, onExtraSlotsChange = onExtraSlotsChange,
         onNewSlotChange = onNewSlotChange, onRemoveSlot = onRemoveSlot)
-    AssemblyAssembleCard(rawPlan, rawSpec, inputs, busy, markdown, metaSummary, assembleRepro, validateRepro,
+    AssemblyAssembleCard(AssemblyAssembleCardArgs(rawPlan, rawSpec, inputs, busy, markdown, metaSummary, assembleRepro, validateRepro,
         modifier = Modifier.bringIntoViewRequester(reqAssemble),
         onBusyChange = onBusyChange, onErrorChange = onErrorChange,
         onMarkdownChange = onMarkdownChange, onMetaSummaryChange = onMetaSummaryChange,
         onAssembleReproChange = onAssembleReproChange, onValidateReproChange = onValidateReproChange,
-        onReportChange = onReportChange)
+        onReportChange = onReportChange))
     AssemblyExportCard(markdown, busy, manifest,
         modifier = Modifier.bringIntoViewRequester(reqExport),
         onBusyChange = onBusyChange, onErrorChange = onErrorChange, onManifestChange = onManifestChange)

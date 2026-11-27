@@ -338,98 +338,109 @@ fn scan_block(
                 cur.iter().cloned().collect::<Vec<_>>().join(","),
             ));
         }
-        match st {
-            past::Stmt::Assign(_) | past::Stmt::AnnAssign(_) | past::Stmt::AugAssign(_) => {
-                for name in assigned_names(st) {
-                    if assigns_none(st, &name) {
-                        cur.insert(name);
-                    } else {
-                        cur.remove(&name);
-                    }
-                }
-            }
-            past::Stmt::Assert(_) => {
-                if let Some((n, kind)) = guard(st) {
-                    if kind == "is-not-none" {
-                        cur.remove(&n);
-                    }
-                }
-            }
-            past::Stmt::If(i) => {
-                let g = guard(st);
-                match &g {
-                    Some((n, "is-not-none")) => {
-                        let mut sub = cur.clone();
-                        sub.remove(n);
-                        scan_block(&i.body, &sub, rel, ls, out);
-                        scan_block(&i.orelse, &cur, rel, ls, out);
-                    }
-                    Some((n, "is-none")) => {
-                        scan_block(&i.body, &cur, rel, ls, out);
-                        let mut sub = cur.clone();
-                        sub.remove(n);
-                        scan_block(&i.orelse, &sub, rel, ls, out);
-                    }
-                    _ => {
-                        scan_block(&i.body, &cur, rel, ls, out);
-                        scan_block(&i.orelse, &cur, rel, ls, out);
-                    }
-                }
-                if let Some((n, "is-none")) = &g {
-                    if always_exits(&i.body) {
-                        cur.remove(n);
-                    }
-                }
-                for name in assigned_names(st) {
-                    cur.remove(&name);
-                }
-            }
-            past::Stmt::For(f) => {
-                scan_block(&f.body, &cur, rel, ls, out);
-                for name in assigned_names(st) {
-                    cur.remove(&name);
-                }
-            }
-            past::Stmt::AsyncFor(f) => {
-                scan_block(&f.body, &cur, rel, ls, out);
-                for name in assigned_names(st) {
-                    cur.remove(&name);
-                }
-            }
-            past::Stmt::While(w) => {
-                scan_block(&w.body, &cur, rel, ls, out);
-                for name in assigned_names(st) {
-                    cur.remove(&name);
-                }
-            }
-            past::Stmt::With(w) => {
-                scan_block(&w.body, &cur, rel, ls, out);
-                for name in assigned_names(st) {
-                    cur.remove(&name);
-                }
-            }
-            past::Stmt::AsyncWith(w) => {
-                scan_block(&w.body, &cur, rel, ls, out);
-                for name in assigned_names(st) {
-                    cur.remove(&name);
-                }
-            }
-            past::Stmt::Try(t) => {
-                scan_block(&t.body, &cur, rel, ls, out);
-                for h in &t.handlers {
-                    let past::ExceptHandler::ExceptHandler(h) = h;
-                    scan_block(&h.body, &cur, rel, ls, out);
-                }
-                scan_block(&t.orelse, &cur, rel, ls, out);
-                scan_block(&t.finalbody, &cur, rel, ls, out);
-                for name in assigned_names(st) {
-                    cur.remove(&name);
-                }
-            }
-            _ => {}
-        }
+        step_stmt(st, &mut cur, rel, ls, out);
     }
     cur
+}
+
+/// 单条语句对「可能为 None 的变量集」的流转（递归进入子块）。
+fn step_stmt(
+    st: &past::Stmt,
+    cur: &mut BTreeSet<String>,
+    rel: &str,
+    ls: &crate::pyast::LineStarts,
+    out: &mut Vec<(String, u32, String)>,
+) {
+    match st {
+        past::Stmt::Assign(_) | past::Stmt::AnnAssign(_) | past::Stmt::AugAssign(_) => {
+            for name in assigned_names(st) {
+                if assigns_none(st, &name) {
+                    cur.insert(name);
+                } else {
+                    cur.remove(&name);
+                }
+            }
+        }
+        past::Stmt::Assert(_) => {
+            if let Some((n, kind)) = guard(st) {
+                if kind == "is-not-none" {
+                    cur.remove(&n);
+                }
+            }
+        }
+        past::Stmt::If(i) => {
+            let g = guard(st);
+            match &g {
+                Some((n, "is-not-none")) => {
+                    let mut sub = cur.clone();
+                    sub.remove(n);
+                    scan_block(&i.body, &sub, rel, ls, out);
+                    scan_block(&i.orelse, &cur, rel, ls, out);
+                }
+                Some((n, "is-none")) => {
+                    scan_block(&i.body, &cur, rel, ls, out);
+                    let mut sub = cur.clone();
+                    sub.remove(n);
+                    scan_block(&i.orelse, &sub, rel, ls, out);
+                }
+                _ => {
+                    scan_block(&i.body, &cur, rel, ls, out);
+                    scan_block(&i.orelse, &cur, rel, ls, out);
+                }
+            }
+            if let Some((n, "is-none")) = &g {
+                if always_exits(&i.body) {
+                    cur.remove(n);
+                }
+            }
+            for name in assigned_names(st) {
+                cur.remove(&name);
+            }
+        }
+        past::Stmt::For(f) => {
+            scan_block(&f.body, &cur, rel, ls, out);
+            for name in assigned_names(st) {
+                cur.remove(&name);
+            }
+        }
+        past::Stmt::AsyncFor(f) => {
+            scan_block(&f.body, &cur, rel, ls, out);
+            for name in assigned_names(st) {
+                cur.remove(&name);
+            }
+        }
+        past::Stmt::While(w) => {
+            scan_block(&w.body, &cur, rel, ls, out);
+            for name in assigned_names(st) {
+                cur.remove(&name);
+            }
+        }
+        past::Stmt::With(w) => {
+            scan_block(&w.body, &cur, rel, ls, out);
+            for name in assigned_names(st) {
+                cur.remove(&name);
+            }
+        }
+        past::Stmt::AsyncWith(w) => {
+            scan_block(&w.body, &cur, rel, ls, out);
+            for name in assigned_names(st) {
+                cur.remove(&name);
+            }
+        }
+        past::Stmt::Try(t) => {
+            scan_block(&t.body, &cur, rel, ls, out);
+            for h in &t.handlers {
+                let past::ExceptHandler::ExceptHandler(h) = h;
+                scan_block(&h.body, &cur, rel, ls, out);
+            }
+            scan_block(&t.orelse, &cur, rel, ls, out);
+            scan_block(&t.finalbody, &cur, rel, ls, out);
+            for name in assigned_names(st) {
+                cur.remove(&name);
+            }
+        }
+        _ => {}
+    }
 }
 
 /// BFS 序的函数种子（真源 `for fn in ast.walk(tree)` 收集 `FunctionDef/AsyncFunctionDef`）。

@@ -827,45 +827,63 @@ pub fn check_data(root: &Path, spec: &Json) -> (Vec<String>, Json) {
             ),
         };
         issues.extend(sub);
-        if let Json::Object(kv) = s {
-            // 真源对 `no_schema` / `yaml_unavailable` 两个键**累加**到顶层，其余键 `update` 覆盖。
-            for (k, v) in kv {
-                if k == "no_schema" || k == "yaml_unavailable" {
-                    let add = pyval::py_int_or(Some(&v), 0);
-                    match stats.iter_mut().find(|(kk, _)| *kk == k) {
-                        Some(e) => {
-                            let base = pyval::py_int_or(Some(&e.1), 0);
-                            e.1 = Json::Int(base + add);
-                        }
-                        None => stats.push((k, Json::Int(add))),
-                    }
-                    continue;
-                }
+        merge_format_stats(&mut stats, s);
+        data_sha_link_issues(root, rel, spec, has_sha, &obj, &mut issues);
+    }
+    (issues, Json::Object(stats))
+}
+
+
+/// 各格式统计的合并（真源对 `no_schema` / `yaml_unavailable` 两个键累加，其余键覆盖）。
+fn merge_format_stats(stats: &mut Vec<(String, Json)>, s: Json) {
+    if let Json::Object(kv) = s {
+        // 真源对 `no_schema` / `yaml_unavailable` 两个键**累加**到顶层，其余键 `update` 覆盖。
+        for (k, v) in kv {
+            if k == "no_schema" || k == "yaml_unavailable" {
+                let add = pyval::py_int_or(Some(&v), 0);
                 match stats.iter_mut().find(|(kk, _)| *kk == k) {
-                    Some(e) => e.1 = v,
-                    None => stats.push((k, v)),
+                    Some(e) => {
+                        let base = pyval::py_int_or(Some(&e.1), 0);
+                        e.1 = Json::Int(base + add);
+                    }
+                    None => stats.push((k, Json::Int(add))),
                 }
+                continue;
             }
-        }
-        if has_sha {
-            let got = digest_of(&root.join(rel));
-            let want = sg_str(spec, "sha256");
-            if got != want {
-                issues.push(format!(
-                    "数据件 {} 摘要不符（记录 {} / 实测 {}）（修复指引：核对改动，确认后用 nf asset contract --freeze 重冻）",
-                    rel,
-                    head_chars(&want, 12),
-                    head_chars(&got, 12)
-                ));
-            }
-        }
-        if pyval::py_truthy(&sg(spec, "link")) {
-            if let Some(o) = &obj {
-                issues.extend(data_link(root, rel, spec, o));
+            match stats.iter_mut().find(|(kk, _)| *kk == k) {
+                Some(e) => e.1 = v,
+                None => stats.push((k, v)),
             }
         }
     }
-    (issues, Json::Object(stats))
+}
+
+/// 数据件摘要与链接面（声明了 sha256 才查摘要；声明了 link 才查链接）。
+fn data_sha_link_issues(
+    root: &Path,
+    rel: &str,
+    spec: &Json,
+    has_sha: bool,
+    obj: &Option<Json>,
+    issues: &mut Vec<String>,
+) {
+    if has_sha {
+        let got = digest_of(&root.join(rel));
+        let want = sg_str(spec, "sha256");
+        if got != want {
+            issues.push(format!(
+                "数据件 {} 摘要不符（记录 {} / 实测 {}）（修复指引：核对改动，确认后用 nf asset contract --freeze 重冻）",
+                rel,
+                head_chars(&want, 12),
+                head_chars(&got, 12)
+            ));
+        }
+    }
+if pyval::py_truthy(&sg(spec, "link")) {
+    if let Some(o) = obj {
+        issues.extend(data_link(root, rel, spec, o));
+    }
+}
 }
 
 fn head_chars(s: &str, n: usize) -> String {
@@ -1436,30 +1454,7 @@ pub fn check_script(root: &Path, spec: &Json) -> (Vec<String>, Json) {
             (Vec::new(), Vec::new())
         }
     };
-    for (key, declared, embedded) in [
-        ("inputs", sg_strs(spec, "inputs"), emb_in),
-        ("outputs", sg_strs(spec, "outputs"), emb_out),
-    ] {
-        if declared != embedded {
-            issues.push(format!(
-                "脚本 {} 的 {} 双源不一致：声明={} / 头={}（修复指引：让两边逐字一致）",
-                rel,
-                key,
-                pyval::py_repr_list(
-                    &declared
-                        .iter()
-                        .map(|s| Json::Str(s.clone()))
-                        .collect::<Vec<_>>()
-                ),
-                pyval::py_repr_list(
-                    &embedded
-                        .iter()
-                        .map(|s| Json::Str(s.clone()))
-                        .collect::<Vec<_>>()
-                )
-            ));
-        }
-    }
+    script_dual_source_issues(&rel, spec, emb_in, emb_out, &mut issues);
     let declared_all: std::collections::BTreeSet<String> = sg_strs(spec, "inputs")
         .into_iter()
         .chain(sg_strs(spec, "outputs"))
@@ -1493,7 +1488,41 @@ pub fn check_script(root: &Path, spec: &Json) -> (Vec<String>, Json) {
     )
 }
 
-/// 真源 `_check_chain`。
+
+/// 脚本契约的 inputs/outputs 双源核对（声明 vs nf-io 头）。
+fn script_dual_source_issues(
+    rel: &str,
+    spec: &Json,
+    emb_in: Vec<String>,
+    emb_out: Vec<String>,
+    issues: &mut Vec<String>,
+) {
+    for (key, declared, embedded) in [
+        ("inputs", sg_strs(spec, "inputs"), emb_in),
+        ("outputs", sg_strs(spec, "outputs"), emb_out),
+    ] {
+        if declared != embedded {
+            issues.push(format!(
+                "脚本 {} 的 {} 双源不一致：声明={} / 头={}（修复指引：让两边逐字一致）",
+                rel,
+                key,
+                pyval::py_repr_list(
+                    &declared
+                        .iter()
+                        .map(|s| Json::Str(s.clone()))
+                        .collect::<Vec<_>>()
+                ),
+                pyval::py_repr_list(
+                    &embedded
+                        .iter()
+                        .map(|s| Json::Str(s.clone()))
+                        .collect::<Vec<_>>()
+                )
+            ));
+        }
+    }
+}
+
 pub fn check_chain(specs: &[(String, Json)], chain: &Json) -> (Vec<String>, Json) {
     let a_id = sg_str(chain, "from");
     let b_id = sg_str(chain, "to");
@@ -1632,48 +1661,7 @@ pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
         };
         let mut declared: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
         for item in &outs {
-            if !matches!(item, Json::Object(_)) {
-                continue;
-            }
-            let pth = sg_str(item, "path");
-            if pth.is_empty() {
-                issues.push(format!(
-                    "包清单 {} 有一条无 path 的声明（修复指引：补 path）",
-                    rel
-                ));
-                continue;
-            }
-            declared.insert(pth.clone());
-            declared_total += 1;
-            if !root.join(&base).join(&pth).is_file() {
-                issues.push(format!(
-                    "包清单 {} 声明的 {} 不在场（修复指引：补件或重跑 nf domain build）",
-                    rel, pth
-                ));
-            }
-            let sch = sg_str(item, "schema");
-            if !sch.is_empty() && !root.join(&base).join(&sch).is_file() {
-                issues.push(format!(
-                    "包清单 {} 声明的 schema {} 不在场（修复指引：补件）",
-                    rel, sch
-                ));
-            }
-            // 真源 `item.get("inputs") or ((item.get("recompute") or {}).get("inputs") or [])`
-            let mut ins: Vec<String> = sg_strs(item, "inputs");
-            if ins.is_empty() {
-                let rec = sg(item, "recompute");
-                if matches!(rec, Json::Object(_)) {
-                    ins = sg_strs(&rec, "inputs");
-                }
-            }
-            for inp in &ins {
-                if !root.join(&base).join(inp).is_file() {
-                    issues.push(format!(
-                        "包清单 {} 声明的输入 {} 不在场（修复指引：补件或改声明）",
-                        rel, inp
-                    ));
-                }
-            }
+            declared_total += check_index_item(root, &base, rel, item, &mut declared, &mut issues);
         }
         let mut on_disk: Vec<String> = Vec::new();
         walk_files(
@@ -1713,7 +1701,62 @@ pub fn check_index(root: &Path, spec: &Json) -> (Vec<String>, Json) {
     )
 }
 
-// ---------------------------------------------------------------- 登记册面（D1）
+
+/// 包清单里单条 output 声明的核对（在场性 / schema / inputs）；返回计入 declared 的条数。
+fn check_index_item(
+    root: &Path,
+    base: &str,
+    rel: &str,
+    item: &Json,
+    declared: &mut std::collections::BTreeSet<String>,
+    issues: &mut Vec<String>,
+) -> i64 {
+    let mut count = 0i64;
+    if !matches!(item, Json::Object(_)) {
+        return 0;
+    }
+    let pth = sg_str(item, "path");
+    if pth.is_empty() {
+        issues.push(format!(
+            "包清单 {} 有一条无 path 的声明（修复指引：补 path）",
+            rel
+        ));
+        return 0;
+    }
+    declared.insert(pth.clone());
+    count += 1;
+    if !root.join(&base).join(&pth).is_file() {
+        issues.push(format!(
+            "包清单 {} 声明的 {} 不在场（修复指引：补件或重跑 nf domain build）",
+            rel, pth
+        ));
+    }
+    let sch = sg_str(item, "schema");
+    if !sch.is_empty() && !root.join(&base).join(&sch).is_file() {
+        issues.push(format!(
+            "包清单 {} 声明的 schema {} 不在场（修复指引：补件）",
+            rel, sch
+        ));
+    }
+    // 真源 `item.get("inputs") or ((item.get("recompute") or {}).get("inputs") or [])`
+    let mut ins: Vec<String> = sg_strs(item, "inputs");
+    if ins.is_empty() {
+        let rec = sg(item, "recompute");
+        if matches!(rec, Json::Object(_)) {
+            ins = sg_strs(&rec, "inputs");
+        }
+    }
+    for inp in &ins {
+        if !root.join(&base).join(inp).is_file() {
+            issues.push(format!(
+                "包清单 {} 声明的输入 {} 不在场（修复指引：补件或改声明）",
+                rel, inp
+            ));
+        }
+    }
+    count
+}
+
 
 /// 真源 `_registry_issues`：本册声明为数据的 `protocol/` 件必须已在
 /// `protocol/data_contracts.json` 登记。
@@ -1825,69 +1868,7 @@ pub fn frictionless_export(root: &Path) -> (Json, Vec<String>) {
                 if rel.starts_with("protocol/") {
                     continue;
                 }
-                let mut item: Vec<(String, Json)> = vec![
-                    ("name".to_string(), Json::Str(rel.replace('/', "--"))),
-                    ("path".to_string(), Json::Str(rel.clone())),
-                ];
-                let fmt = sg_str(spec, "format");
-                if !fmt.is_empty() {
-                    item.push(("format".to_string(), Json::Str(fmt)));
-                }
-                let sch_rel = schema_of(root, &rel, spec);
-                if !sch_rel.is_empty() {
-                    let (stext, err) = sread(root, &sch_rel);
-                    if err.is_none() {
-                        let sch = strict_json(&stext.unwrap_or_default())
-                            .unwrap_or_else(|_| Json::Object(vec![]));
-                        let keep = [
-                            "type",
-                            "required",
-                            "properties",
-                            "$schema",
-                            "title",
-                            "description",
-                        ];
-                        let mut sub: Vec<(String, Json)> = Vec::new();
-                        if let Json::Object(kv) = &sch {
-                            for k in keep.iter() {
-                                if let Some((kk, vv)) = kv.iter().find(|(kk, _)| kk == k) {
-                                    sub.push((kk.clone(), vv.clone()));
-                                }
-                            }
-                        }
-                        let sch_nonempty = matches!(&sch, Json::Object(kv) if !kv.is_empty());
-                        if sch_nonempty {
-                            item.push(("x-nf-json-schema".to_string(), Json::Object(sub)));
-                            item.push((
-                                "x-nf-schema-source".to_string(),
-                                Json::Str(sch_rel.clone()),
-                            ));
-                        }
-                        let mut props: Vec<(String, Json)> = match obj_get(&sch, "properties") {
-                            Some(Json::Object(o)) => o.clone(),
-                            _ => Vec::new(),
-                        };
-                        props.sort_by(|a, b| a.0.cmp(&b.0));
-                        let mut fields: Vec<Json> = Vec::new();
-                        for (k, v) in props {
-                            if !matches!(v, Json::Object(_)) {
-                                continue;
-                            }
-                            let t = sg_str(&v, "type");
-                            fields.push(Json::Object(vec![
-                                ("name".to_string(), Json::Str(k)),
-                                ("type".to_string(), Json::Str(friendly_type(&t).to_string())),
-                            ]));
-                        }
-                        if !fields.is_empty() {
-                            item.push((
-                                "schema".to_string(),
-                                Json::Object(vec![("fields".to_string(), Json::Array(fields))]),
-                            ));
-                        }
-                    }
-                }
-                res.push(Json::Object(item));
+                res.push(frictionless_item(root, &rel, spec));
             }
         }
     }
@@ -1916,7 +1897,74 @@ pub fn frictionless_export(root: &Path) -> (Json, Vec<String>) {
     (pkg, Vec::new())
 }
 
-/// 真源 `_export_drift`（④）：导出件 == 实时导出（缺件/漂移都 FAIL：导出面不许只在人手里新鲜）。
+
+/// 单件资产 → Frictionless resource 条目（JSON Schema properties 尽力映射为 fields）。
+fn frictionless_item(root: &Path, rel: &str, spec: &Json) -> Json {
+    let mut item: Vec<(String, Json)> = vec![
+        ("name".to_string(), Json::Str(rel.replace('/', "--"))),
+        ("path".to_string(), Json::Str(rel.to_string())),
+    ];
+    let fmt = sg_str(spec, "format");
+    if !fmt.is_empty() {
+        item.push(("format".to_string(), Json::Str(fmt)));
+    }
+    let sch_rel = schema_of(root, &rel, spec);
+    if !sch_rel.is_empty() {
+        let (stext, err) = sread(root, &sch_rel);
+        if err.is_none() {
+            let sch = strict_json(&stext.unwrap_or_default())
+                .unwrap_or_else(|_| Json::Object(vec![]));
+            let keep = [
+                "type",
+                "required",
+                "properties",
+                "$schema",
+                "title",
+                "description",
+            ];
+            let mut sub: Vec<(String, Json)> = Vec::new();
+            if let Json::Object(kv) = &sch {
+                for k in keep.iter() {
+                    if let Some((kk, vv)) = kv.iter().find(|(kk, _)| kk == k) {
+                        sub.push((kk.clone(), vv.clone()));
+                    }
+                }
+            }
+            let sch_nonempty = matches!(&sch, Json::Object(kv) if !kv.is_empty());
+            if sch_nonempty {
+                item.push(("x-nf-json-schema".to_string(), Json::Object(sub)));
+                item.push((
+                    "x-nf-schema-source".to_string(),
+                    Json::Str(sch_rel.clone()),
+                ));
+            }
+            let mut props: Vec<(String, Json)> = match obj_get(&sch, "properties") {
+                Some(Json::Object(o)) => o.clone(),
+                _ => Vec::new(),
+            };
+            props.sort_by(|a, b| a.0.cmp(&b.0));
+            let mut fields: Vec<Json> = Vec::new();
+            for (k, v) in props {
+                if !matches!(v, Json::Object(_)) {
+                    continue;
+                }
+                let t = sg_str(&v, "type");
+                fields.push(Json::Object(vec![
+                    ("name".to_string(), Json::Str(k)),
+                    ("type".to_string(), Json::Str(friendly_type(&t).to_string())),
+                ]));
+            }
+            if !fields.is_empty() {
+                item.push((
+                    "schema".to_string(),
+                    Json::Object(vec![("fields".to_string(), Json::Array(fields))]),
+                ));
+            }
+        }
+    }
+    Json::Object(item)
+}
+
 pub fn export_drift(root: &Path) -> Vec<String> {
     let (live, errs) = frictionless_export(root);
     if !errs.is_empty() {
