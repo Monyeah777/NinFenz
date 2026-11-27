@@ -64,6 +64,14 @@ android {
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += listOf("release")
             isDebuggable = false
+            // benchmark 变体额外关闭名称混淆：macrobenchmark 测试 APK 与 app 同进程，
+            // 若两者都混淆会撞名（真机 k3.j NoSuchMethodError）；AGP 又不给 com.android.test
+            // 模块传 proguardFiles，只能从被测 app 侧消除冲突（详见 proguard-benchmark.pro）。
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+                "proguard-benchmark.pro"
+            )
         }
     }
 

@@ -24,6 +24,9 @@ android {
             // 否则 assemble 直接报 "shrinking enabled ... enable shrinking in this test project"。
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("debug")
+            // 注意：AGP 8.10 对 com.android.test 模块**不会**把这里的 proguardFiles 传给 R8
+            // （实测 R8 输入只有 AAR 的 consumer proguard.txt），因此真正生效的规则放在
+            // libs/nf-benchmark-rules.jar 的 META-INF/proguard/nf-benchmark.pro 里。
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -48,4 +51,7 @@ dependencies {
     implementation("androidx.startup:startup-runtime:1.1.1")
     implementation("androidx.arch.core:core-runtime:2.2.0")
     compileOnly("com.google.errorprone:error_prone_annotations:2.27.0")
+    // 测试 APK 自身的 R8 规则（-dontobfuscate 等）以依赖 jar 形式进入 R8 规则流；
+    // 直接用 buildType.proguardFiles 会被 AGP 忽略，见上方注释。
+    implementation(files("libs/nf-benchmark-rules.jar"))
 }
