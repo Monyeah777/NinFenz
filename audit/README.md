@@ -94,8 +94,8 @@ tool/manual 未执行 31 条不计分，也不作为"通过"。
 
 ## 当前状态（2026-11-27）
 
-- 最新证据：audit/evidence/p2-batch7/（同 commit 连跑两次 issues/report 逐字节一致、meta 全等）。
-- 总分 **97.64**；维度 A100 B97 C80 D99 E100 F98 G–N 全 100；P0=0 / P1=0 / P2=1233 / P3=220。
+- 最新证据：audit/evidence/p2-batch10/（同 commit 连跑两次 issues/report 逐字节一致、meta 全等，见 trend.md）。
+- 总分 **98.08**；维度 A100 B97 C80 D99 E100 F98 G–N 全 100；P0=0 / P1=0 / P2=1007 / P3=183。
 - 门禁：bash audit/ci/gate.sh --evidence audit/evidence/p2-batch7 → PASS。
 - 测试面：Android 全量单测 green；engine/rust 全量 249/249 green；Python 资产契约/报告模块等关键套件 green。
 - 残留债务（见 remediation.md 与 calibration.md，均有 owner/到期）：B-004（UI→data 直连 200 处，属单模块架构取舍，待 0.4 领域层拆分）、C 维度结构项（大文件/函数/圈复杂度）、D-005（测试样板重复）、F-003（C# sync-over-async，本机无 .NET SDK 无法构建校验）。
