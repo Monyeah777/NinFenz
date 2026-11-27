@@ -33,6 +33,18 @@
 - 真机未测：长文本/中文输入法（未做完整输入法验收）、PDF/EPUB/DOCX/HTML 导出、分享文件、杀进程恢复、TalkBack、横屏、Play 上传。
 - 数据安全表单提交：**未提交**
 
+### 0.3.7-preview.1（2026-11-27）
+
+- versionCode 10 / versionName 0.3.7-preview.1；package dev.ninfenz.mobile；minSdk 26；compile/target 36。
+- Daily debug APK 54MB；Pro debug APK 55MB；debug AAB 32MB（历史构建，未签）。
+- release base APK **18MB**（on-demand OCR feature；R8 + resource shrink）；SHA-256 `6ab06178350652a6acfc724afd8ac8f759168207a7615d2a10842e2022daf05b`。
+- release AAB **31MB**（base 模块约 11.1MB + OCR feature 11.3MB）；SHA-256 `510cd8a8a72785b550a9451450a7d4369141593b780fba792c469a27657ea04a`；`jarsigner -verify` 未签名。
+- 16KB：`zipalign -c -P 16 4` exit 0（release base APK）；AAB 未用 bundletool 复核。
+- 权限：aapt 仅 `dev.ninfenz.mobile.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`，无 INTERNET。
+- 签名：**OPEN-SIGN**；`NF_UPLOAD_*` 未设置；无 upload AAB。
+- 真机：**OPEN-PERF-DEVICE**；当前 adb 无设备，未做安装/启动/TalkBack/RTL/10k。
+- Play：未上传；未做 staged rollout/rollback 演练。
+
 ### Windows
 - CMP app-image：pass；`NFStudio.exe` 551,936 B；SHA-256 `780a2dc2e152e7b5f6eaebc6b59890a48d9dbe52d81ed0309c0a2edfb5742e81`；目录总 137,150,938 B；**启动冒烟通过**：进程存活 10s、RSS 约 10,063,872 B，随后主动关闭；未做 UI 交互
 - MSI：未跑通（WiX 下载阻塞）

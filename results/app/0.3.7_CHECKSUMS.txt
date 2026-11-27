@@ -1,0 +1,10 @@
+NF 0.3.7-preview.1 校验清单（未签名 RC）
+
+commit: 6b44898cf (before final docs)
+versionCode: 10
+versionName: 0.3.7-preview.1
+
+6ab06178350652a6acfc724afd8ac8f759168207a7615d2a10842e2022daf05b  app-release-unsigned.apk
+510cd8a8a72785b550a9451450a7d4369141593b780fba792c469a27657ea04a  app-release.aab
+
+备注：AAB 未签名；base APK 18MB；AAB 31MB（on-demand OCR feature）。
