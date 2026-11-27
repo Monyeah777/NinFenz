@@ -1490,6 +1490,12 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_macro_done">宏完成：%1$s · 失败 %2$d</string>
     <string name="delivery_macro_no_params">该宏没有 {{key}} 参数</string>
     <string name="ocr_feature_installing">OCR 扩展未安装，已请求按需下载；请稍后重试</string>
+    <string name="delivery_macro_missing_plan_spec">缺少计划/spec</string>
+    <string name="delivery_macro_missing_inputs">缺少 markdown/spec/plan</string>
+    <string name="delivery_macro_import_missing_file">import 步骤缺 params.file</string>
+    <string name="delivery_macro_no_import_draft">没有最近导入草稿</string>
+    <string name="delivery_macro_draft_not_json">草稿不是 JSON</string>
+    <string name="delivery_macro_missing_markdown">缺少 markdown</string>
     <string name="delivery_macro_run_selected">运行</string>
     <string name="delivery_macro_batch_run">运行全部宏</string>
     <string name="delivery_macro_batch_confirm">批量运行会依次执行所有宏；assemble/import/export 可能改变当前内容或写文件。确认继续？</string>

@@ -4,6 +4,8 @@
 -keep class dev.ninfenz.mobile.core.CoreBridgeNative$CoreNativeLib { *; }
 
 # PDFBox Android：资源加载与反射字体/解析入口；release 冒烟覆盖 PDF 导入/样式
+-keep class dev.ninfenz.mobile.ocr.OcrFeature { *; }
+
 -keep class com.tom_roush.** { *; }
 -dontwarn com.tom_roush.**
 

@@ -1494,6 +1494,12 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_macro_done">Macro %1$s · %2$d failed</string>
     <string name="delivery_macro_no_params">This macro has no {{key}} parameters</string>
     <string name="ocr_feature_installing">OCR extension is not installed; an on-demand download was requested. Try again shortly.</string>
+    <string name="delivery_macro_missing_plan_spec">Missing plan/spec</string>
+    <string name="delivery_macro_missing_inputs">Missing markdown/spec/plan</string>
+    <string name="delivery_macro_import_missing_file">Import step is missing params.file</string>
+    <string name="delivery_macro_no_import_draft">No recent import draft</string>
+    <string name="delivery_macro_draft_not_json">Draft is not JSON</string>
+    <string name="delivery_macro_missing_markdown">Missing markdown</string>
     <string name="delivery_macro_run_selected">Run</string>
     <string name="delivery_macro_batch_run">Run all macros</string>
     <string name="delivery_macro_batch_confirm">Batch run executes every macro in order; assemble/import/export may change content or write files. Continue?</string>

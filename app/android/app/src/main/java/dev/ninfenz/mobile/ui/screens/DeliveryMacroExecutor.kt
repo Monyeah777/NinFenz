@@ -31,7 +31,7 @@ class DeliveryMacroExecutor(
             val raw = plan
             val specJson = spec
             if (raw == null || specJson == null) {
-                Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "缺少计划/spec")))
+                Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_missing_plan_spec)))
             } else {
                 val response = call("assemble", buildJsonObject {
                     put("plan", raw)
@@ -52,7 +52,7 @@ class DeliveryMacroExecutor(
             val specJson = spec
             val raw = plan
             if (md.isNullOrBlank() || specJson == null || raw == null) {
-                Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "缺少 markdown/spec/plan")))
+                Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_missing_inputs)))
             } else {
                 val response = call("validate", buildJsonObject {
                     put("markdown", md)
@@ -67,7 +67,7 @@ class DeliveryMacroExecutor(
         "import" -> {
             val file = params["file"]?.jsonPrimitive?.content
             if (file.isNullOrBlank()) {
-                Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "import 步骤缺 params.file")))
+                Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_import_missing_file)))
             } else {
                 val response = call("import", buildJsonObject { put("file", file) })
                 if (response.ok) Result.success("imported")
@@ -77,11 +77,11 @@ class DeliveryMacroExecutor(
         "map" -> {
             val raw = ImportDraftStore(context.filesDir).load()
             if (raw.isNullOrBlank()) {
-                Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "没有最近导入草稿")))
+                Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_no_import_draft)))
             } else {
                 val input = runCatching { Json.parseToJsonElement(raw).jsonObject }.getOrNull()
                 if (input == null) {
-                    Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "草稿不是 JSON")))
+                    Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_draft_not_json)))
                 } else {
                     val response = call("map-suggest", buildJsonObject { put("import", input) })
                     if (response.ok) Result.success("mapped")
@@ -94,7 +94,7 @@ class DeliveryMacroExecutor(
             val blocked = ContractGate.blocked(ContractIrStore(context.filesDir, projectId).loadSolve())
             when {
                 blocked -> Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_contract_unsat)))
-                md.isNullOrBlank() -> Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_failed, "缺少 markdown")))
+                md.isNullOrBlank() -> Result.failure(IllegalStateException(context.getString(dev.ninfenz.mobile.R.string.delivery_macro_missing_markdown)))
                 else -> {
                     val dir = File(File(context.filesDir, "exports"), "macro").apply { mkdirs() }
                     val file = File(dir, "macro-" + System.currentTimeMillis() + ".md")
