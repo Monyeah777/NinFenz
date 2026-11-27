@@ -138,3 +138,11 @@
 - 结果：总分 96.82 → 96.94；D 98→99；Android 编译+全量单测 BUILD SUCCESSFUL。
 - 已知遗留（非本轮引入）：engine/rust 全量 cargo test 有 4 个 truth-source 清单测试失败（asset_contract 3 + quality_depth_scan 1，实际 files=1260 与 protocol/generated 期望值不一致）——属仓库工作区新增文件导致的清单漂移，与本次重构无关；评估：需按仓库生成器流程重算 truth source，已挂 OPEN-TRUTH-DRIFT。
 
+
+## 第八轮：OPEN-TRUTH-DRIFT 收口 + Rust 全量转绿（2026-11-27）
+
+- 定位：4 个失败测试分三类原因——(a) 聚合/合成用例的期望值块由生成器产出，工作区新增文件后 stats 从 1258 变为 1260；(b) 真实存在 Rust 与 Python 真源的文案分歧（schema 非法 JSON 时 Rust 报「不符 schema…：schema 本身不是合法 JSON」，真源报「schema 读不到：…不是合法 JSON」）；(c) 仓库自带 depth-scan 扫出本轮新增的 .github/workflows/audit.yml 未关 checkout 凭据持久化。
+- 处理：按仓库生成器流程重跑 engine/rust/tools/gen_asset_code_cases.py、gen_asset_data_cases.py、gen_depth_scan_cases.py 更新生成段（不手改）；修 asset_contract.rs 的 schema 读不到分支文案与真源一致；给 audit.yml 的 checkout 加 persist-credentials: false。
+- 验证：engine/rust 全量 cargo test **249 passed / 0 failed**（此前 245 passed / 4 failed）；desktop/tests 资产契约相关 58 passed；审计总分维持 96.94、门禁 PASS。
+- 说明：生成段 diff 较大是生成器格式化结果（同一生成器重跑覆盖），非手改；已确认生成后测试转绿。
+

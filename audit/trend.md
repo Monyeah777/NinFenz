@@ -13,6 +13,7 @@
 | p2-batch2（重复代码 + 错误处理） | 0.3.7-preview.1 | 166 | **96.52** | 0 | 0 | 1294 | 229 | audit/evidence/p2-batch2/ |
 | p2-batch3（报告样板 + UI 路径） | 0.3.7-preview.1 | 166 | **96.82** | 0 | 0 | 1264 | 229 | audit/evidence/p2-batch3/ |
 | p2-batch4（Rust/Kotlin 重复块） | 0.3.7-preview.1 | 166 | **96.94** | 0 | 0 | 1261 | 221 | audit/evidence/p2-batch4/ |
+| p2-batch5（truth-drift 收口） | 0.3.7-preview.1 | 166 | **96.94** | 0 | 0 | 1261 | 220 | audit/evidence/p2-batch5/ |
 
 ## 维度分变化
 
@@ -70,3 +71,9 @@
 
 - 最新证据 p2-batch4：总分 96.94，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
 - 本轮收益：D-004 5→0（subject_docs + jsonx 共享模块）、D-002 1→0（NfSurfaceKit）。
+
+
+## 门禁状态（第八轮后）
+
+- 最新证据 p2-batch5：总分 96.94，P0=0/P1=0/error=0/no_targets=0，audit/ci/gate.sh PASS。
+- engine/rust 全量测试 249 passed / 0 failed（OPEN-TRUTH-DRIFT 关闭）；Python 资产契约测试 58 passed。
