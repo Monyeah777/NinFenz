@@ -2565,12 +2565,14 @@ def main(argv=None) -> int:
         "errors": errors,
         "no_targets": sorted(rid for rid, info in rule_status.items() if info["status"] == "no_targets"),
     }
+    # newline="\n" 显式钉死 LF：证据包是逐字节复现判据，不能被 Windows 的默认
+    # 换行转换写成 CRLF（否则同 commit 跨平台重跑 evidence 字节不一致）。
     (out_dir / "issues.json").write_text(
-        json.dumps(issues_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        json.dumps(issues_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     (out_dir / "meta.json").write_text(
-        json.dumps(meta, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        json.dumps(meta, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     report = build_report(meta, per_dim, issues, rules_by_id)
-    (out_dir / "report.md").write_text(report, encoding="utf-8")
+    (out_dir / "report.md").write_text(report, encoding="utf-8", newline="\n")
 
     if not args.quiet:
         print(f"NF 审计完成：commit={args.commit or '(未提供)'} 规则 {len(rules)} 条")

@@ -165,20 +165,22 @@
 - 新挂 OPEN-F003-CS：F-003（C# sync-over-async `.Result` 2 处）本机无 .NET SDK（dotnet host 有、SDK 缺失），改后无法构建校验，暂不动，等有 SDK 的环境修并验证。
 
 
-## 状态汇总（2026-11-27 收口）
+## 状态汇总（2026-11-28 收口）
 
 | 项 | 状态 | 证据/说明 |
 |---|---|---|
-| P0 / P1 | 全部清零 | audit/evidence/p2-batch7：P0=0、P1=0 |
-| 审计总分 | 98.08（基线 92.1 → +5.98） | trend.md 六轮对比 |
-| 门禁 | PASS（exit 0） | audit/ci/gate.sh --evidence audit/evidence/p2-batch10 |
-| 规则库 | 166 条（A–N 全覆盖） | rules.json；校准 18 条均附证据/owner/到期（calibration.md） |
-| 测试面 | Rust 249/249、Android 全量单测、Python 关键套件全绿 | 本轮复跑 |
+| P0 / P1 | 全部清零 | audit/evidence/6878a19f4：P0=0、P1=0 |
+| 审计总分 | **98.70**（基线 92.1 → +6.60） | trend.md；C 82→87，D/E/F 回 100 |
+| 门禁 | PASS（exit 0） | `bash audit/ci/gate.sh --evidence audit/evidence/6878a19f4` |
+| 规则库 | 166 条（A–N 全覆盖） | 校准 28 条均附证据/owner/到期（calibration.md） |
+| 测试面 | Rust 249/249、app/core 全绿；Android 全量单测；C# 3 工程 0 warn/0 error；Python 分层 327 passed + 2 skipped | 本轮复跑 |
 | B-004（UI 平台 IO） | DONE | 7 处 contentResolver 收口 data/UriIo；规则改为 UI 不做 IO |
-| C-001/C-002/C-003/C-005/C-007/C-008/C-009/C-012 | PENDING（0.4 结构批次） | 大文件/长函数/圈复杂度/嵌套；C-010 已按棘轮处置（10 件真源豁免、新增不得超限） |
-| D-005（测试样板重复） | DONE（校准） | 22 个 workflow helper 去重；阈值 15→40 守住真复制用例，harness 抽取挂 0.4 |
-| F-003（C# `.Result` 2 处） | BLOCKED（OPEN-F003-CS） | 本机无 .NET SDK，改后无法构建校验 |
-| Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | 见 results/app/0.3.7_RELEASE.md 发布阻断 |
+| C-002 / C-003 / C-013 | DONE | 18 个 Composable + 84 个 Kotlin 函数 + 7 个 C# 大文件拆分；规则命中 0 |
+| C-001 / C-005 / C-007 / C-008 / C-009 / C-012 / C-010 | IN_PROGRESS（后续批次） | C-001 98 文件 / C-005 792 函数 / C-007 88 / C-008 14 / C-009 9（含生成块）/ C-012 63 / C-010 剩 6 模块 allow_files |
+| D-005（测试样板重复） | DONE（校准） | 22 个 workflow helper 去重；阈值 15→40 守住真复制用例 |
+| F-003（C# `.Result`） | DONE（检测器精度修正） | 2 处均为嵌套 record 类型名；修正后真实 sync-over-async 仍命中；.NET SDK 8.0.428 已可用于构建校验 |
+| Python 基线红 | OPEN（rebind 批次） | reverse_coupling/style_ratchet/json_shape_contracts/freshness/dead_code 等存量漂移，非本轮引入 |
+| Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | macrobenchmark 代码/APK/脚本就绪，等设备接入 ADB；Play 无账号；OCR 待 URI 授权 |
 
 
 ## 第十一轮：B-004 UI 直连 IO 收口（2026-11-27）

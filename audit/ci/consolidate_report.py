@@ -74,7 +74,7 @@ def main() -> int:
         "",
         "- tool/manual 共 " + str(status.get("not-run", 0)) + " 条未执行（离线无 detekt/ktlint/jscpd/jacoco/CodeQL 等）：不计分、不写成 pass，接 CI 后重跑。",
     ]
-    Path(args.out).write_text("\n".join(lines) + "\n", encoding="utf-8")
+    Path(args.out).write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     print("wrote", args.out)
     return 0
 
