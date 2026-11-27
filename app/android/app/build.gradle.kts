@@ -49,6 +49,12 @@ android {
     buildTypes {
         getByName("release") {
             if (hasUploadSigning) signingConfig = signingConfigs.getByName("upload")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
         // 性能测量变体：与 release 同源，仅用于 Macrobenchmark；生产 release 行为不变。
         create("benchmark") {
@@ -88,6 +94,8 @@ android {
         }
         resources {
             excludes.addAll(listOf("META-INF/AL2.0", "META-INF/LGPL2.1", "META-INF/LICENSE*", "META-INF/NOTICE*"))
+            // PDFBox Android 真正使用 assets/com/tom_roush；JAR 内同路径副本重复，排除以减小包体。
+            excludes.add("com/tom_roush/**")
         }
     }
 
