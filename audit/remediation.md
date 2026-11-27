@@ -164,3 +164,18 @@
 - 结果：总分 97.34 → 97.64；A 97→100；ARCH-004 8→0。
 - 新挂 OPEN-F003-CS：F-003（C# sync-over-async `.Result` 2 处）本机无 .NET SDK（dotnet host 有、SDK 缺失），改后无法构建校验，暂不动，等有 SDK 的环境修并验证。
 
+
+## 状态汇总（2026-11-27 收口）
+
+| 项 | 状态 | 证据/说明 |
+|---|---|---|
+| P0 / P1 | 全部清零 | audit/evidence/p2-batch7：P0=0、P1=0 |
+| 审计总分 | 97.64（基线 92.1 → +5.54） | trend.md 六轮对比 |
+| 门禁 | PASS（exit 0） | audit/ci/gate.sh |
+| 规则库 | 166 条（A–N 全覆盖） | rules.json；校准 18 条均附证据/owner/到期（calibration.md） |
+| 测试面 | Rust 249/249、Android 全量单测、Python 关键套件全绿 | 本轮复跑 |
+| B-004（UI→data 200 处） | PENDING（0.4 领域层） | 单模块架构取舍：ARCHITECTURE.md §4.1 未设领域层，拆分属 0.4 |
+| C-001/C-003/C-005 等结构项 | PENDING | 需文件/函数级重构，按文件分批，见 rules.json 命中清单 |
+| D-005（测试样板重复） | PENDING | 37 个契约测试文件，抽取共享 test harness 属测试基建改造 |
+| F-003（C# `.Result` 2 处） | BLOCKED（OPEN-F003-CS） | 本机无 .NET SDK，改后无法构建校验 |
+| Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | 见 results/app/0.3.7_RELEASE.md 发布阻断 |
