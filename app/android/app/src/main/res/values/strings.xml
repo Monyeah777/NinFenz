@@ -1489,6 +1489,7 @@ MIT License · 详见仓库 app/docs/LEGAL.md</string>
     <string name="delivery_macro_none">还没有宏；先在设置导入。</string>
     <string name="delivery_macro_done">宏完成：%1$s · 失败 %2$d</string>
     <string name="delivery_macro_no_params">该宏没有 {{key}} 参数</string>
+    <string name="ocr_feature_installing">OCR 扩展未安装，已请求按需下载；请稍后重试</string>
     <string name="delivery_macro_run_selected">运行</string>
     <string name="delivery_macro_batch_run">运行全部宏</string>
     <string name="delivery_macro_batch_confirm">批量运行会依次执行所有宏；assemble/import/export 可能改变当前内容或写文件。确认继续？</string>

@@ -1,6 +1,7 @@
 package dev.ninfenz.mobile.data
 
 import android.content.Context
+import dev.ninfenz.mobile.R
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
 import com.google.android.play.core.splitinstall.SplitInstallRequest
 import java.io.File
@@ -22,7 +23,7 @@ internal object OcrFeatureBridge {
                     SplitInstallRequest.newBuilder().addModule("ocr").build()
                 )
             }
-            throw IllegalStateException("OCR 扩展未安装，已请求按需下载；请稍后重试", cause)
+            throw IllegalStateException(context.getString(R.string.ocr_feature_installing), cause)
         }
     }
 }

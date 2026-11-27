@@ -1493,6 +1493,7 @@ MIT License · See app/docs/LEGAL.md</string>
     <string name="delivery_macro_none">No macros yet; import one in Settings.</string>
     <string name="delivery_macro_done">Macro %1$s · %2$d failed</string>
     <string name="delivery_macro_no_params">This macro has no {{key}} parameters</string>
+    <string name="ocr_feature_installing">OCR extension is not installed; an on-demand download was requested. Try again shortly.</string>
     <string name="delivery_macro_run_selected">Run</string>
     <string name="delivery_macro_batch_run">Run all macros</string>
     <string name="delivery_macro_batch_confirm">Batch run executes every macro in order; assemble/import/export may change content or write files. Continue?</string>
