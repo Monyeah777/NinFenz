@@ -1,7 +1,10 @@
 # JNA：保留动态映射入口（release 构建时 core bridge 依赖反射式接口映射）
 -keep class com.sun.jna.** { *; }
 -keepclassmembers class * extends com.sun.jna.Library { *; }
--keep class dev.ninfenz.mobile.core.CoreBridgeNative$CoreNativeLib { *; }
+# CoreNativeLib 是文件级 private interface（JVM 名 dev.ninfenz.mobile.core.CoreNativeLib，不是 CoreBridgeNative$…）。
+# 0.3.7 真机实测：旧规则写错名 → 接口被 R8 改名且方法被裁 → Native.load 抛 ClassCastException → 所有核心 op 报 NF-E-005。
+-keep class dev.ninfenz.mobile.core.CoreNativeLib { *; }
+-keep interface dev.ninfenz.mobile.core.CoreNativeLib { *; }
 
 # PDFBox Android：资源加载与反射字体/解析入口；release 冒烟覆盖 PDF 导入/样式
 -keep class dev.ninfenz.mobile.ocr.OcrFeature { *; }
