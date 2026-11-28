@@ -1,0 +1,66 @@
+INSTRUMENTATION_STATUS: class=dev.ninfenz.mobile.benchmark.FrameBenchmark
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+dev.ninfenz.mobile.benchmark.FrameBenchmark:
+INSTRUMENTATION_STATUS: test=scrollHomeAndLibrary
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: additionalTestOutputFile_FrameBenchmark_scrollHomeAndLibrary_iter000_2026-11-28-02-53-57.perfetto-trace=/storage/emulated/0/Android/media/dev.ninfenz.mobile.benchmark/FrameBenchmark_scrollHomeAndLibrary_iter000_2026-11-28-02-53-57.perfetto-trace
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: additionalTestOutputFile_FrameBenchmark_scrollHomeAndLibrary_iter001_2026-11-28-02-54-01.perfetto-trace=/storage/emulated/0/Android/media/dev.ninfenz.mobile.benchmark/FrameBenchmark_scrollHomeAndLibrary_iter001_2026-11-28-02-54-01.perfetto-trace
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: additionalTestOutputFile_FrameBenchmark_scrollHomeAndLibrary_iter002_2026-11-28-02-54-06.perfetto-trace=/storage/emulated/0/Android/media/dev.ninfenz.mobile.benchmark/FrameBenchmark_scrollHomeAndLibrary_iter002_2026-11-28-02-54-06.perfetto-trace
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: additionalTestOutputFile_FrameBenchmark_scrollHomeAndLibrary_iter003_2026-11-28-02-54-13.perfetto-trace=/storage/emulated/0/Android/media/dev.ninfenz.mobile.benchmark/FrameBenchmark_scrollHomeAndLibrary_iter003_2026-11-28-02-54-13.perfetto-trace
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: additionalTestOutputFile_FrameBenchmark_scrollHomeAndLibrary_iter004_2026-11-28-02-54-18.perfetto-trace=/storage/emulated/0/Android/media/dev.ninfenz.mobile.benchmark/FrameBenchmark_scrollHomeAndLibrary_iter004_2026-11-28-02-54-18.perfetto-trace
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: android.studio.display.benchmark=FrameBenchmark_scrollHomeAndLibrary
+  frameCount           [min  41.0](file://FrameBenchmark_scrollHomeAndLibrary_iter001_2026-11-28-02-54-01.perfetto-trace),   [median  43.0](file://FrameBenchmark_scrollHomeAndLibrary_iter002_2026-11-28-02-54-06.perfetto-trace),   [max  43.0](file://FrameBenchmark_scrollHomeAndLibrary_iter000_2026-11-28-02-53-57.perfetto-trace)
+  frameDurationCpuMs   P50    3.8,   P90    6.6,   P95   13.5,   P99  332.4
+  frameOverrunMs       P50   -8.0,   P90   -3.7,   P95    3.7,   P99  353.1
+    Traces: Iteration [0](file://FrameBenchmark_scrollHomeAndLibrary_iter000_2026-11-28-02-53-57.perfetto-trace) [1](file://FrameBenchmark_scrollHomeAndLibrary_iter001_2026-11-28-02-54-01.perfetto-trace) [2](file://FrameBenchmark_scrollHomeAndLibrary_iter002_2026-11-28-02-54-06.perfetto-trace) [3](file://FrameBenchmark_scrollHomeAndLibrary_iter003_2026-11-28-02-54-13.perfetto-trace) [4](file://FrameBenchmark_scrollHomeAndLibrary_iter004_2026-11-28-02-54-18.perfetto-trace)
+
+INSTRUMENTATION_STATUS: android.studio.v2display.benchmark=FrameBenchmark_scrollHomeAndLibrary
+  frameCount           [min  41.0](file://FrameBenchmark_scrollHomeAndLibrary_iter001_2026-11-28-02-54-01.perfetto-trace),   [median  43.0](file://FrameBenchmark_scrollHomeAndLibrary_iter002_2026-11-28-02-54-06.perfetto-trace),   [max  43.0](file://FrameBenchmark_scrollHomeAndLibrary_iter000_2026-11-28-02-53-57.perfetto-trace)
+  frameDurationCpuMs   P50    3.8,   P90    6.6,   P95   13.5,   P99  332.4
+  frameOverrunMs       P50   -8.0,   P90   -3.7,   P95    3.7,   P99  353.1
+    Traces: Iteration [0](file://FrameBenchmark_scrollHomeAndLibrary_iter000_2026-11-28-02-53-57.perfetto-trace) [1](file://FrameBenchmark_scrollHomeAndLibrary_iter001_2026-11-28-02-54-01.perfetto-trace) [2](file://FrameBenchmark_scrollHomeAndLibrary_iter002_2026-11-28-02-54-06.perfetto-trace) [3](file://FrameBenchmark_scrollHomeAndLibrary_iter003_2026-11-28-02-54-13.perfetto-trace) [4](file://FrameBenchmark_scrollHomeAndLibrary_iter004_2026-11-28-02-54-18.perfetto-trace)
+
+INSTRUMENTATION_STATUS: android.studio.v2display.benchmark.outputDirPath=/storage/emulated/0/Android/media/dev.ninfenz.mobile.benchmark
+INSTRUMENTATION_STATUS: android.studio.v3display.benchmark=FrameBenchmark_scrollHomeAndLibrary
+  frameCount           [min  41.0](file://FrameBenchmark_scrollHomeAndLibrary_iter001_2026-11-28-02-54-01.perfetto-trace),   [median  43.0](file://FrameBenchmark_scrollHomeAndLibrary_iter002_2026-11-28-02-54-06.perfetto-trace),   [max  43.0](file://FrameBenchmark_scrollHomeAndLibrary_iter000_2026-11-28-02-53-57.perfetto-trace)
+  frameDurationCpuMs   P50    3.8,   P90    6.6,   P95   13.5,   P99  332.4
+  frameOverrunMs       P50   -8.0,   P90   -3.7,   P95    3.7,   P99  353.1
+    Traces: Iteration [0](file://FrameBenchmark_scrollHomeAndLibrary_iter000_2026-11-28-02-53-57.perfetto-trace) [1](file://FrameBenchmark_scrollHomeAndLibrary_iter001_2026-11-28-02-54-01.perfetto-trace) [2](file://FrameBenchmark_scrollHomeAndLibrary_iter002_2026-11-28-02-54-06.perfetto-trace) [3](file://FrameBenchmark_scrollHomeAndLibrary_iter003_2026-11-28-02-54-13.perfetto-trace) [4](file://FrameBenchmark_scrollHomeAndLibrary_iter004_2026-11-28-02-54-18.perfetto-trace)
+
+INSTRUMENTATION_STATUS: android.studio.v3display.benchmark.outputDirPath=/storage/emulated/0/Android/media/dev.ninfenz.mobile.benchmark
+INSTRUMENTATION_STATUS: frame_count_max=43.0
+INSTRUMENTATION_STATUS: frame_count_median=43.0
+INSTRUMENTATION_STATUS: frame_count_min=41.0
+INSTRUMENTATION_STATUS: frame_count_stddev=0.8944271909999159
+INSTRUMENTATION_STATUS: frame_duration_cpu_millis_p50=3.801461
+INSTRUMENTATION_STATUS: frame_duration_cpu_millis_p90=6.5684768000000044
+INSTRUMENTATION_STATUS: frame_duration_cpu_millis_p95=13.485430599999937
+INSTRUMENTATION_STATUS: frame_duration_cpu_millis_p99=332.40906803999997
+INSTRUMENTATION_STATUS: frame_overrun_millis_p50=-8.036525
+INSTRUMENTATION_STATUS: frame_overrun_millis_p90=-3.6502809999999997
+INSTRUMENTATION_STATUS: frame_overrun_millis_p95=3.6902133999999913
+INSTRUMENTATION_STATUS: frame_overrun_millis_p99=353.07091768
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: class=dev.ninfenz.mobile.benchmark.FrameBenchmark
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=.
+INSTRUMENTATION_STATUS: test=scrollHomeAndLibrary
+INSTRUMENTATION_STATUS_CODE: 0
+INSTRUMENTATION_RESULT: stream=
+
+Time: 32.081
+
+OK (1 test)
+
+
+INSTRUMENTATION_CODE: -1

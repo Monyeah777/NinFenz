@@ -48,7 +48,9 @@ dependencies {
     implementation("androidx.test.ext:junit:1.2.1")
     implementation("androidx.test:runner:1.6.2")
     implementation("androidx.test.uiautomator:uiautomator:2.3.0")
-    implementation("androidx.benchmark:benchmark-macro-junit4:1.3.4")
+    // 1.3.4 的 gfxinfo framestats 解析在 Android 16 上拿不到新帧（Unable to confirm
+    // activity launch completion），升级到 1.5.0（2026 稳定版，支持 API 36 frame stats）。
+    implementation("androidx.benchmark:benchmark-macro-junit4:1.5.0")
     // 被测 app 的 benchmark 变体开了 R8，本模块也必须压缩；压缩时 R8 需要这些
     // 依赖库引用到的运行时类可见，否则报 missing class（见 missing_rules.txt）。
     implementation("androidx.profileinstaller:profileinstaller:1.4.0")

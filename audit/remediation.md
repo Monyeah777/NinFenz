@@ -178,7 +178,8 @@
 | D-005 / F-003 | DONE（校准/检测器修正） | 见 calibration.md |
 | Python 基线 rebind | OPEN（非审计分项） | reverse_coupling/style_ratchet/json_shape/freshness/dead_code + sast/style/coupling 基线需按官方入口重冻 |
 | decisions 真源↔Rust 端口漂移 | OPEN（挂账） | ADR030 evidence 空槽误报 + ADR042–046 端口未同步；生成器漂移保护不写盘 |
-| Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | macrobenchmark harness 实现面闭环（自测+无压缩+权限，模拟器冒烟到测量阶段），指标待真机；Play 无 Google 账号跳过 |
+| Play 上传 / on-demand OCR | OPEN（外部） | Play 无 Google 账号跳过；OCR 待 URI 授权 |
+| 真机 macrobenchmark | DONE（2026-11-28） | 三项 OK；冷启动 median 488.0ms 达标、帧 p95 13.49ms 未达标；证据 results/app/macrobenchmark-20261128-1052 |
 
 
 ## 第十一轮：B-004 UI 直连 IO 收口（2026-11-27）
@@ -263,6 +264,7 @@
 - **根因收口**：类遮蔽无法靠逐类 keep 补完（实测依次命中 kotlin Intrinsics → androidx.arch/startup/tracing → lifecycle 接口）。最终：benchmark 变体与测试模块关闭 R8/资源压缩（release 不变）；测试模块启用 `android.experimental.self-instrumenting=true`（macrobenchmark 要求自测，原 targetProjectPath 默认形态被判 NOT-SELF-INSTRUMENTING）；benchmark 变体 manifest 声明 READ/WRITE_EXTERNAL_STORAGE（MacrobenchmarkRule grant 需要）。
 - **验证**：`:app:assembleBenchmark` + `:benchmark:assembleBenchmark` 通过；headless API36 模拟器上 instrument 成功启动、目标 app 拉起并进入测量阶段（自测进程/权限/类加载全过）；模拟器因 `dumpsys gfxinfo framestats` 无法确认 launch completion 报 `Unable to confirm activity launch completion` —— 属模拟器限制（非 app 崩溃），正式 P50/P90/jank 需真机。
 - **审计不受影响**：本轮只改 app/android benchmark 配置与 results 文档，审计仍 100.00（证据见本轮 commit）。
+- **真机执行（2026-11-28 10:52–10:56，PLF110/Android16/arm64）**：1.3.4 harness 的 gfxinfo frame-stats 解析在 Android 16 拿不到新帧 → 升级 benchmark-macro-junit4 **1.5.0**；三项全部 `OK (1 test)`：Startup 冷启动 median 488.0ms（min 397.1/max 529.4/stddev 38.4，目标 P50 ≤1.0s 达标）；Frame frame_duration_cpu p50 3.80/p90 6.57/p95 13.49/p99 332.4ms（**p95 未达 ≤8ms**，含一次 332ms 长帧）；BaselineProfile 生成（16,489 行/1.65MB）。原始输出 `results/app/macrobenchmark-20261128-1052/`；指标表已写回 0.3.7_PERF_BASELINE.md / 0.3.7_DEVICE.md。
 
 
 

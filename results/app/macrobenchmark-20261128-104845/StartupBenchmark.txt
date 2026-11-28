@@ -1,0 +1,103 @@
+INSTRUMENTATION_STATUS: class=dev.ninfenz.mobile.benchmark.StartupBenchmark
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+dev.ninfenz.mobile.benchmark.StartupBenchmark:
+INSTRUMENTATION_STATUS: test=coldStart
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: additionalTestOutputFile_StartupBenchmark_coldStart_iter000_2026-11-28-02-49-07.perfetto-trace=/storage/emulated/0/Android/media/dev.ninfenz.mobile.benchmark/StartupBenchmark_coldStart_iter000_2026-11-28-02-49-07.perfetto-trace
+INSTRUMENTATION_STATUS_CODE: 2
+INSTRUMENTATION_STATUS: class=dev.ninfenz.mobile.benchmark.StartupBenchmark
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=java.lang.IllegalStateException: Unable to confirm activity launch completion [] Please report a bug with the output of `adb shell dumpsys gfxinfo dev.ninfenz.mobile framestats`
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait(MacrobenchmarkScope.kt:233)
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait$default(MacrobenchmarkScope.kt:167)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityImpl(MacrobenchmarkScope.kt:162)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:147)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:126)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait$default(MacrobenchmarkScope.kt:119)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark.coldStart$lambda$0(StartupBenchmark.kt:26)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark.$r8$lambda$FYn5COYXkCHW7lP3RfpoF1x4Z6Y(Unknown Source:0)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+	at androidx.benchmark.macro.MacrobenchmarkPhaseKt$runPhase$2$tracePath$1.invoke(MacrobenchmarkPhase.kt:139)
+	at androidx.benchmark.macro.MacrobenchmarkPhaseKt$runPhase$2$tracePath$1.invoke(MacrobenchmarkPhase.kt:105)
+	at androidx.benchmark.perfetto.PerfettoCaptureWrapper.record(PerfettoCaptureWrapper.kt:137)
+	at androidx.benchmark.perfetto.PerfettoCaptureWrapper.record$default(PerfettoCaptureWrapper.kt:95)
+	at androidx.benchmark.macro.MacrobenchmarkPhaseKt.runPhase(MacrobenchmarkPhase.kt:105)
+	at androidx.benchmark.macro.MacrobenchmarkKt$macrobenchmark$4.invoke(Macrobenchmark.kt:267)
+	at androidx.benchmark.macro.MacrobenchmarkKt$macrobenchmark$4.invoke(Macrobenchmark.kt:264)
+	at androidx.benchmark.perfetto.PerfettoTraceProcessor$Companion.runServer-VtjQ1oo(PerfettoTraceProcessor.kt:133)
+	at androidx.benchmark.perfetto.PerfettoTraceProcessor$Companion.runServer(PerfettoTraceProcessor.kt:108)
+	at androidx.benchmark.macro.MacrobenchmarkKt.macrobenchmark(Macrobenchmark.kt:264)
+	at androidx.benchmark.macro.MacrobenchmarkKt.macrobenchmarkWithStartupMode(Macrobenchmark.kt:401)
+	at androidx.benchmark.macro.junit4.MacrobenchmarkRule.measureRepeated(MacrobenchmarkRule.kt:108)
+	at androidx.benchmark.macro.junit4.MacrobenchmarkRule.measureRepeated$default(MacrobenchmarkRule.kt:99)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark.coldStart(StartupBenchmark.kt:18)
+
+INSTRUMENTATION_STATUS: stream=
+Error in coldStart(dev.ninfenz.mobile.benchmark.StartupBenchmark):
+java.lang.IllegalStateException: Unable to confirm activity launch completion [] Please report a bug with the output of `adb shell dumpsys gfxinfo dev.ninfenz.mobile framestats`
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait(MacrobenchmarkScope.kt:233)
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait$default(MacrobenchmarkScope.kt:167)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityImpl(MacrobenchmarkScope.kt:162)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:147)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:126)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait$default(MacrobenchmarkScope.kt:119)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark.coldStart$lambda$0(StartupBenchmark.kt:26)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark.$r8$lambda$FYn5COYXkCHW7lP3RfpoF1x4Z6Y(Unknown Source:0)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+	at androidx.benchmark.macro.MacrobenchmarkPhaseKt$runPhase$2$tracePath$1.invoke(MacrobenchmarkPhase.kt:139)
+	at androidx.benchmark.macro.MacrobenchmarkPhaseKt$runPhase$2$tracePath$1.invoke(MacrobenchmarkPhase.kt:105)
+	at androidx.benchmark.perfetto.PerfettoCaptureWrapper.record(PerfettoCaptureWrapper.kt:137)
+	at androidx.benchmark.perfetto.PerfettoCaptureWrapper.record$default(PerfettoCaptureWrapper.kt:95)
+	at androidx.benchmark.macro.MacrobenchmarkPhaseKt.runPhase(MacrobenchmarkPhase.kt:105)
+	at androidx.benchmark.macro.MacrobenchmarkKt$macrobenchmark$4.invoke(Macrobenchmark.kt:267)
+	at androidx.benchmark.macro.MacrobenchmarkKt$macrobenchmark$4.invoke(Macrobenchmark.kt:264)
+	at androidx.benchmark.perfetto.PerfettoTraceProcessor$Companion.runServer-VtjQ1oo(PerfettoTraceProcessor.kt:133)
+	at androidx.benchmark.perfetto.PerfettoTraceProcessor$Companion.runServer(PerfettoTraceProcessor.kt:108)
+	at androidx.benchmark.macro.MacrobenchmarkKt.macrobenchmark(Macrobenchmark.kt:264)
+	at androidx.benchmark.macro.MacrobenchmarkKt.macrobenchmarkWithStartupMode(Macrobenchmark.kt:401)
+	at androidx.benchmark.macro.junit4.MacrobenchmarkRule.measureRepeated(MacrobenchmarkRule.kt:108)
+	at androidx.benchmark.macro.junit4.MacrobenchmarkRule.measureRepeated$default(MacrobenchmarkRule.kt:99)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark.coldStart(StartupBenchmark.kt:18)
+
+INSTRUMENTATION_STATUS: test=coldStart
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 20.045
+There was 1 failure:
+1) coldStart(dev.ninfenz.mobile.benchmark.StartupBenchmark)
+java.lang.IllegalStateException: Unable to confirm activity launch completion [] Please report a bug with the output of `adb shell dumpsys gfxinfo dev.ninfenz.mobile framestats`
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait(MacrobenchmarkScope.kt:233)
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait$default(MacrobenchmarkScope.kt:167)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityImpl(MacrobenchmarkScope.kt:162)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:147)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:126)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait$default(MacrobenchmarkScope.kt:119)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark.coldStart$lambda$0(StartupBenchmark.kt:26)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark.$r8$lambda$FYn5COYXkCHW7lP3RfpoF1x4Z6Y(Unknown Source:0)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+	at androidx.benchmark.macro.MacrobenchmarkPhaseKt$runPhase$2$tracePath$1.invoke(MacrobenchmarkPhase.kt:139)
+	at androidx.benchmark.macro.MacrobenchmarkPhaseKt$runPhase$2$tracePath$1.invoke(MacrobenchmarkPhase.kt:105)
+	at androidx.benchmark.perfetto.PerfettoCaptureWrapper.record(PerfettoCaptureWrapper.kt:137)
+	at androidx.benchmark.perfetto.PerfettoCaptureWrapper.record$default(PerfettoCaptureWrapper.kt:95)
+	at androidx.benchmark.macro.MacrobenchmarkPhaseKt.runPhase(MacrobenchmarkPhase.kt:105)
+	at androidx.benchmark.macro.MacrobenchmarkKt$macrobenchmark$4.invoke(Macrobenchmark.kt:267)
+	at androidx.benchmark.macro.MacrobenchmarkKt$macrobenchmark$4.invoke(Macrobenchmark.kt:264)
+	at androidx.benchmark.perfetto.PerfettoTraceProcessor$Companion.runServer-VtjQ1oo(PerfettoTraceProcessor.kt:133)
+	at androidx.benchmark.perfetto.PerfettoTraceProcessor$Companion.runServer(PerfettoTraceProcessor.kt:108)
+	at androidx.benchmark.macro.MacrobenchmarkKt.macrobenchmark(Macrobenchmark.kt:264)
+	at androidx.benchmark.macro.MacrobenchmarkKt.macrobenchmarkWithStartupMode(Macrobenchmark.kt:401)
+	at androidx.benchmark.macro.junit4.MacrobenchmarkRule.measureRepeated(MacrobenchmarkRule.kt:108)
+	at androidx.benchmark.macro.junit4.MacrobenchmarkRule.measureRepeated$default(MacrobenchmarkRule.kt:99)
+	at dev.ninfenz.mobile.benchmark.StartupBenchmark.coldStart(StartupBenchmark.kt:18)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1

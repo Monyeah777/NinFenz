@@ -1,0 +1,83 @@
+INSTRUMENTATION_STATUS: class=dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stream=
+dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark:
+INSTRUMENTATION_STATUS: test=generate
+INSTRUMENTATION_STATUS_CODE: 1
+INSTRUMENTATION_STATUS: class=dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark
+INSTRUMENTATION_STATUS: current=1
+INSTRUMENTATION_STATUS: id=AndroidJUnitRunner
+INSTRUMENTATION_STATUS: numtests=1
+INSTRUMENTATION_STATUS: stack=java.lang.IllegalStateException: Unable to confirm activity launch completion [] Please report a bug with the output of `adb shell dumpsys gfxinfo dev.ninfenz.mobile framestats`
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait(MacrobenchmarkScope.kt:233)
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait$default(MacrobenchmarkScope.kt:167)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityImpl(MacrobenchmarkScope.kt:162)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:147)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:126)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait$default(MacrobenchmarkScope.kt:119)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark.generate$lambda$0(BaselineProfileBenchmark.kt:19)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark.$r8$lambda$WUe9dt0LxAr2beomGtJwBBs26J8(Unknown Source:0)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+	at androidx.benchmark.macro.BaselineProfilesKt$collect$1$1.invoke(BaselineProfiles.kt:77)
+	at androidx.benchmark.macro.BaselineProfilesKt$collect$1$1.invoke(BaselineProfiles.kt:72)
+	at androidx.benchmark.macro.CompilationMode$Partial.compileImpl$benchmark_macro_release(CompilationMode.kt:356)
+	at androidx.benchmark.macro.CompilationMode.resetAndCompile$benchmark_macro_release(CompilationMode.kt:133)
+	at androidx.benchmark.macro.BaselineProfilesKt.collect(BaselineProfiles.kt:72)
+	at androidx.benchmark.macro.junit4.BaselineProfileRule.collect(BaselineProfileRule.kt:137)
+	at androidx.benchmark.macro.junit4.BaselineProfileRule.collect$default(BaselineProfileRule.kt:127)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark.generate(BaselineProfileBenchmark.kt:15)
+
+INSTRUMENTATION_STATUS: stream=
+Error in generate(dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark):
+java.lang.IllegalStateException: Unable to confirm activity launch completion [] Please report a bug with the output of `adb shell dumpsys gfxinfo dev.ninfenz.mobile framestats`
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait(MacrobenchmarkScope.kt:233)
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait$default(MacrobenchmarkScope.kt:167)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityImpl(MacrobenchmarkScope.kt:162)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:147)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:126)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait$default(MacrobenchmarkScope.kt:119)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark.generate$lambda$0(BaselineProfileBenchmark.kt:19)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark.$r8$lambda$WUe9dt0LxAr2beomGtJwBBs26J8(Unknown Source:0)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+	at androidx.benchmark.macro.BaselineProfilesKt$collect$1$1.invoke(BaselineProfiles.kt:77)
+	at androidx.benchmark.macro.BaselineProfilesKt$collect$1$1.invoke(BaselineProfiles.kt:72)
+	at androidx.benchmark.macro.CompilationMode$Partial.compileImpl$benchmark_macro_release(CompilationMode.kt:356)
+	at androidx.benchmark.macro.CompilationMode.resetAndCompile$benchmark_macro_release(CompilationMode.kt:133)
+	at androidx.benchmark.macro.BaselineProfilesKt.collect(BaselineProfiles.kt:72)
+	at androidx.benchmark.macro.junit4.BaselineProfileRule.collect(BaselineProfileRule.kt:137)
+	at androidx.benchmark.macro.junit4.BaselineProfileRule.collect$default(BaselineProfileRule.kt:127)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark.generate(BaselineProfileBenchmark.kt:15)
+
+INSTRUMENTATION_STATUS: test=generate
+INSTRUMENTATION_STATUS_CODE: -2
+INSTRUMENTATION_RESULT: stream=
+
+Time: 16.697
+There was 1 failure:
+1) generate(dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark)
+java.lang.IllegalStateException: Unable to confirm activity launch completion [] Please report a bug with the output of `adb shell dumpsys gfxinfo dev.ninfenz.mobile framestats`
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait(MacrobenchmarkScope.kt:233)
+	at androidx.benchmark.macro.MacrobenchmarkScope.amStartAndWait$default(MacrobenchmarkScope.kt:167)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityImpl(MacrobenchmarkScope.kt:162)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:147)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait(MacrobenchmarkScope.kt:126)
+	at androidx.benchmark.macro.MacrobenchmarkScope.startActivityAndWait$default(MacrobenchmarkScope.kt:119)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark.generate$lambda$0(BaselineProfileBenchmark.kt:19)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark.$r8$lambda$WUe9dt0LxAr2beomGtJwBBs26J8(Unknown Source:0)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark$$ExternalSyntheticLambda0.invoke(D8$$SyntheticClass:0)
+	at androidx.benchmark.macro.BaselineProfilesKt$collect$1$1.invoke(BaselineProfiles.kt:77)
+	at androidx.benchmark.macro.BaselineProfilesKt$collect$1$1.invoke(BaselineProfiles.kt:72)
+	at androidx.benchmark.macro.CompilationMode$Partial.compileImpl$benchmark_macro_release(CompilationMode.kt:356)
+	at androidx.benchmark.macro.CompilationMode.resetAndCompile$benchmark_macro_release(CompilationMode.kt:133)
+	at androidx.benchmark.macro.BaselineProfilesKt.collect(BaselineProfiles.kt:72)
+	at androidx.benchmark.macro.junit4.BaselineProfileRule.collect(BaselineProfileRule.kt:137)
+	at androidx.benchmark.macro.junit4.BaselineProfileRule.collect$default(BaselineProfileRule.kt:127)
+	at dev.ninfenz.mobile.benchmark.BaselineProfileBenchmark.generate(BaselineProfileBenchmark.kt:15)
+
+FAILURES!!!
+Tests run: 1,  Failures: 1
+
+
+INSTRUMENTATION_CODE: -1
