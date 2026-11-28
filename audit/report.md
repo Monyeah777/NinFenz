@@ -1,7 +1,7 @@
 # NF 审计报告（汇总）
 
 > 本文件由 audit/ci/consolidate_report.py 生成，勿手改；明细见证据包与 remediation/calibration/trend。
-> 证据：audit/evidence/d99aac035；commit：d99aac035；扫描根：D:/NinFenz
+> 证据：audit/evidence/d40368cb5；commit：d40368cb5；扫描根：D:/NinFenz
 
 ## 结论
 
@@ -30,7 +30,7 @@
 
 ## 门禁
 
-- 命令：bash audit/ci/gate.sh --evidence audit/evidence/d99aac035
+- 命令：bash audit/ci/gate.sh --evidence audit/evidence/d40368cb5
 - 阈值：audit/ci/thresholds.json（总分 / 单维 / P0 / error / no_targets）
 
 ## 交付物索引

@@ -140,6 +140,6 @@
 
 ## 门禁状态（第十九轮后·收官）
 
-- 最新证据：audit/evidence/d99aac035（同 commit 连跑两次 issues/report 逐字节一致、meta 全等）；总分 **100.00**，P0=P1=P2=P3=0，audit/ci/gate.sh PASS。
+- 最新证据：audit/evidence/d40368cb5（同 commit 连跑两次 issues/report 逐字节一致、meta 全等）；总分 **100.00**，P0=P1=P2=P3=0，audit/ci/gate.sh PASS。
 - 维度：A–N 14 维全部 100；166 条规则 fail=0/error=0/no_targets=0（tool/manual 32 条 not-run 不计分）。
 - C 维度：C-001/C-002/C-003/C-005/C-007/C-008/C-009/C-010/C-012/C-013 全部清零；C-005 802→0（Python 658/Rust 116/Kotlin 25）。
