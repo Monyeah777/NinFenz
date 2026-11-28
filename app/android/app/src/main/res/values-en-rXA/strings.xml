@@ -920,7 +920,7 @@
     <string name="project_detail_delete">⟦Delete project···⟧</string>
     <string name="about_body">⟦NF Mobile %1$s (versionCode %2$d)
 Local-only · No network permission · No telemetry
-MIT License · See app/docs/LEGAL.md···⟧</string>
+App license: PolyForm Noncommercial 1.0.0···⟧</string>
     <string name="project_delete_title">⟦Permanently delete project···⟧</string>
     <string name="project_delete_body">⟦Permanently delete “%1$s”? Its JSON and authoring/assembly data are removed and cannot be undone. Archive or share the full project first.···⟧</string>
     <string name="project_delete_confirm">⟦Delete permanently···⟧</string>

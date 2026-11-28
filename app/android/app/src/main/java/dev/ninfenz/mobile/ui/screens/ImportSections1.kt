@@ -140,7 +140,7 @@ internal fun ImportSection1(s: ImportUiState) {
                             horizontalArrangement = Arrangement.spacedBy(NfSpacing.s),
                             verticalArrangement = Arrangement.spacedBy(NfSpacing.s)
                         ) {
-                            Button(onClick = { s.launchFilePicker(arrayOf("text/markdown", "text/plain", "text/csv", "application/json", "application/zip", "application/octet-stream")) }, enabled = !s.busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_pick_file)) }
+                            Button(onClick = { s.launchFilePicker(importFileMimeTypes) }, enabled = !s.busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_pick_file)) }
                             OutlinedButton(onClick = { s.importClipboard() }, enabled = !s.busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_clipboard)) }
                             OutlinedButton(onClick = { s.launchCsvPicker(arrayOf("text/csv", "text/comma-separated-values", "text/plain")) }, enabled = !s.busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_csv_file)) }
                             OutlinedButton(onClick = { s.importCsv() }, enabled = !s.busy) { Text(stringResource(dev.ninfenz.mobile.R.string.import_csv_clipboard)) }

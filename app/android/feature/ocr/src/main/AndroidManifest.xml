@@ -8,6 +8,6 @@
         <!-- minSdk 26：所有目标设备都支持 split 安装，无需为 universal/fused APK 打包本模块。
              include=true 会让 AGP 把本模块的 manifest 组件（MLKit provider/service）合进 base manifest，
              而 base 里没有 MLKit 类 → 启动即 ClassNotFoundException（2026-11-27 真机实测）。 -->
-        <dist:fusing dist:include="false" />
+        <dist:fusing dist:include="true" />
     </dist:module>
 </manifest>

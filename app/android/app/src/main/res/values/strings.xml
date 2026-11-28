@@ -927,7 +927,7 @@
     <string name="project_detail_delete">删除项目</string>
     <string name="about_body">NF Mobile %1$s（versionCode %2$d）
 本地处理 · 无网络权限 · 无遥测
-MIT License · 详见仓库 app/docs/LEGAL.md</string>
+应用许可：PolyForm Noncommercial 1.0.0（非商业使用免费，商业使用需授权）· 详见仓库 app/docs/LEGAL.md</string>
     <string name="project_delete_title">永久删除项目</string>
     <string name="project_delete_body">确定永久删除「%1$s」？项目 JSON 与 authoring/assembly 数据一并删除，不可撤销。建议先归档或分享完整项目。</string>
     <string name="project_delete_confirm">永久删除</string>

@@ -239,7 +239,7 @@ internal fun LazyListScope.ImportSection19(s: ImportUiState) {
                     Column(modifier = Modifier.padding(horizontal = NfSpacing.page)) {
                         NfErrorCard(requireNotNull(s.error).code, requireNotNull(s.error).message, requireNotNull(s.error).fix)
                         if (requireNotNull(s.error).code == "NF-E-004") {
-                            TextButton(onClick = { s.launchFilePicker(arrayOf("text/markdown", "text/plain", "text/csv", "application/json", "application/zip", "application/octet-stream")) }) {
+                            TextButton(onClick = { s.launchFilePicker(importFileMimeTypes) }) {
                                 Text(stringResource(dev.ninfenz.mobile.R.string.import_reselect_file))
                             }
                         }
@@ -260,7 +260,7 @@ internal fun LazyListScope.ImportSection20(s: ImportUiState) {
                         title = stringResource(dev.ninfenz.mobile.R.string.import_empty_title),
                         message = stringResource(dev.ninfenz.mobile.R.string.import_empty_body),
                         actionLabel = s.context.getString(dev.ninfenz.mobile.R.string.import_pick_file_action),
-                        onAction = { s.launchFilePicker(arrayOf("text/markdown", "text/plain", "text/csv", "application/json", "application/zip", "application/octet-stream")) },
+                        onAction = { s.launchFilePicker(importFileMimeTypes) },
                         secondaryLabel = s.context.getString(dev.ninfenz.mobile.R.string.import_sample_content),
                         onSecondary = { s.importSample() }
                     )

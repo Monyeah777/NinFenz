@@ -18,6 +18,7 @@ internal object OcrFeatureBridge {
             return target.invoke(null, context, file)
         } catch (t: Throwable) {
             val cause = (t as? InvocationTargetException)?.targetException ?: t
+            android.util.Log.w("NfOcr", "OCR 反射调用失败", cause)
             runCatching {
                 SplitInstallManagerFactory.create(context).startInstall(
                     SplitInstallRequest.newBuilder().addModule("ocr").build()
