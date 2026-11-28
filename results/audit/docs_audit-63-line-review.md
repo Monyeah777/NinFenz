@@ -11,11 +11,13 @@ subjects:
   - protocol/data_contracts.json:e2babf2aa7090e1019fdea7dc48ff03fb12a567d0095393f4b02504838a0db75
   - protocol/assertions.json:7f0009dbfc308c35b924f4f943532489c9f9c916488c705ff22eaebce4993679
   - desktop/src/core/interop_export.py:1fb3738e2a778ac355b9948ada14fbfa4d6a16cd7123e5aa0724cc93d77f2b28
-  - desktop/src/core/text_hygiene.py:494be550e3196302ee8822c71fea964d62c5ea7c9e9c1532c978c5b97b63fff0
+  - desktop/src/core/text_hygiene.py:e18d287345395bbc3e33959632f5f04dfbc280115b057ef7e8d9ab2fbd27dd3a
   - desktop/src/core/workloop.py:2f399772dfcf886ea1d54b7dccd8463afa834ae6a7d6eb99fbacc0bc0d0afc3c
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
   - scripts/nf.py:68050d08eae690dcd9a42f7876a65213ae2f4d5a5dc2e0ac34c4f735d4f19b67
 ---
+> 重审（2026-11-28）：编码卫生按 .gitattributes 放行显式 eol=crlf（批处理），不改变 LF 主纪律
+
 > 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
 
 > 重审（2026-11-15）：NF-Final §19.1 补件：新增 core/layer_reports.py、results/{wiki-report,spec-report}.json、results/qa/{layers.json,README.md}、docs/qa/README.md、examples/{README,core-only,governance}/README.md、test_layer_reports.py；assertions/data_contracts/independence/code_metrics/check12 更新

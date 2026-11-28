@@ -1,7 +1,7 @@
 {
   "approved_at": "2026-11-28",
   "approved_by": "Monyeah777",
-  "note": "pipeline_loader typing 修复后重审重算",
+  "note": "编码卫生放行 eol=crlf 声明后重审重算",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
   "subject_digest": "e2af02697db754d1fa7e5c30d2eeae3662b715c6422eb52d7eab38aab321eb52"
