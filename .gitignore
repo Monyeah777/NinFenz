@@ -135,3 +135,12 @@ results/app/dev[0-9]*.png
 results/app/dev*.png
 results/app/*.png
 results/app/*.xml
+
+# 发布二进制不入库（2026-11-28：超大历史产物移出 git，归档在本地 D:/ninfenz-backup/release-artifacts-20261128/；
+# 直装 APK 走 GitHub Release + 官网直链，源码 tag 可复现构建）
+results/app/*.apk
+results/app/*.aab
+results/app/*.apks
+results/app/*.idsig
+results/app/*.zip
+results/app/*.tar
