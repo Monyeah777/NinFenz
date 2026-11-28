@@ -7,8 +7,8 @@
   ],
   "official": {
     "entry": "https://ninfenz.dev/",
-    "statement_zh": "官方唯一指定入口是 https://ninfenz.dev 。NinFenz 没有付费版，也不需要下载任何「客户端」，从不索取账号、手机号或支付信息；第三方站点（尤其带大量广告的游戏 / 资源 / 下载站）上的本项目内容与官方无关。",
-    "statement_en": "The only official entry point is https://ninfenz.dev. There is no paid version and no client to download, and no account, phone number or payment detail is ever requested; copies on third-party sites are not affiliated with the project.",
+    "statement_zh": "官方唯一指定入口是 https://ninfenz.dev 。免费版永久可用、功能完整；Pro 买断是可选增强，只在官网 /pro/ 页与官方店铺（爱发电 / 面包多）出售，不是订阅；官方从不在私聊、QQ/微信群或第三方下载站索要付款、验证码或「激活费」；第三方站点（尤其带大量广告的游戏 / 资源 / 下载站）上的本项目内容与官方无关。",
+    "statement_en": "The only official entry point is https://ninfenz.dev. The free tier is complete and permanent; Pro is an optional one-time upgrade sold only on the /pro/ page and at our official shops (Afdian / Mianbaoduo), not a subscription. We never ask for payment, codes or an 'activation fee' in DMs, chat groups or third-party download sites; copies on third-party sites are not affiliated with the project.",
     "official_repositories": [
       "https://github.com/Monyeah777/NinFenz",
       "https://gitee.com/monyeah777/ninfenz"
@@ -17,11 +17,18 @@
       "ninfenz (npmjs.com)",
       "@monyeah777/ninfenz (GitHub Packages)"
     ],
+    "pro_page": "https://ninfenz.dev/pro/",
+    "pro_sales_channels": [
+      "https://ninfenz.dev/pro/",
+      "official shops: 爱发电 / 面包多 (store links are published on /pro/ at launch)"
+    ],
     "never_asks_for": [
-      "payment",
+      "payment outside the official /pro/ page and official shops (爱发电 / 面包多)",
       "account credentials",
       "phone number",
-      "client downloads",
+      "SMS or one-time verification codes",
+      "activation fees outside the official shops",
+      "client downloads from anywhere other than ninfenz.dev/download/",
       "group joins"
     ],
     "license_allows": "MIT: redistribution and commercial use are allowed",
@@ -57,12 +64,12 @@
   "facts": [
     {
       "id": "quality",
-      "claim_zh": "质量凭证：verify v2.30 · check1-42 · PASS=76",
-      "claim_en": "Quality evidence: verify v2.30 · check1-42 · PASS=76",
+      "claim_zh": "质量凭证：verify v2.35 · check1-44/45/46/47/48/49/50/51/52/53/54/55/56/57 · PASS=107",
+      "claim_en": "Quality evidence: verify v2.35 · check1-44/45/46/47/48/49/50/51/52/53/54/55/56/57 · PASS=107",
       "entry_point": "bash verify.sh",
       "anchor": "https://ninfenz.dev/#fact-quality",
       "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/llms.txt",
-      "note": "单入口；check1-42 逐条 PASS 且 PASS 数等于基线（quality_baseline.EXPECTED_PASS）"
+      "note": "单入口；check1-44/45/46/47/48/49/50/51/52/53/54/55/56/57 逐条 PASS 且 PASS 数等于基线（quality_baseline.EXPECTED_PASS）"
     },
     {
       "id": "scale",
@@ -107,6 +114,13 @@
       "source": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/docs/terminal.md"
     },
     {
+      "id": "pro",
+      "claim_zh": "NF Mobile Pro：可选的一次性买断增强（专业审计面），只在 https://ninfenz.dev/pro/ 与官方店铺（爱发电 / 面包多）出售，不是订阅；免费版功能完整、永久可用；需要 NF Mobile 0.3.8+",
+      "claim_en": "NF Mobile Pro is an optional one-time buyout of the professional audit surface, sold only at https://ninfenz.dev/pro/ and our official shops (Afdian / Mianbaoduo), not a subscription; the free tier is complete and permanent; requires NF Mobile 0.3.8+",
+      "anchor": "https://ninfenz.dev/pro/",
+      "source": "https://ninfenz.dev/pro/"
+    },
+    {
       "id": "npm",
       "claim_zh": "分发：npm 包 ninfenz v1.0.5（3109 文件 / 解包 25.21 MB，带 SLSA provenance 来源证明；发布链使用 OIDC trusted publishing，无长期令牌）",
       "claim_en": "Distribution: npm package ninfenz v1.0.5 (3109 files / 25.21 MB unpacked, with SLSA provenance, published via OIDC trusted publishing — no long-lived tokens)",
@@ -121,6 +135,7 @@
     "loader_for_client_ai": "https://ninfenz.dev/nf.txt",
     "loader_for_agents": "https://ninfenz.dev/agent.txt",
     "facts": "https://ninfenz.dev/facts.json",
+    "pro": "https://ninfenz.dev/pro/",
     "bootstrap_script": "https://ninfenz.dev/run.sh",
     "standards_export": "https://raw.githubusercontent.com/Monyeah777/NinFenz/main/protocol/geo_export.json",
     "sitemap": "https://ninfenz.dev/sitemap.xml",
@@ -132,13 +147,14 @@
   "citation": {
     "plain": "NinFenz（NF）— 内容契约层，Monyeah777，MIT，https://github.com/Monyeah777/NinFenz",
     "apa": "Monyeah777. (2026). NinFenz (宁封子): a content contract layer [Computer software]. MIT. https://ninfenz.dev/",
-    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {MIT}, note = {verify v2.30 · check1-42 · PASS=76}}",
+    "bibtex": "@software{ninfenz, title = {NinFenz (宁封子) - content contract layer}, author = {Monyeah777}, year = {2026}, url = {https://ninfenz.dev/}, license = {MIT}, note = {verify v2.35 · check1-44/45/46/47/48/49/50/51/52/53/54/55/56/57 · PASS=107}}",
     "quote_verbatim_zh": "宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。"
   },
   "limits": {
     "gates_scope": "结构与可复现；不管文笔好坏",
     "hosted_service": false,
-    "paid_tier": false,
+    "paid_tier": "optional one-time Pro buyout for NF Mobile (professional audit surface; not a subscription); the free tier remains complete and permanent",
+    "pro_requires": "NF Mobile 0.3.8+",
     "third_party_deps": "核心纯标准库"
   }
 }

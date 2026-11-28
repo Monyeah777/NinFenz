@@ -1232,7 +1232,16 @@ App license: PolyForm Noncommercial 1.0.0 (free for noncommercial use; commercia
     <string name="settings_tier_current">current</string>
     <string name="settings_tier_free">Free: all open</string>
     <string name="settings_tier_debug">Debug tier switch</string>
-    <string name="settings_tier_release_note">Release has no purchase/entitlement entry; defaults to Free</string>
+    <string name="settings_tier_release_note">Free tier is complete; Pro is an optional one-time upgrade — activate the code below</string>
+    <string name="settings_license_title">Pro license</string>
+    <string name="settings_license_desc">Verified offline. No account, no network. Paste the code you received after purchase.</string>
+    <string name="settings_license_state">status</string>
+    <string name="settings_license_order">order</string>
+    <string name="settings_license_hint">License code (starts with NF1.)</string>
+    <string name="settings_license_activate">Activate</string>
+    <string name="settings_license_ok">Activated: %1$s</string>
+    <string name="settings_license_invalid">Invalid or damaged code — check and try again</string>
+    <string name="settings_license_version">This code is for a different major version</string>
     <string name="settings_chain_title">Archive migration chain</string>
     <string name="settings_chain_desc">Verify next archive predecessor equals previous archive SHA-256</string>
     <string name="settings_chain_first">Pick previous</string>

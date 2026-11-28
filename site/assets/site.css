@@ -42,6 +42,8 @@ footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:v
 .btn{display:inline-block;background:var(--acc);color:#061014;border-radius:8px;padding:9px 16px;font-weight:700;margin:6px 0}
 .btn:hover{text-decoration:none;filter:brightness(1.08)}
 .btn.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+.btn[aria-disabled=true],.btn[aria-disabled=true]:hover{background:#2a3442;color:var(--dim);cursor:not-allowed;filter:none}
+.btn.ghost[aria-disabled=true],.btn.ghost[aria-disabled=true]:hover{background:transparent;border-color:var(--line);color:var(--dim)}
 .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:12px;color:var(--dim);margin-right:6px}
 .kv{display:grid;grid-template-columns:7em 1fr;gap:4px 12px;font-size:14px}
 .kv b{color:var(--dim);font-weight:500}

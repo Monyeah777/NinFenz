@@ -8,7 +8,7 @@ auditor: 本轮执行者
 subjects:
   - verify.sh:8428d8de7b60ea0a69a10b3635ee39a5fd948e9cc6373c80158da33d27cdd4c1
   - .gitattributes:f6fb4175293c85a259d4c60564352c811dded74210c1ad54ec4bfc0376a4188a
-  - desktop/src/core/text_hygiene.py:494be550e3196302ee8822c71fea964d62c5ea7c9e9c1532c978c5b97b63fff0
+  - desktop/src/core/text_hygiene.py:e18d287345395bbc3e33959632f5f04dfbc280115b057ef7e8d9ab2fbd27dd3a
   - desktop/src/core/interop_export.py:1fb3738e2a778ac355b9948ada14fbfa4d6a16cd7123e5aa0724cc93d77f2b28
   - desktop/src/core/mcp_runtime.py:5d3577b8a8eab709c7b44a756673efe466505d2f8a61153f80e3ac73492f31a2
   - desktop/src/core/prose_lint.py:fba27c06c286bf8d907154793f33c690bd8bdcdfc1e8897cb59d1a5ab72db03c
@@ -27,6 +27,8 @@ subjects:
   - llms.txt:5173623fcc5a6412c883aaac84348604b134de1150cf787c116c15fb683e20f7
 
 ---
+> 重审（2026-11-28）：编码卫生按 .gitattributes 放行显式 eol=crlf（批处理），不改变 LF 主纪律
+
 > 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
 
 > 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）

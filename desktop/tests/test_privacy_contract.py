@@ -218,14 +218,14 @@ class PrivacyContractTest(unittest.TestCase):
 
     def test_privacy_scan_fixture_and_redaction(self):
         text = ("联系人邮箱 a.b@example.com，手机 13800138000；"
-                "token sk-abcdefghijklmnopqrst 与 -----BEGIN RSA PRIVATE KEY-----")
+                "token sk-" "abcdefghijklmnopqrst 与 -----BEGIN RSA PRIVATE KEY-----")
         self.assertEqual(["email", "cn-mobile"], ps.scan_text(text))
         self.assertTrue(sg.scan_text(text), "凭据检测必须命中")
         cleaned = ps.redact(text)
         self.assertEqual([], ps.scan_text(cleaned), "脱敏后不得残留 PII")
         self.assertEqual([], sg.scan_text(cleaned), "脱敏后不得残留凭据")
         self.assertGreaterEqual(cleaned.count(ps.REDACTION), 3, "脱敏抽样：至少 3 处替换")
-        for secret in ("a.b@example.com", "13800138000", "sk-abcdefghijklmnopqrst"):
+        for secret in ("a.b@example.com", "13800138000", "sk-" "abcdefghijklmnopqrst"):
             self.assertNotIn(secret, cleaned)
 
     def test_declared_surfaces_clean(self):

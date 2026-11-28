@@ -24,6 +24,7 @@ pub mod fsutil;
 pub mod golden;
 pub mod layout;
 pub mod limits;
+pub mod license_entitlement;
 #[path = "macro.rs"]
 pub mod macros;
 pub mod markdown;

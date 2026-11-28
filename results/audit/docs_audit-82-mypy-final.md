@@ -14,7 +14,7 @@ subjects:
   - desktop/src/core/protocol_golden.py:4578ec263e8d89c3252d0d4fa8e7652e7e4e038ec0732801c454245156eabcbb
   - desktop/src/core/knowledge_sig.py:019b241a8f3f691b788e5b85b4040e5136a9a143568267e0169a4f401a06979a
   - desktop/src/core/output_forms.py:4190f3ab3caa4d5d2135cda49fefe88b38df8e19d0549d17226f97361fdd3954
-  - desktop/src/core/pipeline_loader.py:307d0f59b6fc09ce01499d62957f0d14f4cfb0544c025970f9d9c54329298d4c
+  - desktop/src/core/pipeline_loader.py:7b075f4159f500ee96b33b0e8031e10bd11030141460e0b2327b0f2975858ec1
   - desktop/src/core/community_inventory.py:dcec33d1a813947727d88c2d901aa8dca4d26a1fb25684199306d716c59a9af5
   - desktop/src/core/retriever.py:db7109e1b00a31a7cf85b2a6bab4f9b1e23f167053d0b8251a4fdd91ebde30e9
   - desktop/src/core/lazy_yaml.py:127a18733214df1a721ad9e2fad8c0bc8cc195a4ee2f7fc782a60f85eb24d641
@@ -32,6 +32,8 @@ subjects:
   - desktop/src/core/exporter.py:a087d01d180af71c05462281d8f3e28a27e0318635f01406073776c8d033fe9c
   - protocol/code_metrics_baseline.json:3d1dd49431fa4b9286c0586397c1246b5dd7caa81612c41dcc4e10aff1066c9b
 ---
+> 重审（2026-11-28）：pipeline_loader 补 typing 导入（ruff F821 存量红，语义不变）
+
 > 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
 
 > 重审（2026-11-15）：APP MVP: code_metrics baseline refresh (app subtree 入仓)

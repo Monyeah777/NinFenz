@@ -5,6 +5,7 @@ pub mod ccos;
 pub mod export;
 pub mod graph;
 pub mod import_ops;
+pub mod license;
 pub mod pack;
 pub mod project;
 pub mod protocol;
@@ -183,6 +184,7 @@ pub fn dispatch(op: &str, req: &Value) -> Envelope {
         "graph-compile" => graph::graph_compile(req),
         "graph-typecheck" => maybe_fail(graph::graph_typecheck(req)),
         "spec-validate" => maybe_fail(spec::spec_validate(req)),
+        "license-verify" => license::license_verify(req),
         "assemble" => assemble::assemble(req),
         "validate" => maybe_fail(assemble::validate(req)),
         "export" => export::export(req),

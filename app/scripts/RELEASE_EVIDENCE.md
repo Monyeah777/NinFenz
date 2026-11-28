@@ -66,3 +66,16 @@
 2. Windows Authenticode 证书（EV/OV）+ Windows SDK signtool。
 3. macOS 机器 + Apple Developer Program（Developer ID Application）+ `NOTARY_PROFILE`。
 4. Play Console 账号、service account JSON、商店素材与数据安全材料。
+
+### 0.3.8-preview.1（2026-11-28）
+
+- versionCode 11 / versionName `0.3.8-preview.1`；package `dev.ninfenz.mobile`；minSdk 26；compile/target 36。
+- 变更：Pro 离线授权闭环（core `license-verify` op + Ed25519 验签 + 设置页激活 + `scripts/issue_license.py` 签发器）、错误码 NF-LIC-001/002、站点口径三段式 + `/pro/` 落地页。
+- 产物（本地，不入库）：universal 融合 APK 43,561,975 B / SHA-256 `58f54acadb1020d4e8ba32dfe565a02e2e53d240d695257b5df7a9cfe0144cc1`；AAB 31,683,053 B / SHA-256 `7e89a627be2b4da486de47bbe474acf60406efc6b25d0e618e100f67c74e0fd4`。
+- 签名：**upload key**（cert SHA-256 `A4:F4:68:7A:3C:E7:3E:E1:…:1D:B6:4C:4B`）；`zipalign -c -P 16 4` exit 0；ABI arm64-v8a / x86_64；universal 含 MLKit OCR + PDFBox。
+- 权限：沿用无 INTERNET（离线红线）。
+- 真机：PLF110 / Android 16；release(R8) debug 签名同源构建：冷启动 203 ms、JNA 已加载、ABI `nf-app-core/1`、错误码 117、Pro 激活/重启恢复/篡改拒绝（instrumentation 1/1）。上传签名包未在设备覆盖（换签名会清数据），仅做 apksigner/zipalign/清单静态校验。
+- 门禁：`PYTHONUTF8=1 bash verify.sh --checks-only` = PASS=107 WARN=2 FAIL=0；conformance 27/27 conformant（root `2a3bcccccc6b94a1`）；纯度 0 违规；receipts 66 件链自洽。
+- Play：未上传（无 Google 账号，按计划跳过）。
+
+

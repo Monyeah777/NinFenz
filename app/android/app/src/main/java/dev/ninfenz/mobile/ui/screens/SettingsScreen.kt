@@ -123,6 +123,7 @@ fun SettingsScreen(
         SettingsCoreDiagCard(s, nav)
         SettingsUpgradeChainCards(s, nav, pickers)
         SettingsTierCard(s)
+        SettingsLicenseCard(s)
         SettingsModulesSection(s, nav, capabilityRevision)
         if (capabilityRevision >= 0 && CapabilityRegistry.isEnabled(Capability.MACROS)) {
             SettingsMacroSection()

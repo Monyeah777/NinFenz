@@ -12,6 +12,7 @@
 """
 from __future__ import annotations
 
+import fnmatch
 import os
 import re
 import unicodedata
@@ -191,11 +192,12 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     # EOL 纪律的**可执行落点**：.gitattributes 须声明全仓 LF（属性优先于 core.autocrlf，
     # 因此这是跨平台字节一致的前提；缺失则 CRLF 会在 Windows 检出时反复回流）。
     issues += _gitattributes_issues(root)
+    allow_crlf = _crlf_patterns(root)
     files = _walk(root)
     counters = {"text": 0, "json": 0, "crlf": 0, "bom": 0,
                 "keys_checked": 0, "values_checked": 0}
     for path in files:
-        _scan_file(path, root, issues, counters)
+        _scan_file(path, root, issues, counters, allow_crlf)
     stats = {"files": len(files), "text": counters["text"], "json": counters["json"],
              "bom": counters["bom"], "crlf": counters["crlf"],
              "keys_checked": counters["keys_checked"],
@@ -221,9 +223,35 @@ def _gitattributes_issues(root: str) -> List[str]:
     return []
 
 
+def _crlf_patterns(root: str) -> List[str]:
+    """读取 .gitattributes 中显式声明 eol=crlf 的路径模式（如 *.bat）。
+
+    这类文件是**有意**的 CRLF（Windows 批处理对 LF 支持不稳），与全仓 LF 纪律不冲突：
+    属性即契约，门禁据此放行，避免 Linux 检出把 .bat 判红而 Windows 必须 CRLF 的死循环。
+    """
+    ga_path = os.path.join(root, ".gitattributes")
+    patterns: List[str] = []
+    try:
+        with open(ga_path, encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split()
+                if len(parts) >= 2 and "eol=crlf" in parts[1:]:
+                    patterns.append(parts[0])
+    except OSError:
+        return []
+    return patterns
+
+
+def _crlf_declared(rel: str, patterns: List[str]) -> bool:
+    return any(fnmatch.fnmatch(rel, pat) for pat in patterns)
+
+
 def _scan_file(path: str, root: str, issues: List[str],
-               counters: Dict[str, int]) -> None:
-    """单文件的 BOM/CRLF/UTF-8/JSON 键值面。"""
+               counters: Dict[str, int], allow_crlf: List[str] | None = None) -> None:
+    """单文件的 BOM/CRLF/UTF-8/JSON 键值面（CRLF 按 .gitattributes 声明放行）。"""
     rel = os.path.relpath(path, root).replace(os.sep, "/")
     try:
         with open(path, "rb") as fh:
@@ -234,11 +262,11 @@ def _scan_file(path: str, root: str, issues: List[str],
         return
     counters["text"] += 1
     raw = _bom_issue(rel, raw, issues, counters)
-    if b"\r\n" in raw:
+    if b"\r\n" in raw and not _crlf_declared(rel, allow_crlf or []):
         counters["crlf"] += 1
         issues.append("%s 含 CRLF 行尾（修复指引：仓库 EOL 纪律 = LF"
-                      "（.gitattributes `* text=auto eol=lf`）；本地去 CR 后存回，勿改内容）"
-                      % rel)
+                      "（.gitattributes `* text=auto eol=lf`；批处理等显式 eol=crlf 的除外）；"
+                      "本地去 CR 后存回，勿改内容）" % rel)
     try:
         text = raw.decode("utf-8")
     except UnicodeDecodeError as exc:

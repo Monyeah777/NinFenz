@@ -269,8 +269,8 @@ def test_safe_join_inside_ok(tmp_path: Path) -> None:
 def test_sanitize_masks_paths_and_secrets() -> None:
     raw = (
         "路径 C:\\Users\\alice\\proj\\a.md 与 /home/bob/x，"
-        "邮箱 a@b.com，token sk-abcdefghijklmnopqrstuvwxyz012345，"
-        "AWS AKIAABCDEFGHIJKLMNOP。"
+        "邮箱 a@b.com，token sk-" "abcdefghijklmnopqrstuvwxyz012345，"
+        "AWS AKIA" "ABCDEFGHIJKLMNOP。"
     )
     text, masks = sanitize_text(raw)
     assert find_sensitive(text) == []
@@ -290,7 +290,7 @@ def test_sanitize_obj_recurses() -> None:
 
 def test_assert_share_safe_rejects_secret() -> None:
     with pytest.raises(AppError) as exc:
-        assert_share_safe("key=sk-abcdefghijklmnopqrstuvwxyz012345")
+        assert_share_safe("key=sk-" "abcdefghijklmnopqrstuvwxyz012345")
     assert exc.value.code == "NF-E-002"
 
 

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import dev.ninfenz.mobile.data.AppPrefs
 import dev.ninfenz.mobile.data.CapabilityRegistry
 import dev.ninfenz.mobile.data.CrashLogStore
+import dev.ninfenz.mobile.data.EntitlementStore
 import dev.ninfenz.mobile.data.PrefsStore
 import dev.ninfenz.mobile.data.PrefsTheme
 import dev.ninfenz.mobile.data.RecentProjectShortcuts
@@ -107,6 +108,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installCrashHandler()
         dev.ninfenz.mobile.ui.installCoreCallContext(this)
+        // Pro 离线授权：启动时本地验签恢复（不联网）；失败一律回 Free，不因授权问题阻断启动。
+        runCatching { kotlinx.coroutines.runBlocking { EntitlementStore.restore(this@MainActivity) } }
         pendingShortcut = shortcutFrom(intent)
         val prefs = AppPrefs(this)
         val nfPrefs = PrefsStore(filesDir, prefs).load()
