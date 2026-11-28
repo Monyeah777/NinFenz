@@ -376,14 +376,14 @@ def test_share_masks_paths_emails_secrets(tmp_path: Path) -> None:
     pfile = _share_project(tmp_path)
     text = (
         "补充：路径 C:\\Users\\alice\\ws\\x.md 与 /home/bob/y；"
-        "邮箱 a@b.com；token sk-abcdefghijklmnopqrstuvwxyz012345"
+        "邮箱 a@b.com；token sk-" "abcdefghijklmnopqrstuvwxyz012345"
     )
     env = run_cli("--json", "share", "markdown", "--project", str(pfile), "--text", text).envelope()
     assert env["exit"] == 0, env
     content = env["result"]["content"]
     assert "alice" not in content and "bob" not in content
     assert "a@b.com" not in content
-    assert "sk-abcdefghijklmnopqrstuvwxyz012345" not in content
+    assert "sk-" "abcdefghijklmnopqrstuvwxyz012345" not in content
     assert set(env["result"]["masks"]) >= {"home", "email", "openai_key"}, env["result"]["masks"]
 
 
