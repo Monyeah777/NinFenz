@@ -149,7 +149,7 @@
     },
     {
       "digest": {
-        "sha256": "b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49"
+        "sha256": "f2e5039e012c37f0691972e86c14bf36ff613a3bb925b07620a4cb6581d0bb26"
       },
       "name": "protocol/coupling_baseline.json"
     },
@@ -161,7 +161,7 @@
     },
     {
       "digest": {
-        "sha256": "321c7c2e23badef278c8b2a7c2c8f04309c947a011823b6ba617c295fcdd51d4"
+        "sha256": "8d5a8b967a2ef990114669adaa76d77da90f480ce02434f37f388c730e1c96ac"
       },
       "name": "protocol/instruction_evidence.json"
     },

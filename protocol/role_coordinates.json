@@ -6467,6 +6467,12 @@
       "rule": "auto:R-core"
     },
     {
+      "function": "LLM-as-judge 校准：judge 与 human 的一致性、分类别可靠度、位置/长度偏差。",
+      "path": "desktop/src/core/judge_calibration.py",
+      "role": "prod",
+      "rule": "auto:R-core"
+    },
+    {
       "function": "判据接线覆盖（静态可核验 / 架构纯度面 · 顶层化补维）。",
       "path": "desktop/src/core/judgement_coverage.py",
       "role": "verify",
@@ -9751,6 +9757,12 @@
     {
       "function": "JSON 顶层形状契约（审计 N11：132 个 json.load/loads 站点无类型校验）。",
       "path": "desktop/tests/test_json_shape_contracts.py",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
+      "function": "judge 校准单测：整体/分类别 kappa、样本量门、位置/长度偏差、fail-closed。",
+      "path": "desktop/tests/test_judge_calibration.py",
       "role": "verify",
       "rule": "R-verify"
     },

@@ -187,6 +187,15 @@
       "subcommands": []
     },
     {
+      "doc": "Generate Kotlin/TypeScript types from NF App view contracts.",
+      "flags": [
+        "--lang",
+        "--out"
+      ],
+      "path": "scripts/contract_codegen.py",
+      "subcommands": []
+    },
+    {
       "doc": "core 模块 → 测试引用面（`nf-core-judge-map/1`）：哪些核心模块没有被任何测试提到。",
       "flags": [
         "--check",
@@ -411,6 +420,20 @@
         "--rule"
       ],
       "path": "scripts/jcs.py",
+      "subcommands": []
+    },
+    {
+      "doc": "judge 校准 CLI：读 labeled JSONL，输出整体/分类别 kappa 与偏差探针。",
+      "flags": [
+        "--gate",
+        "--json",
+        "--kappa-threshold",
+        "--labeled",
+        "--min-category-n",
+        "--pairwise",
+        "--positive-label"
+      ],
+      "path": "scripts/judge_calibrate.py",
       "subcommands": []
     },
     {
@@ -998,6 +1021,15 @@
         "--status"
       ],
       "path": "scripts/release_conclusion.py",
+      "subcommands": []
+    },
+    {
+      "doc": "Research 入口自检（生产面）：真调用 App 门面/导入/PBE/约束/灰度/实验健康。",
+      "flags": [
+        "--check",
+        "--json"
+      ],
+      "path": "scripts/research_selftest.py",
       "subcommands": []
     },
     {

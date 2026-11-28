@@ -801,7 +801,7 @@
       "path": "protocol/code_metrics_baseline.json",
       "proof": [
         {
-          "hash": "468bb689c59a4ed5ec841278bbe701346d5ced5ae6def99b996bfcd6e8d1f9b2",
+          "hash": "1feab5317b807b734054b25ec87769f2f2cdd8d84bbe54ba25b05e1de578b5b6",
           "side": "right"
         },
         {
@@ -831,9 +831,9 @@
       ]
     },
     {
-      "digest": "b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49",
+      "digest": "f2e5039e012c37f0691972e86c14bf36ff613a3bb925b07620a4cb6581d0bb26",
       "id": "protocol/coupling_baseline.json",
-      "leaf": "468bb689c59a4ed5ec841278bbe701346d5ced5ae6def99b996bfcd6e8d1f9b2",
+      "leaf": "1feab5317b807b734054b25ec87769f2f2cdd8d84bbe54ba25b05e1de578b5b6",
       "path": "protocol/coupling_baseline.json",
       "proof": [
         {
@@ -873,7 +873,7 @@
       "path": "protocol/drill_fidelity.json",
       "proof": [
         {
-          "hash": "3f6f08073d7f3f0c647906e526aa05404729ef0510b8d733eec50b2b997d95eb",
+          "hash": "b3e0e015a6aeb0af8e1ccf54da4784adca2169042ed33c9015456dd3a0d792ca",
           "side": "right"
         },
         {
@@ -903,9 +903,9 @@
       ]
     },
     {
-      "digest": "321c7c2e23badef278c8b2a7c2c8f04309c947a011823b6ba617c295fcdd51d4",
+      "digest": "8d5a8b967a2ef990114669adaa76d77da90f480ce02434f37f388c730e1c96ac",
       "id": "protocol/instruction_evidence.json",
-      "leaf": "3f6f08073d7f3f0c647906e526aa05404729ef0510b8d733eec50b2b997d95eb",
+      "leaf": "b3e0e015a6aeb0af8e1ccf54da4784adca2169042ed33c9015456dd3a0d792ca",
       "path": "protocol/instruction_evidence.json",
       "proof": [
         {
@@ -949,7 +949,7 @@
           "side": "right"
         },
         {
-          "hash": "cb246eadbea4194120eec6518c44f698cebbebaa1ba1719e2658c46cbb1197e7",
+          "hash": "37ff3bef57d5e270af807705a8c466f1c2c656c1fad87949e82e4bd337fdac8b",
           "side": "left"
         },
         {
@@ -985,7 +985,7 @@
           "side": "left"
         },
         {
-          "hash": "cb246eadbea4194120eec6518c44f698cebbebaa1ba1719e2658c46cbb1197e7",
+          "hash": "37ff3bef57d5e270af807705a8c466f1c2c656c1fad87949e82e4bd337fdac8b",
           "side": "left"
         },
         {

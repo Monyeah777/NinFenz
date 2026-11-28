@@ -49,7 +49,8 @@ def _gate_modules(root: Path) -> set:
     if not path.is_file():
         raise ValueError("缺 " + GATES_REL
                          + "（修复指引：先跑 python scripts/gate_probe.py --write）")
-    doc = json.loads(path.read_text(encoding="utf-8"))
+    from core import json_doc
+    doc = json_doc.load(path, dict, what=GATES_REL)
     names = set()
     for row in doc.get("rows") or []:
         if row.get("has_negative") and str(row.get("module") or ""):

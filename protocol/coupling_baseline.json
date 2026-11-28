@@ -347,9 +347,9 @@
       "i": 0.0
     },
     "domain_metrics": {
-      "ca": 2,
+      "ca": 3,
       "ce": 2,
-      "i": 0.5
+      "i": 0.4
     },
     "domain_neutral": {
       "ca": 1,
@@ -675,6 +675,11 @@
       "ca": 5,
       "ce": 0,
       "i": 0.0
+    },
+    "judge_calibration": {
+      "ca": 0,
+      "ce": 1,
+      "i": 1.0
     },
     "judgement_coverage": {
       "ca": 0,

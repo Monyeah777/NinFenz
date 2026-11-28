@@ -1145,6 +1145,10 @@
       "source": "negative_case"
     },
     {
+      "module": "test_judge_calibration.py",
+      "source": "negative_assertion"
+    },
+    {
       "module": "test_judge_clock_purity.py",
       "source": "negative_case"
     },
