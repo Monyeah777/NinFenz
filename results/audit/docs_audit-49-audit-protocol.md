@@ -7,14 +7,16 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - protocol/audit.json:cce69546ca42d2d5fb3785a22d51e8cd6c49229d8d2f35c4abb1d2b9ee0a91b3
-  - desktop/src/core/audit.py:b316c77fb2fa718a105af8c51a234c435847077f71309adbbf5f0d6bb25d2afb
-  - desktop/src/core/audit_legacy.py:dda2800fa2a8760ceffdb7bb719cf05557222ac7161bb2a4a2bfb631665f4a01
+  - desktop/src/core/audit.py:7b43433aaa52dda2e8a095ee22ef5850a0f7d0a2f3733baf13307d0457f11761
+  - desktop/src/core/audit_legacy.py:862d2c7f5e86c85f7e548108f0fae92086890f20110d2a5885aa07cf30c5c7f5
   - desktop/src/core/audit_subject.py:1cb262ba9db84c9af4e9ec046e82139ca5c65da25f34f77b9aa3d38f31e00f43
   - desktop/tests/test_audit.py:63bf6c8407ff5a7b51bc25cb9d3a3b833bac372b68b56f9b3d9a7bdf140a7192
   - desktop/tests/test_audit_rebind.py:63066cb91114aef5bceaf4fa54d392ec31210d6c141d81345eda122e7055c2b1
 accepted_by: 作者
 accepted_at: 2026-09-16
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-10-30）：全仓审计口径复核：显式 legacy 清单、subjects 根内解析、Path 参数闸门、惰性导入与 manifest 可复算
 
 > 重审（2026-10-14）：收口：长行/导入序/静默跳过理由/风格基线重冻（评审）

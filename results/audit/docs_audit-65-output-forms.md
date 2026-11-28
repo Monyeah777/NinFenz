@@ -6,19 +6,21 @@ scope: 作者指令「两个域包产出几乎都是文本…产出没有功能�
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/output_forms.py:247645942b14dfac6642cf11bf66453ef12acb5f7fc4363d306dd860fe17bdf5
-  - desktop/src/core/quant_metrics.py:ae2bd5a5b71531ee4cf4abe920f75a939a30a5bea105efa7aed011cc92369ce3
+  - desktop/src/core/output_forms.py:4190f3ab3caa4d5d2135cda49fefe88b38df8e19d0549d17226f97361fdd3954
+  - desktop/src/core/quant_metrics.py:988069e28093e239dba65ef1efd5838ea3adba041e80cb07a8167c26648e2005
   - desktop/src/core/quality_depth_scan.py:563059e8a929bbbba16d5d15a9c77d1f362f9518351860b5ca0682aeb07a23f9
-  - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
+  - desktop/src/core/doc_hygiene.py:003d654e87dd2d0e65a6140416c080243a3a5bca38088170d5d89f508461a171
+  - scripts/nf.py:68050d08eae690dcd9a42f7876a65213ae2f4d5a5dc2e0ac34c4f735d4f19b67
   - protocol/output_forms.json:aff71eccf1cd0b57c51a86681c613580e79d346bb6e5dfdd97a873a2436943e9
   - community/量化金融域包/outputs/INDEX.json:cfe9272a362e138f9cb6d15615176cbb348716336d31b372bf411645f74a7bb6
   - community/AI系统域包/outputs/INDEX.json:95103926c6736571fb38e5c95f8234b76dddf26ee286270e3bdbdf3fd4c33a99
   - docs/output-forms.md:12773b8a39735eee7d8d433afd1f8ce8744758b886dc63c8f69d782a3f67b1c0
   - desktop/tests/test_output_forms.py:8ab8c36b9a44f3e2975ce9eaf995b7b11d08861a532a49d9a3c7b0e25f0df4cf
-  - desktop/tests/test_quant_metrics.py:4f8b0d358f6b132f98cf355e75e33917e700f33033421085197fe56edd02f0c4
+  - desktop/tests/test_quant_metrics.py:d9caa12d2afcfc6652d5a67b05fe5172028676f1af0e59b4010f79eaccaf6286
 
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
 
 > 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新

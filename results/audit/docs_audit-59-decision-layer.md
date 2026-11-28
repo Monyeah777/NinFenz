@@ -10,15 +10,17 @@ subjects:
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - protocol/normative.json:c1bbc14c92cea6bd66ff6cb54fdcf91bf3072f66adee7027f1d3f42e70fe1825
   - protocol/data_contracts.json:e2babf2aa7090e1019fdea7dc48ff03fb12a567d0095393f4b02504838a0db75
-  - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
-  - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
-  - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
-  - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
-  - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
+  - desktop/src/core/decision_layer.py:2bb25bd8c7657b6fa88343004941d2907b6ce7f7a0d81f41dde69ca39ec49611
+  - desktop/src/core/receipts.py:0c0a2a7f7127c42c3782e9fb2f3f3e83e2d8a2492ae555468f75a0bb6c97deb2
+  - desktop/src/core/doc_hygiene.py:003d654e87dd2d0e65a6140416c080243a3a5bca38088170d5d89f508461a171
+  - desktop/tests/test_decision_layer.py:ae97eb21ca578a040b8f68c26b8a7ae836cbad6e96baf78eaaab62f881d4127e
+  - scripts/nf.py:68050d08eae690dcd9a42f7876a65213ae2f4d5a5dc2e0ac34c4f735d4f19b67
   - scripts/pull_decision_model.py:477a77f3a2d8b0ce6c9e5985a7fd12c4678f7a33fa496d23abb28ab884dc3df1
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
 
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-15）：NF-Final §19.1 补件：新增 core/layer_reports.py、results/{wiki-report,spec-report}.json、results/qa/{layers.json,README.md}、docs/qa/README.md、examples/{README,core-only,governance}/README.md、test_layer_reports.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）

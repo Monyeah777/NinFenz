@@ -9,22 +9,24 @@ subjects:
   - desktop/src/core/cli_bridge.py:4247ed0e73dfc1ca319f6b9881f3b73a875b01ee6b24eda3d4fe861736cadad8
   - desktop/src/core/meta_cockpit/__init__.py:f31cbadd59e3f25aab850122bbcc4ad5adcf5a65596a38c4996f264a38427fd7
   - desktop/src/core/meta_cockpit/build_atom_menu.py:3e4d8fe2c0ad594f97ae41dc754886bc757527dde035c01a2ca0aa491f785466
-  - desktop/src/core/meta_cockpit/runtime_executor.py:204a67ec93855257323887011395b0866ac8d5ae1c485362e89eb058ffe64bfb
-  - desktop/src/core/meta_cockpit/cockpit_service.py:18280c6966dd618a8b09daa058b461fa43f89e99f11c797ca884338ff5c13bbf
-  - desktop/src/core/meta_cockpit/cockpit_ab.py:6afcade08f2469aad4adc6f44e0e3d28a17712a85e3223f41b14c0020c2f88e7
-  - desktop/src/core/terminal.py:20ebd7e1faf1b6e321e58ae5efff7f2d0923d8cdf150bba816ab00dcd0a4f97a
-  - desktop/tests/test_meta_cockpit.py:017e3a591004b1e3c1bf28e8938ae22754e39ea61ae369e4ddcca1a556214280
+  - desktop/src/core/meta_cockpit/runtime_executor.py:3eaa5abe59eff3f27bd2b75f00009b8b448deb6e85d50b6a85d5f09917e3d3fb
+  - desktop/src/core/meta_cockpit/cockpit_service.py:5462c9811caee676ea0374bab3a763a32b6cf8fd21b2cdfb5666fd0a78f68dff
+  - desktop/src/core/meta_cockpit/cockpit_ab.py:5ed7f74f03a8f410079a735f1a5380419a7ec4a980fbfaa7b3eeb51db297f121
+  - desktop/src/core/terminal.py:fd835a107c58316400efd24e2ca9beed7587ea2f4d52908c4f94e4e97e7aadb4
+  - desktop/tests/test_meta_cockpit.py:0e16448d868bd8c886282e1a3d16d93e85f3751c5b174799a176a5084fffb05f
   - desktop/tests/test_cli_error_framing.py:788460878349a907eadc21c74a1a689c9cdfe81888f5490c5a935b34fc121c8a
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
-  - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
+  - scripts/nf.py:68050d08eae690dcd9a42f7876a65213ae2f4d5a5dc2e0ac34c4f735d4f19b67
   - tui/_surface.py:6a833d00bebd578632bb36256ff6684436f61c394c86797941cae2b156df05ee
-  - protocol/check12_weights.json:a68a302b393a3c4bf878ef6896d024446c00a34ea334af3c40b71e499d4addad
-  - protocol/coupling_baseline.json:b707d268a3bd295caade986ce6e80fd5ca1a3b24d75c60381e1d2e8bc27d1d49
+  - protocol/check12_weights.json:92976bddeee81536e80646f8db395d1a9a0d73a6098bde4a03278c2b640341cf
+  - protocol/coupling_baseline.json:f2e5039e012c37f0691972e86c14bf36ff613a3bb925b07620a4cb6581d0bb26
   - docs/meta-cockpit/README.md:fa00a7fd014857af56e11f38ced1b7d888be053befaadb10b3dd494d27884316
   - docs/meta-cockpit/功能解析.md:de20c2340d19d541bcfde53f222a3acf22a6e440d8fb3dcf51a37aedf53c0c25
-  - results/meta-cockpit-manifest.json:60c0e100798e49d393557ae5066c02d7e057ec27f386ee1a36ca3fc7740150ba
+  - results/meta-cockpit-manifest.json:5024be8b3b190dd12ece19ff319cdf941e4503264c4cf71098dfb36883e3c9b3
 
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-15）：NF-Final §19.1 补件：新增 core/layer_reports.py、results/{wiki-report,spec-report}.json、results/qa/{layers.json,README.md}、docs/qa/README.md、examples/{README,core-only,governance}/README.md、test_layer_reports.py；assertions/data_contracts/independence/code_metrics/check12 更新
 
 > 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）

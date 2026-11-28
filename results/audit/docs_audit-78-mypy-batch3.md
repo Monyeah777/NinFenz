@@ -6,11 +6,13 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/mcp_package.py:d81326714ca91d0a08129c81b2d9ae4eda437571fda8b3a2667c6a0a9f6fdbb2
-  - desktop/src/core/conformance_scan.py:2860f4d3231a6e56892931dcdcba78b835becb3f2462fd7f0a9d75291cc51870
-  - desktop/src/core/pack_combo.py:5fe16225b1586d5ebf4c8faf1901f0225297dd9af7c2ba0778e86707d24ed525
-  - protocol/code_metrics_baseline.json:d2c50454e886e9e7d522b637892af8a2ca5e9f20446731e1427df5a3c54332f0
+  - desktop/src/core/mcp_package.py:80c970032750a47cb653d4016704ec398d975964e9d0586d9d2a857b43dbc492
+  - desktop/src/core/conformance_scan.py:a759028a0ef7c26120d91367d9104d324b75a9a80316d15b3042b107891aebfb
+  - desktop/src/core/pack_combo.py:f7455ad1b592b72741a28a02eef7ad214ae67043773d08f8e1d4235683ba4655
+  - protocol/code_metrics_baseline.json:3d1dd49431fa4b9286c0586397c1246b5dd7caa81612c41dcc4e10aff1066c9b
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-15）：APP MVP: code_metrics baseline refresh (app subtree 入仓)
 
 > 重审（2026-11-15）：NF-Final §19.1 补件：新增 core/layer_reports.py、results/{wiki-report,spec-report}.json、results/qa/{layers.json,README.md}、docs/qa/README.md、examples/{README,core-only,governance}/README.md、test_layer_reports.py；assertions/data_contracts/independence/code_metrics/check12 更新

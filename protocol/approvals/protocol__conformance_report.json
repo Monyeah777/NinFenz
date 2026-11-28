@@ -1,8 +1,8 @@
 {
-  "approved_at": "2026-11-23",
+  "approved_at": "2026-11-28",
   "approved_by": "Monyeah777",
-  "note": "final UX all",
+  "note": "0.3.7-preview.1 直装发布：合并 origin/main 后全量重算",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "1dbcbfbaf41d8d8675fda3f8f049b4143dd72ab3d287689c35836438f1f9b0ca"
+  "subject_digest": "e0c1e25dbd7e259f7f0b4f21e9bc85773883c4d0a6a642d5df7baaa940aa4af3"
 }

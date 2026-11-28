@@ -7,15 +7,17 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - scripts/serve_decision_model.py:bbb36dff0e3816c2253150b7de6ab619877c3c78269a644c4c966083df15afee
-  - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
-  - desktop/src/core/purity_scan.py:ad02db87eb8908b74ea9c8817ad2a8375eb8a8b37eabc01b2f265387ee4174cb
+  - desktop/src/core/decision_layer.py:2bb25bd8c7657b6fa88343004941d2907b6ce7f7a0d81f41dde69ca39ec49611
+  - desktop/src/core/purity_scan.py:8cc7b51c240760eddbd8094085f379e972d8773942bde152c68e566b25d695a7
   - protocol/decision_layer.json:9330d4057f07647d67f15daa6f37c84913834b7eed65f4e360bf5c7c413e5e06
   - community/通用核心基础包/modules/M94_通用节拍桥.md:5c9605e3becbec64e87d5d3ab32b7e25a22150d949d3b8cf787eaa1e01f0e2c4
   - community/校园西幻轻混组合包/modules/M92_轻混装配执行.md:1e261dcc10d0b7134d8194f6e548ecae0d7230d9ba8e258d48825627503360d6
   - docs/decision-layer.md:cd3a254de738ece7c8f07db36904c74484e4622c58f688a3973c8998b441628c
-  - desktop/tests/test_decision_layer.py:551419122f09c1b77f73e7724919f67698bd6d939c3d556d9c8ef98274a76257
+  - desktop/tests/test_decision_layer.py:ae97eb21ca578a040b8f68c26b8a7ae836cbad6e96baf78eaaab62f881d4127e
 
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-15）：NF-Final WP-51 收尾：crosscheck.py unlink 为 temp 夹具删除，登记 purity SINK_ALLOW（含理由）；派生面重算
 
 > 重审（2026-11-13）：决策层文档顶尖化（修三处计数陈旧 101/1142/1244 + 补 openai-json 适配器 / 三原语三候选活绑定 / 现状对照 / 复现）+ 契约判据 test_decision_layer_doc_contract；权重增量重测。本轮为机械重绑。

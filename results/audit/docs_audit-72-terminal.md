@@ -6,19 +6,21 @@ scope: 作者指令「删除 NF 中的 GUI，且为 NF 构建一个终端（CLI 
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/terminal.py:20ebd7e1faf1b6e321e58ae5efff7f2d0923d8cdf150bba816ab00dcd0a4f97a
-  - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
-  - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
+  - desktop/src/core/terminal.py:fd835a107c58316400efd24e2ca9beed7587ea2f4d52908c4f94e4e97e7aadb4
+  - scripts/nf.py:68050d08eae690dcd9a42f7876a65213ae2f4d5a5dc2e0ac34c4f735d4f19b67
+  - desktop/tests/test_terminal.py:6af9f46a04055e5629fe73d125805175efd21b828cd071ea96adb7f13fe96834
   - scripts/nf:406c221f9f16fb6e318e230b0b0120e3a6d3c9231d57f66285e0e4615e18ca91
   - scripts/nf.cmd:d1e7ea3a9e99c0822102884cddafe1cdf3893d9b75d19abebe7a8d2a8abeec5a
   - verify.sh:8428d8de7b60ea0a69a10b3635ee39a5fd948e9cc6373c80158da33d27cdd4c1
   - desktop/src/core/quality_baseline.py:2cce25f5f9433ec25fa44fa5680526ace4516067dbf3e112b289be42891a0161
-  - desktop/src/core/doc_hygiene.py:5cc5d9d0fe0bea3f609d26759ac497aeb92363b0c6b045c1ca6cd67687bae850
+  - desktop/src/core/doc_hygiene.py:003d654e87dd2d0e65a6140416c080243a3a5bca38088170d5d89f508461a171
   - docs/terminal.md:101145a53ef02a98a39a6657f640cecb8ce7e2a4b36de146693be0154f2fbf6d
   - docs/L3_FROZEN.md:863a152271b1b969a3249194d1169628f4a4647a9bdd801473cfc9cb75c6643b
   - protocol/CONFORMANCE.md:617127a215fac4263deb4f0ce17b3e560ac64d2ce0184837ef83132b676aabba
 
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
 
 > 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）

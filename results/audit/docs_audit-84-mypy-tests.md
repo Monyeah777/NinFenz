@@ -21,7 +21,7 @@ subjects:
   - desktop/tests/test_judge_references.py:4166744627ab477eddfff9fe782eee5f6bb457d8f4c93beb23df584087c8bf53
   - desktop/tests/test_intake_gate.py:3c6786fe00d913603509ac1345208c031def063287c2230682636af439ae5a48
   - desktop/tests/test_import_injection.py:b576a9c4ade045b686a888f0dd5c3fd8b46788bbcf9fbdc71b195d983f50b84b
-  - desktop/tests/test_gap_review.py:f78b4dc0c9f7d6fa035c3cd3c9f1415032416311b0d11d5d96a77f44a718f5e7
+  - desktop/tests/test_gap_review.py:abd7d8b73356ac7da02c62ce6f0c2c51a20cd26755253e0817d93751eab845a0
   - desktop/tests/test_explain_coverage.py:015b68d9207bfe43ff9669a3ea488b070bce3cd10efc96de7ee0aa12796264d6
   - desktop/tests/test_doc_reachability.py:b74cc400e354ca12cf632747eefbe41766f42fce445961613d97e02dd7d1b828
   - desktop/tests/test_dead_code.py:3b4f00dfe82740ba10c7e9949c8114401605050451baee03f95dfdaf2e75d4c1
@@ -31,9 +31,11 @@ subjects:
   - desktop/tests/test_cli_json_face.py:1026b256b76953ce46c510909f83d4de46ba350837ddf3a2f481e4467a45e56c
   - desktop/tests/test_ccv3_adapter.py:bf7e200b3c8df8d56dd811d2baab6a5d4961d4a043aa98bdfa2b4e95640bf7db
   - desktop/tests/test_ai_domain_closure.py:f9ec87c5c53daa811f443ec207fe6190c48039f24228c8d7af1b9873d6805bba
-  - desktop/tests/test_terminal.py:0bb35b80919c62ee22b8460a538826279b092db6775f527b23896ca08b638b00
+  - desktop/tests/test_terminal.py:6af9f46a04055e5629fe73d125805175efd21b828cd071ea96adb7f13fe96834
   - desktop/tests/test_nf_cli.py:18c407b6780205e50997d99ab9ea967e6ee066b2dca5d087e9eeea632d311804
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-09）：合并后重算生成物
 
 > 重审（2026-11-09）：冻结链

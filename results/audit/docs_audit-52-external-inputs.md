@@ -7,11 +7,13 @@ verdict: pass
 auditor: 本轮执行者
 subjects:
   - .github/PULL_REQUEST_TEMPLATE.md:db180228f1b4c29177b8bc27ccdbca028f58f8c046ff24c66268c30db5454829
-  - CONTRIBUTING.md:0f9720dfcb4da5549fca35470ead646d76ba1dbcc084e0712259d8cf4cfbb4d7
-  - desktop/src/core/asset_density.py:aa60651ad8269e7db09a709570ae69192f39ee95cfd6bd1d4f652696b3d26c56
-  - desktop/src/core/asset_line_baseline.py:b9630078b3569553be70d89734068c11329d7a35083efc846a1349ccf9bc61d1
+  - CONTRIBUTING.md:49eed246e89dc0e9fe47ffdb46cf70339a7b98aff96d84c1ebd61f0789c18eb6
+  - desktop/src/core/asset_density.py:5899962b943ab05cfd98893dd0e072eac061bab973a196549c0c1a3c88a0bd3a
+  - desktop/src/core/asset_line_baseline.py:e2b83fe7d87f2e63cd36288f95f1663abef8ff3bdf6ee3779cf98a270e7b4842
 
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-10）：CONTRIBUTING 入口面顶尖化：§5 重写为「入口分流（空白 Issue 已关 + 四条分流 ⇄ config.yml）/ 改动域四类（代码面清单照抄 library/intake.json 声明）/ 三个模板各自守什么 / 一次一件事 / 提 PR 前自检」；新增 test_contributing_contract（5 项，含配置放开与悬空路径变异自证）；§4.2 补代码面清单真源注记。本轮为机械重绑。
 
 > 重审（2026-11-10）：PR 模板与两个 Issue 表单同构化（改动域/问题→做法→影响面/可核验收命令+期望/门禁自检四项/Closes-Refs+只做一件事声明）；新增 test_pr_template_contract（4 项，含删段与悬空路径变异自证）；本轮为机械重绑，不主张新的语义审计。

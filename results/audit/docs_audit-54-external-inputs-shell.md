@@ -6,11 +6,13 @@ scope: 机制借鉴类外部输入的筛选与逐条仓内实证（STRATEGY §3.
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - CONTRIBUTING.md:0f9720dfcb4da5549fca35470ead646d76ba1dbcc084e0712259d8cf4cfbb4d7
+  - CONTRIBUTING.md:49eed246e89dc0e9fe47ffdb46cf70339a7b98aff96d84c1ebd61f0789c18eb6
   - skills/ninfenz/SKILL.md:2f90bbd4140f48232849deb4db8fd56f5264c600baa6e1102f8df590284e478f
   - library/INDEX.md:040f26673966549783290e6e2a3dd201cc15a7370176e3293321c38517155d3e
 
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-12）：SKILL.md 顶尖化（契约数 16→27 修正 / 常见失败模式 / 维护者校验段）+ 契约判据 test_skill_md_contract；权重增量重测。本轮为机械重绑。
 
 > 重审（2026-11-12）：library/INDEX 顶尖化（人读区补三步取件/机检面 + 日配额对齐 intake；生成区未手改）+ 契约判据 test_library_index_contract；权重增量重测。本轮为机械重绑。

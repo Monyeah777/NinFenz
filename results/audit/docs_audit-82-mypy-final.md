@@ -6,32 +6,34 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/silent_skip.py:7a9e953f959d31161f29dcb5de4ef755a63d31ff807bdf333403c4b048f07457
-  - desktop/src/core/round_drill.py:0407fc814cbb7ea5bc610036a4cf3e4675977eaaf5b7fa11fa142e32d6504c0b
-  - desktop/src/core/quant_metrics.py:ae2bd5a5b71531ee4cf4abe920f75a939a30a5bea105efa7aed011cc92369ce3
-  - desktop/src/core/module_lifecycle.py:7b84396342e77fea32e6b54cd78e296f1dddf925937b8331dbcdebeb4e9ad1d0
-  - desktop/src/core/market_analyzer.py:eb5edffc55470b5f4aa8e6151ab7bffded36a45ce3ecc69fcdc54de59071cbdf
-  - desktop/src/core/protocol_golden.py:b37b80ee8691fd76ed2df41f5006285c92914449bdfd6a2210164c7bc1f3e353
-  - desktop/src/core/knowledge_sig.py:06409878244907e1135846a71aae76e5d66303534a7e611b8870a1edd307c35e
-  - desktop/src/core/output_forms.py:247645942b14dfac6642cf11bf66453ef12acb5f7fc4363d306dd860fe17bdf5
-  - desktop/src/core/pipeline_loader.py:0efbfa0c0e0f8ae5817a79aed429da24504632a97679727ae9d947bf59dc7104
-  - desktop/src/core/community_inventory.py:939924e6f37e0d17143d3e15c196882bd40fb98ddd22fb83479200487f3137f0
-  - desktop/src/core/retriever.py:97409e06af9b66d2b30bfde8a660d90b661c008bfe002b0b0712b824c7f6c9c4
+  - desktop/src/core/silent_skip.py:686f4b2a3604b482d096ecffd9793e41a4c668eb92666d5ab0037170b1759f18
+  - desktop/src/core/round_drill.py:274d36009a70469454520f94caebfb8a2c4677301d92f1a0e051bbeefbdf4e0d
+  - desktop/src/core/quant_metrics.py:988069e28093e239dba65ef1efd5838ea3adba041e80cb07a8167c26648e2005
+  - desktop/src/core/module_lifecycle.py:c0c9d6741a45980f70648f32680460ab0b46822ecdce4356bb0148a218f8cf11
+  - desktop/src/core/market_analyzer.py:83ce7d6d22b4827722c0dd7a94ad2eebf9fe39841e76af0f6c720a273efc4a17
+  - desktop/src/core/protocol_golden.py:4578ec263e8d89c3252d0d4fa8e7652e7e4e038ec0732801c454245156eabcbb
+  - desktop/src/core/knowledge_sig.py:019b241a8f3f691b788e5b85b4040e5136a9a143568267e0169a4f401a06979a
+  - desktop/src/core/output_forms.py:4190f3ab3caa4d5d2135cda49fefe88b38df8e19d0549d17226f97361fdd3954
+  - desktop/src/core/pipeline_loader.py:307d0f59b6fc09ce01499d62957f0d14f4cfb0544c025970f9d9c54329298d4c
+  - desktop/src/core/community_inventory.py:dcec33d1a813947727d88c2d901aa8dca4d26a1fb25684199306d716c59a9af5
+  - desktop/src/core/retriever.py:db7109e1b00a31a7cf85b2a6bab4f9b1e23f167053d0b8251a4fdd91ebde30e9
   - desktop/src/core/lazy_yaml.py:127a18733214df1a721ad9e2fad8c0bc8cc195a4ee2f7fc782a60f85eb24d641
-  - desktop/src/core/json_schema.py:f3a4a6a14de5104e217af8b154505f9ca46fd6133081188209add78143e2b23e
-  - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
-  - desktop/src/core/orchestration.py:c1af716bbb08fc06b8d75edc96a662b50f57bb91b5d06b3f8ecd3f19289e8084
-  - desktop/src/core/machine_contract.py:8b1bb40cdacac3e1104baa90e4c16d433c4db58983144e30764dc61e08f6c541
-  - desktop/src/core/decisions.py:ea111202d12e1079a85dec047e55f556496312a4cfb3da659e6b1ae1cf3b52c1
-  - desktop/src/core/layer_model.py:7464fad8e9703b76b6582a641fb80c5a93c4bbf87b5d2aad191e610eafe64dd2
-  - desktop/src/core/import_graph.py:2ea0fe79cf12e2f9bdb6078af0a08287ae062fc0f4f3e6136e3b240c0d11123a
-  - desktop/src/core/bench.py:5d7ef263ca30a9888f2c32f4db2253406dfdc510b52fbb19958a3afefe9cf574
-  - desktop/src/core/import_adapter.py:0d062c6f28215b7d81eeb46e653fa4edcc7e8cb9f3e9178e73f2dff9f834bc35
-  - desktop/src/core/daemon.py:75940f32b3068a5bc7a83b288bb9302e76a948eca0baa76e1e62f02243c8b498
-  - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
-  - desktop/src/core/exporter.py:c2a1caa2a70f02ab0a99fa52ba5de108b069add25d0414f1d9e2ad7b8b8e5fe1
-  - protocol/code_metrics_baseline.json:d2c50454e886e9e7d522b637892af8a2ca5e9f20446731e1427df5a3c54332f0
+  - desktop/src/core/json_schema.py:b6e6f8a4aeb86ad431f3282aa7681078131685f8602c04106c37c87d57b8f3c3
+  - desktop/src/core/export_schema.py:8d3d7015c92c398f90815222b9046c12f10b7f2a0779ffb0e1047297b33a6b39
+  - desktop/src/core/orchestration.py:367fa641c231b9ce431d2cc2de2291239892fcfbf5fdfecc82c6b6c3eb72df4b
+  - desktop/src/core/machine_contract.py:ea6529edb31dae60e12031a36ab415838e53f09ad6ee2fd9b3176b11ba128783
+  - desktop/src/core/decisions.py:43d450bd083d3e971001667fb3afbdacbe5ad97c7ed9939a03c72296192870ea
+  - desktop/src/core/layer_model.py:aa8d635330e16e611bf5a4582806be2b3cec7102d07c44a1aca05dc553934330
+  - desktop/src/core/import_graph.py:12df85986c93d204eeb29e4344c443a1076f24f80b183bfa4b8c32b1658c01f1
+  - desktop/src/core/bench.py:e31276263985dcc62a0e09a4e44124fd00de2e2325c1cfd3ad3af71e538d2441
+  - desktop/src/core/import_adapter.py:31940e92841335fdec2c9d6d7dfe6f88f9981dfd1418ca15f58543b8ef6b5bc4
+  - desktop/src/core/daemon.py:5aa5532c006ed5d9f38dbd7ba4288db51dfc5975631eb1dfdaded1fdd8e89787
+  - desktop/src/core/decision_layer.py:2bb25bd8c7657b6fa88343004941d2907b6ce7f7a0d81f41dde69ca39ec49611
+  - desktop/src/core/exporter.py:a087d01d180af71c05462281d8f3e28a27e0318635f01406073776c8d033fe9c
+  - protocol/code_metrics_baseline.json:3d1dd49431fa4b9286c0586397c1246b5dd7caa81612c41dcc4e10aff1066c9b
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-15）：APP MVP: code_metrics baseline refresh (app subtree 入仓)
 
 > 重审（2026-11-15）：NF-Final §19.1 补件：新增 core/layer_reports.py、results/{wiki-report,spec-report}.json、results/qa/{layers.json,README.md}、docs/qa/README.md、examples/{README,core-only,governance}/README.md、test_layer_reports.py；assertions/data_contracts/independence/code_metrics/check12 更新

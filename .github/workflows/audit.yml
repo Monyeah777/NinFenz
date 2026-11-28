@@ -24,7 +24,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
-          python-version: "3.11"
+          python-version: '3.11'
       - name: 离线审计（全量 script 规则）
         run: |
           short="${GITHUB_SHA::9}"

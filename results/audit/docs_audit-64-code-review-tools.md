@@ -6,17 +6,19 @@ scope: 作者指令「拉取 ≥10 项代码审查工具；用工具 + 决策模
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/audit.py:b316c77fb2fa718a105af8c51a234c435847077f71309adbbf5f0d6bb25d2afb
-  - desktop/src/core/export_schema.py:9052dc891be0c70ceb5b42544eceeceeeb4dee8c4f107b1ec660913cf922ad3d
-  - desktop/src/core/decision_layer.py:b31b67d1feda7bd520aea978e19ab3e165c5524c058c24605e0dc5e800ff1d32
-  - desktop/src/core/storage.py:b64401314fd788fe0bae9676c21d61f162d704d3ac81e2f1d619b963149ab88c
-  - desktop/src/core/gap_review.py:7d1d600926e13b9936f2a7d30e8a8ca95e4bb3b2a73308f88cfb89b563055953
-  - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
+  - desktop/src/core/audit.py:7b43433aaa52dda2e8a095ee22ef5850a0f7d0a2f3733baf13307d0457f11761
+  - desktop/src/core/export_schema.py:8d3d7015c92c398f90815222b9046c12f10b7f2a0779ffb0e1047297b33a6b39
+  - desktop/src/core/decision_layer.py:2bb25bd8c7657b6fa88343004941d2907b6ce7f7a0d81f41dde69ca39ec49611
+  - desktop/src/core/storage.py:a7c7a637771fb5264d0c17707cae5202cde4949c8e109585764eea39d07ba650
+  - desktop/src/core/gap_review.py:486e3ca052e3639ddf0178302daf3515072348afa3c2fc4fb983b25c8ffa9952
+  - scripts/nf.py:68050d08eae690dcd9a42f7876a65213ae2f4d5a5dc2e0ac34c4f735d4f19b67
   - scripts/check_external_links.py:1cbee65ba19a83fbcdf333e35b8d99c2e45f3b400f3a025860357baf7a806b02
   - scripts/check_interop_schemas.py:f9c1add0ee80fb23a3913e32482027e9a4049c5ce70cb35b2b1be4afa075d091
   - scripts/ai_domain_closure.py:583cb8ef79afe689df27a1b73885b314dda31e667c8f4f585c907828571356ad
 
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
 
 > 重审（2026-11-15）：NF-Final WP-23：新增 core/delivery.py、results/delivery/*（包+报告）、docs/delivery.md、test_delivery_contract.py；nf agent run --deliver/--sidecar；assertions/data_contracts/independence/code_metrics/check12 更新

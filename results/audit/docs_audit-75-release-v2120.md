@@ -8,14 +8,16 @@ auditor: 本轮执行者
 subjects:
   - CHANGELOG.md:90a4221af07e088a8a031685050b8d9e3f9ff1132efb79e6a3bca209ba8a743e
   - docs/meta/VERSION-MATRIX.md:1e24642c6d55c5844d31c1d543be4bfb76fc8a8764b71edf0badd5afb372c5f8
-  - README.md:f4fa730f2d19acd31d6b6074421baf8bb26b65349a6e5bda530c1c8ea9f58ff8
-  - desktop/src/core/changelog_gen.py:152aecae6e55e53913e546658ee9385e1ea2dd5ab74e3021cd9bc665282efe40
+  - README.md:231d6c696e0f44ba81c5f8d06055c748b05157c366a1f368f3a1ba073f3201b3
+  - desktop/src/core/changelog_gen.py:878e870df58e5ab782cabffa426a4ca4c8df7b864b464bc473bb604d7a04f8a2
   - desktop/tests/test_changelog_gen.py:acde329ef16701c680c1eb15df0cc8edbe3d13bdbdc45a7ee4821bf9949f24da
   - protocol/release_policy.json:1f2fc3f2a3c1ca2e26a8bbd15c1ed8a589e29756a219a4a93c857c732d156c66
   - docs/release.md:09b0c6bbd0f2514a32cef0e404bb4dac877f42d57a6674157ea45b1629290aa2
-  - scripts/nf.py:4223fce17ca1a66a7e4818776492a1447fedde490c4b685b31cffad39a8a265a
+  - scripts/nf.py:68050d08eae690dcd9a42f7876a65213ae2f4d5a5dc2e0ac34c4f735d4f19b67
 
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-15）：NF-Final WP-52：新增 protocol/keywords.json、core/keywords.py、docs/keywords.md、test_keywords_contract.py、nf keywords check（命令 80/索引 215）；verify.sh check57 + quality_baseline 57 条/PASS=107；check12 预算 2185→2195（+1.4s CLI 烟测，容量调整）
 
 > 重审（2026-11-15）：NF-Final WP-51：新增 protocol/crosscheck.json、core/crosscheck.py、results/crosscheck/report.json、test_crosscheck_contract.py；verify.sh check56 + quality_baseline 56 条/PASS=105；assembly_runtime 计划/轨迹对齐加固（D-05 修复驱动）

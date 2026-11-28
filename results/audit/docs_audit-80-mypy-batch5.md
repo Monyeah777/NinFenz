@@ -6,15 +6,17 @@ scope: 作者指令「按 rivet 62 计划执行（除外部）」——62 计划
 verdict: pass
 auditor: 本轮执行者
 subjects:
-  - desktop/src/core/semantic_conflict.py:eb11b7e32ac07c52400c4c4a457ed877f434decc05a77fd69ef6d0bf2ddcf131
-  - desktop/src/core/storage.py:b64401314fd788fe0bae9676c21d61f162d704d3ac81e2f1d619b963149ab88c
-  - desktop/src/core/receipts.py:b748915bb519aeeb1aa0f7d367df2eb7d4321b369b85905a7f918d8d55d96363
-  - desktop/src/core/intake.py:23007fd42c627df44dcce7ffa6873a28f5679a68f3b00351f32e728bb25dcbe0
-  - desktop/src/core/world_slots.py:29935ff13c23a18bd4db94d1459f62b762ba704d6002c5209294060cc4e95384
-  - desktop/src/core/pipelinerun.py:131c62002d98c1c08b62570fd28f14295eda8f24b80cc39956c82265a79e22bd
-  - desktop/src/core/mcp_runtime.py:22e24633e87e95453d0c2cf4a595d0496bae5d7331c1fc644d5b1555e4925a41
-  - protocol/code_metrics_baseline.json:d2c50454e886e9e7d522b637892af8a2ca5e9f20446731e1427df5a3c54332f0
+  - desktop/src/core/semantic_conflict.py:bd0dcfe2e66b947333230a24e727d1e7e1fde495a3043f5259a2289f83c46a3a
+  - desktop/src/core/storage.py:a7c7a637771fb5264d0c17707cae5202cde4949c8e109585764eea39d07ba650
+  - desktop/src/core/receipts.py:0c0a2a7f7127c42c3782e9fb2f3f3e83e2d8a2492ae555468f75a0bb6c97deb2
+  - desktop/src/core/intake.py:9755628c00bbecbe6bb115aca6575715f6dae80a493031eb6c37a90d9a8c4ee8
+  - desktop/src/core/world_slots.py:86860344463cbd5351dd612e18e6c248bb2f3ae43e209c671d9fa3847e16233e
+  - desktop/src/core/pipelinerun.py:51f31b2dd0e39c3bff07f130a86faebb3a26c511d2abf5128f81c7589a4162c1
+  - desktop/src/core/mcp_runtime.py:5d3577b8a8eab709c7b44a756673efe466505d2f8a61153f80e3ac73492f31a2
+  - protocol/code_metrics_baseline.json:3d1dd49431fa4b9286c0586397c1246b5dd7caa81612c41dcc4e10aff1066c9b
 ---
+> 重审（2026-11-28）：0.3.7-preview.1 直装发布：合并 origin/main 后对象字节变化，机械重绑
+
 > 重审（2026-11-15）：APP MVP: code_metrics baseline refresh (app subtree 入仓)
 
 > 重审（2026-11-15）：NF-Final §19.1 补件：新增 core/layer_reports.py、results/{wiki-report,spec-report}.json、results/qa/{layers.json,README.md}、docs/qa/README.md、examples/{README,core-only,governance}/README.md、test_layer_reports.py；assertions/data_contracts/independence/code_metrics/check12 更新
