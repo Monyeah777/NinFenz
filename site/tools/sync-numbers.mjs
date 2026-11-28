@@ -31,19 +31,19 @@ const OPTIONAL = ['robots.txt', 'sitemap.xml', '404.html', 'README.md'];
 //: 规模数字必须齐全的面（同一条规模行上）
 const SCALE_FILES = ['index.html', 'en/index.html', 'llms.txt', 'llms-full.txt'];
 
-const RE = /verify v\d+\.\d+ · check\d+-\d+ · PASS=\d+/g;
+const RE = /verify v\d+\.\d+ · check[0-9/-]+ · PASS=\d+/g;
 
 function read(p) { return fs.readFileSync(p, 'utf8'); }
 
 // ---- 真源 1：llms.txt 的 nf:stats 区 ----
 const src = read(path.join(ROOT, 'llms.txt'));
-const m = src.match(/verify v(\d+\.\d+) · check(\d+)-(\d+) · PASS=(\d+)/);
+const m = src.match(/verify v(\d+\.\d+) · check[^·]* · PASS=(\d+)/);
 if (!m) { console.error('未能在 llms.txt 的 nf:stats 区找到质量凭证真源'); process.exit(2); }
-const want = 'verify v' + m[1] + ' · check' + m[2] + '-' + m[3] + ' · PASS=' + m[4];
 
-// ---- 真源 2：protocol/repo_stats.json（交叉核对）----
+// ---- 真源 2：protocol/repo_stats.json（交叉核对；check 标签可能含多个区间）----
 const stats = JSON.parse(read(path.join(ROOT, 'protocol', 'repo_stats.json')));
-const want2 = 'verify v' + stats.verify_version + ' · check1-' + stats.verify_checks + ' · PASS=' + stats.baseline_pass;
+const want = 'verify v' + m[1] + ' · ' + stats.check_label + ' · PASS=' + stats.baseline_pass;
+const want2 = 'verify v' + stats.verify_version + ' · ' + stats.check_label + ' · PASS=' + stats.baseline_pass;
 console.log('真源（llms.txt）      : ' + want);
 console.log('真源（repo_stats.json）: ' + want2);
 let fail = 0;
@@ -62,16 +62,16 @@ for (const f of LIVE_FILES) {
   const p = path.join(SITE, f);
   if (!fs.existsSync(p)) continue;
   let t = read(p);
-  const badChecks = [...new Set([...t.matchAll(/check1-(\d+)/g)].map((x) => x[1])
-    .filter((n) => n !== String(stats.verify_checks)))];
+  const badChecks = [...new Set([...t.matchAll(/check1-[0-9/-]+/g)].map((x) => x[0])
+    .filter((s) => s !== stats.check_label))];
   const badPasses = [...new Set([...t.matchAll(/PASS=(\d+)/g)].map((x) => x[1])
     .filter((n) => n !== String(stats.baseline_pass)))];
   if (badChecks.length) {
-    console.error('✗ site/' + f + ' 局部 check 数漂移：check1-' + badChecks.join(' / check1-')
-                  + '（真源 check1-' + stats.verify_checks + '）');
+    console.error('✗ site/' + f + ' 局部 check 标签漂移：' + badChecks.join(' / ')
+                  + '（真源 ' + stats.check_label + '）');
     fail = 1;
     if (write) {
-      t = t.replace(/check1-\d+/g, 'check1-' + stats.verify_checks);
+      t = t.replace(/check1-[0-9/-]+/g, stats.check_label);
       fs.writeFileSync(p, t, 'utf8');
     }
   }
