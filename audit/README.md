@@ -101,4 +101,4 @@ tool/manual 未执行 31 条不计分，也不作为"通过"。
 - 测试面：engine/rust 249/249、app/core 228/228；Android 全量单测 667/0；C# 3 csproj 0 warn 0 error；Python 分层 1424 passed + 23 条既存红（id 集合与基线逐条相同）。
 - 残留债务（见 remediation.md 与 calibration.md）：审计分项已全部清零；另 decisions 真源↔Rust 端口漂移挂账、Python 基线 rebind 批次（既有 known-red，非审计规则）待做。
 - 已知红（基线存量、非本轮引入）：Python 全量 pytest 的 test_reverse_coupling / test_style_ratchet / test_json_shape_contracts / test_freshness_check / test_dead_code 等；另有 sast/style/coupling baseline 因拆分新增文件键需按官方入口重冻（rebind 批次）。
-- 外部阻断（不在本仓能力内）：Play 上传（无 Google 账号）、真机 macrobenchmark（设备未接入 ADB）、on-demand OCR 触发（URI 授权）。
+- 外部阻断（不在本仓能力内）：Play 上传（无 Google 账号）、真机 macrobenchmark 指标（harness 实现面已闭环、模拟器冒烟到测量阶段，设备未接入 ADB）、on-demand OCR 触发（URI 授权）。

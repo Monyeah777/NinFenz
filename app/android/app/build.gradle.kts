@@ -58,20 +58,19 @@ android {
                 "proguard-rules.pro"
             )
         }
-        // 性能测量变体：与 release 同源，仅用于 Macrobenchmark；生产 release 行为不变。
+        // 性能测量变体：与 release 同源（profileable + 非 debuggable），仅用于 Macrobenchmark。
+        // 2026-11-28 收口实测：测试 APK（com.android.test）拿不到自己的 R8 规则，同进程类遮蔽
+        // 会随 app 侧 R8 收缩逐层出现（kotlin Intrinsics → androidx.arch/startup/tracing →
+        // lifecycle 接口），无法靠被测侧 keep 规则穷举；故 benchmark 变体关闭代码/资源压缩，
+        // 让两侧 APK 的运行时类保持原始形态。**生产 release 仍是全量 R8**，口径差异已记入
+        // results/app/0.3.7_PERF_BASELINE.md（benchmark 变体仅用于 harness/指标采集，不作发布物）。
         create("benchmark") {
             initWith(getByName("release"))
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += listOf("release")
             isDebuggable = false
-            // benchmark 变体额外关闭名称混淆：macrobenchmark 测试 APK 与 app 同进程，
-            // 若两者都混淆会撞名（真机 k3.j NoSuchMethodError）；AGP 又不给 com.android.test
-            // 模块传 proguardFiles，只能从被测 app 侧消除冲突（详见 proguard-benchmark.pro）。
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-                "proguard-benchmark.pro"
-            )
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 

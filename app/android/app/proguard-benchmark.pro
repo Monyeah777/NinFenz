@@ -15,3 +15,12 @@
 -keep class kotlin.ranges.** { *; }
 -keep class kotlin.text.** { *; }
 -keep class kotlin.time.** { *; }
+
+# 第三层：androidx 共享运行时同样会被 app 侧 R8 裁剪/优化，而测试 APK（androidx.test/startup/benchmark）
+# 依赖其完整成员；同进程父加载器先命中 app 副本 → NoSuchMethodError / NoClassDefFoundError。
+# 仅 benchmark 变体保留完整成员，release 仍是全量 R8。
+-keep class androidx.arch.core.** { *; }
+-keep class androidx.startup.** { *; }
+-keep class androidx.profileinstaller.** { *; }
+-keep class androidx.tracing.** { *; }
+-keep class androidx.concurrent.** { *; }

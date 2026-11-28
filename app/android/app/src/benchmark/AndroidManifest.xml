@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Macrobenchmark 1.3.4 的 MacrobenchmarkRule 会对被测包 grants WRITE/READ_EXTERNAL_STORAGE；
+         权限必须在 manifest 声明，否则 UiAutomation 的 pm grant 失败 → "Failed to grant permissions"。
+         仅 benchmark 变体声明；release 清单不含存储权限（离线红线不变，permission 本身不授予访问）。 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application>
         <profileable android:shell="true" />
     </application>

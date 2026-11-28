@@ -178,7 +178,7 @@
 | D-005 / F-003 | DONE（校准/检测器修正） | 见 calibration.md |
 | Python 基线 rebind | OPEN（非审计分项） | reverse_coupling/style_ratchet/json_shape/freshness/dead_code + sast/style/coupling 基线需按官方入口重冻 |
 | decisions 真源↔Rust 端口漂移 | OPEN（挂账） | ADR030 evidence 空槽误报 + ADR042–046 端口未同步；生成器漂移保护不写盘 |
-| Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | macrobenchmark 代码/APK/脚本就绪，等设备接入 ADB；Play 无 Google 账号跳过 |
+| Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | macrobenchmark harness 实现面闭环（自测+无压缩+权限，模拟器冒烟到测量阶段），指标待真机；Play 无 Google 账号跳过 |
 
 
 ## 第十一轮：B-004 UI 直连 IO 收口（2026-11-27）
@@ -257,6 +257,13 @@
 - **生成物**：`nf layers --write`、`results/meta-cockpit-manifest` 官方 save()、`gen_asset_code_cases.py` 真源计数刷新；C-005 过程新增的私有子模块均 ≤400 行。
 - **结果**：总分 99.70 → **100.00**；14 维全 100；P0=P1=P2=P3=**0**；error=0/no_targets=0；门禁 PASS。
 - **遗留（非审计分项）**：Python 基线 rebind 批次（reverse_coupling/style_ratchet/json_shape/freshness/dead_code + sast/style/coupling 基线，existing red）；decisions 真源↔Rust 端口漂移挂账；真机 macrobenchmark 待设备接入；Play 上传按用户说明（无 Google 账号）跳过。
+
+## 第二十轮：macrobenchmark harness 实现面闭环（2026-11-28）
+
+- **根因收口**：类遮蔽无法靠逐类 keep 补完（实测依次命中 kotlin Intrinsics → androidx.arch/startup/tracing → lifecycle 接口）。最终：benchmark 变体与测试模块关闭 R8/资源压缩（release 不变）；测试模块启用 `android.experimental.self-instrumenting=true`（macrobenchmark 要求自测，原 targetProjectPath 默认形态被判 NOT-SELF-INSTRUMENTING）；benchmark 变体 manifest 声明 READ/WRITE_EXTERNAL_STORAGE（MacrobenchmarkRule grant 需要）。
+- **验证**：`:app:assembleBenchmark` + `:benchmark:assembleBenchmark` 通过；headless API36 模拟器上 instrument 成功启动、目标 app 拉起并进入测量阶段（自测进程/权限/类加载全过）；模拟器因 `dumpsys gfxinfo framestats` 无法确认 launch completion 报 `Unable to confirm activity launch completion` —— 属模拟器限制（非 app 崩溃），正式 P50/P90/jank 需真机。
+- **审计不受影响**：本轮只改 app/android benchmark 配置与 results 文档，审计仍 100.00（证据见本轮 commit）。
+
 
 
 
