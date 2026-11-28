@@ -1,6 +1,6 @@
-NF 0.3.7-preview.1 校验清单（release，upload key 已签名）
+NF 0.3.7-preview.1 校验清单（直装发布，upload key 已签名，2026-11-28）
 
-commit: 30cce7b05 + 真机修复（base manifest 移除 MLKit 组件 / feature 取消 fusing）
+commit: 见发布时 main HEAD（merge eb21f0664 后；app 修复 a7ec1ff1f/后续）
 versionCode: 10
 versionName: 0.3.7-preview.1
 
@@ -8,14 +8,15 @@ versionName: 0.3.7-preview.1
 SHA-256: A4:F4:68:7A:3C:E7:3E:E1:8A:49:E0:54:A6:42:9C:0A:35:4B:45:01:B4:9A:E2:74:53:04:A9:C4:1D:B6:4C:4B
 SHA-1  : 8B:20:2C:E1:D5:AC:13:1F:69:0B:1D:DC:DE:5E:F4:D4:D4:2B:3C:5B
 
-443f9c2e33307c03112616ff3c304c01cfd9e1c52d0a557fa8348e8103ea3ef8  results/app/0.3.7-preview.1-release-signed.aab（31,567,456 B）
-d61b2fa5f03460fcafc35861ce5227e2fe2c0ffe7b724a322ee0e305258c602a  results/app/0.3.7-preview.1-release-signed.apk（17,907,192 B）
-199f50afcdec29e3d131f4dbd136c9d354e355304f9ab1f547b2d379b829d947  results/app/0.3.7-preview.1-internal-debugsigned.apk
+发布物（直装 universal APK）
+3798bf48c97602a233cb332fc071094b8c112d3a178a1a9be91b29cdab1445e0  results/app/0.3.7-preview.1-fused-universal-signed.apk（43,533,303 B）
 
-历史（旧构建，保留比对）
-6ab06178350652a6acfc724afd8ac8f759168207a7615d2a10842e2022daf05b  app-release-unsigned.apk
-510cd8a8a72785b550a9451450a7d4369141593b780fba792c469a27657ea04a  app-release.aab（未签名）
-14d204e0bff504f891c14443b4e483a80acb53de0e53f428f03b75a2997a6ccb  release APK（修复前，启动崩 MLKitInitProvider）
+构建面（同 commit）
+a320d98e3ccd27cb714d7b0ae37a9c9998eb7966ed793d0aedfa528990fdc460  results/app/0.3.7-preview.1-release-signed.aab（31,685,668 B）
+94fa116b97f253be8de83d7eef579cc1dfe8b4253bd60d36b8154a2cf300e0cf  results/app/0.3.7-preview.1-release-signed.apk（17,927,024 B，base；不含 OCR 模块）
+199f50afcdec29e3d131f4dbd136c9d354e355304f9ab1f547b2d379b829d947  results/app/0.3.7-preview.1-internal-debugsigned.apk（历史：debug 证书内部件）
 
-备注：AAB/APK 同一 upload key 签名；16KB zipalign 通过；release 无 INTERNET；真机结果见 0.3.7_DEVICE.md。
-签名不等于上架：Play Console 上传账号与商店素材仍无输入。
+历史（0.2.0 已下架，本地封存）
+2ec54779395122219f42aef16dd3785a3409050602b67bcf5094d8980340bbe6  nf-mobile-0.2.0.apk（44,849,313 B；证书 F8:54:EF:94…:69:CA；封存于 D:/ninfenz-backup/releases/0.2.0/）
+
+备注：AAB/APK 同一 upload key；zipalign -c -P 16 通过；release 无 INTERNET；直装包 OCR 为 fused（Play 侧仍 on-demand）。
