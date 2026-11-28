@@ -84,7 +84,7 @@ def _document_digest(doc: dict) -> str:
     return digest({k: v for k, v in doc.items() if k != "digest"})
 
 
-def _validate(doc: dict) -> list[str]:
+def _header_issues(doc: dict) -> list[str]:
     issues = [e.message for e in VALIDATOR.iter_errors(doc)]
     if issues:
         return issues
@@ -96,7 +96,71 @@ def _validate(doc: dict) -> list[str]:
         issues.append("document-digest")
     if _forbidden_paths(doc):
         issues.append("forbidden-drive-key")
+    return issues
 
+
+def _event_chain_issues(index: int, event: dict, chain_digest: str, state_digest: str) -> list[str]:
+    issues = []
+    if event["seq"] != index:
+        issues.append(f"sequence:{index}")
+    if event["prev_digest"] != chain_digest:
+        issues.append(f"chain:{index}")
+    if event["state_before_digest"] != state_digest:
+        issues.append(f"state-before:{index}")
+    return issues
+
+
+def _event_state_issues(index: int, event: dict) -> tuple[list[str], str]:
+    issues = []
+    actual_state_digest = digest(event["state"])
+    if event["state_after_digest"] != actual_state_digest:
+        issues.append(f"state-after:{index}")
+    if event["event_digest"] != _event_digest(event):
+        issues.append(f"event-digest:{index}")
+    if set(event["predicted"]) != set(event["resolved"]):
+        issues.append(f"calibration:{index}")
+    trace_ids = [item["atom_id"] for item in event["atom_trace"]]
+    if trace_ids != event["cluster"]:
+        issues.append(f"atom-trace:{index}")
+    return issues, actual_state_digest
+
+
+def _candidate_issues(index: int, decision: dict, event: dict) -> list[str]:
+    issues = []
+    choice = decision["choice"]
+    candidates = decision["candidates"]
+    if decision["candidate_count"] != len(candidates):
+        issues.append(f"candidate-count:{index}")
+    if digest(candidates) != decision["candidate_set_digest"]:
+        issues.append(f"candidate-digest:{index}")
+    if not 0 <= choice < len(candidates):
+        issues.append(f"candidate-choice:{index}")
+        return issues
+    chosen = candidates[choice]
+    if chosen["cluster"] != event["cluster"]:
+        issues.append(f"candidate-cluster:{index}")
+    if digest(chosen) != decision["chosen_candidate_digest"]:
+        issues.append(f"chosen-digest:{index}")
+    return issues
+
+
+def _patch_digest_issues(index: int, decision: dict) -> list[str]:
+    issues = []
+    if digest(decision["source_snapshot"]) != decision["source_snapshot_digest"]:
+        issues.append(f"source-snapshot-digest:{index}")
+    patch = decision.get("thought_patch")
+    if patch is not None and (
+        "thought_patch_digest" not in decision
+        or digest(patch) != decision["thought_patch_digest"]
+    ):
+        issues.append(f"thought-patch-digest:{index}")
+    return issues
+
+
+def _validate(doc: dict) -> list[str]:
+    issues = _header_issues(doc)
+    if issues:
+        return issues
     state_digest = digest(doc["initial_state"])
     calibration_digest = doc["initial_calibration_digest"]
     chain_digest = digest(
@@ -107,45 +171,12 @@ def _validate(doc: dict) -> list[str]:
         }
     )
     for index, event in enumerate(doc["events"], 1):
-        if event["seq"] != index:
-            issues.append(f"sequence:{index}")
-        if event["prev_digest"] != chain_digest:
-            issues.append(f"chain:{index}")
-        if event["state_before_digest"] != state_digest:
-            issues.append(f"state-before:{index}")
-        actual_state_digest = digest(event["state"])
-        if event["state_after_digest"] != actual_state_digest:
-            issues.append(f"state-after:{index}")
-        if event["event_digest"] != _event_digest(event):
-            issues.append(f"event-digest:{index}")
-        if set(event["predicted"]) != set(event["resolved"]):
-            issues.append(f"calibration:{index}")
-        trace_ids = [item["atom_id"] for item in event["atom_trace"]]
-        if trace_ids != event["cluster"]:
-            issues.append(f"atom-trace:{index}")
+        issues.extend(_event_chain_issues(index, event, chain_digest, state_digest))
+        state_issues, actual_state_digest = _event_state_issues(index, event)
+        issues.extend(state_issues)
         decision = event["decision"]
-        choice = decision["choice"]
-        candidates = decision["candidates"]
-        if decision["candidate_count"] != len(candidates):
-            issues.append(f"candidate-count:{index}")
-        if digest(candidates) != decision["candidate_set_digest"]:
-            issues.append(f"candidate-digest:{index}")
-        if not 0 <= choice < len(candidates):
-            issues.append(f"candidate-choice:{index}")
-        else:
-            chosen = candidates[choice]
-            if chosen["cluster"] != event["cluster"]:
-                issues.append(f"candidate-cluster:{index}")
-            if digest(chosen) != decision["chosen_candidate_digest"]:
-                issues.append(f"chosen-digest:{index}")
-        if digest(decision["source_snapshot"]) != decision["source_snapshot_digest"]:
-            issues.append(f"source-snapshot-digest:{index}")
-        patch = decision.get("thought_patch")
-        if patch is not None and (
-            "thought_patch_digest" not in decision
-            or digest(patch) != decision["thought_patch_digest"]
-        ):
-            issues.append(f"thought-patch-digest:{index}")
+        issues.extend(_candidate_issues(index, decision, event))
+        issues.extend(_patch_digest_issues(index, decision))
         if event["calibration_before_digest"] != calibration_digest:
             issues.append(f"calibration-chain:{index}")
         calibration_digest = event["calibration_after_digest"]
@@ -239,51 +270,69 @@ def reconcile_calibration(doc: dict, ledger: dict) -> tuple[dict, str]:
     return current, "ok"
 
 
+def _replay_context_issues(event: dict, state: dict) -> list[str]:
+    from .. import context_pack
+    from ..constrained_choice import build_prompt_payload
+
+    if event["decision"]["external_context"]:
+        return []
+    try:
+        payload = build_prompt_payload(state, event["decision"]["candidates"])
+        if context_pack.digest(payload) != event["decision"]["context_digest"]:
+            return [f"context:{event['seq']}"]
+    except Exception:
+        return [f"context-build:{event['seq']}"]
+    return []
+
+
+def _replayed_state(event: dict, state: dict, result: dict) -> dict:
+    replayed = copy.deepcopy(result["state"])
+    replayed["turn"] = event["state"].get("turn", replayed.get("turn", 0))
+    replayed["context_units_spent"] = int(state.get("context_units_spent", 0)) + int(
+        event["decision"]["context_units"]
+    )
+    method_memory.record_turn(
+        replayed,
+        int(event["seq"]),
+        event["cluster"],
+        event["resolved"],
+        event["changed_keys"],
+        event["kind"],
+    )
+    return replayed
+
+
+def _replay_event_issues(event: dict, result: dict, replayed: dict) -> list[str]:
+    issues = []
+    if digest(replayed) != event["state_after_digest"]:
+        issues.append(f"state:{event['seq']}")
+    if set(result["resolved"]) != set(event["resolved"]):
+        issues.append(f"resolved:{event['seq']}")
+    if set(result["changed_keys"]) != set(event["changed_keys"]):
+        issues.append(f"changed:{event['seq']}")
+    if result["atom_trace"] != event["atom_trace"]:
+        issues.append(f"trace:{event['seq']}")
+    return issues
+
+
 def replay(doc: dict) -> dict:
     """从 initial_state 确定性重放每个已提交原子簇。"""
-    from .. import context_pack
     from ..cognitive_cockpit import execute_cluster
-    from ..constrained_choice import build_prompt_payload
 
     issues = []
     state = copy.deepcopy(doc["initial_state"])
     for event in doc["events"]:
         for question in event["observations"]:
             state.setdefault("open_questions", []).append(question)
-        if not event["decision"]["external_context"]:
-            try:
-                payload = build_prompt_payload(state, event["decision"]["candidates"])
-                if context_pack.digest(payload) != event["decision"]["context_digest"]:
-                    issues.append(f"context:{event['seq']}")
-            except Exception:
-                issues.append(f"context-build:{event['seq']}")
+        issues.extend(_replay_context_issues(event, state))
         result = execute_cluster(
             state, event["cluster"], thought_patch=event["decision"].get("thought_patch")
         )
         if result["status"] != "pass":
             issues.append(f"execute:{event['seq']}")
             break
-        replayed = copy.deepcopy(result["state"])
-        replayed["turn"] = event["state"].get("turn", replayed.get("turn", 0))
-        replayed["context_units_spent"] = int(state.get("context_units_spent", 0)) + int(
-            event["decision"]["context_units"]
-        )
-        method_memory.record_turn(
-            replayed,
-            int(event["seq"]),
-            event["cluster"],
-            event["resolved"],
-            event["changed_keys"],
-            event["kind"],
-        )
-        if digest(replayed) != event["state_after_digest"]:
-            issues.append(f"state:{event['seq']}")
-        if set(result["resolved"]) != set(event["resolved"]):
-            issues.append(f"resolved:{event['seq']}")
-        if set(result["changed_keys"]) != set(event["changed_keys"]):
-            issues.append(f"changed:{event['seq']}")
-        if result["atom_trace"] != event["atom_trace"]:
-            issues.append(f"trace:{event['seq']}")
+        replayed = _replayed_state(event, state, result)
+        issues.extend(_replay_event_issues(event, result, replayed))
         state = copy.deepcopy(event["state"])
     return {
         "status": "pass" if not issues else "fail",

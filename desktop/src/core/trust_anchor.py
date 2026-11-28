@@ -74,19 +74,23 @@ def make_manifest(root_pubs: list[bytes],
     return {"schema": SCHEMA, "roots": roots, "delegations": list(delegations or [])}
 
 
+def _root_issues(roots: Any) -> list[str]:
+    """roots 形状/公钥判定；非空逐项判到首个坏项（空 roots 记问题）。"""
+    if not isinstance(roots, list) or not roots:
+        return ["信任清单没有 roots（" + GUIDE + "至少钉一个根公钥，否则什么都证不了）"]
+    for item in roots:
+        if not isinstance(item, dict) or not HEX64.match(str(item.get("pub") or "")):
+            return ["root 公钥必须是 64 位十六进制（" + GUIDE
+                    + "用 revocations pubkey 导出）"]
+    return []
+
+
 def _shape_issues(manifest: dict[str, Any]) -> list[str]:
     issues: list[str] = []
     if not isinstance(manifest, dict) or str(manifest.get("schema") or "") != SCHEMA:
         return ["信任清单 schema 不匹配（" + GUIDE + f"需要 {SCHEMA}）"]
     roots = manifest.get("roots")
-    if not isinstance(roots, list) or not roots:
-        issues.append("信任清单没有 roots（" + GUIDE + "至少钉一个根公钥，否则什么都证不了）")
-    else:
-        for item in roots:
-            if not isinstance(item, dict) or not HEX64.match(str(item.get("pub") or "")):
-                issues.append("root 公钥必须是 64 位十六进制（" + GUIDE
-                              + "用 revocations pubkey 导出）")
-                break
+    issues.extend(_root_issues(roots))
     dels = manifest.get("delegations")
     if dels is not None and not isinstance(dels, list):
         issues.append("delegations 必须是数组（" + GUIDE + "没有委派就给空数组）")
@@ -140,9 +144,9 @@ def anchor(manifest: dict[str, Any], pub: bytes, at: str = "") -> dict[str, Any]
     return res
 
 
-def _delegation_issue(item: dict[str, Any], issuer: str, subject: str, at: str) -> str:
-    """单条委派的自检 → 空串表示通过。"""
-    from core import ed25519
+def _delegation_shape_issue(item: dict[str, Any], issuer: str, subject: str,
+                            at: str) -> str:
+    """委派字段/时效自检 → 空串表示形状通过。"""
     if str(item.get("scope") or "") != SCOPE:
         return "委派 scope 不匹配（" + GUIDE + f"只允许 {SCOPE}）"
     if not HEX64.match(issuer) or not HEX64.match(subject):
@@ -152,6 +156,16 @@ def _delegation_issue(item: dict[str, Any], issuer: str, subject: str, at: str) 
         return "委派缺有效 expires_at（" + GUIDE + "重签并给出失效期）"
     if at and at > exp:
         return f"委派已过期（{exp}）（" + GUIDE + "重新签发委派）"
+    return ""
+
+
+def _delegation_issue(item: dict[str, Any], issuer: str, subject: str, at: str) -> str:
+    """单条委派的自检 → 空串表示通过。"""
+    from core import ed25519
+    shape = _delegation_shape_issue(item, issuer, subject, at)
+    if shape:
+        return shape
+    exp = str(item.get("expires_at") or "")
     sig = str(item.get("sig") or "")
     if not HEX128.match(sig):
         return "委派签名不是 128 位十六进制（" + GUIDE + "重签该委派）"

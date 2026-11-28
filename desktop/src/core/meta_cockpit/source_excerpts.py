@@ -60,21 +60,24 @@ def _path_for(source_id: str) -> Path:
     return target
 
 
-def _paths_for(source_id: str) -> list[Path]:
-    primary = _path_for(source_id)
-    item = BY_ID[source_id]
-    if not source_id.startswith("community:"):
-        return [primary]
-    root = (NF / item["path"]).resolve().parent
+def _markdown_paths(root: Path) -> list[Path]:
+    return sorted(path.resolve() for path in root.rglob("*.md") if path.is_file())
+
+
+def _domain_candidates(root: Path) -> list[Path]:
     candidates = [
         candidate
         for candidate in (root / "README.md", root / "protocol.yaml")
         if candidate.is_file()
     ]
-    all_markdown = sorted(path.resolve() for path in root.rglob("*.md") if path.is_file())
+    all_markdown = _markdown_paths(root)
     for folder in ("assets", "modules", "pipelines"):
         candidates += [path for path in all_markdown if folder in path.relative_to(root).parts]
     candidates += [path for path in all_markdown if path not in candidates]
+    return candidates
+
+
+def _dedupe_paths(candidates: list[Path]) -> list[Path]:
     out = []
     seen = set()
     for path in candidates:
@@ -89,6 +92,15 @@ def _paths_for(source_id: str) -> list[Path]:
         if len(out) >= MAX_DOMAIN_FILES:
             break
     return out
+
+
+def _paths_for(source_id: str) -> list[Path]:
+    primary = _path_for(source_id)
+    item = BY_ID[source_id]
+    if not source_id.startswith("community:"):
+        return [primary]
+    root = (NF / item["path"]).resolve().parent
+    return _dedupe_paths(_domain_candidates(root))
 
 
 def _role_for(source_id: str, path: Path) -> str:
@@ -162,16 +174,47 @@ def _cover_order(matches: list[dict], anchors: list[str], requested_roles: list[
     return ordered
 
 
-def select(
-    s: dict,
-    references: list[dict],
-    limit: int = MAX_EXCERPTS,
-    requested_roles: list[str] | None = None,
-) -> list[dict]:
-    anchors = _anchors(s, references)
-    if not anchors:
-        return []
-    roles = sorted(set(requested_roles or []))
+def _role_hits(roles: list[str], text: str) -> list[str]:
+    lowered = text.casefold()
+    return [
+        role_name
+        for role_name in roles
+        if role_name in evidence_roles.ROLE_TERMS
+        and any(term.casefold() in lowered for term in evidence_roles.ROLE_TERMS[role_name])
+    ]
+
+
+def _excerpt_item(
+    source_id: str,
+    role: str,
+    path: Path,
+    line_no: int,
+    snippet: tuple[str, bool, int, int],
+    match: tuple[list[str], list[str], str],
+) -> dict:
+    text, truncated, char_start, char_end = snippet
+    hits, role_hits, file_digest = match
+    return {
+        "source": source_id,
+        "role": role,
+        "trust": ("derived" if role == "domain-output" else "local-trusted"),
+        "path": str(path.relative_to(NF)),
+        "line": line_no,
+        "text": text,
+        "truncated": truncated,
+        "char_start": char_start,
+        "char_end": char_end,
+        "normalization": "none",
+        "matched_terms": hits,
+        "matched_roles": role_hits,
+        "content_digest": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "file_digest": file_digest,
+    }
+
+
+def _collect_grouped(
+    s: dict, references: list[dict], anchors: list[str], roles: list[str]
+) -> dict[str, list[dict]]:
     grouped: dict[str, list[dict]] = {}
     for reference in references:
         source_id = reference["source"]
@@ -185,42 +228,30 @@ def select(
                 text, truncated, char_start, char_end = _snippet(line, anchors)
                 if not text:
                     continue
-                role_hits = [
-                    role_name
-                    for role_name in roles
-                    if role_name in evidence_roles.ROLE_TERMS
-                    and any(
-                        term.casefold() in text.casefold()
-                        for term in evidence_roles.ROLE_TERMS[role_name]
-                    )
-                ]
                 grouped.setdefault(source_id, []).append(
-                    {
-                        "source": source_id,
-                        "role": role,
-                        "trust": ("derived" if role == "domain-output" else "local-trusted"),
-                        "path": str(path.relative_to(NF)),
-                        "line": line_no,
-                        "text": text,
-                        "truncated": truncated,
-                        "char_start": char_start,
-                        "char_end": char_end,
-                        "normalization": "none",
-                        "matched_terms": hits,
-                        "matched_roles": role_hits,
-                        "content_digest": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-                        "file_digest": file_digest,
-                    }
+                    _excerpt_item(
+                        source_id, role, path, line_no,
+                        (text, truncated, char_start, char_end),
+                        (hits, _role_hits(roles, text), file_digest),
+                    )
                 )
-    for source_id, source_matches in grouped.items():
-        grouped[source_id] = _cover_order(source_matches, anchors, roles)
-    out: list[dict] = []
-    seen: set[tuple[str, str]] = set()
-    scope_seen: set[str] = set()
-    ordered_references = [
-        reference for reference in references if not reference.get("context_only", False)
-    ] + [reference for reference in references if reference.get("context_only", False)]
-    source_order = [reference["source"] for reference in ordered_references]
+    return grouped
+
+
+def _ordered_references(references: list[dict]) -> list[dict]:
+    plain = [reference for reference in references if not reference.get("context_only", False)]
+    context_only = [reference for reference in references if reference.get("context_only", False)]
+    return plain + context_only
+
+
+def _take_round(
+    out: list[dict],
+    grouped: dict[str, list[dict]],
+    source_order: list[str],
+    seen: set[tuple[str, str]],
+    scope_seen: set[str],
+    limit: int,
+) -> None:
     while len(out) < limit:
         progressed = False
         for source_id in source_order:
@@ -242,12 +273,36 @@ def select(
                 break
         if not progressed:
             break
-    content_terms = {
+
+
+def _content_terms(out: list[dict]) -> set[str]:
+    return {
         term
         for item in out
         if item["role"] in {"content", "domain-content"}
         for term in item["matched_terms"]
     }
+
+
+def select(
+    s: dict,
+    references: list[dict],
+    limit: int = MAX_EXCERPTS,
+    requested_roles: list[str] | None = None,
+) -> list[dict]:
+    anchors = _anchors(s, references)
+    if not anchors:
+        return []
+    roles = sorted(set(requested_roles or []))
+    grouped = _collect_grouped(s, references, anchors, roles)
+    for source_id, source_matches in grouped.items():
+        grouped[source_id] = _cover_order(source_matches, anchors, roles)
+    out: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    scope_seen: set[str] = set()
+    source_order = [reference["source"] for reference in _ordered_references(references)]
+    _take_round(out, grouped, source_order, seen, scope_seen, limit)
+    content_terms = _content_terms(out)
     if len(content_terms) < 2 and not any(len(term) >= 4 for term in content_terms):
         out = [item for item in out if item["role"] == "domain-scope"]
     return out

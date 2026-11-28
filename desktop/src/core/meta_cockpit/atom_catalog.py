@@ -48,27 +48,56 @@ def _load(root: str, rel: str, schema: str) -> Any:
     return doc
 
 
+def _load_optional(path: Path) -> Any:
+    """读可选 JSON 文件：不在场/读失败都返回 None（不抛）。"""
+    if not path.is_file():
+        return None
+    try:
+        return json_doc.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def _pack_refs(root: str, item: dict) -> set[str]:
+    used: set[str] = set()
+    pack = _load_optional(Path(root) / str(item.get("path") or ""))
+    if not pack:
+        return used
+    for move in pack.get("expert_moves") or []:
+        used.update(str(x) for x in move.get("maps_to") or [])
+    return used
+
+
 def _pack_actions(root: str) -> set[str]:
     """方法包引用的原子/算子集合（A4 的外部引用来源之一）。"""
     used: set[str] = set()
-    path = Path(root) / PACKS_INDEX_REL
-    if not path.is_file():
-        return used
-    try:
-        index = json_doc.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    index = _load_optional(Path(root) / PACKS_INDEX_REL)
+    if not index:
         return used
     for item in index.get("packs") or []:
-        pack_path = Path(root) / str(item.get("path") or "")
-        if not pack_path.is_file():
-            continue
-        try:
-            pack = json_doc.loads(pack_path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue
-        for move in pack.get("expert_moves") or []:
-            used.update(str(x) for x in move.get("maps_to") or [])
+        used.update(_pack_refs(root, item))
     return used
+
+
+def _composition_item(item: dict, out: dict[str, list[str]]) -> None:
+    aid = str(item.get("id") or "")
+    if not aid:
+        raise ValueError("组合覆盖层有条目缺 id（" + GUIDE + "补 id）")
+    if aid in out:
+        raise ValueError("组合覆盖层重复 id：" + aid)
+    parts = [str(x) for x in item.get("composed_of") or []]
+    if not parts:
+        raise ValueError(aid + " 的 composed_of 为空（" + GUIDE + "删掉该条或补零件）")
+    if not str(item.get("why") or "").strip():
+        raise ValueError(aid + " 缺 why（" + GUIDE + "写清为什么是这个组合）")
+    out[aid] = parts
+
+
+def _composition_entries(doc: dict) -> dict[str, list[str]]:
+    out: dict[str, list[str]] = {}
+    for item in doc.get("compositions") or []:
+        _composition_item(item, out)
+    return out
 
 
 def _compositions(root: str) -> dict[str, list[str]]:
@@ -83,20 +112,7 @@ def _compositions(root: str) -> dict[str, list[str]]:
     if str(doc.get("schema")) != COMPOSITION_SCHEMA:
         raise ValueError(COMPOSITION_REL + " schema 不匹配（" + GUIDE + "需要 "
                          + COMPOSITION_SCHEMA + "）")
-    out: dict[str, list[str]] = {}
-    for item in doc.get("compositions") or []:
-        aid = str(item.get("id") or "")
-        if not aid:
-            raise ValueError("组合覆盖层有条目缺 id（" + GUIDE + "补 id）")
-        if aid in out:
-            raise ValueError("组合覆盖层重复 id：" + aid)
-        parts = [str(x) for x in item.get("composed_of") or []]
-        if not parts:
-            raise ValueError(aid + " 的 composed_of 为空（" + GUIDE + "删掉该条或补零件）")
-        if not str(item.get("why") or "").strip():
-            raise ValueError(aid + " 缺 why（" + GUIDE + "写清为什么是这个组合）")
-        out[aid] = parts
-    return out
+    return _composition_entries(doc)
 
 
 def _debt(root: str) -> dict[str, str]:
@@ -112,6 +128,54 @@ def _debt(root: str) -> dict[str, str]:
             for item in doc.get("atoms") or []}
 
 
+def _contract_view(contract: dict) -> dict[str, Any]:
+    return {"requires": list(contract.get("requires") or []),
+            "adds": list(contract.get("adds") or []),
+            "removes": list(contract.get("removes") or []),
+            "cost": contract.get("cost"),
+            "incompatible_with": list(contract.get("incompatible_with") or [])}
+
+
+def _success_witness(output: list[str], failures: list[str]) -> dict[str, str]:
+    return {
+        "observe": output[0] if output else "",
+        "expected": ("该原子声明的产物在状态中可见：" + "、".join(output)) if output else "",
+        "falsifier": (failures[0] if failures else
+                      "产物不可见或与声明不符（" + GUIDE + "补 failure_mode）"),
+    }
+
+
+def _atom_outcomes(atom: dict) -> tuple[list[str], list[str]]:
+    output = [str(x) for x in atom.get("output") or []]
+    failures = [str(atom.get("failure_mode"))] if atom.get("failure_mode") else []
+    return output, failures
+
+
+def _catalog_item(atom: dict, contract: dict, overlay: dict[str, list[str]]) -> dict[str, Any]:
+    aid = str(atom.get("id") or "")
+    output, failures = _atom_outcomes(atom)
+    return {
+        "id": aid,
+        "name": atom.get("name"),
+        "function": atom.get("function"),
+        "meta_level": "object",
+        "level_min": atom.get("level_min"),
+        "level_max": atom.get("level_max"),
+        "input": [str(x) for x in atom.get("input") or []],
+        "output": output,
+        "trigger": atom.get("trigger"),
+        "composed_of": (overlay.get(aid)
+                        or [str(x) for x in atom.get("composed_of") or []]),
+        "aliases": [],
+        "tags": [str(atom.get("function") or "")],
+        "status": "active",
+        "version": "2.0.0",
+        "contract": _contract_view(contract),
+        "success_witness": _success_witness(output, failures),
+        "failure_modes": failures,
+    }
+
+
 def build(root: str = ".") -> dict[str, Any]:
     """派生 nf/atom-catalog/2（纯函数：不写盘）。"""
     atoms_doc = _load(root, ATOMS_REL, V1_SCHEMA)
@@ -121,40 +185,8 @@ def build(root: str = ".") -> dict[str, Any]:
     overlay = _compositions(root)
     items: list[dict[str, Any]] = []
     for atom in atoms_doc.get("atoms") or []:
-        aid = str(atom.get("id") or "")
-        contract = contracts.get(aid, {})
-        output = [str(x) for x in atom.get("output") or []]
-        failures = [str(atom.get("failure_mode"))] if atom.get("failure_mode") else []
-        items.append({
-            "id": aid,
-            "name": atom.get("name"),
-            "function": atom.get("function"),
-            "meta_level": "object",
-            "level_min": atom.get("level_min"),
-            "level_max": atom.get("level_max"),
-            "input": [str(x) for x in atom.get("input") or []],
-            "output": output,
-            "trigger": atom.get("trigger"),
-            "composed_of": (overlay.get(aid)
-                            or [str(x) for x in atom.get("composed_of") or []]),
-            "aliases": [],
-            "tags": [str(atom.get("function") or "")],
-            "status": "active",
-            "version": "2.0.0",
-            "contract": {"requires": list(contract.get("requires") or []),
-                         "adds": list(contract.get("adds") or []),
-                         "removes": list(contract.get("removes") or []),
-                         "cost": contract.get("cost"),
-                         "incompatible_with": list(contract.get("incompatible_with") or [])},
-            "success_witness": {
-                "observe": output[0] if output else "",
-                "expected": ("该原子声明的产物在状态中可见：" + "、".join(output)) if output else
-                        "",
-                "falsifier": (failures[0] if failures else
-                              "产物不可见或与声明不符（" + GUIDE + "补 failure_mode）"),
-            },
-            "failure_modes": failures,
-        })
+        contract = contracts.get(str(atom.get("id") or ""), {})
+        items.append(_catalog_item(atom, contract, overlay))
     return {"schema": SCHEMA, "source": {"atoms": ATOMS_REL, "contracts": CONTRACTS_REL},
             "count": len(items), "atoms": items, "pack_references": sorted(pack_used),
             "atom_debt": sorted(_debt(root)),
@@ -184,15 +216,9 @@ def _cycle_check(nodes: dict[str, list[str]]) -> list[str]:
     return sorted(set(bad))
 
 
-def invariants(catalog: dict[str, Any]) -> dict[str, Any]:
-    """A1–A5 检查 → {ok, violations:[{code, atom, detail}], warnings:[...], counts}。"""
-    atoms = catalog.get("atoms") or []
-    by_id = {str(a.get("id")): a for a in atoms}
+def _identity_violations(atoms: list[dict], seen: set[str]) -> list[dict[str, Any]]:
+    """A5 身份一致 + 唯一。"""
     violations: list[dict[str, Any]] = []
-    warnings: list[dict[str, Any]] = []
-
-    # A5 身份一致 + 唯一
-    seen: set[str] = set()
     for atom in atoms:
         aid = str(atom.get("id") or "")
         if not aid:
@@ -208,8 +234,16 @@ def invariants(catalog: dict[str, Any]) -> dict[str, Any]:
         if str(atom.get("meta_level")) != "object":
             violations.append({"code": "A5", "atom": aid,
                                "detail": "object 原子 meta_level 必须是 object"})
+    return violations
 
-    # A1 composed_of 引用闭合
+
+def _composed_graph(atoms: list[dict]) -> dict[str, list[str]]:
+    return {str(a.get("id")): [str(x) for x in a.get("composed_of") or []] for a in atoms}
+
+
+def _composition_violations(atoms: list[dict], by_id: dict[str, Any]) -> list[dict[str, Any]]:
+    """A1 composed_of 引用闭合（含成环）。"""
+    violations: list[dict[str, Any]] = []
     for atom in atoms:
         aid = str(atom.get("id") or "")
         for ref in atom.get("composed_of") or []:
@@ -218,29 +252,55 @@ def invariants(catalog: dict[str, Any]) -> dict[str, Any]:
             elif ref not in by_id:
                 violations.append({"code": "A1", "atom": aid,
                                    "detail": "composed_of 引用不存在的原子：" + str(ref)})
-    graph = {str(a.get("id")): [str(x) for x in a.get("composed_of") or []] for a in atoms}
-    for node in _cycle_check(graph):
+    for node in _cycle_check(_composed_graph(atoms)):
         violations.append({"code": "A1", "atom": node, "detail": "composed_of 成环"})
+    return violations
 
-    # A2 契约完整
+
+def _contract_field_violations(aid: str, contract: dict) -> list[dict[str, Any]]:
+    violations: list[dict[str, Any]] = []
+    if not isinstance(contract.get("requires"), list):
+        violations.append({"code": "A2", "atom": aid, "detail": "contract.requires 不是数组"})
+    for field in ("adds", "removes"):
+        if not isinstance(contract.get(field), list):
+            violations.append({"code": "A2", "atom": aid,
+                               "detail": "contract." + field + " 不是数组"})
+    if not isinstance(contract.get("cost"), int):
+        violations.append({"code": "A2", "atom": aid, "detail": "contract.cost 缺失或非整数"})
+    return violations
+
+
+def _contract_refs(contract: dict) -> list:
+    return list(contract.get("requires") or []) + list(contract.get("adds") or [])
+
+
+def _contract_violations(atoms: list[dict], by_id: dict[str, Any]) -> list[dict[str, Any]]:
+    """A2 契约完整。"""
+    violations: list[dict[str, Any]] = []
     for atom in atoms:
         aid = str(atom.get("id") or "")
         contract = atom.get("contract") or {}
         if str(by_id.get(aid, {}).get("id")) not in by_id:
             continue
-        if not isinstance(contract.get("requires"), list):
-            violations.append({"code": "A2", "atom": aid, "detail": "contract.requires 不是数组"})
-        for field in ("adds", "removes"):
-            if not isinstance(contract.get(field), list):
-                violations.append({"code": "A2", "atom": aid,
-                                   "detail": "contract." + field + " 不是数组"})
-        if not isinstance(contract.get("cost"), int):
-            violations.append({"code": "A2", "atom": aid, "detail": "contract.cost 缺失或非整数"})
-        for ref in list(contract.get("requires") or []) + list(contract.get("adds") or []):
+        violations.extend(_contract_field_violations(aid, contract))
+        for ref in _contract_refs(contract):
             if str(ref) and str(ref) not in by_id and str(ref) in {"k.represent"}:
                 continue  # 契约字段是状态键不是原子 id，跳过
+    return violations
 
-    # A3 success_witness 可判
+
+def _vague_issues(aid: str, observe: str, falsifier: str) -> list[dict[str, Any]]:
+    violations: list[dict[str, Any]] = []
+    for word in VAGUE:
+        if observe == word or falsifier == word:
+            violations.append({"code": "A3", "atom": aid,
+                               "detail": "witness 用了空泛词：" + word})
+    return violations
+
+
+def _witness_violations(atoms: list[dict]) -> list[dict[str, Any]]:
+    """A3 success_witness 可判。"""
+    violations: list[dict[str, Any]] = []
     for atom in atoms:
         aid = str(atom.get("id") or "")
         witness = atom.get("success_witness") or {}
@@ -251,13 +311,12 @@ def invariants(catalog: dict[str, Any]) -> dict[str, Any]:
         if not falsifier:
             violations.append({"code": "A3", "atom": aid,
                                "detail": "success_witness.falsifier 为空"})
-        for word in VAGUE:
-            if observe == word or falsifier == word:
-                violations.append({"code": "A3", "atom": aid,
-                                   "detail": "witness 用了空泛词：" + word})
+        violations.extend(_vague_issues(aid, observe, falsifier))
+    return violations
 
-    # A4 无死码：被**别处**引用（方法包 maps_to / 组合 / 互斥 / 被别的原子组合）
-    #     自己契约里的 adds/removes 不算「被使用」——否则「填满但空洞」会通过。
+
+def _used_atoms(atoms: list[dict], catalog: dict[str, Any]) -> set[str]:
+    """A4 的「被使用」集合：方法包 maps_to / 组合 / 互斥 / 被别的原子组合。"""
     used: set[str] = {str(x) for x in catalog.get("pack_references") or []}
     for atom in atoms:
         if atom.get("composed_of"):
@@ -267,8 +326,18 @@ def invariants(catalog: dict[str, Any]) -> dict[str, Any]:
         contract = atom.get("contract") or {}
         for ref in contract.get("incompatible_with") or []:
             used.add(str(ref))
+    return used
+
+
+def _dead_code_issues(
+    atoms: list[dict], by_id: dict[str, Any], catalog: dict[str, Any]
+) -> tuple[list[str], list[dict[str, Any]], list[dict[str, Any]]]:
+    """A4 无死码 → (dead ids, warnings, violations)。"""
+    used = _used_atoms(atoms, catalog)
     dead = sorted(aid for aid in by_id if aid not in used and not by_id[aid].get("composed_of"))
     debt = {str(x) for x in catalog.get("atom_debt") or []}
+    warnings: list[dict[str, Any]] = []
+    violations: list[dict[str, Any]] = []
     for aid in dead:
         if aid in debt:
             warnings.append({"code": "A4", "atom": aid,
@@ -277,7 +346,23 @@ def invariants(catalog: dict[str, Any]) -> dict[str, Any]:
             violations.append({"code": "A4", "atom": aid,
                                "detail": "新增死码：没有契约/组合/方法包引用它"
                                          "（" + GUIDE + "接入或记入 atom_debt.json）"})
+    return dead, warnings, violations
 
+
+def invariants(catalog: dict[str, Any]) -> dict[str, Any]:
+    """A1–A5 检查 → {ok, violations:[{code, atom, detail}], warnings:[...], counts}。"""
+    atoms = catalog.get("atoms") or []
+    by_id = {str(a.get("id")): a for a in atoms}
+    violations: list[dict[str, Any]] = []
+    warnings: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    violations.extend(_identity_violations(atoms, seen))
+    violations.extend(_composition_violations(atoms, by_id))
+    violations.extend(_contract_violations(atoms, by_id))
+    violations.extend(_witness_violations(atoms))
+    dead, dead_warnings, dead_violations = _dead_code_issues(atoms, by_id, catalog)
+    warnings.extend(dead_warnings)
+    violations.extend(dead_violations)
     counts = {"atoms": len(atoms),
               "composed_of_nonempty": sum(1 for a in atoms if a.get("composed_of")),
               "dead": len(dead),

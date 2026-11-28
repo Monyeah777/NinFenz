@@ -76,6 +76,27 @@ def domain_spec_md(spec: Dict[str, Any], root: str = ".") -> str:
 
 
 
+def _anchor_mark(status: Any) -> str:
+    """锚点探针状态 → 可达性标记（未探如实记档）。"""
+    if isinstance(status, int) and status == 200:
+        return "✓ %s" % status
+    return "✗ %s" % status if status else "未探（如实记档）"
+
+
+def _anchor_cell(role: Tuple[str, str], cat: Dict[str, Any]) -> str:
+    """单个锚位（主/辅）→ Markdown 单元格。"""
+    sid, why = role
+    if not sid:
+        return "—"
+    std = cat.get(sid) or {}
+    ev = std.get("evidence") or {}
+    reach = ("✓ %s" % ev.get("probe_date", "")) if ev.get("reachable") \
+        else "✗ %s" % (ev.get("http_status") or "")
+    return ("`%s` %s（%s｜%s｜%s；%s）"
+            % (sid, std.get("title", ""), std.get("body", ""), std.get("layer", ""),
+               reach, why or "—"))
+
+
 def standards_md(spec: Dict[str, Any], root: str = ".") -> str:
     name = spec["name"]
     cat = standards_catalog(root)
@@ -97,21 +118,8 @@ def standards_md(spec: Dict[str, Any], root: str = ".") -> str:
         "|---|---|---|---|---|---|",
     ]
     for s in spec["subdivisions"]:
-        st = s.get("anchor_status")
-        mark = "✓ %s" % st if isinstance(st, int) and st == 200 else (
-            "✗ %s" % st if st else "未探（如实记档）")
-        cells = []
-        for role in ("primary", "support"):
-            sid, why = bd[s["id"]][role]
-            std = cat.get(sid) or {}
-            ev = std.get("evidence") or {}
-            if not sid:
-                cells.append("—")
-                continue
-            cells.append("`%s` %s（%s｜%s｜%s；%s）"
-                         % (sid, std.get("title", ""), std.get("body", ""), std.get("layer", ""),
-                            ("✓ %s" % ev.get("probe_date", "")) if ev.get("reachable")
-                            else "✗ %s" % (ev.get("http_status") or ""), why or "—"))
+        mark = _anchor_mark(s.get("anchor_status"))
+        cells = [_anchor_cell(bd[s["id"]][role], cat) for role in ("primary", "support")]
         lines.append("| `%s` | %s | %s | %s | %s | %s |"
                      % (s["id"], s.get("anchor_kind", "spec"), s["anchor"], mark,
                         cells[0], cells[1]))

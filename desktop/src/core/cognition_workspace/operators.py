@@ -105,22 +105,26 @@ CONTROL_SCHEMA = "nf-control-state/1"
 GUIDE = "修复指引："
 
 
-def validate_request(op_id: str, payload: Any) -> list[str]:
-    """校验一次算子请求 → 问题列表（空 = 可执行）。"""
-    if op_id not in OPERATORS:
-        return ["未知元算子：" + str(op_id) + "（可用：" + "、".join(OPERATOR_IDS) + "）"]
-    if not isinstance(payload, dict):
-        return ["算子 payload 必须是对象（" + GUIDE + "见 operators.OPERATORS）"]
+def _witness_issues(op_id: str, payload: dict[str, Any]) -> list[str]:
     issues: list[str] = []
     for key in OPERATORS[op_id]["witness"]:
         value = payload.get(key)
         if value is None or (isinstance(value, (str, list, dict)) and not value):
             issues.append("算子 " + op_id + " 缺 witness 字段 " + key
                           + "（" + GUIDE + "没有副作用证据的算子请求要拒绝）")
+    return issues
+
+
+def _crossed_issues(op_id: str, payload: dict[str, Any]) -> list[str]:
     crossed = [key for key in DISCOURSE_KEYS if key in payload]
     if crossed:
-        issues.append("算子 " + op_id + " 越界写了 discourse 字段 " + str(crossed)
-                      + "（" + GUIDE + "算子只改过程，内容变化要用 meta move）")
+        return ["算子 " + op_id + " 越界写了 discourse 字段 " + str(crossed)
+                + "（" + GUIDE + "算子只改过程，内容变化要用 meta move）"]
+    return []
+
+
+def _effect_issues(op_id: str, payload: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
     if op_id == "switch" and str(payload.get("from")) == str(payload.get("to")):
         issues.append("switch 的 from 与 to 相同——没换策略（" + GUIDE + "写清换到哪条）")
     if op_id == "allocate" and str(payload.get("from")) == str(payload.get("to")):
@@ -129,6 +133,18 @@ def validate_request(op_id: str, payload: Any) -> list[str]:
         issues.append("revise 的 before 与 after 相同——没改（" + GUIDE + "写改成了什么）")
     if op_id == "calibrate" and not str(payload.get("estimate_ref") or "").strip():
         issues.append("calibrate 缺 estimate_ref——凭空校准（" + GUIDE + "先 estimate）")
+    return issues
+
+
+def validate_request(op_id: str, payload: Any) -> list[str]:
+    """校验一次算子请求 → 问题列表（空 = 可执行）。"""
+    if op_id not in OPERATORS:
+        return ["未知元算子：" + str(op_id) + "（可用：" + "、".join(OPERATOR_IDS) + "）"]
+    if not isinstance(payload, dict):
+        return ["算子 payload 必须是对象（" + GUIDE + "见 operators.OPERATORS）"]
+    issues = _witness_issues(op_id, payload)
+    issues.extend(_crossed_issues(op_id, payload))
+    issues.extend(_effect_issues(op_id, payload))
     return issues
 
 

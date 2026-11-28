@@ -14,6 +14,31 @@ from ._const import CERT_SCHEMA
 
 # ---------------------------------------------------------------- 组合包产物化
 
+def _expand_pack(name: str, pr: dict, out: dict, combo_packs: list) -> None:
+    """单包自身模块摊平，并登记该包是否为组合包。"""
+    if pr.get("references"):
+        # 组合包作为来源 → **显式摊平**：保留它自己的模块（它们是真实模块，且是其它源包
+        # 发布事件的消费者），同时把它的 references 一并升为本次组合的 references ——
+        # 这样嵌套引用是「显式闭合」的（check15 ② 新增判据：嵌套必须显式闭合）。
+        combo_packs.append(name)
+    out.setdefault(name, [])
+    for mid in pr["modules"]:
+        if mid not in out[name]:
+            out[name].append(mid)
+
+
+def _expand_refs(pr: dict, out: dict) -> None:
+    """组合包 references → 升为本次组合的源（去重保序）。"""
+    for ref in pr.get("references") or []:
+        src = str(ref.get("source_package") or "")
+        if not src:
+            continue
+        out.setdefault(src, [])
+        mid = str(ref.get("module_id") or "")
+        if mid and mid not in out[src]:
+            out[src].append(mid)
+
+
 def _flatten_sources(root: str, packs: Sequence[str]) -> Tuple[Dict[str, List[str]], List[str]]:
     """把选中包摊平成 {源包名: [模块 id…]}（组合包本身再展开一层，避免多层嵌套 references）。"""
     prof = profiles(root)
@@ -23,23 +48,8 @@ def _flatten_sources(root: str, packs: Sequence[str]) -> Tuple[Dict[str, List[st
         pr = prof.get(name)
         if not pr:
             continue
-        if pr.get("references"):
-            # 组合包作为来源 → **显式摊平**：保留它自己的模块（它们是真实模块，且是其它源包
-            # 发布事件的消费者），同时把它的 references 一并升为本次组合的 references ——
-            # 这样嵌套引用是「显式闭合」的（check15 ② 新增判据：嵌套必须显式闭合）。
-            combo_packs.append(name)
-        out.setdefault(name, [])
-        for mid in pr["modules"]:
-            if mid not in out[name]:
-                out[name].append(mid)
-        for ref in pr.get("references") or []:
-            src = str(ref.get("source_package") or "")
-            if not src:
-                continue
-            out.setdefault(src, [])
-            mid = str(ref.get("module_id") or "")
-            if mid and mid not in out[src]:
-                out[src].append(mid)
+        _expand_pack(name, pr, out, combo_packs)
+        _expand_refs(pr, out)
     return out, combo_packs
 
 

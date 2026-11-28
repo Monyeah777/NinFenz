@@ -58,6 +58,100 @@ def _parse_ts(text: Any, where: str, issues: list) -> datetime | None:
         return None
 
 
+def _active_issues(key: dict, where: str) -> list:
+    issues: list = []
+    if key.get("revoked_at") or key.get("revocation_reason"):
+        issues.append(f"{where} active key 不得带吊销字段")
+    if key.get("rotated_to"):
+        issues.append(f"{where} active key 不得带 rotated_to")
+    return issues
+
+
+def _retired_issues(key: dict, where: str, kid: str) -> list:
+    target = key.get("rotated_to")
+    if not target:
+        return [f"{where} retired key 必须给 rotated_to（轮换不断链）"]
+    if target == kid:
+        return [f"{where} rotated_to 不得指向自身"]
+    return []
+
+
+def _revoked_issues(key: dict, where: str) -> list:
+    issues: list = []
+    if not key.get("revoked_at"):
+        issues.append(f"{where} revoked key 必须给 revoked_at")
+    if not str(key.get("revocation_reason") or "").strip():
+        issues.append(f"{where} revoked key 必须给 revocation_reason")
+    return issues
+
+
+def _key_lifecycle_issues(key: dict, where: str, kid: str, status: Any) -> list:
+    if status == "active":
+        return _active_issues(key, where)
+    if status == "retired":
+        return _retired_issues(key, where, kid)
+    if status == "revoked":
+        return _revoked_issues(key, where)
+    return []
+
+
+def _key_common_issues(key: dict, where: str, kid: str, key_owner: dict, stats: dict) -> list:
+    issues: list = []
+    if kid in key_owner:
+        issues.append(f"{where} keyid 重复：{kid}（{GUIDE}keyid 全表唯一）")
+    key_owner[kid] = where
+    alg = key.get("alg")
+    if alg not in ALGS:
+        issues.append(f"{where} alg 越界：{alg!r}")
+    status = key.get("status")
+    if status not in STATUSES:
+        issues.append(f"{where} status 越界：{status!r}")
+    start = _parse_ts(key.get("not_before"), f"{where}.not_before", issues)
+    end = _parse_ts(key.get("not_after"), f"{where}.not_after", issues)
+    if start and end and start > end:
+        issues.append(f"{where} not_before 晚于 not_after")
+    issues += _key_lifecycle_issues(key, where, kid, status)
+    stats["keys"] += 1
+    stats[str(status)] = stats.get(str(status), 0) + 1
+    return issues
+
+
+def _issuer_issues(
+    issuer: dict, index: int, seen_issuers: dict, key_owner: dict, stats: dict
+) -> list:
+    issues: list = []
+    iid = str(issuer.get("id") or "")
+    if iid in seen_issuers:
+        issues.append(f"issuers[{index}] id 重复：{iid}（{GUIDE}issuer id 全局唯一）")
+    seen_issuers[iid] = issuer
+    if issuer.get("kind") not in ISSUER_KINDS:
+        issues.append(f"issuers[{index}] kind 越界：{issuer.get('kind')}")
+    keys = issuer.get("keys") or []
+    if len(keys) > MAX_KEYS:
+        issues.append(f"issuers[{index}] keys 超过上限 {MAX_KEYS}")
+    stats["issuers"] += 1
+    for k_index, key in enumerate(keys):
+        where = f"{iid}#keys[{k_index}]"
+        kid = str(key.get("keyid") or "")
+        issues += _key_common_issues(key, where, kid, key_owner, stats)
+    return issues
+
+
+def _delegation_issues(issuers: list, seen_issuers: dict, key_owner: dict) -> list:
+    issues: list = []
+    for issuer in issuers:
+        ref = issuer.get("delegated_by")
+        if ref and ref not in seen_issuers:
+            issues.append(f"{issuer.get('id')} delegated_by 指向不存在 issuer：{ref}"
+                          f"（{GUIDE}先注册被委派方或删该字段）")
+        for key in issuer.get("keys") or []:
+            target = key.get("rotated_to")
+            if target and target not in key_owner:
+                issues.append(f"{issuer.get('id')} 的 rotated_to 指向不存在 keyid：{target}"
+                              f"（{GUIDE}补目标 key 或删 rotated_to）")
+    return issues
+
+
 def validate_registry(doc: Any, schema: dict | None = None,
                       root: str = ".") -> tuple:
     """注册表体检 → (issues, stats)。schema 结构 + 语义（唯一性/生命周期/轮换可寻址）。"""
@@ -77,60 +171,8 @@ def validate_registry(doc: Any, schema: dict | None = None,
     seen_issuers: dict = {}
     key_owner: dict = {}
     for index, issuer in enumerate(issuers):
-        iid = str(issuer.get("id") or "")
-        if iid in seen_issuers:
-            issues.append(f"issuers[{index}] id 重复：{iid}（{GUIDE}issuer id 全局唯一）")
-        seen_issuers[iid] = issuer
-        if issuer.get("kind") not in ISSUER_KINDS:
-            issues.append(f"issuers[{index}] kind 越界：{issuer.get('kind')}")
-        keys = issuer.get("keys") or []
-        if len(keys) > MAX_KEYS:
-            issues.append(f"issuers[{index}] keys 超过上限 {MAX_KEYS}")
-        stats["issuers"] += 1
-        for k_index, key in enumerate(keys):
-            where = f"{iid}#keys[{k_index}]"
-            kid = str(key.get("keyid") or "")
-            if kid in key_owner:
-                issues.append(f"{where} keyid 重复：{kid}（{GUIDE}keyid 全表唯一）")
-            key_owner[kid] = where
-            alg = key.get("alg")
-            if alg not in ALGS:
-                issues.append(f"{where} alg 越界：{alg!r}")
-            status = key.get("status")
-            if status not in STATUSES:
-                issues.append(f"{where} status 越界：{status!r}")
-            start = _parse_ts(key.get("not_before"), f"{where}.not_before", issues)
-            end = _parse_ts(key.get("not_after"), f"{where}.not_after", issues)
-            if start and end and start > end:
-                issues.append(f"{where} not_before 晚于 not_after")
-            if status == "active":
-                if key.get("revoked_at") or key.get("revocation_reason"):
-                    issues.append(f"{where} active key 不得带吊销字段")
-                if key.get("rotated_to"):
-                    issues.append(f"{where} active key 不得带 rotated_to")
-            if status == "retired":
-                target = key.get("rotated_to")
-                if not target:
-                    issues.append(f"{where} retired key 必须给 rotated_to（轮换不断链）")
-                elif target == kid:
-                    issues.append(f"{where} rotated_to 不得指向自身")
-            if status == "revoked":
-                if not key.get("revoked_at"):
-                    issues.append(f"{where} revoked key 必须给 revoked_at")
-                if not str(key.get("revocation_reason") or "").strip():
-                    issues.append(f"{where} revoked key 必须给 revocation_reason")
-            stats["keys"] += 1
-            stats[str(status)] = stats.get(str(status), 0) + 1
-    for issuer in issuers:
-        ref = issuer.get("delegated_by")
-        if ref and ref not in seen_issuers:
-            issues.append(f"{issuer.get('id')} delegated_by 指向不存在 issuer：{ref}"
-                          f"（{GUIDE}先注册被委派方或删该字段）")
-        for key in issuer.get("keys") or []:
-            target = key.get("rotated_to")
-            if target and target not in key_owner:
-                issues.append(f"{issuer.get('id')} 的 rotated_to 指向不存在 keyid：{target}"
-                              f"（{GUIDE}补目标 key 或删 rotated_to）")
+        issues += _issuer_issues(issuer, index, seen_issuers, key_owner, stats)
+    issues += _delegation_issues(issuers, seen_issuers, key_owner)
     return issues, stats
 
 
@@ -140,6 +182,18 @@ def _index(doc: dict) -> dict:
         for key in issuer.get("keys") or []:
             index[str(key.get("keyid"))] = (issuer, key)
     return index
+
+
+def _key_time_issue(key: dict, moment: datetime) -> tuple[str | None, str | None]:
+    start = _parse_ts(key.get("not_before"), "not_before", [])
+    end = _parse_ts(key.get("not_after"), "not_after", [])
+    if start is None or end is None:
+        return "KEY-TIME-INVALID", None
+    if moment < start:
+        return "KEY-NOT-YET-VALID", str(key.get("not_before"))
+    if moment > end:
+        return "KEY-EXPIRED", str(key.get("not_after"))
+    return None, None
 
 
 def resolve_keyid(doc: dict, keyid: str, now: str | None = None) -> dict:
@@ -152,15 +206,9 @@ def resolve_keyid(doc: dict, keyid: str, now: str | None = None) -> dict:
     moment = _parse_ts(now, "now", [])
     if moment is None:
         return {"ok": False, "reason": "NOW-INVALID"}
-    start = _parse_ts(key.get("not_before"), "not_before", [])
-    end = _parse_ts(key.get("not_after"), "not_after", [])
-    if start is None or end is None:
-        return {"ok": False, "reason": "KEY-TIME-INVALID"}
-    if moment < start:
-        return {"ok": False, "reason": "KEY-NOT-YET-VALID",
-                "detail": str(key.get("not_before"))}
-    if moment > end:
-        return {"ok": False, "reason": "KEY-EXPIRED", "detail": str(key.get("not_after"))}
+    reason, detail = _key_time_issue(key, moment)
+    if reason is not None:
+        return {"ok": False, "reason": reason, "detail": detail}
     status = key.get("status")
     if status == "revoked":
         return {"ok": False, "reason": "KEY-REVOKED",
@@ -197,37 +245,56 @@ def _build_verifier(entry: dict, material: dict) -> dict:
     return {"ok": True, "alg": alg, "verify": verify}
 
 
+def _envelope_header(
+    registry: dict, now: Any, envelope: Any
+) -> tuple[dict | None, list | None]:
+    issues, _stats = validate_registry(registry)
+    if issues:
+        return {"valid": False, "reason": "REGISTRY-INVALID", "detail": issues[0]}, None
+    if not isinstance(now, str) or not now:
+        return {"valid": False, "reason": "NOW-REQUIRED"}, None
+    if not isinstance(envelope, dict):
+        return {"valid": False, "reason": "ENVELOPE-NOT-OBJECT"}, None
+    signatures = envelope.get("signatures")
+    if not isinstance(signatures, list) or not signatures:
+        return {"valid": False, "reason": "SIGNATURES-MISSING"}, None
+    return None, signatures
+
+
+def _signer_info(
+    item: Any, registry: dict, material: dict, now: str
+) -> tuple[tuple | None, dict | None]:
+    if not isinstance(item, dict):
+        return None, {"valid": False, "reason": "SIGNATURE-INVALID"}
+    keyid = str(item.get("keyid") or "")
+    if not keyid:
+        return None, {"valid": False, "reason": "SIGNATURE-INVALID"}
+    resolved = resolve_keyid(registry, keyid, now)
+    if not resolved["ok"]:
+        return None, {"valid": False, "reason": resolved["reason"], "keyid": keyid,
+                      "detail": resolved.get("detail", "")}
+    built = _build_verifier(resolved["key"], material)
+    if not built["ok"]:
+        return None, {"valid": False, "reason": built["reason"], "keyid": keyid}
+    if built["alg"] != resolved["key"].get("alg"):
+        return None, {"valid": False, "reason": "KEY-ALG-MISMATCH", "keyid": keyid}
+    return (keyid, built, resolved), None
+
+
 def verify_envelope(envelope: Any, registry: dict, material: dict,
                     schema: dict | None = None, now: str | None = None) -> dict:
     """注册表口径验信封：生命周期 + 签名一起判（未知/吊销/过期即拒，不降级）。"""
-    issues, _stats = validate_registry(registry)
-    if issues:
-        return {"valid": False, "reason": "REGISTRY-INVALID", "detail": issues[0]}
-    if not isinstance(now, str) or not now:
-        return {"valid": False, "reason": "NOW-REQUIRED"}
-    if not isinstance(envelope, dict):
-        return {"valid": False, "reason": "ENVELOPE-NOT-OBJECT"}
-    signatures = envelope.get("signatures")
-    if not isinstance(signatures, list) or not signatures:
-        return {"valid": False, "reason": "SIGNATURES-MISSING"}
+    error, signatures = _envelope_header(registry, now, envelope)
+    if error is not None:
+        return error
     keys, issuers, retired = {}, {}, []
     for item in signatures:
-        if not isinstance(item, dict):
-            return {"valid": False, "reason": "SIGNATURE-INVALID"}
-        keyid = str(item.get("keyid") or "")
-        if not keyid:
-            return {"valid": False, "reason": "SIGNATURE-INVALID"}
-        resolved = resolve_keyid(registry, keyid, now)
-        if not resolved["ok"]:
-            return {"valid": False, "reason": resolved["reason"], "keyid": keyid,
-                    "detail": resolved.get("detail", "")}
+        info, error = _signer_info(item, registry, material, now)
+        if error is not None:
+            return error
+        keyid, built, resolved = info
         if resolved.get("retired"):
             retired.append(keyid)
-        built = _build_verifier(resolved["key"], material)
-        if not built["ok"]:
-            return {"valid": False, "reason": built["reason"], "keyid": keyid}
-        if built["alg"] != resolved["key"].get("alg"):
-            return {"valid": False, "reason": "KEY-ALG-MISMATCH", "keyid": keyid}
         keys[keyid] = {"alg": built["alg"], "verify": built["verify"]}
         issuers[keyid] = resolved["issuer"]
     merged = dsse.verify_envelope(envelope, keys, schema)

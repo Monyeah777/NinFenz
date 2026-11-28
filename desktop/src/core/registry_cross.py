@@ -58,6 +58,17 @@ def build(root: str = ".") -> Dict[str, Any]:
     return {"publishers": publishers, "subscribers": subscribers}
 
 
+def _missing_publisher(ev: str, subs: List[Dict[str, Any]],
+                       allow: Set[str]) -> Tuple[str, str]:
+    """无仓内发布方 → ("warn"/"issue", 文案)；挂账外部通道只 warn。"""
+    if ev in allow:
+        return "warn", "事件 %s 无仓内发布方（已挂账为外部通道：%s）" % (ev, ALLOWLIST_REL)
+    modules = "、".join(sorted({s["module"] for s in subs})[:3])
+    return "issue", ("事件背书缺口：%s 被 %s 订阅，但全仓无发布方"
+                     "（修复指引：补发布模块，或登记进 %s 作为外部通道）"
+                     % (ev, modules, ALLOWLIST_REL))
+
+
 def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     """→ (issues, warns, stats)。"""
     data = build(root)
@@ -69,14 +80,12 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     for ev, subs in sorted(data["subscribers"].items()):
         pubs = data["publishers"].get(ev) or []
         if not pubs:
-            if ev in allow:
-                warns.append("事件 %s 无仓内发布方（已挂账为外部通道：%s）" % (ev, ALLOWLIST_REL))
+            kind, msg = _missing_publisher(ev, subs, allow)
+            if kind == "warn":
+                warns.append(msg)
             else:
                 uncovered.append(ev)
-                issues.append("事件背书缺口：%s 被 %s 订阅，但全仓无发布方"
-                              "（修复指引：补发布模块，或登记进 %s 作为外部通道）"
-                              % (ev, "、".join(sorted({s["module"] for s in subs})[:3]),
-                                 ALLOWLIST_REL))
+                issues.append(msg)
             continue
         sub_pkgs = {s["pkg"] for s in subs}
         pub_pkgs = {p["pkg"] for p in pubs}

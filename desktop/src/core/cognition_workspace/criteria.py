@@ -48,6 +48,59 @@ def _walk_keys(obj: Any, hits: list[str], path: str = "") -> None:
             _walk_keys(value, hits, path + "/" + str(i))
 
 
+def _role_issues(cid: str, item: dict[str, Any]) -> list[str]:
+    """source_role / max_role 合法性与「不许角色升级」判定。"""
+    role = str(item.get("source_role") or "")
+    max_role = str(item.get("max_role") or "")
+    if role not in ROLES or max_role not in ROLES:
+        return [cid + " 的 source_role/max_role 非法（" + GUIDE + "见 ROLES）"]
+    if ROLES.index(role) > ROLES.index(max_role):
+        return [cid + " 角色升级：" + role + " 高于 " + max_role
+                + "（" + GUIDE + "外部意见不能变成本地可信）"]
+    return []
+
+
+def _content_issues(layer: str, cid: str, item: dict[str, Any]) -> list[str]:
+    """单条判据的内容校验（id 已确认在场）。"""
+    issues: list[str] = []
+    if item.get("kind") not in KINDS:
+        issues.append(cid + " 的 kind 非法：" + str(item.get("kind")))
+    if not item.get("how") or not item.get("witness"):
+        issues.append(cid + " 缺 how/witness（" + GUIDE + "判据必须写清怎么判、留什么）")
+    issues.extend(_role_issues(cid, item))
+    if layer == "review" and item.get("kind") != "external-blind":
+        issues.append(cid + " 在 review 层但 kind 不是 external-blind")
+    return issues
+
+
+def _item_issues(layer: str, item: Any, seen: set[str]) -> list[str]:
+    """单条判据的 id/去重/前缀 + 内容校验（问题顺序与原实现一致）。"""
+    if not isinstance(item, dict):
+        return [layer + " 里有非对象判据（" + GUIDE + "改写成对象）"]
+    cid = str(item.get("id") or "")
+    if not cid:
+        return [layer + " 里有判据缺 id（" + GUIDE + "给唯一 id）"]
+    issues: list[str] = []
+    if cid in seen:
+        issues.append("判据 id 重复：" + cid)
+    seen.add(cid)
+    if not cid.startswith(layer + ":"):
+        issues.append("判据 id 前缀与层不符：" + cid + "（" + GUIDE + "应为 "
+                      + layer + ":…）")
+    issues.extend(_content_issues(layer, cid, item))
+    return issues
+
+
+def _layer_issues(layer: str, items: Any, seen: set[str]) -> list[str]:
+    """一层的判据集合校验。"""
+    if not isinstance(items, list) or not items:
+        return ["层 " + layer + " 为空（" + GUIDE + "每层至少一条判据）"]
+    issues: list[str] = []
+    for item in items:
+        issues.extend(_item_issues(layer, item, seen))
+    return issues
+
+
 def validate(doc: Any) -> list[str]:
     """注册表校验 → 问题列表（空 = 合法）。"""
     issues: list[str] = []
@@ -63,37 +116,7 @@ def validate(doc: Any) -> list[str]:
                       + "（" + GUIDE + "判据只输出 pass/fail/unknown + witness）")
     seen: set[str] = set()
     for layer in LAYERS:
-        items = layers.get(layer)
-        if not isinstance(items, list) or not items:
-            issues.append("层 " + layer + " 为空（" + GUIDE + "每层至少一条判据）")
-            continue
-        for item in items:
-            if not isinstance(item, dict):
-                issues.append(layer + " 里有非对象判据（" + GUIDE + "改写成对象）")
-                continue
-            cid = str(item.get("id") or "")
-            if not cid:
-                issues.append(layer + " 里有判据缺 id（" + GUIDE + "给唯一 id）")
-                continue
-            if cid in seen:
-                issues.append("判据 id 重复：" + cid)
-            seen.add(cid)
-            if not cid.startswith(layer + ":"):
-                issues.append("判据 id 前缀与层不符：" + cid + "（" + GUIDE + "应为 "
-                              + layer + ":…）")
-            if item.get("kind") not in KINDS:
-                issues.append(cid + " 的 kind 非法：" + str(item.get("kind")))
-            if not item.get("how") or not item.get("witness"):
-                issues.append(cid + " 缺 how/witness（" + GUIDE + "判据必须写清怎么判、留什么）")
-            role = str(item.get("source_role") or "")
-            max_role = str(item.get("max_role") or "")
-            if role not in ROLES or max_role not in ROLES:
-                issues.append(cid + " 的 source_role/max_role 非法（" + GUIDE + "见 ROLES）")
-            elif ROLES.index(role) > ROLES.index(max_role):
-                issues.append(cid + " 角色升级：" + role + " 高于 " + max_role
-                              + "（" + GUIDE + "外部意见不能变成本地可信）")
-            if layer == "review" and item.get("kind") != "external-blind":
-                issues.append(cid + " 在 review 层但 kind 不是 external-blind")
+        issues.extend(_layer_issues(layer, layers.get(layer), seen))
     return issues
 
 
@@ -121,6 +144,24 @@ def get(root: str, criterion_id: str) -> dict[str, Any]:
     raise ValueError("未知判据：" + criterion_id + "（" + GUIDE + "见 nf cog criteria）")
 
 
+def _missing_witness(item: dict[str, Any], witness: dict[str, Any]) -> list[str]:
+    need = [str(x) for x in item.get("witness") or []]
+    return [x for x in need if x not in witness]
+
+
+def _verdict_unknown(res: dict[str, Any], reason: str) -> dict[str, Any]:
+    res["verdict"] = "unknown"
+    res["reason"] = reason
+    return res
+
+
+def _verdict_by_witness(res: dict[str, Any], witness: dict[str, Any]) -> dict[str, Any]:
+    ok = bool(witness.get("ok", True))
+    res["verdict"] = "pass" if ok else "fail"
+    res["reason"] = str(witness.get("reason") or "按判据 how 执行并通过" if ok else "判据不通过")
+    return res
+
+
 def evaluate(root: str, criterion_id: str, witness: Any) -> dict[str, Any]:
     """按判据评估一次 → {criterion, verdict, witness_ok, reason}。
 
@@ -133,19 +174,12 @@ def evaluate(root: str, criterion_id: str, witness: Any) -> dict[str, Any]:
     if not isinstance(witness, dict) or not witness:
         res["reason"] = "没有 witness——按铁律③ 只能是 unknown（" + GUIDE + "补证据）"
         return res
-    need = [str(x) for x in item.get("witness") or []]
-    missing = [x for x in need if x not in witness]
+    missing = _missing_witness(item, witness)
     res["witness_ok"] = not missing
     if item["layer"] == "review":
-        res["verdict"] = "unknown"
-        res["reason"] = ("外部盲评不能由本仓产出 pass（" + GUIDE + "只能用 review 件引用，"
-                         "见 review:blind-review-protocol）")
-        return res
+        return _verdict_unknown(res, "外部盲评不能由本仓产出 pass（" + GUIDE + "只能用 review 件引用，"
+                               "见 review:blind-review-protocol）")
     if missing:
-        res["verdict"] = "unknown"
-        res["reason"] = "witness 缺项：" + "、".join(missing) + "（" + GUIDE + "补齐后重评）"
-        return res
-    ok = bool(witness.get("ok", True))
-    res["verdict"] = "pass" if ok else "fail"
-    res["reason"] = str(witness.get("reason") or "按判据 how 执行并通过" if ok else "判据不通过")
-    return res
+        return _verdict_unknown(res, "witness 缺项：" + "、".join(missing)
+                                + "（" + GUIDE + "补齐后重评）")
+    return _verdict_by_witness(res, witness)

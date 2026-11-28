@@ -53,91 +53,129 @@ def _bump(state: dict[str, Any]) -> None:
     state["digest"] = digest_of({k: v for k, v in state.items() if k != "digest"})
 
 
+def _delta_restated(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    state["problem"] = {"statement": str(delta.get("statement")
+                                         or state["problem"]["statement"]),
+                        "digest": str(delta["after_digest"])}
+    state["open_questions"].append({"kind": "restated", "changed_terms":
+                                    list(delta["changed_terms"])})
+
+
+def _delta_suspended(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    state["assumptions"].append({"id": str(delta["assumption_id"]),
+                                 "status": "suspended",
+                                 "reason": str(delta["reason"])})
+
+
+def _delta_revived(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    for item in state["assumptions"]:
+        if item["id"] == delta["assumption_id"]:
+            item["status"] = "active"
+            item["reason"] = str(delta["reason"])
+            break
+    else:
+        state["assumptions"].append({"id": str(delta["assumption_id"]),
+                                     "status": "active",
+                                     "reason": str(delta["reason"])})
+
+
+def _delta_concept(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    state["open_questions"].append({"kind": "concept", "concept": str(delta["concept"]),
+                                    "distinctions": list(delta["distinctions"])})
+
+
+def _delta_tension(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    state["tensions"].append({"between": list(delta["between"]),
+                              "statement": str(delta["statement"])})
+
+
+def _delta_open_question(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    kind = str(delta["kind"])
+    item = {"kind": kind}
+    for key in ("hypothesis", "expected_observation", "case", "near_miss",
+                "claim", "breaks", "objection", "reasons"):
+        if key in delta:
+            item[key] = delta[key]
+    state["open_questions"].append(item)
+
+
+def _delta_mapping(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    state["open_questions"].append({"kind": "analogy", "source": str(delta["source"]),
+                                    "target": str(delta["target"]),
+                                    "preserved": list(delta["preserved"]),
+                                    "broken": list(delta["broken"])})
+
+
+def _delta_stakeholder(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    state["open_questions"].append({"kind": "perspective",
+                                    "perspective": str(delta["perspective"]),
+                                    "obligations": list(delta["obligations"])})
+
+
+def _delta_provenance(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    state["open_questions"].append({"kind": "genealogy", "origin": str(delta["origin"]),
+                                    "lineage": list(delta["lineage"])})
+
+
+def _delta_subquestions(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    state["open_questions"].append({"kind": "decomposition",
+                                    "subquestions": list(delta["subquestions"])})
+
+
+def _delta_commitment(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    state["open_questions"].append({"kind": "commitment", "claim": str(delta["claim"]),
+                                    "evidence_standard": str(delta["evidence_standard"])})
+
+
+def _delta_evidence_standard(state: dict[str, Any], delta: dict[str, Any]) -> None:
+    state["open_questions"].append({"kind": "evidence_standard",
+                                    "claim_kind": str(delta["claim_kind"]),
+                                    "required": list(delta["required"])})
+
+
+_DELTA_HANDLERS = {
+    "question_restated": _delta_restated,
+    "assumption_suspended": _delta_suspended,
+    "assumption_revived": _delta_revived,
+    "concept_clarified": _delta_concept,
+    "tension_added": _delta_tension,
+    "hypothesis_proposed": _delta_open_question,
+    "boundary_added": _delta_open_question,
+    "counterexample_found": _delta_open_question,
+    "objection_strengthened": _delta_open_question,
+    "mapping_added": _delta_mapping,
+    "stakeholder_added": _delta_stakeholder,
+    "provenance_added": _delta_provenance,
+    "subquestions_added": _delta_subquestions,
+    "commitment_formed": _delta_commitment,
+    "evidence_standard": _delta_evidence_standard,
+}
+
+
 def apply_delta(state: dict[str, Any], move_id: str, delta: dict[str, Any]) -> None:
     """把 frame_delta 落到状态上（只做最小事实记录，不做推理）。"""
     kind = str(delta["kind"])
-    if kind == "question_restated":
-        state["problem"] = {"statement": str(delta.get("statement")
-                                             or state["problem"]["statement"]),
-                            "digest": str(delta["after_digest"])}
-        state["open_questions"].append({"kind": "restated", "changed_terms":
-                                        list(delta["changed_terms"])})
-        return
-    if kind == "assumption_suspended":
-        state["assumptions"].append({"id": str(delta["assumption_id"]),
-                                     "status": "suspended",
-                                     "reason": str(delta["reason"])})
-        return
-    if kind == "assumption_revived":
-        for item in state["assumptions"]:
-            if item["id"] == delta["assumption_id"]:
-                item["status"] = "active"
-                item["reason"] = str(delta["reason"])
-                break
-        else:
-            state["assumptions"].append({"id": str(delta["assumption_id"]),
-                                         "status": "active",
-                                         "reason": str(delta["reason"])})
-        return
-    if kind == "concept_clarified":
-        state["open_questions"].append({"kind": "concept", "concept": str(delta["concept"]),
-                                        "distinctions": list(delta["distinctions"])})
-        return
-    if kind == "tension_added":
-        state["tensions"].append({"between": list(delta["between"]),
-                                  "statement": str(delta["statement"])})
-        return
-    if kind in ("hypothesis_proposed", "boundary_added", "counterexample_found",
-                  "objection_strengthened"):
-        item = {"kind": kind}
-        for key in ("hypothesis", "expected_observation", "case", "near_miss",
-                    "claim", "breaks", "objection", "reasons"):
-            if key in delta:
-                item[key] = delta[key]
-        state["open_questions"].append(item)
-        return
-    if kind == "mapping_added":
-        state["open_questions"].append({"kind": "analogy", "source": str(delta["source"]),
-                                        "target": str(delta["target"]),
-                                        "preserved": list(delta["preserved"]),
-                                        "broken": list(delta["broken"])})
-        return
-    if kind == "stakeholder_added":
-        state["open_questions"].append({"kind": "perspective",
-                                        "perspective": str(delta["perspective"]),
-                                        "obligations": list(delta["obligations"])})
-        return
-    if kind == "provenance_added":
-        state["open_questions"].append({"kind": "genealogy", "origin": str(delta["origin"]),
-                                        "lineage": list(delta["lineage"])})
-        return
-    if kind == "subquestions_added":
-        state["open_questions"].append({"kind": "decomposition",
-                                        "subquestions": list(delta["subquestions"])})
-        return
-    if kind == "commitment_formed":
-        state["open_questions"].append({"kind": "commitment", "claim": str(delta["claim"]),
-                                        "evidence_standard": str(delta["evidence_standard"])})
-        return
-    if kind == "evidence_standard":
-        state["open_questions"].append({"kind": "evidence_standard",
-                                        "claim_kind": str(delta["claim_kind"]),
-                                        "required": list(delta["required"])})
-        return
-    raise ValueError("未知 frame_delta.kind：" + kind + "（" + GUIDE + "见 moves.DELTA_KINDS）")
+    handler = _DELTA_HANDLERS.get(kind)
+    if handler is None:
+        raise ValueError("未知 frame_delta.kind：" + kind + "（" + GUIDE + "见 moves.DELTA_KINDS）")
+    handler(state, delta)
 
 
-def validate(state: Any) -> list[str]:
-    """状态形状校验 → 问题列表（空 = 合法）。"""
-    issues: list[str] = []
+def _shape_issues(state: Any) -> list[str] | None:
+    """schema 与必填字段：问题非空即到此为止，None 表示可继续做语义校验。"""
     if not isinstance(state, dict) or str(state.get("schema") or "") != SCHEMA:
         return ["discourse schema 不匹配（" + GUIDE + "需要 " + SCHEMA + "）"]
+    issues: list[str] = []
     for field in ("session_id", "problem", "assumptions", "tensions", "open_questions",
                   "moves", "budget", "status"):
         if field not in state:
             issues.append("缺字段 " + field + "（" + GUIDE + "用 discourse.new 生成，不手搓）")
-    if issues:
-        return issues
+    return issues or None
+
+
+def _semantic_issues(state: dict[str, Any]) -> list[str]:
+    """字段都在场后的状态语义校验。"""
+    issues: list[str] = []
     if state["status"] not in ("open", "closed"):
         issues.append("status 只能是 open/closed（" + GUIDE + "close 用 session.close）")
     if not isinstance(state["problem"], dict) or "statement" not in state["problem"]:
@@ -148,6 +186,14 @@ def validate(state: Any) -> list[str]:
     if state.get("digest") != expected:
         issues.append("digest 不匹配（" + GUIDE + "状态被改过——用重放重建）")
     return issues
+
+
+def validate(state: Any) -> list[str]:
+    """状态形状校验 → 问题列表（空 = 合法）。"""
+    shape = _shape_issues(state)
+    if shape is not None:
+        return shape
+    return _semantic_issues(state)
 
 
 def append_move(state: dict[str, Any], move_id: str,

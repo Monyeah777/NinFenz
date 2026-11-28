@@ -132,25 +132,50 @@ def freshness(doc: dict[str, Any], at: str = "") -> dict[str, Any]:
     return {"state": "fresh" if now <= exp else "stale", "expires_at": exp, "basis": basis}
 
 
-def _shape_issues(doc: dict[str, Any]) -> list[str]:
-    """feed 可选字段的形状判定（在**签名校验之前**跑；返回问题文本，空 = 通过）。"""
-    issues: list[str] = []
+def _expires_issue(doc: dict[str, Any]) -> str:
+    """expires_at 形状判定（可选字段；空串=通过）。"""
     exp = doc.get("expires_at")
     if "expires_at" in doc and not (isinstance(exp, str) and STAMP_RE.match(exp)):
-        issues.append(f"feed 的 expires_at 形状不对：{exp!r}（" + GUIDE +
-                      "UTC 秒级 YYYY-MM-DDTHH:MM:SSZ）")
+        return (f"feed 的 expires_at 形状不对：{exp!r}（" + GUIDE +
+                "UTC 秒级 YYYY-MM-DDTHH:MM:SSZ）")
+    return ""
+
+
+def _ttl_issue(doc: dict[str, Any]) -> str:
+    """ttl 形状判定（可选字段；空串=通过）。"""
     if "ttl" in doc and not _valid_ttl(doc.get("ttl")):
-        issues.append("feed 的 ttl 必须是正整数秒且 ≤31536000（" + GUIDE +
-                      "重签该 feed；不要手工改已签名件）")
+        return ("feed 的 ttl 必须是正整数秒且 ≤31536000（" + GUIDE +
+                "重签该 feed；不要手工改已签名件）")
+    return ""
+
+
+def _status_uri_issue(doc: dict[str, Any]) -> str:
+    """status_uri 形状判定（可选字段；空串=通过）。"""
     uri = doc.get("status_uri")
     if "status_uri" in doc and not (isinstance(uri, str) and uri.strip()):
-        issues.append("feed 的 status_uri 必须是非空字符串（" + GUIDE +
-                      "填 URI 形式；本仓不会去取它）")
+        return ("feed 的 status_uri 必须是非空字符串（" + GUIDE +
+                "填 URI 形式；本仓不会去取它）")
+    return ""
+
+
+def _order_issue(doc: dict[str, Any]) -> str:
+    """expires_at 早于 issued_at 判定（空串=通过）。"""
+    exp = doc.get("expires_at")
     issued = doc.get("issued_at")
     if (isinstance(exp, str) and STAMP_RE.match(exp) and isinstance(issued, str)
             and STAMP_RE.match(issued) and exp < issued):
-        issues.append("feed 的 expires_at 早于 issued_at（" + GUIDE +
-                      "重签；手工改必破签名）")
+        return ("feed 的 expires_at 早于 issued_at（" + GUIDE +
+                "重签；手工改必破签名）")
+    return ""
+
+
+def _shape_issues(doc: dict[str, Any]) -> list[str]:
+    """feed 可选字段的形状判定（在**签名校验之前**跑；返回问题文本，空 = 通过）。"""
+    issues: list[str] = []
+    for check in (_expires_issue, _ttl_issue, _status_uri_issue, _order_issue):
+        msg = check(doc)
+        if msg:
+            issues.append(msg)
     return issues
 
 

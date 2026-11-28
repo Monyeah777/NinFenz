@@ -182,6 +182,83 @@ def _witness_file_issues(witness: Any, root: str) -> list[str]:
     return []
 
 
+def _restated_issues(delta: dict[str, Any], _root: str) -> list[str]:
+    issues: list[str] = []
+    if str(delta["before_digest"]) == str(delta["after_digest"]):
+        issues.append("问题重述前后 digest 相同——只换词没换问题（判失败）")
+    if not isinstance(delta["changed_terms"], list) or not delta["changed_terms"]:
+        issues.append("changed_terms 为空——没写清改了什么")
+    return issues
+
+
+def _counterexample_issues(delta: dict[str, Any], root: str) -> list[str]:
+    issues: list[str] = []
+    if delta["breaks"] is not True:
+        issues.append("breaks 必须为 true——例子不违反主张就不算反例")
+    issues.extend(_witness_shape_issues(delta.get("witness")))
+    if root:
+        issues.extend(_witness_file_issues(delta.get("witness"), root))
+    return issues
+
+
+def _boundary_issues(delta: dict[str, Any], _root: str) -> list[str]:
+    if delta["near_miss"] is not True:
+        return ["near_miss 必须为 true——离边界很远的例子不算边界案例"]
+    return []
+
+
+def _concept_issues(delta: dict[str, Any], _root: str) -> list[str]:
+    if not isinstance(delta["distinctions"], list) or not delta["distinctions"]:
+        return ["distinctions 为空——定义必须给出至少一组区分"]
+    return []
+
+
+def _mapping_issues(delta: dict[str, Any], _root: str) -> list[str]:
+    if not isinstance(delta["broken"], list) or not delta["broken"]:
+        return ["broken 为空——类比必须给断点"]
+    return []
+
+
+def _tension_issues(delta: dict[str, Any], _root: str) -> list[str]:
+    if not isinstance(delta["between"], list) or len(delta["between"]) < 2:
+        return ["between 至少两端——张力必须写明冲突双方"]
+    return []
+
+
+def _subquestions_issues(delta: dict[str, Any], _root: str) -> list[str]:
+    if not isinstance(delta["subquestions"], list) or len(delta["subquestions"]) < 2:
+        return ["subquestions 至少两条——否则不叫分解"]
+    return []
+
+
+#: 每种 delta 的语义判据（不是格式检查，是「有没有真变化」检查）
+_SEMANTIC_CHECKS = {
+    "question_restated": _restated_issues,
+    "counterexample_found": _counterexample_issues,
+    "boundary_added": _boundary_issues,
+    "concept_clarified": _concept_issues,
+    "mapping_added": _mapping_issues,
+    "tension_added": _tension_issues,
+    "subquestions_added": _subquestions_issues,
+}
+
+
+def _field_issues(kind: str, delta: dict[str, Any]) -> list[str]:
+    issues: list[str] = []
+    for field in DELTA_KINDS[kind]:
+        if field not in delta:
+            issues.append("frame_delta[" + kind + "] 缺 " + field
+                          + "（修复指引：把这次动作留下的变化写清）")
+    return issues
+
+
+def _semantic_issues(kind: str, delta: dict[str, Any], root: str) -> list[str]:
+    handler = _SEMANTIC_CHECKS.get(kind)
+    if handler is None:
+        return []
+    return handler(delta, root)
+
+
 def validate_delta(move_id: str, delta: Any, root: str = "") -> list[str]:
     """校验一个 move 的 frame_delta → 问题列表（空 = 合法）。
 
@@ -197,40 +274,10 @@ def validate_delta(move_id: str, delta: Any, root: str = "") -> list[str]:
     if kind not in contract["delta_kinds"]:
         return ["动作 " + move_id + " 不接受 frame_delta.kind=" + repr(kind)
                 + "（允许：" + "、".join(contract["delta_kinds"]) + "）"]
-    for field in DELTA_KINDS[kind]:
-        if field not in delta:
-            issues.append("frame_delta[" + kind + "] 缺 " + field
-                          + "（修复指引：把这次动作留下的变化写清）")
+    issues = _field_issues(kind, delta)
     if issues:
         return issues
-    # 每种 delta 的语义判据（不是格式检查，是「有没有真变化」检查）
-    if kind == "question_restated":
-        if str(delta["before_digest"]) == str(delta["after_digest"]):
-            issues.append("问题重述前后 digest 相同——只换词没换问题（判失败）")
-        if not isinstance(delta["changed_terms"], list) or not delta["changed_terms"]:
-            issues.append("changed_terms 为空——没写清改了什么")
-    elif kind == "counterexample_found":
-        if delta["breaks"] is not True:
-            issues.append("breaks 必须为 true——例子不违反主张就不算反例")
-        issues.extend(_witness_shape_issues(delta.get("witness")))
-        if root:
-            issues.extend(_witness_file_issues(delta.get("witness"), root))
-    elif kind == "boundary_added":
-        if delta["near_miss"] is not True:
-            issues.append("near_miss 必须为 true——离边界很远的例子不算边界案例")
-    elif kind == "concept_clarified":
-        if not isinstance(delta["distinctions"], list) or not delta["distinctions"]:
-            issues.append("distinctions 为空——定义必须给出至少一组区分")
-    elif kind == "mapping_added":
-        if not isinstance(delta["broken"], list) or not delta["broken"]:
-            issues.append("broken 为空——类比必须给断点")
-    elif kind == "tension_added":
-        if not isinstance(delta["between"], list) or len(delta["between"]) < 2:
-            issues.append("between 至少两端——张力必须写明冲突双方")
-    elif kind == "subquestions_added":
-        if not isinstance(delta["subquestions"], list) or len(delta["subquestions"]) < 2:
-            issues.append("subquestions 至少两条——否则不叫分解")
-    return issues
+    return _semantic_issues(kind, delta, root)
 
 
 def describe(move_id: str) -> dict[str, Any]:

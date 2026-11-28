@@ -74,13 +74,16 @@ def method_cards(candidates: list[dict]) -> list[dict]:
     return cards
 
 
-def graph_slice(s: dict) -> dict:
-    parts = [str(item) for item in s.get("artifact", {}).get("parts", [])]
-    anchors = sorted(set(parts))
+def _rel_edges(anchors: list[str]) -> list[dict]:
     edges = []
     for part in anchors:
         for target in cc.REL_MAP.get(part, []):
             edges.append({"from": part, "to": target, "kind": "nf-mapping", "source": "REL_MAP"})
+    return edges
+
+
+def _relation_edges(anchors: list[str], s: dict) -> list[dict]:
+    edges = []
     for relation in s.get("artifact", {}).get("relations", []):
         text = str(relation)
         if "→" in text:
@@ -89,20 +92,39 @@ def graph_slice(s: dict) -> dict:
                 edges.append(
                     {"from": left, "to": right, "kind": "state-relation", "source": "session-state"}
                 )
-    domain_entries = [
+    return edges
+
+
+def _domain_entries(s: dict) -> list[dict]:
+    return [
         domain_sources.BY_ID[reference["source"]]
         for reference in s.get("reference", [])
         if reference.get("source") in domain_sources.BY_ID
     ]
-    domain_graph = domain_sources.graph_slice_for_text(s.get("goal", ""), domain_entries)
-    edges += domain_graph["edges"]
+
+
+def _unique_edges(edges: list[dict]) -> list[dict]:
     unique = {(edge["from"], edge["to"], edge["kind"], edge["source"]): edge for edge in edges}
-    ordered_edges = [unique[key] for key in sorted(unique)]
-    nodes = sorted(
+    return [unique[key] for key in sorted(unique)]
+
+
+def _graph_nodes(ordered_edges: list[dict], domain_graph: dict) -> list[str]:
+    return sorted(
         {edge["from"] for edge in ordered_edges}
         | {edge["to"] for edge in ordered_edges}
         | {node["concept"] for node in domain_graph["nodes"]}
     )
+
+
+def graph_slice(s: dict) -> dict:
+    parts = [str(item) for item in s.get("artifact", {}).get("parts", [])]
+    anchors = sorted(set(parts))
+    edges = _rel_edges(anchors) + _relation_edges(anchors, s)
+    domain_entries = _domain_entries(s)
+    domain_graph = domain_sources.graph_slice_for_text(s.get("goal", ""), domain_entries)
+    edges += domain_graph["edges"]
+    ordered_edges = _unique_edges(edges)
+    nodes = _graph_nodes(ordered_edges, domain_graph)
     return {
         "anchors": anchors,
         "nodes": nodes,

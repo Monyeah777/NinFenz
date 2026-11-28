@@ -31,37 +31,54 @@ DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
 DOMAIN_SEP = b"\x00"
 
 
+def _reject_float(node: float, path: str) -> None:
+    code = ("NONFINITE-FORBIDDEN" if math.isnan(node) or math.isinf(node)
+            else "FLOAT-FORBIDDEN")
+    raise ValueError(
+        f"{path}: {code}（{GUIDE}改用 int/字符串；浮点序列化跨语言不稳定）")
+
+
+def _reject_dict(node: dict, path: str) -> None:
+    for key, sub in node.items():
+        if not isinstance(key, str):
+            raise ValueError(
+                f"{path}: 对象键必须是字符串（{GUIDE}JSON 对象键只收字符串）")
+        _walk_reject(sub, f"{path}.{key}")
+
+
+def _reject_sequence(node: list, path: str) -> None:
+    if isinstance(node, tuple):
+        raise ValueError(
+            f"{path}: 拒绝 tuple（{GUIDE}先转成 list，JSON 只有数组）")
+    for index, sub in enumerate(node):
+        _walk_reject(sub, f"{path}[{index}]")
+
+
+def _reject_unsupported(node: Any, path: str) -> None:
+    if isinstance(node, (bytes, bytearray)):
+        raise ValueError(
+            f"{path}: 拒绝 bytes（{GUIDE}先 base64 编码成字符串再进 canonical）")
+    if isinstance(node, (set, frozenset)):
+        raise ValueError(
+            f"{path}: 拒绝 set（{GUIDE}先排序成 list 再进 canonical）")
+    raise ValueError(
+        f"{path}: 不支持的类型 {type(node).__name__}（{GUIDE}只收 "
+        "int/bool/null/str/list/object）")
+
+
 def _walk_reject(node: Any, path: str) -> None:
     """递归拒绝 float/非字符串键/不可规范化的容器。"""
     if isinstance(node, float):
-        code = ("NONFINITE-FORBIDDEN" if math.isnan(node) or math.isinf(node)
-                else "FLOAT-FORBIDDEN")
-        raise ValueError(
-            f"{path}: {code}（{GUIDE}改用 int/字符串；浮点序列化跨语言不稳定）")
+        _reject_float(node, path)
     if isinstance(node, dict):
-        for key, sub in node.items():
-            if not isinstance(key, str):
-                raise ValueError(
-                    f"{path}: 对象键必须是字符串（{GUIDE}JSON 对象键只收字符串）")
-            _walk_reject(sub, f"{path}.{key}")
-    elif isinstance(node, (list, tuple)):
-        if isinstance(node, tuple):
-            raise ValueError(
-                f"{path}: 拒绝 tuple（{GUIDE}先转成 list，JSON 只有数组）")
-        for index, sub in enumerate(node):
-            _walk_reject(sub, f"{path}[{index}]")
-    elif isinstance(node, (bool, int, str)) or node is None:
+        _reject_dict(node, path)
         return
-    elif isinstance(node, (bytes, bytearray)):
-        raise ValueError(
-            f"{path}: 拒绝 bytes（{GUIDE}先 base64 编码成字符串再进 canonical）")
-    elif isinstance(node, (set, frozenset)):
-        raise ValueError(
-            f"{path}: 拒绝 set（{GUIDE}先排序成 list 再进 canonical）")
-    else:
-        raise ValueError(
-            f"{path}: 不支持的类型 {type(node).__name__}（{GUIDE}只收 "
-            "int/bool/null/str/list/object）")
+    if isinstance(node, (list, tuple)):
+        _reject_sequence(node, path)
+        return
+    if isinstance(node, (bool, int, str)) or node is None:
+        return
+    _reject_unsupported(node, path)
 
 
 def canonical_text(obj: Any) -> str:

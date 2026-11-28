@@ -118,6 +118,63 @@ def hmac_verifier(key: bytes) -> Callable[[bytes, bytes], bool]:
     return verify
 
 
+def _envelope_base(envelope: Any) -> tuple[str | None, bytes | None, list | None, str | None]:
+    if not isinstance(envelope, dict):
+        return None, None, None, "ENVELOPE-NOT-OBJECT"
+    payload_type = envelope.get("payloadType")
+    if not isinstance(payload_type, str) or not payload_type:
+        return None, None, None, "PAYLOAD-TYPE-INVALID"
+    try:
+        payload = _b64d(envelope.get("payload"))
+    except ValueError:
+        return None, None, None, "PAYLOAD-B64-INVALID"
+    signatures = envelope.get("signatures")
+    if not isinstance(signatures, list) or not signatures:
+        return None, None, None, "SIGNATURES-MISSING"
+    if len(signatures) > MAX_SIGNATURES:
+        return None, None, None, "SIGNATURES-TOO-MANY"
+    return payload_type, payload, signatures, None
+
+
+def _alg_issue(item: dict, key: dict) -> str | None:
+    key_alg = str(key.get("alg") or "")
+    if key_alg not in ALGS:
+        return "ALG-UNSUPPORTED"
+    sig_alg = str(item.get("alg") or key_alg)
+    if sig_alg != key_alg:
+        return "ALG-MISMATCH"
+    return None
+
+
+def _signature_issue(item: dict, key: dict, data: bytes) -> str | None:
+    try:
+        signature = _b64d(item.get("sig"))
+    except ValueError:
+        return "SIGNATURE-B64-INVALID"
+    verify = key.get("verify")
+    if not callable(verify):
+        return "VERIFIER-MISSING"
+    try:
+        ok = bool(verify(data, signature))
+    except Exception:
+        # 静默跳过理由：验签回调异常 = 验签失败（fail-closed），绝不把异常当通过。
+        ok = False
+    if not ok:
+        return "SIGNATURE-INVALID"
+    return None
+
+
+def _verify_signature(item: Any, keys: dict, data: bytes) -> tuple[str, str | None]:
+    """返回 (keyid, None=已验过 | 'untrusted'=未知 key | reason=失败)。"""
+    if not isinstance(item, dict) or not str(item.get("keyid") or ""):
+        return "", "SIGNATURE-INVALID"
+    keyid = str(item["keyid"])
+    key = (keys or {}).get(keyid)
+    if not isinstance(key, dict):
+        return keyid, "untrusted"
+    return keyid, _alg_issue(item, key) or _signature_issue(item, key, data)
+
+
 def verify_envelope(envelope: Any, keys: dict, schema: dict | None = None) -> dict:
     """验信封：返回 {valid, reason?, payload_type?, payload?, signers?, untrusted?}。
 
@@ -128,51 +185,19 @@ def verify_envelope(envelope: Any, keys: dict, schema: dict | None = None) -> di
         problems = json_schema.json_schema_check(envelope, schema)
         if problems:
             return {"valid": False, "reason": "SCHEMA-INVALID", "detail": problems[0]}
-    if not isinstance(envelope, dict):
-        return {"valid": False, "reason": "ENVELOPE-NOT-OBJECT"}
-    payload_type = envelope.get("payloadType")
-    if not isinstance(payload_type, str) or not payload_type:
-        return {"valid": False, "reason": "PAYLOAD-TYPE-INVALID"}
-    try:
-        payload = _b64d(envelope.get("payload"))
-    except ValueError:
-        return {"valid": False, "reason": "PAYLOAD-B64-INVALID"}
-    signatures = envelope.get("signatures")
-    if not isinstance(signatures, list) or not signatures:
-        return {"valid": False, "reason": "SIGNATURES-MISSING"}
-    if len(signatures) > MAX_SIGNATURES:
-        return {"valid": False, "reason": "SIGNATURES-TOO-MANY"}
+    payload_type, payload, signatures, reason = _envelope_base(envelope)
+    if reason is not None:
+        return {"valid": False, "reason": reason}
     data = pae(payload_type.encode(), payload)
     signers, untrusted = [], []
     for item in signatures:
-        if not isinstance(item, dict) or not str(item.get("keyid") or ""):
-            return {"valid": False, "reason": "SIGNATURE-INVALID"}
-        keyid = str(item["keyid"])
-        key = (keys or {}).get(keyid)
-        if not isinstance(key, dict):
+        keyid, status = _verify_signature(item, keys, data)
+        if status is None:
+            signers.append(keyid)
+        elif status == "untrusted":
             untrusted.append(keyid)
-            continue
-        key_alg = str(key.get("alg") or "")
-        if key_alg not in ALGS:
-            return {"valid": False, "reason": "ALG-UNSUPPORTED"}
-        sig_alg = str(item.get("alg") or key_alg)
-        if sig_alg != key_alg:
-            return {"valid": False, "reason": "ALG-MISMATCH"}
-        try:
-            signature = _b64d(item.get("sig"))
-        except ValueError:
-            return {"valid": False, "reason": "SIGNATURE-B64-INVALID"}
-        verify = key.get("verify")
-        if not callable(verify):
-            return {"valid": False, "reason": "VERIFIER-MISSING"}
-        try:
-            ok = bool(verify(data, signature))
-        except Exception:
-            # 静默跳过理由：验签回调异常 = 验签失败（fail-closed），绝不把异常当通过。
-            ok = False
-        if not ok:
-            return {"valid": False, "reason": "SIGNATURE-INVALID"}
-        signers.append(keyid)
+        else:
+            return {"valid": False, "reason": status}
     if not signers:
         return {"valid": False, "reason": "NO-VALID-SIGNATURE"}
     return {"valid": True, "payload_type": payload_type, "payload": payload,

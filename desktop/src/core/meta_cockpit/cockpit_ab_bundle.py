@@ -32,6 +32,39 @@ def create(document: dict, ballots: list[dict] | None = None) -> dict:
     return result
 
 
+def _manifest_issues(
+    document: dict, expected_packets: dict, manifest: dict
+) -> list[str]:
+    issues = []
+    if manifest.get("experiment_digest") != cockpit_ab.digest(document):
+        issues.append("experiment digest mismatch")
+    if manifest.get("analysis_plan_digest") != (document["analysis_plan"]["plan_digest"]):
+        issues.append("analysis plan digest mismatch")
+    if manifest.get("packet_digest") != expected_packets["packet_digest"]:
+        issues.append("packet manifest digest mismatch")
+    return issues
+
+
+def _ballots_issues(
+    document: dict, ballots: list | None, analysis: dict | None, manifest: dict
+) -> list[str]:
+    issues = []
+    if ballots is None:
+        if manifest.get("ballots_digest") is not None:
+            issues.append("unexpected ballots digest")
+        if analysis is not None:
+            issues.append("analysis without ballots")
+    else:
+        if manifest.get("ballots_digest") != cockpit_ab.digest(ballots):
+            issues.append("ballots digest mismatch")
+        expected_analysis = cockpit_ab.analyze(document, ballots)
+        if analysis != expected_analysis:
+            issues.append("analysis mismatch")
+        if manifest.get("analysis_digest") != expected_analysis["digest"]:
+            issues.append("analysis digest mismatch")
+    return issues
+
+
 def verify(bundle: dict) -> list[str]:
     issues = []
     if bundle.get("schema") != "nf-cockpit-ab-bundle/1":
@@ -48,25 +81,8 @@ def verify(bundle: dict) -> list[str]:
     expected_packets = cockpit_ab.build_blind_packets(document)
     if packets != expected_packets:
         issues.append("packet mismatch")
-    if manifest.get("experiment_digest") != cockpit_ab.digest(document):
-        issues.append("experiment digest mismatch")
-    if manifest.get("analysis_plan_digest") != (document["analysis_plan"]["plan_digest"]):
-        issues.append("analysis plan digest mismatch")
-    if manifest.get("packet_digest") != expected_packets["packet_digest"]:
-        issues.append("packet manifest digest mismatch")
-    if ballots is None:
-        if manifest.get("ballots_digest") is not None:
-            issues.append("unexpected ballots digest")
-        if analysis is not None:
-            issues.append("analysis without ballots")
-    else:
-        if manifest.get("ballots_digest") != cockpit_ab.digest(ballots):
-            issues.append("ballots digest mismatch")
-        expected_analysis = cockpit_ab.analyze(document, ballots)
-        if analysis != expected_analysis:
-            issues.append("analysis mismatch")
-        if manifest.get("analysis_digest") != expected_analysis["digest"]:
-            issues.append("analysis digest mismatch")
+    issues += _manifest_issues(document, expected_packets, manifest)
+    issues += _ballots_issues(document, ballots, analysis, manifest)
     unsigned = {key: value for key, value in bundle.items() if key != "bundle_digest"}
     if bundle.get("bundle_digest") != cockpit_ab.digest(unsigned):
         issues.append("bundle digest mismatch")

@@ -42,34 +42,48 @@ def new_records(state: dict[str, Any]) -> dict[str, Any]:
             "records": [], "head": ""}
 
 
+def _header_issues(records: Any) -> list[str]:
+    if not isinstance(records, dict) or str(records.get("schema") or "") != SCHEMA:
+        return ["记录 schema 不匹配（" + GUIDE + "需要 " + SCHEMA + "）"]
+    if not isinstance(records.get("records"), list):
+        return ["records 必须是数组（" + GUIDE + "用 records.new_records 生成）"]
+    return []
+
+
+def _record_issues(item: Any, prev: str, state: dict[str, Any]) -> list[str]:
+    """单条记录的形状 / 顺序 / 链 / digest 校验（问题顺序与原实现一致）。"""
+    if not isinstance(item, dict):
+        return ["记录项不是对象（" + GUIDE + "重建记录）"]
+    if int(item.get("seq") or 0) != len(state["moves"]) + 1:
+        return ["记录序号不连续（" + GUIDE + "第 " + str(item.get("seq")) + " 条）"]
+    if str(item.get("prev") or "") != prev:
+        return ["记录链断在第 " + str(item.get("seq"))
+                + " 条（" + GUIDE + "prev 必须等于上一条 digest）"]
+    if str(item.get("digest") or "") != _record_digest(item):
+        return ["记录 digest 不符（" + GUIDE + "记录被改过）"]
+    return []
+
+
+def _initial_state(records: dict[str, Any], steps_max: int | None) -> dict[str, Any]:
+    return dc.new(str(records.get("problem") or ""),
+                  session_id=records.get("session_id") or "",
+                  steps_max=int(steps_max or records.get("steps_max") or 24))
+
+
 def replay(records: Any, steps_max: int | None = None) -> dict[str, Any]:
     """从记录重放到最终状态 → {ok, state, issues}。"""
     res: dict[str, Any] = {"ok": False, "state": None, "issues": []}
-    if not isinstance(records, dict) or str(records.get("schema") or "") != SCHEMA:
-        res["issues"].append("记录 schema 不匹配（" + GUIDE + "需要 " + SCHEMA + "）")
+    header = _header_issues(records)
+    if header:
+        res["issues"].extend(header)
         return res
     items = records.get("records")
-    if not isinstance(items, list):
-        res["issues"].append("records 必须是数组（" + GUIDE + "用 records.new_records 生成）")
-        return res
-    state = dc.new(str(records.get("problem") or ""),
-                   session_id=records.get("session_id") or "",
-                   steps_max=int(steps_max or records.get("steps_max") or 24))
+    state = _initial_state(records, steps_max)
     prev = ""
     for item in items:
-        if not isinstance(item, dict):
-            res["issues"].append("记录项不是对象（" + GUIDE + "重建记录）")
-            return res
-        if int(item.get("seq") or 0) != len(state["moves"]) + 1:
-            res["issues"].append("记录序号不连续（" + GUIDE + "第 "
-                                 + str(item.get("seq")) + " 条）")
-            return res
-        if str(item.get("prev") or "") != prev:
-            res["issues"].append("记录链断在第 " + str(item.get("seq"))
-                                 + " 条（" + GUIDE + "prev 必须等于上一条 digest）")
-            return res
-        if str(item.get("digest") or "") != _record_digest(item):
-            res["issues"].append("记录 digest 不符（" + GUIDE + "记录被改过）")
+        issues = _record_issues(item, prev, state)
+        if issues:
+            res["issues"].extend(issues)
             return res
         try:
             state = dc.append_move(state, str(item["move"]), dict(item["delta"]))

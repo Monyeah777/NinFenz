@@ -96,46 +96,50 @@ def _write_json(path: Path, value) -> None:
     atomic_io.write_text(path, json.dumps(value, ensure_ascii=False, indent=2) + "\n")
 
 
+def _dispatch(args: argparse.Namespace) -> None:
+    if args.command == "preregister":
+        experiment = cockpit_ab.preregister(
+            _load(args.experiment),
+            opts=cockpit_ab.PreregisterOptions(
+                min_pairs=args.min_pairs,
+                min_effect=args.min_effect,
+                alpha=args.alpha,
+                min_judges=args.min_judges,
+                min_agreement=args.min_agreement,
+                min_pairs_per_model=args.min_pairs_per_model,
+                target_power=args.target_power,
+                max_pairs=args.max_pairs,
+                planned_pairs=args.planned_pairs,
+            ),
+        )
+        _write_json(args.out, experiment)
+        print(args.out)
+    elif args.command == "packets":
+        packets = cockpit_ab.build_blind_packets(_load(args.experiment))
+        _write_json(args.out, packets)
+        print(args.out)
+    elif args.command == "analyze":
+        analysis = cockpit_ab.analyze(_load(args.experiment), _load(args.ballots))
+        if args.out is not None:
+            _write_json(args.out, analysis)
+        print(json.dumps(analysis, ensure_ascii=False, indent=2))
+    elif args.command == "save":
+        ballots = _load(args.ballots) if args.ballots else None
+        bundle = cockpit_ab_bundle.create(_load(args.experiment), ballots)
+        target = cockpit_ab_store.save(args.store, bundle)
+        print(target)
+    elif args.command == "verify":
+        bundle = cockpit_ab_store.load(args.bundle)
+        print(bundle["bundle_digest"])
+    elif args.command == "index":
+        print(json.dumps(cockpit_ab_store.index(args.store), ensure_ascii=False, indent=2))
+    elif args.command == "audit":
+        print(json.dumps(cockpit_ab_store.audit(args.store), ensure_ascii=False, indent=2))
+
+
 def run(args: argparse.Namespace) -> int:
     try:
-        if args.command == "preregister":
-            experiment = cockpit_ab.preregister(
-                _load(args.experiment),
-                opts=cockpit_ab.PreregisterOptions(
-                    min_pairs=args.min_pairs,
-                    min_effect=args.min_effect,
-                    alpha=args.alpha,
-                    min_judges=args.min_judges,
-                    min_agreement=args.min_agreement,
-                    min_pairs_per_model=args.min_pairs_per_model,
-                    target_power=args.target_power,
-                    max_pairs=args.max_pairs,
-                    planned_pairs=args.planned_pairs,
-                ),
-            )
-            _write_json(args.out, experiment)
-            print(args.out)
-        elif args.command == "packets":
-            packets = cockpit_ab.build_blind_packets(_load(args.experiment))
-            _write_json(args.out, packets)
-            print(args.out)
-        elif args.command == "analyze":
-            analysis = cockpit_ab.analyze(_load(args.experiment), _load(args.ballots))
-            if args.out is not None:
-                _write_json(args.out, analysis)
-            print(json.dumps(analysis, ensure_ascii=False, indent=2))
-        elif args.command == "save":
-            ballots = _load(args.ballots) if args.ballots else None
-            bundle = cockpit_ab_bundle.create(_load(args.experiment), ballots)
-            target = cockpit_ab_store.save(args.store, bundle)
-            print(target)
-        elif args.command == "verify":
-            bundle = cockpit_ab_store.load(args.bundle)
-            print(bundle["bundle_digest"])
-        elif args.command == "index":
-            print(json.dumps(cockpit_ab_store.index(args.store), ensure_ascii=False, indent=2))
-        elif args.command == "audit":
-            print(json.dumps(cockpit_ab_store.audit(args.store), ensure_ascii=False, indent=2))
+        _dispatch(args)
     except (OSError, UnicodeError, ValueError, json.JSONDecodeError) as exc:
         print(str(exc), file=sys.stderr)
         return 2

@@ -123,6 +123,14 @@ EXECUTORS: dict[str, Callable[[dict], dict]] = {
 }
 
 
+def _type_ok(value, typ) -> bool:
+    if typ is float:
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if typ is bool:
+        return isinstance(value, bool)
+    return isinstance(value, typ)
+
+
 def execute_atom(atom_id: str, payload: dict) -> dict:
     if atom_id not in SPECS:
         return _fail(atom_id, "unknown atom", payload)
@@ -141,13 +149,7 @@ def execute_atom(atom_id: str, payload: dict) -> dict:
     if not isinstance(out, dict) or key not in out:
         return _fail(atom_id, f"missing output key: {key}", payload)
     val = out[key]
-    if typ is float:
-        good = isinstance(val, (int, float)) and not isinstance(val, bool)
-    elif typ is bool:
-        good = isinstance(val, bool)
-    else:
-        good = isinstance(val, typ)
-    if not good:
+    if not _type_ok(val, typ):
         return _fail(atom_id, f"output type mismatch: {key}", payload)
     return {
         "atom_id": atom_id,

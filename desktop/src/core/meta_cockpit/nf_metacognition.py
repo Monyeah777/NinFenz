@@ -50,26 +50,32 @@ TEMPLATES = {
 }
 
 
+def _task_type(prompt: str, narrative: bool) -> str:
+    if any(k in prompt for k in ("比较", "对比")):
+        return "comparison"
+    if narrative:
+        return "content"
+    if any(k in prompt for k in ("方案", "计划", "怎么", "步骤", "路线")):
+        return "plan"
+    if any(k in prompt for k in ("分析", "为什么", "原因")):
+        return "analysis"
+    return "content"
+
+
+def _domain(prompt: str) -> str:
+    if any(k in prompt for k in ("西幻", "校园", "生存流", "叙事")):
+        return "narrative"
+    if "技术文档" in prompt:
+        return "techdoc"
+    return "general"
+
+
 def profile(prompt: str) -> dict:
     narrative = any(
         k in prompt for k in ("西幻", "校园", "生存流", "叙事", "玩法", "世界", "完整版")
     )
-    if any(k in prompt for k in ("比较", "对比")):
-        task = "comparison"
-    elif narrative:
-        task = "content"
-    elif any(k in prompt for k in ("方案", "计划", "怎么", "步骤", "路线")):
-        task = "plan"
-    elif any(k in prompt for k in ("分析", "为什么", "原因")):
-        task = "analysis"
-    else:
-        task = "content"
-    if any(k in prompt for k in ("西幻", "校园", "生存流", "叙事")):
-        domain = "narrative"
-    elif "技术文档" in prompt:
-        domain = "techdoc"
-    else:
-        domain = "general"
+    task = _task_type(prompt, narrative)
+    domain = _domain(prompt)
     reqs = [
         k
         for k in ("生存", "经济", "战斗", "死亡重生", "失败成本", "回滚", "对比", "风险")

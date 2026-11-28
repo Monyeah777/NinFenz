@@ -90,39 +90,72 @@ def _card_refs(entity: dict) -> list:
             if isinstance(ref, dict) and str(ref.get("kind")) == "card"]
 
 
+def _card_failure(bound_card: dict, check_schema: dict) -> dict | None:
+    issues = validate_card(bound_card, check_schema)
+    if issues:
+        return {"ok": False, "reason": REASON_CARD_INVALID, "detail": issues[0]}
+    return None
+
+
+def _entity_failure(entity: Any, expected_type: str) -> dict | None:
+    if not isinstance(entity, dict):
+        return {"ok": False, "reason": REASON_TYPE_MISMATCH}
+    if str(entity.get("type") or "") != expected_type:
+        return {"ok": False, "reason": REASON_TYPE_MISMATCH}
+    return None
+
+
+def _ref_failure(entity: dict, bound_card: dict) -> tuple[str | None, dict | None]:
+    refs = _card_refs(entity)
+    if not refs:
+        return None, {"ok": False, "reason": REASON_CARD_REF_MISSING}
+    bound = card_digest(bound_card)
+    if not any(str(ref.get("digest")) == bound for ref in refs):
+        return None, {"ok": False, "reason": REASON_CARD_REF_MISMATCH}
+    return bound, None
+
+
+def _current_outcome(
+    bound_card: dict, current_card: dict, bound: str, check_schema: dict
+) -> dict | None:
+    current_issues = validate_card(current_card, check_schema)
+    if current_issues:
+        return {"ok": False, "reason": REASON_CURRENT_INVALID, "detail": current_issues[0]}
+    current = card_digest(current_card)
+    if current == bound:
+        return None
+    if current_card.get("model_digest") != bound_card.get("model_digest"):
+        return {"ok": False, "reason": REASON_MODEL_REPLACED,
+                "detail": "当前卡 model_digest 与被绑卡不同"}
+    bound_protocol = (bound_card.get("eval_protocol") or {}).get("protocol_digest")
+    current_protocol = (current_card.get("eval_protocol") or {}).get("protocol_digest")
+    if bound_protocol != current_protocol:
+        return {"ok": False, "reason": REASON_EVAL_CHANGED,
+                "detail": "同模型但评测协议摘要已变"}
+    return {"warning": "CARD-REISSUED"}
+
+
 def check_binding(entity: Any, bound_card: dict, current_card: dict | None = None,
                   schema: dict | None = None, expected_type: str = AI_EVIDENCE_TYPE,
                   root: str = ".") -> dict:
     """AI 证据 ↔ 模型卡绑定判定。返回 {ok, reason?, warning?, bound_digest?}。"""
     check_schema = schema if schema is not None else load_schema(root)
-    issues = validate_card(bound_card, check_schema)
-    if issues:
-        return {"ok": False, "reason": REASON_CARD_INVALID, "detail": issues[0]}
-    if not isinstance(entity, dict):
-        return {"ok": False, "reason": REASON_TYPE_MISMATCH}
-    if str(entity.get("type") or "") != expected_type:
-        return {"ok": False, "reason": REASON_TYPE_MISMATCH}
-    refs = _card_refs(entity)
-    if not refs:
-        return {"ok": False, "reason": REASON_CARD_REF_MISSING}
-    bound = card_digest(bound_card)
-    if not any(str(ref.get("digest")) == bound for ref in refs):
-        return {"ok": False, "reason": REASON_CARD_REF_MISMATCH}
+    failure = _card_failure(bound_card, check_schema)
+    if failure is not None:
+        return failure
+    failure = _entity_failure(entity, expected_type)
+    if failure is not None:
+        return failure
+    bound, failure = _ref_failure(entity, bound_card)
+    if failure is not None:
+        return failure
     result = {"ok": True, "bound_digest": bound}
-    if current_card is not None:
-        current_issues = validate_card(current_card, check_schema)
-        if current_issues:
-            return {"ok": False, "reason": REASON_CURRENT_INVALID,
-                    "detail": current_issues[0]}
-        current = card_digest(current_card)
-        if current != bound:
-            if current_card.get("model_digest") != bound_card.get("model_digest"):
-                return {"ok": False, "reason": REASON_MODEL_REPLACED,
-                        "detail": "当前卡 model_digest 与被绑卡不同"}
-            bound_protocol = (bound_card.get("eval_protocol") or {}).get("protocol_digest")
-            current_protocol = (current_card.get("eval_protocol") or {}).get("protocol_digest")
-            if bound_protocol != current_protocol:
-                return {"ok": False, "reason": REASON_EVAL_CHANGED,
-                        "detail": "同模型但评测协议摘要已变"}
-            result["warning"] = "CARD-REISSUED"
-    return result
+    if current_card is None:
+        return result
+    outcome = _current_outcome(bound_card, current_card, bound, check_schema)
+    if outcome is None:
+        return result
+    if "warning" in outcome:
+        result["warning"] = outcome["warning"]
+        return result
+    return outcome

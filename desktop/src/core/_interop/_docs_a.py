@@ -110,6 +110,28 @@ def openapi_doc(root: str = ".") -> Dict[str, Any]:
 
 
 
+def _event_channel(name: str, meta: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """单事件 → (channel 定义, message 定义)。"""
+    fields = meta.get("fields") or {}
+    channel = {
+        "address": "nf/%s" % name,
+        "title": name,
+        "messages": {"nf.%s" % name: {"$ref": "#/components/messages/%s" % _ptr(name)}},
+        "x-nf-cloudevents": {"type": "nf.%s" % name, "source": "urn:nf:repo",
+                             "specversion": "1.0",
+                             "datacontenttype": "application/json"},
+    }
+    message = {
+        "name": name,
+        "contentType": "application/json",
+        "payload": {"type": "object",
+                    "properties": {k: _schema_for((v or {}).get("type", ""))
+                                   for k, v in fields.items()}},
+        "x-nf-note": str(meta.get("note") or "")[:200],
+    }
+    return channel, message
+
+
 def asyncapi_doc(root: str = ".") -> Dict[str, Any]:
     """事件登记 → AsyncAPI 3.0 文档 + CloudEvents 属性（纯派生）。"""
     reg = _read_json(root, EVENTS_REL)
@@ -122,23 +144,9 @@ def asyncapi_doc(root: str = ".") -> Dict[str, Any]:
     channels: Dict[str, Any] = {}
     messages: Dict[str, Any] = {}
     for name, meta in sorted(events.items()):
-        fields = meta.get("fields") or {}
-        channels["nf/%s" % name] = {
-            "address": "nf/%s" % name,
-            "title": name,
-            "messages": {"nf.%s" % name: {"$ref": "#/components/messages/%s" % _ptr(name)}},
-            "x-nf-cloudevents": {"type": "nf.%s" % name, "source": "urn:nf:repo",
-                                 "specversion": "1.0",
-                                 "datacontenttype": "application/json"},
-        }
-        messages[name] = {
-            "name": name,
-            "contentType": "application/json",
-            "payload": {"type": "object",
-                        "properties": {k: _schema_for((v or {}).get("type", ""))
-                                       for k, v in fields.items()}},
-            "x-nf-note": str(meta.get("note") or "")[:200],
-        }
+        channel, message = _event_channel(name, meta)
+        channels["nf/%s" % name] = channel
+        messages[name] = message
     return {
         "asyncapi": "3.0.0",
         "info": {"title": "NinFenz 事件登记（派生）", "version": "1.0.0",
@@ -260,6 +268,16 @@ def sbom_doc(root: str = ".") -> Dict[str, Any]:
 
 
 
+def _gate_version(root: str) -> str:
+    """verify.sh 版本头 → vX.Y（缺文件/无匹配 → 空串）。"""
+    verify_path = os.path.join(root, "verify.sh")
+    if not os.path.isfile(verify_path):
+        return ""
+    with open(verify_path, encoding="utf-8") as fh:
+        m = re.search(r"# 版本\s*:\s*(v[0-9.]+)", fh.read())
+    return m.group(1) if m else ""
+
+
 def slsa_provenance(root: str = ".") -> Dict[str, Any]:
     """SLSA Provenance v1（in-toto predicate）——从**本地门禁事实**派生，不宣称外部构建。
 
@@ -278,12 +296,7 @@ def slsa_provenance(root: str = ".") -> Dict[str, Any]:
         want_checks, want_pass = qb.EXPECTED_CHECKS, qb.EXPECTED_PASS
     except Exception:  # pragma: no cover - 真源不可读即 0（门禁侧会判 FAIL）
         want_checks = want_pass = 0
-    version = ""
-    verify_path = os.path.join(root, "verify.sh")
-    if os.path.isfile(verify_path):
-        with open(verify_path, encoding="utf-8") as fh:
-            m = re.search(r"# 版本\s*:\s*(v[0-9.]+)", fh.read())
-        version = m.group(1) if m else ""
+    version = _gate_version(root)
     subjects = [{"name": str(e.get("path") or ""),
                  "digest": {"sha256": str(e.get("digest") or "")}}
                 for e in (rec.get("entries") or [])]

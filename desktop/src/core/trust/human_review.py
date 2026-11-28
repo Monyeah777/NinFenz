@@ -115,6 +115,63 @@ class ReviewVerifyOptions:
     root: str = '.'
 
 
+def _invalid(detail: str = "") -> dict:
+    result = {"ok": False, "state": STATE_INVALID, "reason": REASON_INVALID}
+    if detail:
+        result["detail"] = detail
+    return result
+
+
+def _invalid_reason(reason: str) -> dict:
+    return {"ok": False, "state": STATE_INVALID, "reason": reason}
+
+
+def _statement_of(envelope: Any) -> tuple[dict | None, dict | None]:
+    if not isinstance(envelope, dict):
+        return None, _invalid_reason(REASON_INVALID)
+    if envelope.get("payloadType") != PAYLOAD_TYPE:
+        return None, _invalid("payloadType 不符")
+    try:
+        payload = dsse._b64d(envelope.get("payload"))
+        statement = json_doc.loads(payload.decode("utf-8"), dict, what="human review")
+    except (UnicodeDecodeError, ValueError) as exc:
+        return None, _invalid(str(exc))
+    return statement, None
+
+
+def _schema_issue(statement: dict, schema_statement: dict | None, root: str) -> dict | None:
+    check_schema = schema_statement if schema_statement is not None else load_schema(root)
+    problems = json_schema.json_schema_check(statement, check_schema)
+    if problems:
+        return _invalid(problems[0])
+    return None
+
+
+def _binding_issue(
+    statement: dict, expected_kind: str, expected_digest: str, registry: dict
+) -> tuple[str, dict | None]:
+    if statement.get("subject_kind") != expected_kind:
+        return "", _invalid_reason(REASON_SUBJECT)
+    if statement.get("subject_digest") != expected_digest:
+        return "", _invalid_reason(REASON_SUBJECT)
+    reviewer = statement.get("reviewer") or {}
+    issuer_id = str(reviewer.get("issuer_id") or "")
+    resolved = tk.resolve_issuer(registry, issuer_id)
+    if not resolved.get("ok"):
+        return "", _invalid_reason("ISSUER-UNKNOWN")
+    if str((resolved.get("issuer") or {}).get("kind")) != "human":
+        return "", _invalid_reason(REASON_NOT_HUMAN)
+    return issuer_id, None
+
+
+def _approved_base(statement: dict, issuer_id: str, verified: dict) -> dict:
+    return {"state": STATE_APPROVED, "decision": statement.get("decision"),
+            "reviewer": issuer_id, "keyid": (statement.get("reviewer") or {}).get("keyid"),
+            "subject_kind": statement.get("subject_kind"),
+            "subject_digest": statement.get("subject_digest"),
+            "signers": verified.get("signers") or []}
+
+
 def verify_review(
     envelope: Any,
     expected_kind: str,
@@ -126,47 +183,23 @@ def verify_review(
     """验复核信封：DSSE + registry 生命周期 + reviewer human kind + 对象绑定 + decision。"""
 
     opts = opts if opts is not None else ReviewVerifyOptions()
-    schema_envelope = opts.schema_envelope
-    schema_statement = opts.schema_statement
-    now = opts.now
-    root = opts.root
-    if not isinstance(envelope, dict):
-        return {"ok": False, "state": STATE_INVALID, "reason": REASON_INVALID}
-    if envelope.get("payloadType") != PAYLOAD_TYPE:
-        return {"ok": False, "state": STATE_INVALID, "reason": REASON_INVALID,
-                "detail": "payloadType 不符"}
-    try:
-        payload = dsse._b64d(envelope.get("payload"))
-        statement = json_doc.loads(payload.decode("utf-8"), dict, what="human review")
-    except (UnicodeDecodeError, ValueError) as exc:
-        return {"ok": False, "state": STATE_INVALID, "reason": REASON_INVALID,
-                "detail": str(exc)}
-    check_schema = schema_statement if schema_statement is not None else load_schema(root)
-    problems = json_schema.json_schema_check(statement, check_schema)
-    if problems:
-        return {"ok": False, "state": STATE_INVALID, "reason": REASON_INVALID,
-                "detail": problems[0]}
-    if statement.get("subject_kind") != expected_kind:
-        return {"ok": False, "state": STATE_INVALID, "reason": REASON_SUBJECT}
-    if statement.get("subject_digest") != expected_digest:
-        return {"ok": False, "state": STATE_INVALID, "reason": REASON_SUBJECT}
-    reviewer = statement.get("reviewer") or {}
-    issuer_id = str(reviewer.get("issuer_id") or "")
-    resolved = tk.resolve_issuer(registry, issuer_id)
-    if not resolved.get("ok"):
-        return {"ok": False, "state": STATE_INVALID, "reason": "ISSUER-UNKNOWN"}
-    if str((resolved.get("issuer") or {}).get("kind")) != "human":
-        return {"ok": False, "state": STATE_INVALID, "reason": REASON_NOT_HUMAN}
-    verified = tk.verify_envelope(envelope, registry, material, schema_envelope, now=now)
+    statement, invalid = _statement_of(envelope)
+    if invalid is not None:
+        return invalid
+    invalid = _schema_issue(statement, opts.schema_statement, opts.root)
+    if invalid is not None:
+        return invalid
+    issuer_id, invalid = _binding_issue(statement, expected_kind, expected_digest, registry)
+    if invalid is not None:
+        return invalid
+    verified = tk.verify_envelope(
+        envelope, registry, material, opts.schema_envelope, now=opts.now
+    )
     if not verified.get("valid"):
         return {"ok": False, "state": STATE_INVALID,
                 "reason": verified.get("reason", REASON_INVALID),
                 "detail": verified.get("detail", "")}
-    base = {"state": STATE_APPROVED, "decision": statement.get("decision"),
-            "reviewer": issuer_id, "keyid": reviewer.get("keyid"),
-            "subject_kind": statement.get("subject_kind"),
-            "subject_digest": statement.get("subject_digest"),
-            "signers": verified.get("signers") or []}
+    base = _approved_base(statement, issuer_id, verified)
     if statement.get("decision") != "approve":
         base.update(ok=False, reason=REASON_NOT_APPROVED,
                     state=(STATE_REJECTED if statement.get("decision") == "reject"

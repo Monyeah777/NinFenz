@@ -160,19 +160,22 @@ def _i_compose(p):
     return {"composed": t if isinstance(t, dict) else {"parts": t}}
 
 
-def _c_select(p):
-    opts, goal = p["options"], p["goal"]
+def _select_options(opts: list[dict], goal: dict) -> list[dict]:
     if "levels" in goal or "functions" in goal:
-        sel = [
+        return [
             o
             for o in opts
             if o.get("meta_level") in goal.get("levels", [])
             and o.get("meta_function") in goal.get("functions", [])
         ]
-    elif "task_type" in goal:
-        sel = [o for o in opts if o.get("task_type") == goal["task_type"]]
-    else:
-        sel = list(opts)
+    if "task_type" in goal:
+        return [o for o in opts if o.get("task_type") == goal["task_type"]]
+    return list(opts)
+
+
+def _c_select(p):
+    opts, goal = p["options"], p["goal"]
+    sel = _select_options(opts, goal)
     if not sel:
         raise ValueError("no selection")
     envelope = int((p.get("budget") or {}).get("envelope", len(sel)))
@@ -213,27 +216,37 @@ def _c_switch(p):
     }
 
 
+def _audit_order(target: dict, ref) -> list[str]:
+    issues = []
+    ref_ids = {x.get("id") for x in ref} if isinstance(ref, list) else set()
+    for nid in target["order"]:
+        if nid not in ref_ids:
+            issues.append(f"unknown method: {nid}")
+    return issues
+
+
+def _audit_rows(target: dict, ref) -> list[str]:
+    issues = []
+    rows = target.get("rows") or []
+    if not rows:
+        issues.append("empty criterion frame")
+    for r in rows:
+        if r.get("unit", "ratio") == "ratio" and "max_missing" not in r:
+            issues.append("missing max_missing: {}".format(r.get("dimension")))
+    if not ref:
+        issues.append("empty node verdicts")
+    return issues
+
+
 def _e_audit(p):
     target, ref = p["target"], p["reference"]
-    issues = []
     if isinstance(target, dict) and "order" in target:
-        ref_ids = {x.get("id") for x in ref} if isinstance(ref, list) else set()
-        for nid in target["order"]:
-            if nid not in ref_ids:
-                issues.append(f"unknown method: {nid}")
-    elif isinstance(target, dict) and "rows" in target:
-        rows = target.get("rows") or []
-        if not rows:
-            issues.append("empty criterion frame")
-        for r in rows:
-            if r.get("unit", "ratio") == "ratio" and "max_missing" not in r:
-                issues.append("missing max_missing: {}".format(r.get("dimension")))
-        if not ref:
-            issues.append("empty node verdicts")
-    else:
-        if not target:
-            issues.append("empty target")
-    return {"audit": issues}
+        return {"audit": _audit_order(target, ref)}
+    if isinstance(target, dict) and "rows" in target:
+        return {"audit": _audit_rows(target, ref)}
+    if not target:
+        return {"audit": ["empty target"]}
+    return {"audit": []}
 
 
 def _m_check(p):

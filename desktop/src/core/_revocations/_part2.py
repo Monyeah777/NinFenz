@@ -165,6 +165,21 @@ def verify(doc: dict[str, Any], key: bytes | None = None,
     return res
 
 
+def _part_entry(doc: dict[str, Any], res: dict[str, Any]) -> dict[str, Any]:
+    """单份 feed → 新鲜度分片（缺省 unknown）。"""
+    return {"seq": int(doc.get("seq") or 0),
+            "state": (res.get("freshness") or {}).get("state", "unknown")}
+
+
+def _merge_state(states: list[str]) -> str:
+    """多份新鲜度取最严：任一 stale；否则任一 unknown（或空）；否则 fresh。"""
+    if "stale" in states:
+        return "stale"
+    if "unknown" in states or not states:
+        return "unknown"
+    return "fresh"
+
+
 def merge(feeds: Sequence[dict[str, Any]], key: bytes | None = None,
           at: str = "") -> dict[str, Any]:
     """多份 feed → 合并后的 `nf-revocation/1` 表（按 seq 排序、逐份验链、取并集）。
@@ -183,8 +198,7 @@ def merge(feeds: Sequence[dict[str, Any]], key: bytes | None = None,
         res = verify(doc, key=key, prev=prev, at=at)
         issues.extend(res["issues"])
         warnings.extend(res["warnings"])
-        parts.append({"seq": int(doc.get("seq") or 0),
-                      "state": (res.get("freshness") or {}).get("state", "unknown")})
+        parts.append(_part_entry(doc, res))
         if not res["ok"]:
             prev = None
             continue
@@ -192,13 +206,7 @@ def merge(feeds: Sequence[dict[str, Any]], key: bytes | None = None,
         items.extend(table.get("revoked") or [])
         prev = doc
     merged = make_table(items)
-    states = [str(p["state"]) for p in parts]
-    if "stale" in states:
-        state = "stale"
-    elif "unknown" in states or not states:
-        state = "unknown"
-    else:
-        state = "fresh"
+    state = _merge_state([str(p["state"]) for p in parts])
     ok = not issues
     return {"ok": ok, "verdict": "ok" if ok else "invalid", "table": merged,
             "feeds": len(rows), "count": merged["count"], "issues": issues,

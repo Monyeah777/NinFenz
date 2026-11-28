@@ -42,7 +42,8 @@ from core.meta_cockpit._runtime_executor._part1 import (
     span_anchor_rate,
     topo,
 )
-from core.meta_cockpit._runtime_executor._part2 import eval_node, main
+from core.meta_cockpit._runtime_executor._part2 import eval_node
+from core.meta_cockpit._runtime_executor._part3 import main
 
 from . import chain_horizontal as horiz
 from . import chain_knowledge as know

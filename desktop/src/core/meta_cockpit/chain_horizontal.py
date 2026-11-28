@@ -172,6 +172,31 @@ def dim_of(source: str) -> str:
     return m.group(0) if m else ""
 
 
+def _distinctness(items: list[dict]) -> float:
+    return frac(items, lambda o: sum(1 for x in items if x["name"] == o["name"]) == 1)
+
+
+def _ratio(part: int, total: int) -> float:
+    return round(part / total, 3) if total else 0.0
+
+
+def _synthesis_evidence(cl: list[dict], cell_by_key: dict) -> float:
+    return frac(
+        cl,
+        lambda c: bool(
+            EVID.search(cell_by_key.get(tuple(c["source"].split(":")), {}).get("evidence", ""))
+        ),
+    )
+
+
+def _tradeoff_declared(cl: list[dict]) -> float:
+    return frac(cl, lambda c: c.get("tradeoff") in {"tradeoff", "dominant", "incomparable"})
+
+
+def _claim_linkage(cl: list[dict], cell_keys: set) -> float:
+    return frac(cl, lambda c: tuple(c["source"].split(":")) in cell_keys)
+
+
 def evaluate(name: str, frame: dict, matrix: dict, claims: dict) -> dict:
     objs, dims, cells = frame["objects"], frame["dimensions"], matrix["cells"]
     cl = claims["claims"]
@@ -183,27 +208,16 @@ def evaluate(name: str, frame: dict, matrix: dict, claims: dict) -> dict:
     m = {
         "object_count": len(objs),
         "dimension_count": len(dims),
-        "object_distinctness": frac(
-            objs, lambda o: sum(1 for x in objs if x["name"] == o["name"]) == 1
-        ),
-        "dimension_distinctness": frac(
-            dims, lambda d: sum(1 for x in dims if x["name"] == d["name"]) == 1
-        ),
-        "cell_coverage": round(len(cell_keys & expected) / len(expected), 3) if expected else 0.0,
+        "object_distinctness": _distinctness(objs),
+        "dimension_distinctness": _distinctness(dims),
+        "cell_coverage": _ratio(len(cell_keys & expected), len(expected)),
         "evidence_anchor_rate": frac(cells, lambda c: bool(EVID.search(c["evidence"]))),
         "value_concreteness": frac(cells, lambda c: bool(CONCRETE.search(c["value"]))),
         "check_ref_rate": frac(cells, lambda c: bool(CHECK.search(c["check"]))),
-        "claim_coverage": round(len(covered_dims) / len(dims), 3) if dims else 0.0,
-        "synthesis_evidence": frac(
-            cl,
-            lambda c: bool(
-                EVID.search(cell_by_key.get(tuple(c["source"].split(":")), {}).get("evidence", ""))
-            ),
-        ),
-        "tradeoff_declared": frac(
-            cl, lambda c: c.get("tradeoff") in {"tradeoff", "dominant", "incomparable"}
-        ),
-        "claim_linkage": frac(cl, lambda c: tuple(c["source"].split(":")) in cell_keys),
+        "claim_coverage": _ratio(len(covered_dims), len(dims)),
+        "synthesis_evidence": _synthesis_evidence(cl, cell_by_key),
+        "tradeoff_declared": _tradeoff_declared(cl),
+        "claim_linkage": _claim_linkage(cl, cell_keys),
     }
     ok = all(
         [

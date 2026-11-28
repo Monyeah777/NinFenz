@@ -41,9 +41,8 @@ def declaration(root: str = ".") -> Tuple[Optional[Dict[str, Any]], List[str]]:
     return doc, issues
 
 
-def collect(root: str = ".") -> Dict[str, List[str]]:
-    """盘上按键采集 → {key: [仓库相对路径,...]}（文件头 + provenance 两源）。"""
-    r = Path(root)
+def _header_keys(r: Path) -> Dict[str, List[str]]:
+    """文件头 nf-asset:key="..." 采集 → {key: [仓库相对路径,...]}。"""
     found: Dict[str, List[str]] = {}
     for pat in HEADER_GLOBS:
         for p in sorted(r.glob(pat)):
@@ -54,6 +53,12 @@ def collect(root: str = ".") -> Dict[str, List[str]]:
             m = re.search(r'nf-asset:\s*key="([^"]*)"', head)
             if m:
                 found.setdefault(m.group(1), []).append(p.relative_to(r).as_posix())
+    return found
+
+
+def _provenance_keys(r: Path) -> Dict[str, List[str]]:
+    """provenance assets[].key 采集 → {key: [仓库相对路径,...]}。"""
+    found: Dict[str, List[str]] = {}
     for pat in PROVENANCE_GLOBS:
         for p in sorted(r.glob(pat)):
             try:
@@ -64,6 +69,15 @@ def collect(root: str = ".") -> Dict[str, List[str]]:
                 k = (a or {}).get("key")
                 if k:
                     found.setdefault(str(k), []).append(p.relative_to(r).as_posix())
+    return found
+
+
+def collect(root: str = ".") -> Dict[str, List[str]]:
+    """盘上按键采集 → {key: [仓库相对路径,...]}（文件头 + provenance 两源）。"""
+    r = Path(root)
+    found = _header_keys(r)
+    for k, paths in _provenance_keys(r).items():
+        found.setdefault(k, []).extend(paths)
     return found
 
 

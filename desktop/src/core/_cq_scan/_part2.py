@@ -23,10 +23,9 @@ from ._part1 import (
 )
 
 
-def build(root: str = ".") -> Dict[str, Any]:
-    """跑全量自动扫描 → (toolchain, scan)。"""
-    tc = toolchain(root)
-    files = _tracked(root)
+def _scan_dims(root: str, files: Any
+               ) -> Tuple[Dict[str, Any], List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """跑 SCANNERS 全维 → (dims, findings, hotspots)；findings 的 id 依序编号。"""
     dims: Dict[str, Any] = {}
     findings: List[Dict[str, Any]] = []
     hotspots: List[Dict[str, Any]] = []
@@ -38,6 +37,13 @@ def build(root: str = ".") -> Dict[str, Any]:
             findings.append(item)
         if dim == "radon-cc":
             hotspots = stats.get("hotspots") or []
+    return dims, findings, hotspots
+
+
+def build(root: str = ".") -> Dict[str, Any]:
+    """跑全量自动扫描 → (toolchain, scan)。"""
+    tc = toolchain(root)
+    dims, findings, hotspots = _scan_dims(root, _tracked(root))
     p0 = [f for f in findings if f["severity"] == "P0"]
     p1 = [f for f in findings if f["severity"] == "P1"]
     scan = {"schema": SCAN_SCHEMA, "fingerprint": _fingerprint(root, tc),

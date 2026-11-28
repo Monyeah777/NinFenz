@@ -138,37 +138,64 @@ def _plan_covers_parts(parts: list[str], plan: list[str]) -> bool:
     return bool(parts) and bool(plan) and all(part in joined for part in parts)
 
 
-def obligation_status(s: dict, need: str) -> tuple[str, str]:
+def _structure_status(s: dict) -> tuple[str, str]:
+    return ("satisfied", "parts") if _parts(s) else ("open", "parts")
+
+
+def _relations_status(s: dict) -> tuple[str, str]:
     artifact = s.get("artifact", {})
     parts = _parts(s)
-    if need == "structure":
-        return ("satisfied", "parts") if parts else ("open", "parts")
-    if need == "relations":
-        relations = _strings(artifact.get("relations"))
-        if not relations:
-            return "open", "relations"
-        return ("satisfied" if _all_parts_related(parts, relations) else "weak", "relations")
-    if need == "risks":
-        risks = _strings(artifact.get("risks"))
-        if not risks:
-            return "open", "risks"
-        return ("satisfied" if any(len(item) >= 12 for item in risks) else "weak", "risks")
-    if need == "synthesis":
-        plan = _strings(artifact.get("plan"))
-        if not plan:
-            return "open", "plan"
-        return ("satisfied" if _plan_covers_parts(parts, plan) else "weak", "plan")
-    if need == "grounding":
-        evidence = _strings(artifact.get("evidence"))
-        if artifact.get("verified") and evidence:
-            return "satisfied", "evidence"
-        if artifact.get("verified") or evidence:
-            return "weak", "evidence"
-        return "open", "verified"
-    if need == "resolve":
-        questions = _strings(s.get("open_questions"))
-        return ("open", "open_questions") if questions else ("satisfied", "open_questions")
-    raise ValueError(f"unknown need: {need}")
+    relations = _strings(artifact.get("relations"))
+    if not relations:
+        return "open", "relations"
+    return ("satisfied" if _all_parts_related(parts, relations) else "weak", "relations")
+
+
+def _risks_status(s: dict) -> tuple[str, str]:
+    risks = _strings(s.get("artifact", {}).get("risks"))
+    if not risks:
+        return "open", "risks"
+    return ("satisfied" if any(len(item) >= 12 for item in risks) else "weak", "risks")
+
+
+def _synthesis_status(s: dict) -> tuple[str, str]:
+    artifact = s.get("artifact", {})
+    plan = _strings(artifact.get("plan"))
+    if not plan:
+        return "open", "plan"
+    return ("satisfied" if _plan_covers_parts(_parts(s), plan) else "weak", "plan")
+
+
+def _grounding_status(s: dict) -> tuple[str, str]:
+    artifact = s.get("artifact", {})
+    evidence = _strings(artifact.get("evidence"))
+    if artifact.get("verified") and evidence:
+        return "satisfied", "evidence"
+    if artifact.get("verified") or evidence:
+        return "weak", "evidence"
+    return "open", "verified"
+
+
+def _resolve_status(s: dict) -> tuple[str, str]:
+    questions = _strings(s.get("open_questions"))
+    return ("open", "open_questions") if questions else ("satisfied", "open_questions")
+
+
+_NEED_STATUS = {
+    "structure": _structure_status,
+    "relations": _relations_status,
+    "risks": _risks_status,
+    "synthesis": _synthesis_status,
+    "grounding": _grounding_status,
+    "resolve": _resolve_status,
+}
+
+
+def obligation_status(s: dict, need: str) -> tuple[str, str]:
+    handler = _NEED_STATUS.get(need)
+    if handler is None:
+        raise ValueError(f"unknown need: {need}")
+    return handler(s)
 
 
 def build_agenda(s: dict) -> dict:
@@ -200,30 +227,62 @@ def unresolved_after(s: dict, predicted: list[str]) -> list[str]:
     return [need for need in predicted if obligation_status(s, need)[0] != "satisfied"]
 
 
+def _key_type_issue(key: str, value: Any) -> str | None:
+    if key in STRING_KEYS and not isinstance(value, str):
+        return f"{key} must be a string"
+    if key in BOOLEAN_KEYS and not isinstance(value, bool):
+        return f"{key} must be a boolean"
+    if key in LIST_KEYS and not isinstance(value, list):
+        return f"{key} must be an array"
+    if key in OBJECT_KEYS and not isinstance(value, (dict, int, float)):
+        return f"{key} must be an object or number"
+    return None
+
+
+def _item_issues(key: str, index: int, item: Any) -> list[str]:
+    issues: list[str] = []
+    if key in STRING_LIST_KEYS and not isinstance(item, str):
+        issues.append(f"{key}[{index}] must be a string")
+    if isinstance(item, str) and len(item) > MAX_ITEM_CHARS:
+        issues.append(f"{key}[{index}] exceeds {MAX_ITEM_CHARS} characters")
+    if not isinstance(item, (str, dict, int, float, bool, type(None))):
+        issues.append(f"{key}[{index}] has unsupported type")
+    return issues
+
+
+def _list_issues(key: str, value: list) -> list[str]:
+    issues: list[str] = []
+    if len(value) > MAX_ITEMS:
+        issues.append(f"{key} exceeds {MAX_ITEMS} items")
+    for index, item in enumerate(value):
+        issues.extend(_item_issues(key, index, item))
+    return issues
+
+
 def _value_issues(key: str, value: Any) -> list[str]:
     issues: list[str] = []
-    if key in STRING_KEYS and not isinstance(value, str):
-        issues.append(f"{key} must be a string")
-    elif key in BOOLEAN_KEYS and not isinstance(value, bool):
-        issues.append(f"{key} must be a boolean")
-    elif key in LIST_KEYS and not isinstance(value, list):
-        issues.append(f"{key} must be an array")
-    elif key in OBJECT_KEYS and not isinstance(value, (dict, int, float)):
-        issues.append(f"{key} must be an object or number")
+    type_issue = _key_type_issue(key, value)
+    if type_issue:
+        issues.append(type_issue)
     if isinstance(value, str) and len(value) > MAX_ITEM_CHARS:
         issues.append(f"{key} exceeds {MAX_ITEM_CHARS} characters")
     if isinstance(value, list):
-        if len(value) > MAX_ITEMS:
-            issues.append(f"{key} exceeds {MAX_ITEMS} items")
-        for index, item in enumerate(value):
-            if key in STRING_LIST_KEYS and not isinstance(item, str):
-                issues.append(f"{key}[{index}] must be a string")
-            if isinstance(item, str) and len(item) > MAX_ITEM_CHARS:
-                issues.append(f"{key}[{index}] exceeds {MAX_ITEM_CHARS} characters")
-            if not isinstance(item, (str, dict, int, float, bool, type(None))):
-                issues.append(f"{key}[{index}] has unsupported type")
+        issues.extend(_list_issues(key, value))
     if key in NUMBER_KEYS and (not isinstance(value, (int, float)) or isinstance(value, bool)):
         issues.append(f"{key} must be a number")
+    return issues
+
+
+def _patch_issues(patch: dict, allowed: set[str]) -> list[str]:
+    issues = []
+    for key, value in patch.items():
+        if not isinstance(key, str) or not re.fullmatch(r"[a-z][a-z0-9_]*", key):
+            issues.append("invalid thought_patch key")
+            continue
+        if key not in allowed:
+            issues.append(f"thought_patch key not produced by selected cluster: {key}")
+            continue
+        issues.extend(_value_issues(key, value))
     return issues
 
 
@@ -245,13 +304,4 @@ def validate_thought_patch(candidate: dict, patch: Any) -> list[str]:
             for item in secrets
         ]
     allowed = {key for atom_id in candidate["cluster"] for key in ls.CONTRACTS[atom_id]["adds"]}
-    issues = []
-    for key, value in patch.items():
-        if not isinstance(key, str) or not re.fullmatch(r"[a-z][a-z0-9_]*", key):
-            issues.append("invalid thought_patch key")
-            continue
-        if key not in allowed:
-            issues.append(f"thought_patch key not produced by selected cluster: {key}")
-            continue
-        issues.extend(_value_issues(key, value))
-    return issues
+    return _patch_issues(patch, allowed)

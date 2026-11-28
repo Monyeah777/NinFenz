@@ -110,13 +110,25 @@ def build(naware: bool) -> dict:
     return {"schema": "nf/comparison-matrix/1", "cells": cells}
 
 
+def _filled(app: list[dict]) -> list[dict]:
+    return [c for c in app if c.get("value") and c.get("evidence") and c.get("check")]
+
+
+def _fabricated(na: list[dict]) -> list[dict]:
+    return [c for c in na if any(k in c for k in ("value", "evidence", "check"))]
+
+
+def _justified(na: list[dict]) -> list[dict]:
+    return [c for c in na if c.get("applicability") == "not_applicable" and c.get("reason")]
+
+
 def metrics(matrix: dict) -> dict:
     cells = matrix["cells"]
     app = [c for c in cells if APPLICABLE[(c["object"], c["dimension"])]]
     na = [c for c in cells if not APPLICABLE[(c["object"], c["dimension"])]]
-    filled = [c for c in app if c.get("value") and c.get("evidence") and c.get("check")]
-    fabricated = [c for c in na if any(k in c for k in ("value", "evidence", "check"))]
-    justified = [c for c in na if c.get("applicability") == "not_applicable" and c.get("reason")]
+    filled = _filled(app)
+    fabricated = _fabricated(na)
+    justified = _justified(na)
     return {
         "cells": len(cells),
         "applicable": len(app),

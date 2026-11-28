@@ -21,6 +21,32 @@ VALIDATOR = jsonschema.Draft202012Validator(SCHEMA)
 ATOM_IDS = {item["id"] for item in json_asset.load(BASE / "meta_atoms.json")["atoms"]}
 
 
+def _entry_issues(entry: dict, witnesses: dict) -> list[str]:
+    label = entry.get("id", "general")
+    issues: list[str] = []
+    if not set(entry["required_facets"]) <= set(entry["facets"]):
+        issues.append("required facet missing from facets: " + label)
+    for facet in entry["facets"]:
+        if facet not in witnesses:
+            issues.append(f"facet witness missing: {label}/{facet}")
+    missing_atoms = set(entry["preferred_atoms"]) - ATOM_IDS
+    if missing_atoms:
+        issues.append(
+            "unknown preferred atoms {}: {}".format(label, ",".join(sorted(missing_atoms)))
+        )
+    unknown_roles = set(entry["context_roles"]) - evidence_roles.KNOWN_ROLES
+    if unknown_roles:
+        issues.append(
+            "unknown context roles {}: {}".format(label, ",".join(sorted(unknown_roles)))
+        )
+    if entry.get("id") is not None:
+        strong = set(entry["strong_triggers"])
+        weak = set(entry["weak_triggers"])
+        if strong & weak:
+            issues.append("overlapping triggers: " + label)
+    return issues
+
+
 def validate_catalog(document: dict | None = None) -> list[str]:
     document = document or PROFILE_DOC
     witnesses = document["facet_witnesses"]
@@ -30,27 +56,7 @@ def validate_catalog(document: dict | None = None) -> list[str]:
         issues.append("duplicate profile id")
     entries = list(document["profiles"]) + [document["general"]]
     for entry in entries:
-        label = entry.get("id", "general")
-        if not set(entry["required_facets"]) <= set(entry["facets"]):
-            issues.append("required facet missing from facets: " + label)
-        for facet in entry["facets"]:
-            if facet not in witnesses:
-                issues.append(f"facet witness missing: {label}/{facet}")
-        missing_atoms = set(entry["preferred_atoms"]) - ATOM_IDS
-        if missing_atoms:
-            issues.append(
-                "unknown preferred atoms {}: {}".format(label, ",".join(sorted(missing_atoms)))
-            )
-        unknown_roles = set(entry["context_roles"]) - evidence_roles.KNOWN_ROLES
-        if unknown_roles:
-            issues.append(
-                "unknown context roles {}: {}".format(label, ",".join(sorted(unknown_roles)))
-            )
-        if entry.get("id") is not None:
-            strong = set(entry["strong_triggers"])
-            weak = set(entry["weak_triggers"])
-            if strong & weak:
-                issues.append("overlapping triggers: " + label)
+        issues.extend(_entry_issues(entry, witnesses))
     return issues
 
 
@@ -66,41 +72,51 @@ def _matches(text: str, trigger: str) -> bool:
     return needle in text
 
 
+def _modes(text: str, trigger_key: str) -> list[str]:
+    return [
+        item["id"]
+        for item in PROFILE_DOC["profiles"]
+        if any(_matches(text, trigger) for trigger in item[trigger_key])
+    ]
+
+
+def _collect(selected: list[dict]) -> tuple[list, list, list, list, list]:
+    facets: list = []
+    required: list = []
+    functions: list = []
+    roles: list = []
+    preferred_atoms: list = []
+    for item in selected:
+        facets.extend(item["facets"])
+        required.extend(item["required_facets"])
+        functions.extend(item["functions"])
+        roles.extend(item["context_roles"])
+        preferred_atoms.extend(item["preferred_atoms"])
+    return facets, required, functions, roles, preferred_atoms
+
+
+def _fallback() -> tuple[list, list, list, list, list, str]:
+    fallback = PROFILE_DOC["general"]
+    return (
+        list(fallback["facets"]),
+        list(fallback["required_facets"]),
+        list(fallback["functions"]),
+        list(fallback["context_roles"]),
+        list(fallback["preferred_atoms"]),
+        "general",
+    )
+
+
 def build(goal: str) -> dict:
     text = goal.casefold()
-    strong_modes = [
-        item["id"]
-        for item in PROFILE_DOC["profiles"]
-        if any(_matches(text, trigger) for trigger in item["strong_triggers"])
-    ]
-    weak_modes = [
-        item["id"]
-        for item in PROFILE_DOC["profiles"]
-        if any(_matches(text, trigger) for trigger in item["weak_triggers"])
-    ]
-    modes = strong_modes or weak_modes
+    modes = _modes(text, "strong_triggers") or _modes(text, "weak_triggers")
     if modes:
-        selected = [PROFILES[item] for item in modes]
-        facets = []
-        required = []
-        functions = []
-        roles = []
-        preferred_atoms = []
-        for item in selected:
-            facets.extend(item["facets"])
-            required.extend(item["required_facets"])
-            functions.extend(item["functions"])
-            roles.extend(item["context_roles"])
-            preferred_atoms.extend(item["preferred_atoms"])
+        facets, required, functions, roles, preferred_atoms = _collect(
+            [PROFILES[item] for item in modes]
+        )
         primary = modes[0]
     else:
-        fallback = PROFILE_DOC["general"]
-        facets = list(fallback["facets"])
-        required = list(fallback["required_facets"])
-        functions = list(fallback["functions"])
-        roles = list(fallback["context_roles"])
-        preferred_atoms = list(fallback["preferred_atoms"])
-        primary = "general"
+        facets, required, functions, roles, preferred_atoms, primary = _fallback()
     return {
         "schema": "nf-task-profile/1",
         "catalog_version": PROFILE_DOC["version"],
@@ -123,23 +139,31 @@ def _state_value(state: dict, key: str):
     return state.get(key)
 
 
+def _list_present(value: list, min_items: int, min_chars: int, item_keys: list[str] | None) -> bool:
+    if len(value) < min_items:
+        return False
+    if item_keys:
+        return all(
+            isinstance(item, dict) and all(key in item for key in item_keys) for item in value
+        )
+    if min_chars:
+        return all(isinstance(item, str) and len(item) >= min_chars for item in value)
+    return True
+
+
+def _dict_present(value: dict, min_items: int, item_keys: list[str] | None) -> bool:
+    if not value or len(value) < min_items:
+        return False
+    return not item_keys or all(key in value for key in item_keys)
+
+
 def _present(
     value, min_items: int = 1, min_chars: int = 0, item_keys: list[str] | None = None
 ) -> bool:
     if isinstance(value, list):
-        if len(value) < min_items:
-            return False
-        if item_keys:
-            return all(
-                isinstance(item, dict) and all(key in item for key in item_keys) for item in value
-            )
-        if min_chars:
-            return all(isinstance(item, str) and len(item) >= min_chars for item in value)
-        return True
+        return _list_present(value, min_items, min_chars, item_keys)
     if isinstance(value, dict):
-        if not value or len(value) < min_items:
-            return False
-        return not item_keys or all(key in value for key in item_keys)
+        return _dict_present(value, min_items, item_keys)
     if isinstance(value, str):
         return bool(value) and len(value) >= min_chars
     return value not in (None, False)

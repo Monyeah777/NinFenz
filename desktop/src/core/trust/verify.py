@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from core import json_doc, json_schema
 from core.trust import anchor as ta
@@ -22,6 +23,12 @@ from core.trust import bundle as tb
 from core.trust import human_review as hrev
 from core.trust import public_anchor as pua
 from core.trust import signature as tsig
+from core.trust._verify_sections import (
+    anchor_section,
+    public_section,
+    review_section,
+    signature_section,
+)
 from core.trust.canonical import digest_of, is_digest
 
 GUIDE = "修复指引："
@@ -148,6 +155,42 @@ class TrustVerifyOptions:
     public_log_id: str = ''
 
 
+def _policy_info(policy: Any, root: str) -> tuple[str, bool]:
+    policy_schema = load_schema(root, POLICY_SCHEMA_REL)
+    policy_problems = json_schema.json_schema_check(policy, policy_schema)
+    raw_required = str((policy or {}).get("required_level") or "")
+    required = raw_required if raw_required in LEVELS else "T0"
+    policy_ok = not policy_problems and raw_required in LEVELS
+    return required, policy_ok
+
+
+def _bundle_info(bundle: dict, root: str) -> tuple[dict, bool, str]:
+    bundle_schema = tb.load_schema(root)
+    run = tb.verify_bundle(bundle, bundle_schema)
+    hash_ok = bool(run["ok"])
+    subject_digest = digest_of(bundle)
+    if not is_digest(subject_digest):
+        raise ValueError(f"无法计算 subject digest（{GUIDE}检查 canonical 编码）")
+    return run, hash_ok, subject_digest
+
+
+def _initial_checks(hash_ok: bool, run: dict) -> list:
+    return [
+        {"id": "A1-bundle-integrity", "ok": hash_ok,
+         "detail": "bundle 结构/Merkle 根/逐叶 proof 全过" if hash_ok
+                   else "bundle 校验失败：" + "；".join(run["issues"][:2])},
+    ]
+
+
+def _trust_roots(policy: Any) -> dict:
+    return {
+        "issuers": [str(item.get("id")) for item in (policy or {}).get("issuers") or []
+                    if isinstance(item, dict)],
+        "tsa": [str(item.get("id")) for item in (policy or {}).get("tsa_roots") or []
+                if isinstance(item, dict)],
+    }
+
+
 def verify(
     bundle: dict,
     policy: dict,
@@ -172,150 +215,41 @@ def verify(
     public_anchor = opts.public_anchor
     public_anchor_verifier = opts.public_anchor_verifier
     public_log_id = opts.public_log_id
-    policy_schema = load_schema(root, POLICY_SCHEMA_REL)
-    bundle_schema = tb.load_schema(root)
-    policy_problems = json_schema.json_schema_check(policy, policy_schema)
-    raw_required = str((policy or {}).get("required_level") or "")
-    required = raw_required if raw_required in LEVELS else "T0"
-    policy_ok = not policy_problems and raw_required in LEVELS
-    run = tb.verify_bundle(bundle, bundle_schema)
-    hash_ok = bool(run["ok"])
-    subject_digest = digest_of(bundle)
-    if not is_digest(subject_digest):
-        raise ValueError(f"无法计算 subject digest（{GUIDE}检查 canonical 编码）")
+    required, policy_ok = _policy_info(policy, root)
+    run, hash_ok, subject_digest = _bundle_info(bundle, root)
     facts = skeleton_facts(hash_ok)
-    checks = [
-        {"id": "A1-bundle-integrity", "ok": hash_ok,
-         "detail": "bundle 结构/Merkle 根/逐叶 proof 全过" if hash_ok
-                   else "bundle 校验失败：" + "；".join(run["issues"][:2])},
-    ]
-    anchor_issues: list = []
-    if anchor is not None:
-        merged = ta.verify_anchor_set(anchor, subject_digest, policy,
-                                      anchor_verifiers, root=root)
-        facts.update(merged["facts"])
-        anchor_issues = merged["issues"]
-        checks.append({"id": "A2-anchor-facts", "ok": not anchor_issues,
-                       "detail": "anchor 事实：" + "；".join(
-                           f"{k}={v}" for k, v in sorted(merged["facts"].items()))})
-        checks.append({"id": "A2-anchor-details", "ok": not anchor_issues,
-                       "detail": "；".join(f"{d['kind']}:{d['status']}"
-                                          for d in merged["details"]) or "无锚"})
-    else:
-        checks.append({"id": "A2-anchor-facts", "ok": False,
-                       "detail": "未提供 nf-anchor/1；T2 及以上只报缺项，不冒充等级"})
-    signature_issues: list = []
-    if head_signature is not None:
-        if not registry or not isinstance(material, dict):
-            checks.append({"id": "A1-head-signature", "ok": False,
-                           "detail": "给了签名信封但缺 registry/material，签名事实记 none"})
-        else:
-            try:
-                envelope_schema = json_doc.load(
-                    Path(root) / "protocol/trust/dsse.schema.json", dict,
-                    what="dsse schema")
-            except (OSError, ValueError):
-                envelope_schema = None
-            verified = tsig.verify_head(
-                head_signature,
-                'bundle',
-                subject_digest,
-                registry,
-                material,
-                opts=tsig.VerifyHeadOptions(schema_envelope=envelope_schema, now=now, root=root),
-            )
-            if verified.get("ok"):
-                facts["signature"] = "ok"
-                checks.append({"id": "A1-head-signature", "ok": True,
-                               "detail": "链头签名有效：signers=" + ",".join(
-                                   verified.get("signers") or [])})
-            elif verified.get("reason") in ("KEY-UNKNOWN", "VERIFIER-MISSING"):
-                checks.append({"id": "A1-head-signature", "ok": False,
-                               "detail": "签名无法判定：" + str(verified.get("reason"))})
-            else:
-                facts["signature"] = "invalid"
-                reason = str(verified.get("reason") or "SIGNATURE-INVALID")
-                signature_issues.append({
-                    "code": reason, "message": "链头签名校验失败",
-                    "fix": "重签链头并确认 issuer registry 生命周期（吊销/过期/轮换）"})
-                checks.append({"id": "A1-head-signature", "ok": False,
-                               "detail": "链头签名失败：" + reason})
-    else:
-        checks.append({"id": "A1-head-signature", "ok": False,
-                       "detail": "未提供链头签名；T1 及以上只报缺项，不冒充等级"})
-    public_issues: list = []
-    if public_anchor is not None:
-        resolved = pua.verify_public_anchor(
-            public_anchor,
-            public_anchor_verifier,
-            public_log_id,
-            subject_digest,
-            opts=pua.PublicAnchorOptions(root=root),
-        )
-        if resolved.get("ok"):
-            facts["public_anchor"] = "ok"
-            checks.append({"id": "A5-public-anchor", "ok": True,
-                           "detail": f"public anchor ok：log={resolved.get('log_id')} "
-                                     f"tree={resolved.get('tree_size')}"})
-        else:
-            facts["public_anchor"] = "invalid"
-            public_issues.append({"code": str(resolved.get("reason") or "PUBLIC-ANCHOR-INVALID"),
-                                  "message": "公共锚校验失败",
-                                  "fix": "核对 pinned log id/公钥、inclusion proof 与目标摘要"})
-            checks.append({"id": "A5-public-anchor", "ok": False,
-                           "detail": str(resolved.get("reason"))})
-    else:
-        checks.append({"id": "A5-public-anchor", "ok": False,
-                       "detail": "未提供公共锚（T4 只报缺项，不冒充已锚）"})
-    review_state = hrev.STATE_PENDING
-    review_issues: list = []
-    if human_review is not None and registry and isinstance(material, dict):
-        try:
-            envelope_schema = json_doc.load(
-                Path(root) / "protocol/trust/dsse.schema.json", dict, what="dsse schema")
-        except (OSError, ValueError):
-            envelope_schema = None
-        reviewed = hrev.verify_review(
-            human_review,
-            'bundle',
-            subject_digest,
-            registry,
-            material,
-            opts=hrev.ReviewVerifyOptions(schema_envelope=envelope_schema, now=now, root=root),
-        )
-        review_state = hrev.review_state(reviewed)
-        review_detail = f"human review state={review_state}"
-        if reviewed.get("reason"):
-            review_detail += f"（{reviewed.get('reason')}）"
-        checks.append({"id": "A4-human-review",
-                       "ok": review_state == hrev.STATE_APPROVED,
-                       "detail": review_detail})
-        if review_state in (hrev.STATE_REJECTED, hrev.STATE_ESCALATED, hrev.STATE_INVALID):
-            review_issues.append({"code": str(reviewed.get("reason") or "REVIEW-INVALID"),
-                                  "message": f"人类复核未通过（state={review_state}）",
-                                  "fix": "重走复核并签 approve，或不要附上被拒记录"})
-    else:
-        checks.append({"id": "A4-human-review", "ok": False,
-                       "detail": "human review state=PENDING"
-                                 "（未提供复核记录；PENDING 不等于通过）"})
+    checks = _initial_checks(hash_ok, run)
+    anchor = anchor_section(opts.anchor, subject_digest, policy,
+                            opts.anchor_verifiers, root)
+    if anchor["facts"] is not None:
+        facts.update(anchor["facts"])
+    checks.extend(anchor["checks"])
+    signature = signature_section(opts.head_signature, subject_digest, opts.registry,
+                                  opts.material, opts.now, root)
+    if signature["facts"] is not None:
+        facts.update(signature["facts"])
+    checks.extend(signature["checks"])
+    public = public_section(opts.public_anchor, opts.public_anchor_verifier,
+                            opts.public_log_id, subject_digest, root)
+    if public["facts"] is not None:
+        facts.update(public["facts"])
+    checks.extend(public["checks"])
+    review = review_section(opts.human_review, subject_digest,
+                            opts.registry, opts.material, opts.now, root)
+    checks.extend(review["checks"])
     decision = decide(facts, required, policy_ok=policy_ok)
     decision["required"] = required
     issues = _missing_issues(decision["missing"])
-    issues.extend(anchor_issues)
-    issues.extend(signature_issues)
-    issues.extend(review_issues)
-    issues.extend(public_issues)
+    issues.extend(anchor["issues"])
+    issues.extend(signature["issues"])
+    issues.extend(review["issues"])
+    issues.extend(public["issues"])
     if not hash_ok:
         issues.insert(0, {"code": "BUNDLE-INVALID",
                           "message": "bundle 自洽性校验失败（" +
                                      "；".join(run["issues"][:2]) + "）",
                           "fix": "重算 bundle，或修复被证数据后重新打包"})
-    trust_roots = {
-        "issuers": [str(item.get("id")) for item in (policy or {}).get("issuers") or []
-                    if isinstance(item, dict)],
-        "tsa": [str(item.get("id")) for item in (policy or {}).get("tsa_roots") or []
-                if isinstance(item, dict)],
-    }
+    trust_roots = _trust_roots(policy)
     report = build_report(
         'bundle',
         subject_digest,

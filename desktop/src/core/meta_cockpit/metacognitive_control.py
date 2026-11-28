@@ -17,6 +17,33 @@ def control_value(plan: dict, s: dict, ledger: dict | None = None) -> float:
     return round(len(plan["resolves"]) * CONTROL_VALUE * rel - plan["cost"] * COST_WEIGHT, 3)
 
 
+def _stop_plan(goals: list[str], reason: str) -> dict:
+    return {
+        "action": "stop",
+        "reason": reason,
+        "cluster": [],
+        "resolves": [],
+        "goal": ",".join(goals),
+    }
+
+
+def _atoms(stages: list[list[str]]) -> list[str]:
+    return [a for st in stages for a in st]
+
+
+def _atoms_cost(atoms: list[str]) -> int:
+    return sum(ls.CONTRACTS[a]["cost"] for a in atoms)
+
+
+def _cluster_prefix(stages: list[list[str]]) -> list[str]:
+    cluster: list[str] = []
+    for st in stages:
+        if len(cluster) + len(st) > 3:
+            break
+        cluster += st
+    return cluster
+
+
 def decide_compiled(
     s: dict, ledger: dict | None = None, max_cost: int = 3, threshold: float = 0.0
 ) -> dict | None:
@@ -28,33 +55,17 @@ def decide_compiled(
     goals, stages = comp["goals"], comp["stages"]
     if not goals or not stages:
         return None
-    atoms = [a for st in stages for a in st]
+    atoms = _atoms(stages)
     rel = ledger_mod.avg_reliability(ledger, atoms)
-    cost = sum(ls.CONTRACTS[a]["cost"] for a in atoms)
+    cost = _atoms_cost(atoms)
     cv = len(goals) * CONTROL_VALUE * rel - cost
     if rel < ledger_mod.RELIABILITY_FLOOR or cv <= threshold:
-        return {
-            "action": "stop",
-            "reason": "no reliable compiled plan",
-            "cluster": [],
-            "resolves": [],
-            "goal": ",".join(goals),
-        }
-    cluster: list[str] = []
-    for st in stages:
-        if len(cluster) + len(st) > 3:
-            break
-        cluster += st
+        return _stop_plan(goals, "no reliable compiled plan")
+    cluster = _cluster_prefix(stages)
     if not cluster:
         cluster = stages[0][:1]
     if any(ledger[a]["reliability"] < ledger_mod.RELIABILITY_FLOOR for a in cluster):
-        return {
-            "action": "stop",
-            "reason": "cluster reliability below floor",
-            "cluster": [],
-            "resolves": [],
-            "goal": ",".join(goals),
-        }
+        return _stop_plan(goals, "cluster reliability below floor")
     return {
         "action": "continue",
         "reason": "compiled plan",

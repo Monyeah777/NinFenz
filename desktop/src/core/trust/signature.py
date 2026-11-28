@@ -109,6 +109,36 @@ class VerifyHeadOptions:
     root: str = '.'
 
 
+def _statement_of(envelope: Any) -> tuple[dict | None, dict | None]:
+    if not isinstance(envelope, dict):
+        return None, {"ok": False, "reason": "ENVELOPE-NOT-OBJECT"}
+    if envelope.get("payloadType") != PAYLOAD_TYPE:
+        return None, {"ok": False, "reason": "PAYLOAD-TYPE-MISMATCH"}
+    try:
+        payload = dsse._b64d(envelope.get("payload"))
+    except ValueError as exc:
+        return None, {"ok": False, "reason": "PAYLOAD-B64-INVALID", "detail": str(exc)}
+    try:
+        statement = json_doc.loads(payload.decode("utf-8"), dict, what="chain-head payload")
+    except (UnicodeDecodeError, ValueError) as exc:
+        return None, {"ok": False, "reason": "STATEMENT-INVALID", "detail": str(exc)}
+    return statement, None
+
+
+def _statement_issue(
+    statement: dict, expected_kind: str, expected_digest: str, opts: VerifyHeadOptions
+) -> dict | None:
+    check_schema = opts.schema_statement if opts.schema_statement is not None else load_schema(opts.root)
+    problems = json_schema.json_schema_check(statement, check_schema)
+    if problems:
+        return {"ok": False, "reason": "STATEMENT-SCHEMA-INVALID", "detail": problems[0]}
+    if statement.get("subject_kind") != expected_kind:
+        return {"ok": False, "reason": "SUBJECT-KIND-MISMATCH"}
+    if statement.get("subject_digest") != expected_digest:
+        return {"ok": False, "reason": "SUBJECT-DIGEST-MISMATCH"}
+    return None
+
+
 def verify_head(
     envelope: Any,
     expected_kind: str,
@@ -124,32 +154,15 @@ def verify_head(
     """
 
     opts = opts if opts is not None else VerifyHeadOptions()
-    schema_envelope = opts.schema_envelope
-    schema_statement = opts.schema_statement
-    now = opts.now
-    root = opts.root
-    if not isinstance(envelope, dict):
-        return {"ok": False, "reason": "ENVELOPE-NOT-OBJECT"}
-    if envelope.get("payloadType") != PAYLOAD_TYPE:
-        return {"ok": False, "reason": "PAYLOAD-TYPE-MISMATCH"}
-    try:
-        payload = dsse._b64d(envelope.get("payload"))
-    except ValueError as exc:
-        return {"ok": False, "reason": "PAYLOAD-B64-INVALID", "detail": str(exc)}
-    try:
-        statement = json_doc.loads(payload.decode("utf-8"), dict, what="chain-head payload")
-    except (UnicodeDecodeError, ValueError) as exc:
-        return {"ok": False, "reason": "STATEMENT-INVALID", "detail": str(exc)}
-    check_schema = schema_statement if schema_statement is not None else load_schema(root)
-    problems = json_schema.json_schema_check(statement, check_schema)
-    if problems:
-        return {"ok": False, "reason": "STATEMENT-SCHEMA-INVALID", "detail": problems[0]}
-    if statement.get("subject_kind") != expected_kind:
-        return {"ok": False, "reason": "SUBJECT-KIND-MISMATCH"}
-    if statement.get("subject_digest") != expected_digest:
-        return {"ok": False, "reason": "SUBJECT-DIGEST-MISMATCH"}
-    verified = tk.verify_envelope(envelope, registry, material,
-                                  schema_envelope, now=now)
+    statement, issue = _statement_of(envelope)
+    if issue is not None:
+        return issue
+    issue = _statement_issue(statement, expected_kind, expected_digest, opts)
+    if issue is not None:
+        return issue
+    verified = tk.verify_envelope(
+        envelope, registry, material, opts.schema_envelope, now=opts.now
+    )
     if not verified.get("valid"):
         return {"ok": False, "reason": verified.get("reason", "SIGNATURE-INVALID"),
                 "detail": verified.get("detail", "")}

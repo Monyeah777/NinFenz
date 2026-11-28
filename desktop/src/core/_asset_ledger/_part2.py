@@ -210,6 +210,17 @@ def iter_assets(root: str):
     return rows
 
 
+def _row_matches(r: dict, pkg: str, tier: str, status: str) -> bool:
+    """单行是否命中 ls 过滤器（pkg/tier/status 全为空即全命中）。"""
+    if pkg and r.get("package", "") != pkg:
+        return False
+    if tier and r.get("tier", "") != tier:
+        return False
+    if status and r.get("status") != status:
+        return False
+    return True
+
+
 def filter_rows(rows: list, pkg: str = "", tier: str = "",
                 status: str = "") -> list:
     """ls 过滤器（pkg = 台账 package 字段；tier/status = 台账级/条目级匹配）。"""
@@ -219,13 +230,8 @@ def filter_rows(rows: list, pkg: str = "", tier: str = "",
         raise AssetLedgerError("status 过滤器非法：%s" % status)
     out = []
     for r in rows:
-        if pkg and r.get("package", "") != pkg:
-            continue
-        if tier and r.get("tier", "") != tier:
-            continue
-        if status and r.get("status") != status:
-            continue
-        out.append(r)
+        if _row_matches(r, pkg, tier, status):
+            out.append(r)
     return out
 
 

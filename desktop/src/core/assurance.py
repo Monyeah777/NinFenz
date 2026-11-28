@@ -178,10 +178,15 @@ def validate_raid(doc: Dict[str, Any], root: str = ".") -> List[str]:
     return issues
 
 
+def _gap_ids(claims: Dict[str, Any]) -> set:
+    """保证案例登记的缺口 id 集合。"""
+    return {str(g.get("id")) for g in claims.get("gaps") or [] if isinstance(g, dict)}
+
+
 def link_issues(claims: Dict[str, Any], raid: Dict[str, Any]) -> List[str]:
     """缺口 ↔ RAID issues 一一绑定（双向；缺口不能只在保证案例里出现）。"""
     issues: List[str] = []
-    gap_ids = {str(g.get("id")) for g in claims.get("gaps") or [] if isinstance(g, dict)}
+    gap_ids = _gap_ids(claims)
     linked = {}
     for item in raid.get("issues") or []:
         gap = str((item or {}).get("link_gap") or "")
@@ -204,7 +209,7 @@ def audit(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         return [str(exc)], {}
     issues = validate_claims(claims, root) + validate_raid(raid, root)
     issues += link_issues(claims, raid)
-    gap_ids = {str(g.get("id")) for g in claims.get("gaps") or [] if isinstance(g, dict)}
+    gap_ids = _gap_ids(claims)
     facts = {
         "goals": len(claims.get("goals") or []),
         "arguments": len(claims.get("arguments") or []),

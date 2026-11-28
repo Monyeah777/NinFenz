@@ -31,21 +31,35 @@ CLOSURE_FOR_OUTPUT = {
 LEVELS = ("M0", "M1", "M2", "M3", "M4")
 
 
+def _levels(atoms: list[dict]) -> list[str]:
+    return sorted(
+        {atom["level_min"] for atom in atoms} | {atom["level_max"] for atom in atoms},
+        key=LEVELS.index,
+    )
+
+
+def _roles(functions: list[str], profile: dict | None) -> set[str]:
+    roles = {role for function in functions for role in FUNCTION_CONTEXT[function]}
+    if profile:
+        roles |= set(profile.get("context_roles", []))
+    return roles
+
+
+def _closure(patch_keys: list[str], candidate: dict) -> list[str]:
+    closure = [CLOSURE_FOR_OUTPUT[key] for key in patch_keys if key in CLOSURE_FOR_OUTPUT]
+    if candidate.get("resolves"):
+        closure.append("预测必须由本回合真实状态增量兑现")
+    return closure
+
+
 def build_contract(candidate: dict, profile: dict | None = None) -> dict:
     atom_ids = list(candidate["cluster"])
     atoms = [ATOMS[atom_id] for atom_id in atom_ids]
     functions = sorted({atom["function"] for atom in atoms})
-    levels = sorted(
-        {atom["level_min"] for atom in atoms} | {atom["level_max"] for atom in atoms},
-        key=LEVELS.index,
-    )
+    levels = _levels(atoms)
     patch_keys = sorted({key for atom_id in atom_ids for key in ls.CONTRACTS[atom_id]["adds"]})
-    roles = {role for function in functions for role in FUNCTION_CONTEXT[function]}
-    if profile:
-        roles |= set(profile.get("context_roles", []))
-    closure = [CLOSURE_FOR_OUTPUT[key] for key in patch_keys if key in CLOSURE_FOR_OUTPUT]
-    if candidate.get("resolves"):
-        closure.append("预测必须由本回合真实状态增量兑现")
+    roles = _roles(functions, profile)
+    closure = _closure(patch_keys, candidate)
     return {
         "schema": "nf-thought-contract/1",
         "atom_ids": atom_ids,

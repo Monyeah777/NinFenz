@@ -38,47 +38,85 @@ def parser() -> argparse.ArgumentParser:
     return p
 
 
-def run(args: argparse.Namespace) -> int:
-    injections = None
-    try:
-        if args.prompt_file is not None and args.prompt_file.stat().st_size > MAX_PROMPT_FILE_BYTES:
-            raise ValueError("prompt file too large")
-        prompt = (
-            args.prompt_file.read_text(encoding="utf-8").strip()
-            if args.prompt_file is not None
-            else args.prompt.strip()
+def _prompt_of(args: argparse.Namespace) -> str:
+    if args.prompt_file is not None and args.prompt_file.stat().st_size > MAX_PROMPT_FILE_BYTES:
+        raise ValueError("prompt file too large")
+    return (
+        args.prompt_file.read_text(encoding="utf-8").strip()
+        if args.prompt_file is not None
+        else args.prompt.strip()
+    )
+
+
+def _load_injections(args: argparse.Namespace) -> dict | None:
+    if args.injections is None:
+        return None
+    if args.injections.stat().st_size > MAX_PROMPT_FILE_BYTES:
+        raise ValueError("injections file too large")
+    raw = json_asset.load(args.injections)
+    if not isinstance(raw, dict):
+        raise ValueError("injections must be an object")
+    injections = {}
+    for key, values in raw.items():
+        turn = int(key)
+        if (
+            turn < 1
+            or not isinstance(values, list)
+            or not all(isinstance(value, str) and value.strip() for value in values)
+        ):
+            raise ValueError("invalid injections")
+        injections[turn] = values
+    return injections
+
+
+def _adapter_for(args: argparse.Namespace):
+    if args.responses is not None:
+        return file_model_adapter.FileModelAdapter(args.responses, context_dir=args.context_dir)
+    if args.context_dir is not None:
+        raise ValueError("--context-dir requires --responses")
+    return None
+
+
+def _write_outputs(args: argparse.Namespace, result: dict) -> None:
+    if args.handoff_out is not None:
+        atomic_io.write_text(args.handoff_out, result["markdown"])
+    if args.manifest_out is not None:
+        atomic_io.write_text(
+            args.manifest_out,
+            json.dumps(result["manifest"], ensure_ascii=False, indent=2) + "\n",
         )
-        if args.injections is not None:
-            if args.injections.stat().st_size > MAX_PROMPT_FILE_BYTES:
-                raise ValueError("injections file too large")
-            raw = json_asset.load(args.injections)
-            if not isinstance(raw, dict):
-                raise ValueError("injections must be an object")
-            injections = {}
-            for key, values in raw.items():
-                turn = int(key)
-                if (
-                    turn < 1
-                    or not isinstance(values, list)
-                    or not all(isinstance(value, str) and value.strip() for value in values)
-                ):
-                    raise ValueError("invalid injections")
-                injections[turn] = values
+    if args.json:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+    else:
+        print(result["markdown"])
+
+
+def _status_code(result: dict, adapter) -> int:
+    if result["run"]["status"] == "fail":
+        return 1
+    if not result["run"]["complete"] or result["handoff"]["gaps"]:
+        return 2
+    if adapter is not None:
+        try:
+            adapter.assert_consumed()
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+    return 0
+
+
+def run(args: argparse.Namespace) -> int:
+    try:
+        prompt = _prompt_of(args)
+        injections = _load_injections(args)
     except (OSError, UnicodeError, ValueError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
     if not prompt:
         print("empty prompt", file=sys.stderr)
         return 2
-    adapter = None
     try:
-        if args.responses is not None:
-            adapter = file_model_adapter.FileModelAdapter(
-                args.responses, context_dir=args.context_dir
-            )
-        elif args.context_dir is not None:
-            print("--context-dir requires --responses", file=sys.stderr)
-            return 2
+        adapter = _adapter_for(args)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2
@@ -98,28 +136,8 @@ def run(args: argparse.Namespace) -> int:
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 2
-    if args.handoff_out is not None:
-        atomic_io.write_text(args.handoff_out, result["markdown"])
-    if args.manifest_out is not None:
-        atomic_io.write_text(
-            args.manifest_out,
-            json.dumps(result["manifest"], ensure_ascii=False, indent=2) + "\n",
-        )
-    if args.json:
-        print(json.dumps(result, ensure_ascii=False, indent=2))
-    else:
-        print(result["markdown"])
-    if result["run"]["status"] == "fail":
-        return 1
-    if not result["run"]["complete"] or result["handoff"]["gaps"]:
-        return 2
-    if adapter is not None:
-        try:
-            adapter.assert_consumed()
-        except ValueError as exc:
-            print(str(exc), file=sys.stderr)
-            return 2
-    return 0
+    _write_outputs(args, result)
+    return _status_code(result, adapter)
 
 
 def main(argv: list[str] | None = None) -> int:

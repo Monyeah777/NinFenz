@@ -90,6 +90,29 @@ def records(root: str = ".") -> List[Dict[str, Any]]:
     return out
 
 
+def _record_issues(root: str, rec: Dict[str, Any],
+                   allowed) -> Tuple[List[str], str]:
+    """单条批准记录 → (issues, 失效对象；无失效为 "")。判定顺序与文案同 verify。"""
+    subj = str(rec.get("subject") or "")
+    if rec.get("schema") != SCHEMA:
+        return ["批准记录 schema 不匹配：%s" % subj], ""
+    out: List[str] = []
+    if not str(rec.get("approved_by") or "").strip():
+        out.append("批准记录缺批准人：%s" % subj)
+    elif allowed and str(rec.get("approved_by")).strip() not in allowed:
+        out.append("批准人不在允许列表：%s（%s；修复指引：由获授权者重新批准）"
+                   % (rec.get("approved_by"), subj))
+    try:
+        changed = subject_digest(root, subj) != str(rec.get("subject_digest") or "")
+    except (paths.PathEscapeError, ValueError) as exc:
+        out.append(f"批准对象不可用：{subj}（{exc}）")
+        return out, ""
+    if changed:
+        out.append("批准已失效（对象内容已改）：%s（修复指引：重新批准）" % subj)
+        return out, subj
+    return out, ""
+
+
 def verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     """校验全部批准记录 → (issues, stats)。改动即失效、缺批准人即 FAIL。"""
     issues: List[str] = []
@@ -97,23 +120,10 @@ def verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     stale = []
     allowed = allowed_approvers(root)
     for rec in rows:
-        subj = str(rec.get("subject") or "")
-        if rec.get("schema") != SCHEMA:
-            issues.append("批准记录 schema 不匹配：%s" % subj)
-            continue
-        if not str(rec.get("approved_by") or "").strip():
-            issues.append("批准记录缺批准人：%s" % subj)
-        elif allowed and str(rec.get("approved_by")).strip() not in allowed:
-            issues.append("批准人不在允许列表：%s（%s；修复指引：由获授权者重新批准）"
-                          % (rec.get("approved_by"), subj))
-        try:
-            changed = subject_digest(root, subj) != str(rec.get("subject_digest") or "")
-        except (paths.PathEscapeError, ValueError) as exc:
-            issues.append(f"批准对象不可用：{subj}（{exc}）")
-            continue
-        if changed:
-            stale.append(subj)
-            issues.append("批准已失效（对象内容已改）：%s（修复指引：重新批准）" % subj)
+        rec_issues, stale_subj = _record_issues(root, rec, allowed)
+        issues.extend(rec_issues)
+        if stale_subj:
+            stale.append(stale_subj)
     stats = {"records": len(rows), "stale": stale,
              "subjects": sorted({str(r.get("subject")) for r in rows})}
     return issues, stats

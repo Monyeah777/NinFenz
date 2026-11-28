@@ -125,18 +125,45 @@ def build(subs: list[dict]):
     return claims, causal, attacks
 
 
+def _requirement_coverage(covers: list[set], req: list) -> float:
+    return round(len(set().union(*covers) & set(req)) / len(req), 3) if covers else 0.0
+
+
+def _real_ids(atk: list[dict]) -> list[dict]:
+    return [a for a in atk if module_ids(a["check"]) and module_ids(a["check"])[0] in REAL_IDS]
+
+
+def _claim_ids(claims: dict) -> set:
+    return {c["id"] for c in claims["claims"]}
+
+
+def _deliverables(subs: list[dict], role_aware: bool) -> list[dict]:
+    return [s for s in subs if (not role_aware or s["role"] == "deliverable")]
+
+
+def _disposition_ok(a: dict) -> bool:
+    return a["disposition"] in DISPOSITIONS and bool(a["reason"])
+
+
+def _attack_covered(claim_id: str, atk: list[dict]) -> bool:
+    return any(a["claim"] == claim_id for a in atk)
+
+
+def _real_id_ratio(atk: list[dict], real: list[dict]) -> float:
+    return round(len(real) / len(atk), 3) if atk else 0.0
+
+
 def metrics(subs, claims, causal, attacks, role_aware: bool, req_terms=None) -> dict:
     req = list(req_terms or REQ)
-    deliverable = [s for s in subs if (not role_aware or s["role"] == "deliverable")]
+    deliverable = _deliverables(subs, role_aware)
     covers = [set(s["covers"]) for s in subs]
     recs, atk = causal["records"], attacks["attacks"]
-    real = [a for a in atk if module_ids(a["check"]) and module_ids(a["check"])[0] in REAL_IDS]
+    real = _real_ids(atk)
+    claim_ids = _claim_ids(claims)
     return {
         "subgoal_count": len(subs),
         "deliverable_anchor_rate": frac(deliverable, lambda s: bool(s["deliverable"].strip())),
-        "requirement_coverage_rate": round(len(set().union(*covers) & set(req)) / len(req), 3)
-        if covers
-        else 0.0,
+        "requirement_coverage_rate": _requirement_coverage(covers, req),
         "requirement_assignment_uniqueness": frac(
             req, lambda r: sum(1 for c in covers if r in c) == 1
         ),
@@ -148,17 +175,13 @@ def metrics(subs, claims, causal, attacks, role_aware: bool, req_terms=None) -> 
         "confounder_concreteness": frac(recs, lambda r: bool(CONCRETE.search(r["confounder"]))),
         "counterfactual_check_rate": frac(recs, lambda r: bool(CHECK.search(r["counterfactual"]))),
         "confidence_declared": frac(recs, lambda r: r["confidence"] in CONFIDENCE),
-        "claim_linkage": frac(recs, lambda r: r["claim"] in {c["id"] for c in claims["claims"]}),
-        "attack_coverage": frac(
-            {c["id"] for c in claims["claims"]}, lambda c: any(a["claim"] == c for a in atk)
-        ),
+        "claim_linkage": frac(recs, lambda r: r["claim"] in claim_ids),
+        "attack_coverage": frac(claim_ids, lambda c: _attack_covered(c, atk)),
         "trigger_concreteness": frac(atk, lambda a: bool(CONCRETE.search(a["trigger"]))),
         "check_reference_rate": frac(atk, lambda a: bool(CHECK.search(a["check"]))),
-        "disposition_completeness": frac(
-            atk, lambda a: a["disposition"] in DISPOSITIONS and bool(a["reason"])
-        ),
+        "disposition_completeness": frac(atk, _disposition_ok),
         "evidence_anchor": frac(atk, lambda a: bool(EVID.search(a["evidence"]))),
-        "real_id_validity": round(len(real) / len(atk), 3) if atk else 0.0,
+        "real_id_validity": _real_id_ratio(atk, real),
     }
 
 

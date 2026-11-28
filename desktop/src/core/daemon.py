@@ -190,13 +190,8 @@ def _code_fingerprint(root: Path) -> Tuple:
     return tuple(rows)
 
 
-def _sync_code(root: Path) -> None:
-    """源码变了就整块重载（丢弃 `core.*` 与 CLI 模块）：保证守护不跑旧代码。"""
-    fp = _code_fingerprint(root)
-    if _CLI_CACHE.get("fp") == fp:
-        return
-    # 代码换版必须**同时**清掉「代码面指纹」的记忆：否则持久缓存的键还停在旧代码上，
-    # 会拿旧算法算出来的账当新账（见 core.disk_cache.code_fingerprint 的说明）。
+def _reset_code_fingerprint(root: Path) -> None:
+    """清代码面指纹与导入闭包指纹；清不掉不影响重载。"""
     try:
         from core import disk_cache
         disk_cache.reset_code_fingerprint(str(root))
@@ -206,9 +201,10 @@ def _sync_code(root: Path) -> None:
         _igr.reset_code_scope(str(root))
     except Exception:                                    # noqa: BLE001 - 清不掉不影响重载
         pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
-    # 常驻语料层跨代码换版**保住**：它装的是仓库事实（正文/目录/逐件摘要），与代码无关；
-    # 而 `core.*` 被整块摘掉重载时，新模块会是个**空层**——不搬回来，改一行代码就得让下一条
-    # 重命令把整棵语料重读一遍（实测 ~2 s）。
+
+
+def _save_resident():
+    """取常驻语料层（跨代码换版保住）；失败/未激活 → None。"""
     saved = None
     try:
         from core import conformance_scan as _csc_old
@@ -216,17 +212,63 @@ def _sync_code(root: Path) -> None:
             saved = _csc_old.take_resident()
     except Exception:                                    # noqa: BLE001
         saved = None
+    return saved
+
+
+def _adopt_resident(saved) -> None:
+    """把常驻语料层搬回新模块；搬不回去就下次重读。"""
+    if saved is None:
+        return
+    try:
+        from core import conformance_scan as _csc_new  # 重新导入 → 新模块对象
+        _csc_new.adopt_resident(saved)
+    except Exception:                                    # noqa: BLE001 - 搬不回去就下次重读
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
+
+
+def _sync_code(root: Path) -> None:
+    """源码变了就整块重载（丢弃 `core.*` 与 CLI 模块）：保证守护不跑旧代码。"""
+    fp = _code_fingerprint(root)
+    if _CLI_CACHE.get("fp") == fp:
+        return
+    # 代码换版必须**同时**清掉「代码面指纹」的记忆：否则持久缓存的键还停在旧代码上，
+    # 会拿旧算法算出来的账当新账（见 core.disk_cache.code_fingerprint 的说明）。
+    _reset_code_fingerprint(root)
+    # 常驻语料层跨代码换版**保住**：它装的是仓库事实（正文/目录/逐件摘要），与代码无关；
+    # 而 `core.*` 被整块摘掉重载时，新模块会是个**空层**——不搬回来，改一行代码就得让下一条
+    # 重命令把整棵语料重读一遍（实测 ~2 s）。
+    saved = _save_resident()
     for name in [m for m in list(sys.modules) if m == "core" or m.startswith("core.")]:
         if name != "core.daemon":           # 守护自身模块留着（改它需重启，见模块 docstring）
             sys.modules.pop(name, None)
     _CLI_CACHE.clear()
     _CLI_CACHE["fp"] = fp
-    if saved is not None:
-        try:
-            from core import conformance_scan as _csc_new  # 重新导入 → 新模块对象
-            _csc_new.adopt_resident(saved)
-        except Exception:                                    # noqa: BLE001 - 搬不回去就下次重读
-            pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
+    _adopt_resident(saved)
+
+
+def _run_cli(nf, argv: List[str]) -> int:
+    """在重定向环境下跑 guarded_main → 退出码（SystemExit 也收下）。
+
+    **必须走 guarded_main**（2026-10-10 审计 X0，P0）：`main()` 的异常兜底只在
+    `cli()` 里，守护直接调 `main()` 会让任何未捕获异常穿出去、**杀死常驻进程**。
+    实测触发门槛极低：`protocol/` 下任一 JSON 被截断（18/18）⇒ json.JSONDecodeError
+    ⇒ 守护退出、客户端 rc=1 + 零输出。guarded_main 是 CLI 与本守护**共用的同一条
+    错误面**（scripts/nf.py 单一实现），故两条路径的错误帧逐字一致。
+    """
+    try:
+        return int(nf.guarded_main(list(argv)))
+    except SystemExit as exc:                      # argparse --help 等
+        return int(exc.code or 0)
+
+
+def _reset_after_request() -> None:
+    """请求结束清一次：写命令改了仓库，缓存不留残影。"""
+    reset_process_caches()
+    try:
+        from core import conformance_scan as _csc
+        _csc.clear_changes()          # 确知变更面**只在当次请求内有效**（否则它单调增长、
+    except Exception:                 #  # 几条命令之后会让键层复用退化成全量重算——实测踩过）
+        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
 
 
 def execute(argv: List[str], root: Path, cwd: Optional[str] = None
@@ -260,26 +302,13 @@ def execute(argv: List[str], root: Path, cwd: Optional[str] = None
         sys.argv = ["nf"] + [str(a) for a in argv]
         sys.stdin = io.StringIO("")       # 一次性命令不读交互输入（长驻命令已被拒）
         with contextlib.redirect_stdout(out_txt), contextlib.redirect_stderr(err_txt):
-            try:
-                # **必须走 guarded_main**（2026-10-10 审计 X0，P0）：`main()` 的异常兜底只在
-                # `cli()` 里，守护直接调 `main()` 会让任何未捕获异常穿出去、**杀死常驻进程**。
-                # 实测触发门槛极低：`protocol/` 下任一 JSON 被截断（18/18）⇒ json.JSONDecodeError
-                # ⇒ 守护退出、客户端 rc=1 + 零输出。guarded_main 是 CLI 与本守护**共用的同一条
-                # 错误面**（scripts/nf.py 单一实现），故两条路径的错误帧逐字一致。
-                code = int(nf.guarded_main(list(argv)))
-            except SystemExit as exc:                      # argparse --help 等
-                code = int(exc.code or 0)
+            code = _run_cli(nf, argv)
     finally:
         out_txt.flush()
         err_txt.flush()
         sys.argv, sys.stdin = old_argv, old_stdin
         os.chdir(old_cwd)
-        reset_process_caches()            # 请求结束再清一次：写命令改了仓库，缓存不留残影
-        try:
-            from core import conformance_scan as _csc
-            _csc.clear_changes()          # 确知变更面**只在当次请求内有效**（否则它单调增长、
-        except Exception:                 #  # 几条命令之后会让键层复用退化成全量重算——实测踩过）
-            pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
+        _reset_after_request()
     code, out, err = int(code), out_buf.getvalue(), err_buf.getvalue()
     _rc.store(argv, gen, allowed, opts=_rc.Response(code=code, out=out, err=err, cwd=cwd))
     # **非准入命令 = 无法证明只读**（可能写仓库）⇒ 立刻整批作废，不等监听线程异步察觉（写在

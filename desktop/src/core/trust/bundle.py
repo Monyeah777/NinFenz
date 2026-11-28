@@ -91,39 +91,66 @@ def _proof_for(bundle: dict, index: int) -> dict | None:
     return None
 
 
+def _claim_base(bundle: Any) -> tuple[str | None, list | None, str | None]:
+    if not isinstance(bundle, dict):
+        return None, None, "BUNDLE-NOT-OBJECT"
+    bundle_id = bundle.get("bundle_id")
+    if not is_digest(bundle_id):
+        return None, None, "BUNDLE-ID-INVALID"
+    claims = bundle.get("claims")
+    if not isinstance(claims, list) or not claims:
+        return None, None, "CLAIMS-MISSING"
+    return bundle_id, claims, None
+
+
+def _index_ok(index: Any, claims: list) -> bool:
+    return (
+        isinstance(index, int)
+        and not isinstance(index, bool)
+        and 0 <= index < len(claims)
+    )
+
+
+def _steps_ok(steps: Any) -> bool:
+    if not isinstance(steps, list) or len(steps) > MAX_PROOF_DEPTH:
+        return False
+    for step in steps:
+        if not isinstance(step, dict) or step.get("side") not in ("left", "right"):
+            return False
+        if not is_digest(step.get("hash")):
+            return False
+    return True
+
+
+def _proof_shape(bundle: dict, index: int, proof: dict | None) -> tuple[dict | None, str | None]:
+    if proof is None:
+        proof = _proof_for(bundle, index)
+    if not isinstance(proof, dict):
+        return None, "PROOF-MISSING"
+    if proof.get("index") != index:
+        return None, "PROOF-INDEX-MISMATCH"
+    if not _steps_ok(proof.get("proof")):
+        return None, "PROOF-INVALID"
+    return proof, None
+
+
 def verify_claim(bundle: Any, index: int, proof: dict | None = None) -> dict:
     """单 claim 验证：只读 claims[index] + 一条 proof，哈希 O(log n)。
 
     返回 {ok, reason?, leaf?, root?, claim_id?}。proof 可由调用方直接给（脚手架/侧车），
     避免在 inclusion_proofs 里线性查找（完整包场景仍可用 bundle 自带 proof）。
     """
-    if not isinstance(bundle, dict):
-        return {"ok": False, "reason": "BUNDLE-NOT-OBJECT"}
-    bundle_id = bundle.get("bundle_id")
-    if not is_digest(bundle_id):
-        return {"ok": False, "reason": "BUNDLE-ID-INVALID"}
-    claims = bundle.get("claims")
-    if not isinstance(claims, list) or not claims:
-        return {"ok": False, "reason": "CLAIMS-MISSING"}
-    if not isinstance(index, int) or isinstance(index, bool) or not 0 <= index < len(claims):
+    bundle_id, claims, reason = _claim_base(bundle)
+    if reason is not None:
+        return {"ok": False, "reason": reason}
+    if not _index_ok(index, claims):
         return {"ok": False, "reason": "INDEX-OUT-OF-RANGE"}
     root = bundle.get("merkle_root")
     if not is_digest(root):
         return {"ok": False, "reason": "ROOT-INVALID"}
-    if proof is None:
-        proof = _proof_for(bundle, index)
-    if not isinstance(proof, dict):
-        return {"ok": False, "reason": "PROOF-MISSING"}
-    if proof.get("index") != index:
-        return {"ok": False, "reason": "PROOF-INDEX-MISMATCH"}
-    steps = proof.get("proof")
-    if not isinstance(steps, list) or len(steps) > MAX_PROOF_DEPTH:
-        return {"ok": False, "reason": "PROOF-INVALID"}
-    for step in steps:
-        if not isinstance(step, dict) or step.get("side") not in ("left", "right"):
-            return {"ok": False, "reason": "PROOF-INVALID"}
-        if not is_digest(step.get("hash")):
-            return {"ok": False, "reason": "PROOF-INVALID"}
+    proof, reason = _proof_shape(bundle, index, proof)
+    if reason is not None:
+        return {"ok": False, "reason": reason}
     claim = claims[index]
     if not isinstance(claim, dict):
         return {"ok": False, "reason": "CLAIM-INVALID"}
@@ -131,7 +158,7 @@ def verify_claim(bundle: Any, index: int, proof: dict | None = None) -> dict:
     if proof.get("leaf") != leaf.hex():
         return {"ok": False, "reason": "LEAF-MISMATCH"}
     try:
-        folded = fold_proof(leaf.hex(), steps)
+        folded = fold_proof(leaf.hex(), proof["proof"])
     except ValueError:
         return {"ok": False, "reason": "PROOF-INVALID"}
     if folded != root:
@@ -140,29 +167,32 @@ def verify_claim(bundle: Any, index: int, proof: dict | None = None) -> dict:
             "claim_id": claim.get("id")}
 
 
-def verify_bundle(bundle: Any, schema: dict | None = None) -> dict:
-    """整包验证：结构 + 全叶根重算 + 每条 proof 折叠 + 覆盖/唯一性。
-
-    返回 {ok, issues[], stats}；判据顺序固定，先结构后密码学（fail-closed）。
-    """
+def _verify_header(
+    bundle: Any, schema: dict | None
+) -> tuple[list[str], list | None, str | None]:
     issues: list[str] = []
-    stats = {"claims": 0, "proofs": 0}
     if schema is not None:
         issues += [f"schema: {msg}" for msg in json_schema.json_schema_check(bundle, schema)]
     if not isinstance(bundle, dict):
-        return {"ok": False, "issues": issues + ["bundle 不是对象"], "stats": stats}
+        return issues, None, "bundle 不是对象"
     claims = bundle.get("claims")
     if not isinstance(claims, list) or not claims:
-        return {"ok": False, "issues": issues + ["缺 claims"], "stats": stats}
-    stats["claims"] = len(claims)
-    bundle_id = bundle.get("bundle_id")
-    if not is_digest(bundle_id):
-        issues.append("bundle_id 非法（须 64 位小写 hex）")
+        return issues, None, "缺 claims"
+    return issues, claims, None
+
+
+def _id_issues(claims: list) -> list[str]:
+    issues = []
     ids = [c.get("id") for c in claims if isinstance(c, dict)]
     if len(ids) != len(claims):
         issues.append("claims 里有非对象条目")
     elif len(set(ids)) != len(ids):
         issues.append("claim id 重复")
+    return issues
+
+
+def _leaves(bundle_id: str, claims: list) -> tuple[list[bytes], list[str]]:
+    issues: list[str] = []
     leaves = []
     for index, claim in enumerate(claims):
         if not isinstance(claim, dict):
@@ -173,15 +203,11 @@ def verify_bundle(bundle: Any, schema: dict | None = None) -> dict:
         except ValueError as exc:
             issues.append(f"claims[{index}]: {exc}")
             leaves.append(b"")
-    root = merkle_root(leaves) if leaves and all(leaves) else None
-    if root is None or root.hex() != bundle.get("merkle_root"):
-        issues.append("merkle_root 与 claims 重算不一致")
-    proofs = bundle.get("inclusion_proofs")
-    if not isinstance(proofs, list) or not proofs:
-        issues.append("缺 inclusion_proofs")
-        return {"ok": not issues, "issues": issues, "stats": stats}
-    stats["proofs"] = len(proofs)
-    seen = set()
+    return leaves, issues
+
+
+def _proof_issues(bundle: dict, claims: list, proofs: list, seen: set) -> list[str]:
+    issues: list[str] = []
     for item in proofs:
         if not isinstance(item, dict):
             issues.append("inclusion_proofs 里有非对象条目")
@@ -200,4 +226,33 @@ def verify_bundle(bundle: Any, schema: dict | None = None) -> dict:
     missing = sorted(set(range(len(claims))) - seen)
     if missing:
         issues.append(f"proof 未覆盖 claims：{missing[:5]}")
+    return issues
+
+
+def verify_bundle(bundle: Any, schema: dict | None = None) -> dict:
+    """整包验证：结构 + 全叶根重算 + 每条 proof 折叠 + 覆盖/唯一性。
+
+    返回 {ok, issues[], stats}；判据顺序固定，先结构后密码学（fail-closed）。
+    """
+    issues: list[str] = []
+    stats = {"claims": 0, "proofs": 0}
+    issues, claims, reason = _verify_header(bundle, schema)
+    if reason is not None:
+        return {"ok": False, "issues": issues + [reason], "stats": stats}
+    stats["claims"] = len(claims)
+    bundle_id = bundle.get("bundle_id")
+    if not is_digest(bundle_id):
+        issues.append("bundle_id 非法（须 64 位小写 hex）")
+    issues += _id_issues(claims)
+    leaves, leaf_issues = _leaves(bundle_id, claims)
+    issues += leaf_issues
+    root = merkle_root(leaves) if leaves and all(leaves) else None
+    if root is None or root.hex() != bundle.get("merkle_root"):
+        issues.append("merkle_root 与 claims 重算不一致")
+    proofs = bundle.get("inclusion_proofs")
+    if not isinstance(proofs, list) or not proofs:
+        issues.append("缺 inclusion_proofs")
+        return {"ok": not issues, "issues": issues, "stats": stats}
+    stats["proofs"] = len(proofs)
+    issues += _proof_issues(bundle, claims, proofs, set())
     return {"ok": not issues, "issues": issues, "stats": stats}

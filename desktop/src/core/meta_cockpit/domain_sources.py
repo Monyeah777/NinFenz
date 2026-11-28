@@ -73,30 +73,44 @@ DEPENDENCIES = re.compile(r"依赖：([^｜\n]+)")
 LAYER = re.compile(r"挂载点：([P]\d+)")
 
 
+def _text_hits(entry: dict, text: str) -> tuple[list[str], list[str]]:
+    all_hits = [keyword for keyword in entry["keywords"] if keyword in text]
+    specific_hits = [keyword for keyword in all_hits if keyword not in GENERIC_MATCH_TERMS]
+    generic_hits = [keyword for keyword in all_hits if keyword in GENERIC_MATCH_TERMS]
+    return specific_hits, generic_hits
+
+
+def _match_of(entry: dict, specific_hits: list[str], generic_hits: list[str]) -> dict | None:
+    if not specific_hits and not generic_hits:
+        return None
+    selected_hits = specific_hits or generic_hits
+    return {
+        **entry,
+        "matched_keywords": sorted(selected_hits),
+        "match_units": sum(len(keyword) for keyword in selected_hits),
+        "specificity": max(len(keyword) for keyword in selected_hits),
+        "match_tier": "specific" if specific_hits else "adjacent",
+    }
+
+
+def _match_sort_key(item: dict) -> tuple:
+    return (-item["match_units"], -item["specificity"], item["id"])
+
+
 def select_for_text(text: str, limit: int = 1, include_adjacent: bool = False) -> list[dict]:
     specific: list[dict] = []
     adjacent: list[dict] = []
     for entry in DOMAINS:
-        all_hits = [keyword for keyword in entry["keywords"] if keyword in text]
-        specific_hits = [keyword for keyword in all_hits if keyword not in GENERIC_MATCH_TERMS]
-        generic_hits = [keyword for keyword in all_hits if keyword in GENERIC_MATCH_TERMS]
-        if not specific_hits and not generic_hits:
+        specific_hits, generic_hits = _text_hits(entry, text)
+        match = _match_of(entry, specific_hits, generic_hits)
+        if match is None:
             continue
-        selected_hits = specific_hits or generic_hits
-        match = {
-            **entry,
-            "matched_keywords": sorted(selected_hits),
-            "match_units": sum(len(keyword) for keyword in selected_hits),
-            "specificity": max(len(keyword) for keyword in selected_hits),
-            "match_tier": "specific" if specific_hits else "adjacent",
-        }
-        (specific if specific_hits else adjacent).append(match)
-
-    def sort_key(item):
-        return (-item["match_units"], -item["specificity"], item["id"])
-
-    specific.sort(key=sort_key)
-    adjacent.sort(key=sort_key)
+        if specific_hits:
+            specific.append(match)
+        else:
+            adjacent.append(match)
+    specific.sort(key=_match_sort_key)
+    adjacent.sort(key=_match_sort_key)
     if not specific:
         return []
     matches = specific[:limit]
@@ -155,31 +169,27 @@ def concept_graph(entry: dict) -> tuple[dict, ...]:
     return ()
 
 
-def _module_graph(entry: dict) -> tuple[dict, ...]:
-    folder = (NF / entry["path"]).resolve().parent / "modules"
-    if not folder.is_dir():
-        return ()
-    nodes = {}
-    order = []
-    for path in sorted(folder.glob("*.md")):
-        text = path.read_text(encoding="utf-8", errors="replace")
-        title = next(
-            (MODULE_TITLE.match(line) for line in text.splitlines() if MODULE_TITLE.match(line)),
-            None,
-        )
-        if title is None:
-            continue
-        node_id = title.group(1)
-        layer_match = LAYER.search(text)
-        dependency_line = DEPENDENCIES.search(text)
-        prerequisites = re.findall(r"M\d+", dependency_line.group(1)) if dependency_line else []
-        nodes[node_id] = {
-            "id": node_id,
-            "concept": title.group(2).strip(),
-            "layer": layer_match.group(1) if layer_match else "unknown",
-            "prerequisites": prerequisites,
-        }
-        order.append(node_id)
+def _module_node(path: Path) -> tuple[str, dict] | None:
+    text = path.read_text(encoding="utf-8", errors="replace")
+    title = next(
+        (MODULE_TITLE.match(line) for line in text.splitlines() if MODULE_TITLE.match(line)),
+        None,
+    )
+    if title is None:
+        return None
+    node_id = title.group(1)
+    layer_match = LAYER.search(text)
+    dependency_line = DEPENDENCIES.search(text)
+    prerequisites = re.findall(r"M\d+", dependency_line.group(1)) if dependency_line else []
+    return node_id, {
+        "id": node_id,
+        "concept": title.group(2).strip(),
+        "layer": layer_match.group(1) if layer_match else "unknown",
+        "prerequisites": prerequisites,
+    }
+
+
+def _module_externals(nodes: dict[str, dict]) -> None:
     for node in list(nodes.values()):
         for prerequisite in node["prerequisites"]:
             if prerequisite not in nodes:
@@ -189,9 +199,29 @@ def _module_graph(entry: dict) -> tuple[dict, ...]:
                     "layer": "external",
                     "prerequisites": [],
                 }
+
+
+def _module_order(nodes: dict[str, dict], order: list[str]) -> tuple[dict, ...]:
     return tuple(nodes[node_id] for node_id in order if node_id in nodes) + tuple(
         node for node_id, node in nodes.items() if node_id not in order
     )
+
+
+def _module_graph(entry: dict) -> tuple[dict, ...]:
+    folder = (NF / entry["path"]).resolve().parent / "modules"
+    if not folder.is_dir():
+        return ()
+    nodes: dict[str, dict] = {}
+    order: list[str] = []
+    for path in sorted(folder.glob("*.md")):
+        parsed = _module_node(path)
+        if parsed is None:
+            continue
+        node_id, node = parsed
+        nodes[node_id] = node
+        order.append(node_id)
+    _module_externals(nodes)
+    return _module_order(nodes, order)
 
 
 def _pipeline_graph(entry: dict) -> tuple[dict, ...]:
@@ -222,6 +252,50 @@ def _pipeline_graph(entry: dict) -> tuple[dict, ...]:
     return tuple(nodes)
 
 
+def _cycle_warnings(entry: dict, graph: tuple[dict, ...]) -> list[dict]:
+    cycle = _cycle_path(graph)
+    if not cycle:
+        return []
+    return [{"source": entry["id"], "kind": "module-dependency-cycle", "cycle": cycle}]
+
+
+def _seed_nodes(graph: tuple[dict, ...], entry: dict, text: str) -> list[dict]:
+    return [
+        node
+        for node in graph
+        if any(keyword in node["concept"] for keyword in entry["keywords"])
+        or node["concept"] in text
+    ]
+
+
+def _selected_ids(graph: tuple[dict, ...], seeds: list[dict]) -> list[str]:
+    selected = set()
+    for node in seeds:
+        selected.add(node["id"])
+        selected.update(node["prerequisites"])
+        selected.update(
+            candidate["id"] for candidate in graph if node["id"] in candidate["prerequisites"]
+        )
+    return sorted(selected)
+
+
+def _node_edges(
+    by_id: dict[str, dict], node: dict, selected_ids: list[str], entry: dict
+) -> list[dict]:
+    edges = []
+    for prerequisite in node["prerequisites"]:
+        if prerequisite in selected_ids and prerequisite in by_id:
+            edges.append(
+                {
+                    "from": by_id[prerequisite]["concept"],
+                    "to": node["concept"],
+                    "kind": "domain-prerequisite",
+                    "source": entry["id"],
+                }
+            )
+    return edges
+
+
 def graph_slice_for_text(text: str, entries: list[dict], max_nodes: int = 6) -> dict:
     edges = []
     nodes: dict[str, dict] = {}
@@ -233,32 +307,12 @@ def graph_slice_for_text(text: str, entries: list[dict], max_nodes: int = 6) -> 
             break
         graph = concept_graph(entry)
         graph_sources += graph_source_snapshot(entry)
-        cycle = _cycle_path(graph)
-        if cycle:
-            warnings.append(
-                {
-                    "source": entry["id"],
-                    "kind": "module-dependency-cycle",
-                    "cycle": cycle,
-                }
-            )
+        warnings += _cycle_warnings(entry, graph)
         by_id = {node["id"]: node for node in graph}
-        seeds = [
-            node
-            for node in graph
-            if any(keyword in node["concept"] for keyword in entry["keywords"])
-            or node["concept"] in text
-        ]
+        seeds = _seed_nodes(graph, entry, text)
         if not seeds:
             continue
-        selected = set()
-        for node in seeds:
-            selected.add(node["id"])
-            selected.update(node["prerequisites"])
-            selected.update(
-                candidate["id"] for candidate in graph if node["id"] in candidate["prerequisites"]
-            )
-        selected_ids = sorted(selected)[: max_nodes - len(nodes)]
+        selected_ids = _selected_ids(graph, seeds)[: max_nodes - len(nodes)]
         for node_id in selected_ids:
             node = by_id[node_id]
             nodes[node["concept"]] = {
@@ -267,16 +321,7 @@ def graph_slice_for_text(text: str, entries: list[dict], max_nodes: int = 6) -> 
                 "layer": node["layer"],
                 "source": entry["id"],
             }
-            for prerequisite in node["prerequisites"]:
-                if prerequisite in selected_ids and prerequisite in by_id:
-                    edges.append(
-                        {
-                            "from": by_id[prerequisite]["concept"],
-                            "to": node["concept"],
-                            "kind": "domain-prerequisite",
-                            "source": entry["id"],
-                        }
-                    )
+            edges += _node_edges(by_id, node, selected_ids, entry)
         matched += [node["concept"] for node in seeds]
     unique = {(edge["from"], edge["to"], edge["kind"], edge["source"]): edge for edge in edges}
     ordered_edges = [unique[key] for key in sorted(unique)]

@@ -29,9 +29,8 @@ from ._part1 import (
 )
 
 
-def _embed_jpeg(jpeg: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
-    """把 IR 写进 JPEG 的 APP15 段（幂等替换；扫描数据原样保留）。"""
-    segs, tail = _jpeg_split(jpeg)
+def _checked_payload(jpeg: bytes, ir: dict[str, Any], segs: list) -> tuple[int, bytes]:
+    """校验结构/摘要/上限 → (before 扫描摘要, payload)；不合约抛 CarrierError。"""
     struct_issues = _jpeg_structure_issues(segs)
     if struct_issues:
         raise CarrierError("；".join(struct_issues))
@@ -46,7 +45,11 @@ def _embed_jpeg(jpeg: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]
     if len(payload) > 8000:
         raise CarrierError(f"IR 太大（{len(payload)} 字节，上限 8000）（"
                            + GUIDE + "减小声明项或改用 sidecar 回退）")
-    app15 = _jpeg_seg(APP15, payload)
+    return before, payload
+
+
+def _splice_app15(segs: list, app15: bytes) -> list[bytes]:
+    """把 APP15 段幂等替换/插入 → 段列表（其余段原样字节保留）。"""
     kept: list[bytes] = []
     replaced = False
     insert_at = 0                    # 原文件没有我们的段时，插在 APP0/APP1 之后
@@ -61,6 +64,16 @@ def _embed_jpeg(jpeg: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]
             insert_at = len(kept)
     if not replaced:
         kept.insert(insert_at, app15)
+    return kept
+
+
+def _embed_jpeg(jpeg: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
+    """把 IR 写进 JPEG 的 APP15 段（幂等替换；扫描数据原样保留）。"""
+    segs, tail = _jpeg_split(jpeg)
+    before, payload = _checked_payload(jpeg, ir, segs)
+    app15 = _jpeg_seg(APP15, payload)
+    kept = _splice_app15(segs, app15)
+    replaced = any(marker == APP15 and body.startswith(JPEG_PREFIX) for marker, body, _ in segs)
     out = JPEG_SOI + b"".join(kept) + tail
     after = jpeg_scan_digest(out)
     if after != before:

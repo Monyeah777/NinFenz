@@ -36,30 +36,44 @@ def _families(vectors: list) -> dict:
     return out
 
 
+def _merkle_invalid(vec: dict, issues: list, stats: dict) -> None:
+    leaves = [tb.leaf_hash(s.encode()) for s in vec["input"]["leaves_utf8"]]
+    try:
+        tb.inclusion_proof(leaves, int(vec["input"]["index"]))
+    except IndexError:
+        stats["merkle"] += 1
+        return
+    issues.append(f"{vec['id']}：越界下标未被拒（{GUIDE}收紧密闭集）")
+
+
+def _proof_issues(vec_id: str, expected: dict, leaves: list) -> list[str]:
+    issues = []
+    for proof in expected.get("proofs") or []:
+        folded = tb.fold_proof(leaves[proof["index"]].hex(), proof["proof"])
+        if folded != expected["root"]:
+            issues.append(f"{vec_id}：index={proof['index']} proof 折叠不到根")
+    return issues
+
+
+def _merkle_valid(vec: dict, expected: dict, issues: list, stats: dict) -> None:
+    leaves = [tb.leaf_hash(s.encode()) for s in vec["input"]["leaves_utf8"]]
+    if [leaf.hex() for leaf in leaves] != expected.get("leaf_hashes"):
+        issues.append(f"{vec['id']}：叶哈希与向量不符")
+    root = tb.merkle_root(leaves)
+    if root is None or root.hex() != expected.get("root"):
+        issues.append(f"{vec['id']}：Merkle 根与向量不符")
+        return
+    issues += _proof_issues(vec["id"], expected, leaves)
+    stats["merkle"] += 1
+
+
 def _check_merkle(family: list, issues: list, stats: dict) -> None:
     for vec in family:
         expected = vec.get("expected") or {}
         if not expected.get("valid"):
-            leaves = [tb.leaf_hash(s.encode()) for s in vec["input"]["leaves_utf8"]]
-            try:
-                tb.inclusion_proof(leaves, int(vec["input"]["index"]))
-            except IndexError:
-                stats["merkle"] += 1
-                continue
-            issues.append(f"{vec['id']}：越界下标未被拒（{GUIDE}收紧密闭集）")
+            _merkle_invalid(vec, issues, stats)
             continue
-        leaves = [tb.leaf_hash(s.encode()) for s in vec["input"]["leaves_utf8"]]
-        if [leaf.hex() for leaf in leaves] != expected.get("leaf_hashes"):
-            issues.append(f"{vec['id']}：叶哈希与向量不符")
-        root = tb.merkle_root(leaves)
-        if root is None or root.hex() != expected.get("root"):
-            issues.append(f"{vec['id']}：Merkle 根与向量不符")
-            continue
-        for proof in expected.get("proofs") or []:
-            folded = tb.fold_proof(leaves[proof["index"]].hex(), proof["proof"])
-            if folded != expected["root"]:
-                issues.append(f"{vec['id']}：index={proof['index']} proof 折叠不到根")
-        stats["merkle"] += 1
+        _merkle_valid(vec, expected, issues, stats)
 
 
 def _check_live_bundle(root: str, issues: list, stats: dict) -> None:

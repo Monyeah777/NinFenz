@@ -70,6 +70,19 @@ def changed_modules(changed: Iterable[str]) -> Set[str]:
     return out
 
 
+def _expert_reason(eid: str, e: dict, affected_modules: Set[str],
+                   changed_n: Sequence[str]) -> str:
+    """单个专家 → 命中原因（依赖闭包 / 读面命中）；未命中返回空串。"""
+    mod = str(e.get("module") or "").strip()
+    stem = Path(mod).stem if mod else eid
+    if stem in affected_modules:
+        return "依赖闭包"
+    reads = [str(x) for x in (e.get("reads") or [])]
+    if changed_n and any(gf.covered(c, reads) for c in changed_n):
+        return "读面命中"
+    return ""
+
+
 def affected_experts(root: str = ".", changed: Sequence[str] = (),
                      experts: dict[str, dict] | None = None) -> dict[str, str]:
     """→ {专家 id: 命中原因}；原因 ∈ 依赖闭包 / 读面命中。"""
@@ -78,12 +91,7 @@ def affected_experts(root: str = ".", changed: Sequence[str] = (),
     changed_n = [str(c).replace("\\", "/") for c in (changed or [])]
     out: dict[str, str] = {}
     for eid, e in sorted(decl.items()):
-        mod = str(e.get("module") or "").strip()
-        stem = Path(mod).stem if mod else eid
-        if stem in affected_modules:
-            out[eid] = "依赖闭包"
-            continue
-        reads = [str(x) for x in (e.get("reads") or [])]
-        if changed_n and any(gf.covered(c, reads) for c in changed_n):
-            out[eid] = "读面命中"
+        reason = _expert_reason(eid, e, affected_modules, changed_n)
+        if reason:
+            out[eid] = reason
     return out

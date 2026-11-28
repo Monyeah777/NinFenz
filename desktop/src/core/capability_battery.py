@@ -85,10 +85,8 @@ def _norm(v: Any) -> Any:
     return v
 
 
-def judge(value: Any, expect: Dict[str, Any]) -> Tuple[bool, str]:
-    """→ (是否合契约, 说明)；形态见模块 docstring 的词汇表。"""
-    if not isinstance(expect, dict) or not expect:
-        return False, "契约缺 expect"
+def _judge_basic(value: Any, expect: Dict[str, Any]):
+    """callable / is_none / truthy / empty / nonempty 判定；不负责返回 None。"""
     if expect.get("callable"):
         return True, "可调用（不抛）"
     if expect.get("is_none"):
@@ -99,6 +97,11 @@ def judge(value: Any, expect: Dict[str, Any]) -> Tuple[bool, str]:
         return not value, "空判定 %r" % (value,)
     if expect.get("nonempty"):
         return bool(value), "非空判定 %r" % (value,)
+    return None
+
+
+def _judge_value(value: Any, expect: Dict[str, Any]):
+    """equals / contains / has_keys / type 判定；不负责返回 None。"""
     if "equals" in expect:
         return _norm(value) == _norm(expect["equals"]), "期望 %r 实得 %r" % (expect["equals"], value)
     if "contains" in expect:
@@ -108,7 +111,15 @@ def judge(value: Any, expect: Dict[str, Any]) -> Tuple[bool, str]:
         return all(k in got for k in expect["has_keys"]), "实得键 %s" % sorted(got)
     if "type" in expect:
         return type(value).__name__ == expect["type"], "类型 %s" % type(value).__name__
-    return False, "未知 expect 形态：%r" % (expect,)
+    return None
+
+
+def judge(value: Any, expect: Dict[str, Any]) -> Tuple[bool, str]:
+    """→ (是否合契约, 说明)；形态见模块 docstring 的词汇表。"""
+    if not isinstance(expect, dict) or not expect:
+        return False, "契约缺 expect"
+    return (_judge_basic(value, expect) or _judge_value(value, expect)
+            or (False, "未知 expect 形态：%r" % (expect,)))
 
 
 def _raises(fn: Callable[..., Any], args: List[Any], kwargs: Dict[str, Any]) -> bool:

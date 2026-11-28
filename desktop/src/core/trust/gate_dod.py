@@ -45,75 +45,121 @@ def _claims(root: Path) -> list:
     return rows
 
 
-def scan(root: str = ".") -> tuple:
+def _file_issues(base: Path, stats: dict) -> list:
     issues: list = []
-    stats = {"files": 0, "claims": 0, "supported": 0, "partial": 0,
-             "todo": 0, "unsupported": 0, "p0": 0}
-    base = Path(root)
     for rel in REQUIRED_FILES:
         if (base / rel).is_file():
             stats["files"] += 1
         else:
             issues.append(f"缺 DoD 交付件 {rel}（{GUIDE}补件后再收口）")
+    return issues
+
+
+def _row_issues(row: dict, stats: dict) -> list:
+    status = row["status"]
+    if status.startswith("SUPPORTED"):
+        stats["supported"] += 1
+        return []
+    if status.startswith("PARTIAL"):
+        stats["partial"] += 1
+        # PARTIAL 必须绑定具体 ENV 阻塞，否则不允许作为收口状态
+        if "ENV-" not in status:
+            return [f"claim #{row['id']} 为 PARTIAL 但未标注 ENV 阻塞"
+                    f"（{GUIDE}补 ENV-xx 或修到 SUPPORTED）"]
+        return []
+    if status.startswith(_OPEN_STATUS):
+        stats["todo"] += 1
+        return [f"claim #{row['id']} 仍是 {_OPEN_STATUS}"
+                f"（{GUIDE}收口前必须完成或转 PARTIAL+ENV）"]
+    if "UNSUPPORTED" in status:
+        stats["unsupported"] += 1
+        return [f"claim #{row['id']} 是 UNSUPPORTED（{GUIDE}补证据或修文档）"]
+    if not any(status.startswith(s) for s in STATUSES):
+        return [f"claim #{row['id']} 状态口径未知：{status!r}"]
+    return []
+
+
+def _claim_issues(base: Path, stats: dict) -> list:
     rows = _claims(base)
     stats["claims"] = len(rows)
+    issues: list = []
     for row in rows:
-        status = row["status"]
-        if status.startswith("SUPPORTED"):
-            stats["supported"] += 1
-        elif status.startswith("PARTIAL"):
-            stats["partial"] += 1
-            # PARTIAL 必须绑定具体 ENV 阻塞，否则不允许作为收口状态
-            if "ENV-" not in status:
-                issues.append(f"claim #{row['id']} 为 PARTIAL 但未标注 ENV 阻塞"
-                          f"（{GUIDE}补 ENV-xx 或修到 SUPPORTED）")
-        elif status.startswith(_OPEN_STATUS):
-            stats["todo"] += 1
-            issues.append(f"claim #{row['id']} 仍是 {_OPEN_STATUS}"
-                          f"（{GUIDE}收口前必须完成或转 PARTIAL+ENV）")
-        elif "UNSUPPORTED" in status:
-            stats["unsupported"] += 1
-            issues.append(f"claim #{row['id']} 是 UNSUPPORTED（{GUIDE}补证据或修文档）")
-        elif not any(status.startswith(s) for s in STATUSES):
-            issues.append(f"claim #{row['id']} 状态口径未知：{status!r}")
+        issues.extend(_row_issues(row, stats))
+    return issues
+
+
+def _audit_dimension_issues(audit: dict) -> list:
+    issues: list = []
+    if set(audit.get("dimensions") or {}) == set() or len(audit.get("dimensions") or {}) != 13:
+        issues.append("自审计维度不是 S0–S12 全集")
+    gate = str((audit.get("gate") or {}).get("verify") or "")
+    if f"PASS={qb.EXPECTED_PASS}" not in gate:
+        issues.append("自审计记录的门禁 PASS 与 "
+                      f"quality_baseline.EXPECTED_PASS={qb.EXPECTED_PASS} 不一致")
+    if qb.CHECK_LABEL not in gate and "check1-" not in gate:
+        issues.append("自审计门禁记录缺 CHECK_LABEL")
+    return issues
+
+
+def _audit_issues(base: Path) -> tuple[list, int]:
     audit_path = base / SELF_AUDIT_REL
-    if audit_path.is_file():
-        try:
-            audit = json_doc.load(audit_path, dict, what=SELF_AUDIT_REL)
-        except ValueError as exc:
-            issues.append(f"{SELF_AUDIT_REL} 不可读：{exc}")
-            audit = {}
-        stop = audit.get("stop") or {}
-        stats["p0"] = int(stop.get("p0") or 0)
-        if stats["p0"] != 0:
-            issues.append(f"自审计 P0={stats['p0']}（{GUIDE}先修 P0）")
-        if stop.get("claims_unsupported") not in (0, None):
-            issues.append("自审计 claims_unsupported 非 0")
-        if set(audit.get("dimensions") or {}) == set() or len(audit.get("dimensions") or {}) != 13:
-            issues.append("自审计维度不是 S0–S12 全集")
-        gate = str((audit.get("gate") or {}).get("verify") or "")
-        if f"PASS={qb.EXPECTED_PASS}" not in gate:
-            issues.append("自审计记录的门禁 PASS 与 "
-                          f"quality_baseline.EXPECTED_PASS={qb.EXPECTED_PASS} 不一致")
-        if qb.CHECK_LABEL not in gate and "check1-" not in gate:
-            issues.append("自审计门禁记录缺 CHECK_LABEL")
+    if not audit_path.is_file():
+        return [], 0
+    try:
+        audit = json_doc.load(audit_path, dict, what=SELF_AUDIT_REL)
+    except ValueError as exc:
+        return [f"{SELF_AUDIT_REL} 不可读：{exc}"], 0
+    issues: list = []
+    stop = audit.get("stop") or {}
+    p0 = int(stop.get("p0") or 0)
+    if p0 != 0:
+        issues.append(f"自审计 P0={p0}（{GUIDE}先修 P0）")
+    if stop.get("claims_unsupported") not in (0, None):
+        issues.append("自审计 claims_unsupported 非 0")
+    return issues + _audit_dimension_issues(audit), p0
+
+
+def _dod_issues(base: Path) -> list:
     dod_path = base / DOD_REL
-    if dod_path.is_file():
-        text = dod_path.read_text(encoding="utf-8")
-        for token in ("ENV-01", "ENV-02", "不声称", "PARTIAL"):
-            if token not in text:
-                issues.append(f"DOD 缺要素：{token}")
-        if "全部完成" in text and "不声称" not in text:
-            issues.append("DOD 声称全部完成却没有受限说明（过度声明）")
-        stages = re.findall(r"^\| G[0-4] ", text, re.M)
-        if len(stages) < 5:
-            issues.append(f"DOD 阶段矩阵不完整（G0-G4 至少 5 行，实测 {len(stages)}）")
+    if not dod_path.is_file():
+        return []
+    text = dod_path.read_text(encoding="utf-8")
+    issues: list = []
+    for token in ("ENV-01", "ENV-02", "不声称", "PARTIAL"):
+        if token not in text:
+            issues.append(f"DOD 缺要素：{token}")
+    if "全部完成" in text and "不声称" not in text:
+        issues.append("DOD 声称全部完成却没有受限说明（过度声明）")
+    stages = re.findall(r"^\| G[0-4] ", text, re.M)
+    if len(stages) < 5:
+        issues.append(f"DOD 阶段矩阵不完整（G0-G4 至少 5 行，实测 {len(stages)}）")
+    return issues
+
+
+def _verify_issues(base: Path) -> list:
     verify_path = base / "verify.sh"
-    if verify_path.is_file():
-        verify = verify_path.read_text(encoding="utf-8")
-        for num in (45, 46, 47, 48):
-            if f"check{num}" not in verify:
-                issues.append(f"verify.sh 缺 check{num} 接线（{GUIDE}G1–G4 判据不得断链）")
-        if qb.CHECK_LABEL not in verify and "check1-42/45/46/47/48" not in verify:
-            issues.append("verify.sh 头部声明缺当前 CHECK_LABEL")
+    if not verify_path.is_file():
+        return []
+    verify = verify_path.read_text(encoding="utf-8")
+    issues: list = []
+    for num in (45, 46, 47, 48):
+        if f"check{num}" not in verify:
+            issues.append(f"verify.sh 缺 check{num} 接线（{GUIDE}G1–G4 判据不得断链）")
+    if qb.CHECK_LABEL not in verify and "check1-42/45/46/47/48" not in verify:
+        issues.append("verify.sh 头部声明缺当前 CHECK_LABEL")
+    return issues
+
+
+def scan(root: str = ".") -> tuple:
+    stats = {"files": 0, "claims": 0, "supported": 0, "partial": 0,
+             "todo": 0, "unsupported": 0, "p0": 0}
+    base = Path(root)
+    issues: list = []
+    issues += _file_issues(base, stats)
+    issues += _claim_issues(base, stats)
+    audit_issues, p0 = _audit_issues(base)
+    stats["p0"] = p0
+    issues += audit_issues
+    issues += _dod_issues(base)
+    issues += _verify_issues(base)
     return issues, stats

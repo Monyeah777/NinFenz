@@ -86,6 +86,27 @@ def _keys_of(path: Path, text: Optional[str] = None) -> List[str]:
 ASSET_INPUTS = ("community/*/assets/*.md", "05_资产库/用户自定义/*.md")
 
 
+def _scan_one(root: str, rel: str) -> Tuple[List[str], Optional[Dict[str, Any]]]:
+    """单资产文件 → (issues, row 或 None)。"""
+    path = Path(root) / rel
+    try:
+        size = path.stat().st_size
+        if size > MAX_ASSET_FILE_BYTES:
+            return ["%s 过大（%d > %d 字节）" % (rel, size, MAX_ASSET_FILE_BYTES)], None
+        text = csc.read_text_cached(path)
+    except OSError as exc:
+        return ["%s 不可读：%s" % (rel, exc)], None
+    if not text.strip():
+        return ["%s 为空档（0 字符）" % rel], None
+    try:
+        keys = _keys_of(Path(rel), text)
+    except ValueError as exc:
+        return [str(exc)], None
+    pkg = rel.split("/")[1] if rel.startswith("community") else "官方"
+    return [], {"package": pkg, "file": rel, "keys": len(keys), "key_list": keys,
+                "chars": len(text)}
+
+
 def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     issues: List[str] = []
     rows = []
@@ -96,28 +117,10 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         for rel in csc.iter_files(root, pat):
             if rel.rsplit("/", 1)[-1] == "README.md":
                 continue
-            path = Path(root) / rel
-            try:
-                size = path.stat().st_size
-                if size > MAX_ASSET_FILE_BYTES:
-                    issues.append("%s 过大（%d > %d 字节）" % (rel, size, MAX_ASSET_FILE_BYTES))
-                    continue
-                text = csc.read_text_cached(path)
-            except OSError as exc:
-                issues.append("%s 不可读：%s" % (rel, exc))
-                continue
-            if not text.strip():
-                issues.append("%s 为空档（0 字符）" % rel)
-                continue
-            try:
-                keys = _keys_of(Path(rel), text)
-            except ValueError as exc:
-                issues.append(str(exc))
-                continue
-            pkg = rel.split("/")[1] if rel.startswith("community") else "官方"
-            rows.append({"package": pkg, "file": rel,
-                         "keys": len(keys), "key_list": keys,
-                         "chars": len(text)})
+            file_issues, row = _scan_one(root, rel)
+            issues.extend(file_issues)
+            if row is not None:
+                rows.append(row)
     n_files = len(rows)
     n_keys = sum(x["keys"] for x in rows)
     n_unkeyed = sum(1 for x in rows if x["keys"] == 0)

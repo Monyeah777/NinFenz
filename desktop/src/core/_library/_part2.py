@@ -21,6 +21,19 @@ from ._part1 import (
 )
 
 
+def _supersede_check(root: str, hit: dict, superseded_by: str) -> None:
+    """superseded 流转的前置校验（取代者必须存在且非自己）。"""
+    if not superseded_by:
+        raise ValueError("superseded 必须指定取代者"
+                         "（修复指引：nf library supersede <旧编号> <新编号>）")
+    ids = {e["id"] for e in entries(root)}
+    if superseded_by not in ids:
+        raise ValueError("取代者不存在：%s" % superseded_by)
+    if superseded_by == hit["id"]:
+        raise ValueError("取代者不能是自己（修复指引：指向另一条已入库条目，"
+                         "如 nf library supersede NF-1 NF-2）")
+
+
 def set_status(root: str, entry_id: str, status: str,
                superseded_by: str = "") -> str:
     """流转条目生命周期（active/deprecated/superseded）并同步重建投影。"""
@@ -34,15 +47,7 @@ def set_status(root: str, entry_id: str, status: str,
     if hit is None:
         raise ValueError("条目未找到：%s（nf library ls 可枚举）" % entry_id)
     if status == "superseded":
-        if not superseded_by:
-            raise ValueError("superseded 必须指定取代者"
-                             "（修复指引：nf library supersede <旧编号> <新编号>）")
-        ids = {e["id"] for e in entries(root)}
-        if superseded_by not in ids:
-            raise ValueError("取代者不存在：%s" % superseded_by)
-        if superseded_by == hit["id"]:
-            raise ValueError("取代者不能是自己（修复指引：指向另一条已入库条目，"
-                             "如 nf library supersede NF-1 NF-2）")
+        _supersede_check(root, hit, superseded_by)
     _rewrite_frontmatter(
         os.path.join(root, hit["path"]),
         {"status": status,

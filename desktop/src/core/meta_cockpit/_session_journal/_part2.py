@@ -80,11 +80,114 @@ def ensure(
     return doc, "new"
 
 
+def _append_guard(after_state: dict, cluster: list[str], atom_trace: list[dict]) -> str | None:
+    if _forbidden_paths({"state": after_state, "cluster": cluster}):
+        return "forbidden-drive-key"
+    if [item.get("atom_id") for item in atom_trace] != list(cluster):
+        return "atom-trace-mismatch"
+    if any(item.get("status") != "pass" for item in atom_trace):
+        return "atom-trace-failed"
+    return None
+
+
+def _decision_scalar_ok(decision: dict) -> bool:
+    context_digest = decision.get("context_digest")
+    if not isinstance(context_digest, str) or len(context_digest) != 64:
+        return False
+    context_units = decision.get("context_units")
+    if not isinstance(context_units, int) or isinstance(context_units, bool):
+        return False
+    if not isinstance(decision.get("source_snapshot"), list):
+        return False
+    return isinstance(decision.get("external_context"), bool)
+
+
+def _decision_guard(decision: dict, cluster: list[str]) -> str | None:
+    choice = decision.get("choice")
+    candidates = decision.get("candidates")
+    if not isinstance(choice, int) or not isinstance(candidates, list):
+        return "decision-invalid"
+    if not _decision_scalar_ok(decision):
+        return "decision-invalid"
+    if not 0 <= choice < len(candidates):
+        return "decision-invalid"
+    if candidates[choice]["cluster"] != list(cluster):
+        return "decision-mismatch"
+    return None
+
+
+def _patch_guard(decision: dict, candidate: dict) -> str | None:
+    thought_patch = decision.get("thought_patch")
+    if thought_patch is None:
+        return None
+    patch_issues = epistemic_agenda.validate_thought_patch(candidate, thought_patch)
+    if patch_issues:
+        return "thought-patch-invalid"
+    if digest(thought_patch) != decision.get("thought_patch_digest"):
+        return "thought-patch-digest"
+    return None
+
+
+def _previous_digest(doc: dict) -> str:
+    if doc["events"]:
+        return doc["events"][-1]["event_digest"]
+    return digest(
+        {
+            "type": "session-start",
+            "session_id": doc["session_id"],
+            "state_digest": digest(doc["initial_state"]),
+        }
+    )
+
+
+def _stored_decision(decision: dict) -> dict:
+    choice = decision["choice"]
+    candidates = decision["candidates"]
+    stored_decision = {
+        "choice": choice,
+        "candidate_count": len(candidates),
+        "candidate_set_digest": digest(candidates),
+        "chosen_candidate_digest": digest(candidates[choice]),
+        "context_digest": decision["context_digest"],
+        "context_units": decision["context_units"],
+        "source_snapshot": copy.deepcopy(decision["source_snapshot"]),
+        "source_snapshot_digest": digest(decision["source_snapshot"]),
+        "external_context": decision["external_context"],
+        "candidates": copy.deepcopy(candidates),
+    }
+    thought_patch = decision.get("thought_patch")
+    if thought_patch is not None:
+        stored_decision["thought_patch"] = copy.deepcopy(thought_patch)
+        stored_decision["thought_patch_digest"] = digest(thought_patch)
+    return stored_decision
+
+
+def _turn_event(doc: dict, opts: TurnOptions, before_state: dict, after_state: dict) -> dict:
+    return {
+        "seq": len(doc["events"]) + 1,
+        "type": "turn-commit",
+        "prev_digest": _previous_digest(doc),
+        "state_before_digest": digest(before_state),
+        "state_after_digest": digest(after_state),
+        "cluster": list(opts.cluster),
+        "kind": opts.kind,
+        "predicted": sorted(set(opts.predicted)),
+        "resolved": sorted(set(opts.resolved)),
+        "changed_keys": sorted(set(opts.changed_keys)),
+        "state": copy.deepcopy(after_state),
+        "atom_trace": copy.deepcopy(opts.atom_trace),
+        "decision": _stored_decision(opts.decision),
+        "calibration_before_digest": (opts.calibration_before_digest or digest({})),
+        "calibration_after_digest": (opts.calibration_after_digest or digest({})),
+        "observations": list(opts.observations or []),
+        "created_at": _now(),
+    }
+
+
 def append_turn(path: Path, goal: str, opts: TurnOptions) -> tuple[dict | None, str]:
     before_state = opts.before_state
     after_state = opts.after_state
     cluster = opts.cluster
-    kind = opts.kind
     predicted = opts.predicted
     resolved = opts.resolved
     changed_keys = opts.changed_keys
@@ -104,84 +207,16 @@ def append_turn(path: Path, goal: str, opts: TurnOptions) -> tuple[dict | None, 
         return None, "stale-state"
     if set(predicted) != set(resolved):
         return None, "calibration-mismatch"
-    if _forbidden_paths({"state": after_state, "cluster": cluster}):
-        return None, "forbidden-drive-key"
-    if [item.get("atom_id") for item in atom_trace] != list(cluster):
-        return None, "atom-trace-mismatch"
-    if any(item.get("status") != "pass" for item in atom_trace):
-        return None, "atom-trace-failed"
-    choice = decision.get("choice")
-    candidates = decision.get("candidates")
-    if not isinstance(choice, int) or not isinstance(candidates, list):
-        return None, "decision-invalid"
-    context_digest = decision.get("context_digest")
-    if not isinstance(context_digest, str) or len(context_digest) != 64:
-        return None, "decision-invalid"
-    context_units = decision.get("context_units")
-    if not isinstance(context_units, int) or isinstance(context_units, bool):
-        return None, "decision-invalid"
-    source_snapshot = decision.get("source_snapshot")
-    if not isinstance(source_snapshot, list):
-        return None, "decision-invalid"
-    external_context = decision.get("external_context")
-    if not isinstance(external_context, bool):
-        return None, "decision-invalid"
-    if not 0 <= choice < len(candidates):
-        return None, "decision-invalid"
-    if candidates[choice]["cluster"] != list(cluster):
-        return None, "decision-mismatch"
-    thought_patch = decision.get("thought_patch")
-    if thought_patch is not None:
-        patch_issues = epistemic_agenda.validate_thought_patch(candidates[choice], thought_patch)
-        if patch_issues:
-            return None, "thought-patch-invalid"
-        if digest(thought_patch) != decision.get("thought_patch_digest"):
-            return None, "thought-patch-digest"
-    previous_digest = (
-        doc["events"][-1]["event_digest"]
-        if doc["events"]
-        else digest(
-            {
-                "type": "session-start",
-                "session_id": doc["session_id"],
-                "state_digest": digest(doc["initial_state"]),
-            }
-        )
-    )
-    stored_decision = {
-        "choice": choice,
-        "candidate_count": len(candidates),
-        "candidate_set_digest": digest(candidates),
-        "chosen_candidate_digest": digest(candidates[choice]),
-        "context_digest": context_digest,
-        "context_units": context_units,
-        "source_snapshot": copy.deepcopy(source_snapshot),
-        "source_snapshot_digest": digest(source_snapshot),
-        "external_context": external_context,
-        "candidates": copy.deepcopy(candidates),
-    }
-    if thought_patch is not None:
-        stored_decision["thought_patch"] = copy.deepcopy(thought_patch)
-        stored_decision["thought_patch_digest"] = digest(thought_patch)
-    event = {
-        "seq": len(doc["events"]) + 1,
-        "type": "turn-commit",
-        "prev_digest": previous_digest,
-        "state_before_digest": digest(before_state),
-        "state_after_digest": digest(after_state),
-        "cluster": list(cluster),
-        "kind": kind,
-        "predicted": sorted(set(predicted)),
-        "resolved": sorted(set(resolved)),
-        "changed_keys": sorted(set(changed_keys)),
-        "state": copy.deepcopy(after_state),
-        "atom_trace": copy.deepcopy(atom_trace),
-        "decision": stored_decision,
-        "calibration_before_digest": (calibration_before_digest or digest({})),
-        "calibration_after_digest": (calibration_after_digest or digest({})),
-        "observations": list(observations or []),
-        "created_at": _now(),
-    }
+    guard = _append_guard(after_state, cluster, atom_trace)
+    if guard is not None:
+        return None, guard
+    guard = _decision_guard(decision, cluster)
+    if guard is not None:
+        return None, guard
+    guard = _patch_guard(decision, decision["candidates"][decision["choice"]])
+    if guard is not None:
+        return None, guard
+    event = _turn_event(doc, opts, before_state, after_state)
     event["event_digest"] = _event_digest(event)
     doc["events"].append(event)
     try:

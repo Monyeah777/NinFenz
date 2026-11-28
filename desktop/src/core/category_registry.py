@@ -83,24 +83,32 @@ def _rec(rec_id: str, title: str, tier: str, globs: Any, note: str) -> Dict[str,
             "attributed": True, "note": note}
 
 
+def _tier_rec(t: Dict[str, Any]) -> Dict[str, Any]:
+    """LAYERS tier 条目 → 品类记录（attributed=true）。"""
+    src = t.get("source") or {}
+    return _rec("tier:" + str(t.get("id")),
+                "%s阶真源" % (t.get("name") or t.get("id")),
+                "tier", src.get("globs"), str(src.get("note") or ""))
+
+
+def _level_rec(a: Dict[str, Any]) -> Dict[str, Any]:
+    """LAYERS asset_level 条目 → 品类记录（attributed=true）。"""
+    return _rec("level:" + str(a.get("id")),
+                "%s子级" % (a.get("name") or a.get("id")),
+                str(a.get("tier") or "asset"), a.get("globs"),
+                str(a.get("note") or ""))
+
+
 def categories(root: str = ".") -> List[Dict[str, Any]]:
     """品类表（按 id 排序）：LAYERS 派生（attributed=true）+ 本地登记（attributed=false）。"""
     doc = layers_doc(root)
     out: List[Dict[str, Any]] = []
     for t in doc.get("tiers") or []:
-        if not isinstance(t, dict):
-            continue
-        src = t.get("source") or {}
-        out.append(_rec("tier:" + str(t.get("id")),
-                        "%s阶真源" % (t.get("name") or t.get("id")),
-                        "tier", src.get("globs"), str(src.get("note") or "")))
+        if isinstance(t, dict):
+            out.append(_tier_rec(t))
     for a in doc.get("asset_levels") or []:
-        if not isinstance(a, dict):
-            continue
-        out.append(_rec("level:" + str(a.get("id")),
-                        "%s子级" % (a.get("name") or a.get("id")),
-                        str(a.get("tier") or "asset"), a.get("globs"),
-                        str(a.get("note") or "")))
+        if isinstance(a, dict):
+            out.append(_level_rec(a))
     out.extend(dict(c) for c in LOCAL_CATEGORIES)
     out.sort(key=lambda c: str(c["id"]))
     return out

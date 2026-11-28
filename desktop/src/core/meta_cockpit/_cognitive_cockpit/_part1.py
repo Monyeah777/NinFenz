@@ -50,9 +50,12 @@ BUSINESS_TERMS = ("市场", "商业", "成本", "供给", "信任", "用户", "�
 GAME_TERMS = ("游戏", "玩法", "生存流", "西幻", "战斗", "死亡重生", "刷怪")
 
 
-def select_references(prompt: str) -> list[dict]:
-    domain = domain_sources.select_for_text(prompt, limit=2, include_adjacent=True)
-    domain_refs = (
+def _has(prompt: str, terms: tuple[str, ...]) -> bool:
+    return any(term in prompt for term in terms)
+
+
+def _domain_refs(domain: list[dict]) -> list[dict]:
+    return (
         [
             {
                 "source": item["id"],
@@ -65,21 +68,22 @@ def select_references(prompt: str) -> list[dict]:
         if domain
         else []
     )
+
+
+def select_references(prompt: str) -> list[dict]:
+    domain = domain_sources.select_for_text(prompt, limit=2, include_adjacent=True)
+    domain_refs = _domain_refs(domain)
     if domain_refs:
-        if any(term in prompt for term in GAME_TERMS):
+        if _has(prompt, GAME_TERMS):
             return domain_refs + [{"source": "P03", "ref": "§1"}]
-        if any(term in prompt for term in TECH_TERMS):
+        if _has(prompt, TECH_TERMS):
             return domain_refs + [{"source": "techdoc", "ref": "§1"}]
         return domain_refs
-    if any(term in prompt for term in TECH_TERMS) and not any(
-        term in prompt for term in GAME_TERMS
-    ):
+    if _has(prompt, TECH_TERMS) and not _has(prompt, GAME_TERMS):
         return [{"source": "techdoc", "ref": "§1"}, {"source": "NF-1", "ref": "§2"}]
-    if any(term in prompt for term in BUSINESS_TERMS) and not any(
-        term in prompt for term in GAME_TERMS
-    ):
+    if _has(prompt, BUSINESS_TERMS) and not _has(prompt, GAME_TERMS):
         return [{"source": "NF-1", "ref": "§2"}, {"source": "techdoc", "ref": "§1"}]
-    if any(term in prompt for term in GAME_TERMS):
+    if _has(prompt, GAME_TERMS):
         return [
             {"source": "P03", "ref": "§1"},
             {"source": "NF-1", "ref": "§2"},
@@ -139,14 +143,22 @@ def initial_state(prompt: str) -> dict:
     return state
 
 
+def _prompt_clauses(prompt: str) -> list[str]:
+    return [x.strip() for x in re.split(r"[，。；、,;]", prompt) if x.strip()]
+
+
+def _uncovered_terms(found: list[str], clauses: list[str]) -> list[str]:
+    return [term for term in found if not any(term in clause for clause in clauses)]
+
+
 def parts_from(prompt: str) -> list[str]:
     found = [k for k in REQ_KEYS if k in prompt]
-    clauses = [x.strip() for x in re.split(r"[，。；、,;]", prompt) if x.strip()]
+    clauses = _prompt_clauses(prompt)
     if len(found) >= 2:
         return found
     if found:
         parts = list(clauses)
-        parts += [term for term in found if not any(term in clause for clause in clauses)]
+        parts += _uncovered_terms(found, clauses)
         return parts or found
     return clauses or ["目标"]
 
@@ -203,67 +215,117 @@ def _met(s: dict) -> dict:
     }
 
 
+def _enrich_represent(s: dict, a: dict, parts: list[str]) -> None:
+    a["representation"] = s["goal"]
+
+
+def _enrich_partition(s: dict, a: dict, parts: list[str]) -> None:
+    a["parts"] = parts
+
+
+def _enrich_define(s: dict, a: dict, parts: list[str]) -> None:
+    a["definitions"] = [f"{part}：目标中的边界、状态与验收条件。" for part in parts]
+
+
+def _enrich_relate(s: dict, a: dict, parts: list[str]) -> None:
+    rels = [f"{left} → {right}" for left, right in zip(parts, parts[1:], strict=False)]
+    for p in parts:
+        rels += [f"{p} → {ref}" for ref in REL_MAP.get(p, [])]
+    if len(parts) == 1:
+        rels.append("{} → {}".format(s["goal"], parts[0]))
+    a["relations"] = sorted(set(rels))
+
+
+def _enrich_trace(s: dict, a: dict, parts: list[str]) -> None:
+    a["trace"] = sorted(
+        {
+            item["source"]
+            for item in _payload(s)["reference"]
+            if not item.get("context_only", False)
+        }
+    )
+
+
+def _enrich_falsify(s: dict, a: dict, parts: list[str]) -> None:
+    risks = [f"若「{part}」缺少可观察状态或回退路径，相关结论不可验证。" for part in parts]
+    risks.append("若各部分之间的约束相互冲突，组合结构会在执行阶段断裂。")
+    a["risks"] = risks
+
+
+def _enrich_reconcile(s: dict, a: dict, parts: list[str]) -> None:
+    q = s["open_questions"].pop(0) if s["open_questions"] else "未命名缺口"
+    a["resolutions"].append({"question": q, "resolution": "把缺口转成可观察状态与回退路径。"})
+
+
+def _enrich_abstract(s: dict, a: dict, parts: list[str]) -> None:
+    a["abstract"] = "目标由 {} 组成；各部分的约束、反馈与失败成本必须闭合。".format(
+        "、".join(parts)
+    )
+
+
+def _enrich_compose(s: dict, a: dict, parts: list[str]) -> None:
+    a["plan"] = [
+        "1. 明确目标边界、输入与验收状态。",
+        "2. 定义 {} 的约束与相互作用。".format("、".join(parts)),
+        "3. 为每个部分建立可观察机制与反馈回路。",
+        "4. 设计反例、失败成本、停止条件与回退路径。",
+        "5. 用 NF 证据核验结构完整性与可执行性。",
+    ]
+
+
+def _enrich_verify(s: dict, a: dict, parts: list[str]) -> None:
+    a["evidence"] = list(a["trace"] or select_references(s["goal"]))
+    a["verified"] = True
+
+
+_ENRICHERS = {
+    "k.represent": _enrich_represent,
+    "k.partition": _enrich_partition,
+    "k.define": _enrich_define,
+    "k.relate": _enrich_relate,
+    "m.trace": _enrich_trace,
+    "e.falsify": _enrich_falsify,
+    "i.reconcile": _enrich_reconcile,
+    "k.abstract": _enrich_abstract,
+    "i.compose": _enrich_compose,
+    "e.verify": _enrich_verify,
+}
+
+
+def _apply_adds(s: dict, a: dict, contract: dict, output: dict) -> None:
+    for key in contract["adds"]:
+        if key in output and not a.get(key):
+            value = output[key]
+            if key == "definitions" and isinstance(value, str):
+                value = [value]
+            a[key] = copy.deepcopy(value)
+
+
+def _apply_removals(s: dict, a: dict, keys: list[str]) -> None:
+    for key in keys:
+        if key == "open_questions":
+            s["open_questions"] = []
+        else:
+            a.pop(key, None)
+
+
+def _project_contract(s: dict, a: dict, atom_id: str, output: dict | None) -> None:
+    """其余原子按契约把执行器输出投影到共享状态；已有语义值不覆盖。"""
+    contract = ls.CONTRACTS.get(atom_id)
+    if not contract or not output:
+        return
+    _apply_adds(s, a, contract, output)
+    spec_out = atoms.SPECS[atom_id]["out"]
+    missing_adds = [key for key in contract["adds"] if not a.get(key)]
+    if spec_out in output and len(missing_adds) == 1:
+        a[missing_adds[0]] = copy.deepcopy(output[spec_out])
+    _apply_removals(s, a, contract["removes"])
+
+
 def _enrich(s: dict, atom_id: str, output: dict | None = None) -> None:
     a = s["artifact"]
     parts = a["parts"] or parts_from(s["goal"])
-    if atom_id == "k.represent":
-        a["representation"] = s["goal"]
-    if atom_id == "k.partition":
-        a["parts"] = parts
-    if atom_id == "k.define":
-        a["definitions"] = [f"{part}：目标中的边界、状态与验收条件。" for part in parts]
-    if atom_id == "k.relate":
-        rels = [f"{left} → {right}" for left, right in zip(parts, parts[1:], strict=False)]
-        for p in parts:
-            rels += [f"{p} → {ref}" for ref in REL_MAP.get(p, [])]
-        if len(parts) == 1:
-            rels.append("{} → {}".format(s["goal"], parts[0]))
-        a["relations"] = sorted(set(rels))
-    if atom_id == "m.trace":
-        a["trace"] = sorted(
-            {
-                item["source"]
-                for item in _payload(s)["reference"]
-                if not item.get("context_only", False)
-            }
-        )
-    if atom_id == "e.falsify":
-        risks = [f"若「{part}」缺少可观察状态或回退路径，相关结论不可验证。" for part in parts]
-        risks.append("若各部分之间的约束相互冲突，组合结构会在执行阶段断裂。")
-        a["risks"] = risks
-    if atom_id == "i.reconcile":
-        q = s["open_questions"].pop(0) if s["open_questions"] else "未命名缺口"
-        a["resolutions"].append({"question": q, "resolution": "把缺口转成可观察状态与回退路径。"})
-    if atom_id == "k.abstract":
-        a["abstract"] = "目标由 {} 组成；各部分的约束、反馈与失败成本必须闭合。".format(
-            "、".join(parts)
-        )
-    if atom_id == "i.compose":
-        a["plan"] = [
-            "1. 明确目标边界、输入与验收状态。",
-            "2. 定义 {} 的约束与相互作用。".format("、".join(parts)),
-            "3. 为每个部分建立可观察机制与反馈回路。",
-            "4. 设计反例、失败成本、停止条件与回退路径。",
-            "5. 用 NF 证据核验结构完整性与可执行性。",
-        ]
-    if atom_id == "e.verify":
-        a["evidence"] = list(a["trace"] or select_references(s["goal"]))
-        a["verified"] = True
-    # 其余原子按契约把执行器输出投影到共享状态；已有语义值不覆盖。
-    contract = ls.CONTRACTS.get(atom_id)
-    if contract and output:
-        for key in contract["adds"]:
-            if key in output and not a.get(key):
-                value = output[key]
-                if key == "definitions" and isinstance(value, str):
-                    value = [value]
-                a[key] = copy.deepcopy(value)
-        spec_out = atoms.SPECS[atom_id]["out"]
-        missing_adds = [key for key in contract["adds"] if not a.get(key)]
-        if spec_out in output and len(missing_adds) == 1:
-            a[missing_adds[0]] = copy.deepcopy(output[spec_out])
-        for key in contract["removes"]:
-            if key == "open_questions":
-                s["open_questions"] = []
-            else:
-                a.pop(key, None)
+    handler = _ENRICHERS.get(atom_id)
+    if handler is not None:
+        handler(s, a, parts)
+    _project_contract(s, a, atom_id, output)

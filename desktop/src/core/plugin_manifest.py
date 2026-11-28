@@ -132,6 +132,16 @@ def _io_issues(name: str, method: dict[str, Any], abi: str) -> list[str]:
     return []
 
 
+def _linear_fuel_issue(name: str, method: dict[str, Any], fuel: dict[str, Any]) -> str:
+    """linear 成本必须声明 per_kib；非 linear 返回空串。"""
+    if (method.get("cost") or {}).get("kind") != "linear":
+        return ""
+    per_kib = fuel.get("per_kib")
+    if not isinstance(per_kib, int) or per_kib <= 0:
+        return f"{name} 成本为 linear，fuel.per_kib 须为正整数（否则预算=隐式输入上限）"
+    return ""
+
+
 def _fuel_issues(name: str, method: dict[str, Any]) -> list[str]:
     """燃料预算必须**随输入规模伸缩**。
 
@@ -146,11 +156,9 @@ def _fuel_issues(name: str, method: dict[str, Any]) -> list[str]:
     base = fuel.get("base")
     if not isinstance(base, int) or base <= 0:
         out.append(f"{name}.fuel.base 须为正整数")
-    kind = (method.get("cost") or {}).get("kind")
-    if kind == "linear":
-        per_kib = fuel.get("per_kib")
-        if not isinstance(per_kib, int) or per_kib <= 0:
-            out.append(f"{name} 成本为 linear，fuel.per_kib 须为正整数（否则预算=隐式输入上限）")
+    linear_issue = _linear_fuel_issue(name, method, fuel)
+    if linear_issue:
+        out.append(linear_issue)
     cap = fuel.get("hard_cap")
     if cap is not None and (not isinstance(cap, int) or cap <= 0):
         out.append(f"{name}.fuel.hard_cap 须为正整数")

@@ -27,45 +27,97 @@ PAYLOAD_SCHEMA = json_asset.load(BASE / "constrained_candidates.schema.json")
 PV = jsonschema.Draft202012Validator(PAYLOAD_SCHEMA)
 
 
+def _direct_candidates(direct: list[dict]) -> list[dict]:
+    return [
+        {
+            "cluster": c["cluster"],
+            "resolves": c["resolves"],
+            "cost": c["cost"],
+            "kind": "direct",
+        }
+        for c in direct
+    ]
+
+
+def _compiled_prefix(stages: list) -> list[str]:
+    prefix: list[str] = []
+    for st in stages:
+        if len(prefix) + len(st) > 3:
+            break
+        prefix += st
+    return prefix
+
+
+def _compiled_candidate(s: dict) -> dict | None:
+    try:
+        comp = pc.compile_goals(s, max_cost=3)
+    except ValueError:
+        return None
+    prefix = _compiled_prefix(comp["stages"])
+    if not prefix:
+        return None
+    return {
+        "cluster": prefix,
+        "resolves": ls.resolved(tuple(prefix), s),
+        "cost": sum(ls.CONTRACTS[a]["cost"] for a in prefix),
+        "kind": "compiled",
+    }
+
+
+def _progress_candidates(families: dict, direct: list[dict]) -> list[dict]:
+    direct_keys = {tuple(c["cluster"]) for c in direct}
+    out = []
+    for c in families["progress"]:
+        if tuple(c["cluster"]) in direct_keys:
+            continue
+        out.append({**c, "kind": "direct" if c["resolves"] else "prepare"})
+    return out
+
+
 def _raw_candidates(s: dict) -> list[dict]:
-    raw = []
     families = ls.candidate_families(s, direct_limit=3, progress_limit=48, max_cost=3)
     # 候选面刻意混合“即刻补缺口”和“扩展方法能力”，而不是让结构覆盖率
     # 最高的同型链占满五个槽位。
     direct = families["direct"]
-    for c in direct:
-        raw.append(
-            {
-                "cluster": c["cluster"],
-                "resolves": c["resolves"],
-                "cost": c["cost"],
-                "kind": "direct",
-            }
-        )
-    try:
-        comp = pc.compile_goals(s, max_cost=3)
-        prefix: list[str] = []
-        for st in comp["stages"]:
-            if len(prefix) + len(st) > 3:
-                break
-            prefix += st
-        if prefix:
-            raw.append(
-                {
-                    "cluster": prefix,
-                    "resolves": ls.resolved(tuple(prefix), s),
-                    "cost": sum(ls.CONTRACTS[a]["cost"] for a in prefix),
-                    "kind": "compiled",
-                }
-            )
-    except ValueError:
-        pass
-    direct_keys = {tuple(c["cluster"]) for c in direct}
-    for c in families["progress"]:
-        if tuple(c["cluster"]) in direct_keys:
-            continue
-        raw.append({**c, "kind": "direct" if c["resolves"] else "prepare"})
+    raw = _direct_candidates(direct)
+    compiled = _compiled_candidate(s)
+    if compiled is not None:
+        raw.append(compiled)
+    raw += _progress_candidates(families, direct)
     return raw
+
+
+def _shape_bad(c: dict) -> bool:
+    if not c["cluster"] or len(c["cluster"]) > 3:
+        return True
+    if len(set(c["cluster"])) != len(c["cluster"]):
+        return True
+    return any(a not in ls.CONTRACTS for a in c["cluster"])
+
+
+def _preview_ok(c: dict, s: dict, preview: dict) -> bool:
+    if preview["status"] != "pass":
+        return False
+    if coherence.new_issue_ids(s, preview["state"]):
+        return False
+    if set(preview["resolved"]) != set(c["resolves"]):
+        return False
+    effect = c.get("effect") or {}
+    return set(effect.get("adds", [])) <= set(preview["changed_keys"])
+
+
+def _preview_or_none(c: dict, s: dict, ledger: dict) -> dict | None:
+    """契约模拟 + 执行预跑都通过才返回 preview（否则 None）。"""
+    if ls.simulate(tuple(c["cluster"]), s) is None or c["cost"] > 3:
+        return None
+    if any(ledger[a]["reliability"] < cl.RELIABILITY_FLOOR for a in c["cluster"]):
+        return None
+    # 契约模拟不等于执行可落地：预跑同一执行/写回路径，防止模型选中
+    # 一个必然缺输入或无法兑现 resolves 的“纸面候选”。
+    preview = cc.execute_cluster(s, c["cluster"])
+    if not _preview_ok(c, s, preview):
+        return None
+    return preview
 
 
 def _validated_candidates(s: dict, ledger: dict, raw: list[dict]) -> list[dict]:
@@ -76,27 +128,10 @@ def _validated_candidates(s: dict, ledger: dict, raw: list[dict]) -> list[dict]:
         if key in seen:
             continue
         seen.add(key)
-        if not c["cluster"] or len(c["cluster"]) > 3:
+        if _shape_bad(c):
             continue
-        if len(set(c["cluster"])) != len(c["cluster"]):
-            continue
-        if any(a not in ls.CONTRACTS for a in c["cluster"]):
-            continue
-        if ls.simulate(key, s) is None or c["cost"] > 3:
-            continue
-        if any(ledger[a]["reliability"] < cl.RELIABILITY_FLOOR for a in c["cluster"]):
-            continue
-        # 契约模拟不等于执行可落地：预跑同一执行/写回路径，防止模型选中
-        # 一个必然缺输入或无法兑现 resolves 的“纸面候选”。
-        preview = cc.execute_cluster(s, c["cluster"])
-        if preview["status"] != "pass":
-            continue
-        if coherence.new_issue_ids(s, preview["state"]):
-            continue
-        if set(preview["resolved"]) != set(c["resolves"]):
-            continue
-        effect = c.get("effect") or {}
-        if not set(effect.get("adds", [])) <= set(preview["changed_keys"]):
+        preview = _preview_or_none(c, s, ledger)
+        if preview is None:
             continue
         out.append(
             {
@@ -110,78 +145,88 @@ def _validated_candidates(s: dict, ledger: dict, raw: list[dict]) -> list[dict]:
     return out
 
 
+def _candidate_functions(out: list[dict], index: int) -> set[str]:
+    return {tc.ATOMS[atom_id]["function"] for atom_id in out[index]["cluster"]}
+
+
+def _take(out: list[dict], index: int, ctx: dict) -> None:
+    item = out[index]
+    ctx["selected"].append(item)
+    ctx["covered_functions"].update(_candidate_functions(out, index))
+    ctx["covered_preferred"].update(set(out[index]["cluster"]) & ctx["preferred_atoms"])
+    ctx["covered_repairs"].update(set(item["effect"]["adds"]) & ctx["repair_keys"])
+    ctx["covered_effects"].update(item["effect"]["adds"])
+    ctx["remaining"].remove(index)
+
+
+def _priority(out: list[dict], index: int, ctx: dict) -> tuple:
+    item = out[index]
+    funcs = _candidate_functions(out, index)
+    adds = set(item["effect"]["adds"])
+    kind_rank = 0 if item["kind"] == "compiled" else 1 if item["kind"] == "direct" else 2
+    return (
+        -len(adds & ctx["repair_keys"] - ctx["covered_repairs"]),
+        -len(set(item["cluster"]) & ctx["preferred_atoms"] - ctx["covered_preferred"]),
+        -len((funcs & ctx["desired"]) - ctx["covered_functions"]),
+        -len(funcs - ctx["covered_functions"]),
+        -len(adds - ctx["covered_effects"]),
+        kind_rank,
+        item["cost"],
+        index,
+    )
+
+
+def _basis(out: list[dict], anchor: int, candidate: dict, ctx: dict) -> list[str]:
+    index = out.index(candidate)
+    values = []
+    if index == anchor:
+        values.append("anchor")
+    values += [
+        "repair-key:" + key for key in sorted(set(candidate["effect"]["adds"]) & ctx["repair_keys"])
+    ]
+    values += [
+        "preferred-atom:" + atom_id
+        for atom_id in candidate["cluster"]
+        if atom_id in ctx["preferred_atoms"]
+    ]
+    values += [
+        "function:" + function
+        for function in sorted(_candidate_functions(out, index) & ctx["desired"])
+    ]
+    values += ["resolves:" + need for need in candidate["resolves"]]
+    values.append("kind:" + candidate["kind"])
+    return list(dict.fromkeys(values))
+
+
 def _select_candidates(s: dict, profile: dict, out: list[dict]) -> list[dict]:
     if not out:
         return []
-    desired = set(profile["functions"])
-    preferred_atoms = set(profile["preferred_atoms"])
-    repair_keys = set(task_profile.repair_keys(s, profile)) | set(coherence.repair_keys(s))
-    covered_functions: set[str] = set()
-    covered_preferred: set[str] = set()
-    covered_repairs: set[str] = set()
-    covered_effects: set[str] = set()
-    selected: list[dict] = []
-    remaining = list(range(len(out)))
-
-    def functions(index: int) -> set[str]:
-        return {tc.ATOMS[atom_id]["function"] for atom_id in out[index]["cluster"]}
-
-    def take(index: int) -> None:
-        item = out[index]
-        selected.append(item)
-        covered_functions.update(functions(index))
-        covered_preferred.update(set(out[index]["cluster"]) & preferred_atoms)
-        covered_repairs.update(set(out[index]["effect"]["adds"]) & repair_keys)
-        covered_effects.update(item["effect"]["adds"])
-        remaining.remove(index)
-
-    def priority(index: int) -> tuple:
-        item = out[index]
-        funcs = functions(index)
-        adds = set(item["effect"]["adds"])
-        return (
-            -len(adds & repair_keys - covered_repairs),
-            -len(set(item["cluster"]) & preferred_atoms - covered_preferred),
-            -len((funcs & desired) - covered_functions),
-            -len(funcs - covered_functions),
-            -len(adds - covered_effects),
-            0 if item["kind"] == "compiled" else 1 if item["kind"] == "direct" else 2,
-            item["cost"],
-            index,
-        )
-
+    ctx = {
+        "desired": set(profile["functions"]),
+        "preferred_atoms": set(profile["preferred_atoms"]),
+        "repair_keys": set(task_profile.repair_keys(s, profile)) | set(coherence.repair_keys(s)),
+        "covered_functions": set(),
+        "covered_preferred": set(),
+        "covered_repairs": set(),
+        "covered_effects": set(),
+        "selected": [],
+        "remaining": list(range(len(out))),
+    }
     anchor = next(
         (index for index, item in enumerate(out) if item["kind"] == "direct" and item["resolves"]),
         None,
     )
     if anchor is None:
-        take(min(remaining, key=priority))
-        anchor = out.index(selected[0])
+        _take(out, min(ctx["remaining"], key=lambda index: _priority(out, index, ctx)), ctx)
+        anchor = out.index(ctx["selected"][0])
     else:
-        take(anchor)
-    while remaining and len(selected) < 5:
-        take(min(remaining, key=priority))
-
-    def basis(candidate: dict) -> list[str]:
-        index = out.index(candidate)
-        values = []
-        if index == anchor:
-            values.append("anchor")
-        values += [
-            "repair-key:" + key for key in sorted(set(candidate["effect"]["adds"]) & repair_keys)
-        ]
-        values += [
-            "preferred-atom:" + atom_id
-            for atom_id in candidate["cluster"]
-            if atom_id in preferred_atoms
-        ]
-        values += ["function:" + function for function in sorted(functions(index) & desired)]
-        values += ["resolves:" + need for need in candidate["resolves"]]
-        values.append("kind:" + candidate["kind"])
-        return list(dict.fromkeys(values))
-
-    return [{**candidate, "basis": basis(candidate)} for candidate in selected]
-
+        _take(out, anchor, ctx)
+    while ctx["remaining"] and len(ctx["selected"]) < 5:
+        _take(out, min(ctx["remaining"], key=lambda index: _priority(out, index, ctx)), ctx)
+    return [
+        {**candidate, "basis": _basis(out, anchor, candidate, ctx)}
+        for candidate in ctx["selected"]
+    ]
 
 def build_candidates(s: dict, ledger: dict) -> list[dict]:
     profile = task_profile.build(s["goal"])
@@ -214,27 +259,42 @@ def validate(resp: dict, candidates: list[dict], state: dict | None = None) -> l
     return issues
 
 
+def _describe_candidate(c: dict, s: dict, before: set, profile: dict) -> dict:
+    after = ls.simulate(tuple(c["cluster"]), s)
+    effect = {
+        "adds": sorted((after or set()) - before),
+        "removes": sorted(before - (after or set())),
+    }
+    return {
+        "cluster": c["cluster"],
+        "resolves": c["resolves"],
+        "cost": c["cost"],
+        "kind": c["kind"],
+        "effect": effect,
+        "contract": tc.build_contract(c, profile=profile),
+        "basis": c.get("basis", []),
+    }
+
+
+def _anchor_cluster(candidates: list[dict]) -> list:
+    return next(
+        (
+            candidate["cluster"]
+            for candidate in candidates
+            if "anchor" in candidate.get("basis", [])
+        ),
+        [],
+    )
+
+
+def _requested_roles(described: list[dict]) -> list[str]:
+    return sorted({role for item in described for role in item["contract"]["context_roles"]})
+
+
 def build_prompt_payload(s: dict, candidates: list[dict], providers: list | None = None) -> dict:
     before = ls.available_keys(s)
     profile = task_profile.build(s["goal"])
-    described = []
-    for c in candidates:
-        after = ls.simulate(tuple(c["cluster"]), s)
-        effect = {
-            "adds": sorted((after or set()) - before),
-            "removes": sorted(before - (after or set())),
-        }
-        described.append(
-            {
-                "cluster": c["cluster"],
-                "resolves": c["resolves"],
-                "cost": c["cost"],
-                "kind": c["kind"],
-                "effect": effect,
-                "contract": tc.build_contract(c, profile=profile),
-                "basis": c.get("basis", []),
-            }
-        )
+    described = [_describe_candidate(c, s, before, profile) for c in candidates]
     payload = {
         "schema": "nf-constrained-candidates/1",
         "goal": s["goal"],
@@ -245,14 +305,7 @@ def build_prompt_payload(s: dict, candidates: list[dict], providers: list | None
         "facet_agenda": task_profile.build_facet_agenda(s, profile),
         "coherence": coherence.evaluate(s),
         "candidate_context": {
-            "anchor_cluster": next(
-                (
-                    candidate["cluster"]
-                    for candidate in candidates
-                    if "anchor" in candidate.get("basis", [])
-                ),
-                [],
-            ),
+            "anchor_cluster": _anchor_cluster(candidates),
             "repair_keys": sorted(
                 set(task_profile.repair_keys(s, profile)) | set(coherence.repair_keys(s))
             ),
@@ -271,9 +324,7 @@ def build_prompt_payload(s: dict, candidates: list[dict], providers: list | None
             "thought_patch_mode": "optional",
         },
     }
-    requested_roles = sorted(
-        {role for item in described for role in item["contract"]["context_roles"]}
-    )
+    requested_roles = _requested_roles(described)
     context = context_pack.build_context_pack(
         s["goal"], s, candidates, providers=providers, requested_roles=requested_roles
     )

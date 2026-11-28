@@ -127,25 +127,37 @@ def observed_face(runner: Callable[[], Any], root: str = ".",
     return rel_face(root, keys)
 
 
-def static_face(path: str) -> dict[str, list[str]]:
-    """单文件静态面：import 名 + 路径样字符串字面量（含 glob）。"""
-    tree = ast.parse(Path(path).read_text(encoding="utf-8"))
-    imports, paths = set(), set()
+def _imports_of(tree: ast.AST) -> set[str]:
+    """源码树的 import 名集合（from-import 展开到具体名字）。"""
+    imports: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for a in node.names:
                 imports.add(a.name)
-        elif isinstance(node, ast.ImportFrom):
-            if node.module:
-                imports.add(node.module)
-                for a in node.names:
-                    imports.add(node.module + "." + a.name)
-        elif isinstance(node, ast.Constant) and isinstance(node.value, str):
-            s = node.value
-            if ("/" in s and " " not in s and len(s) < 120
-                    and not s.startswith(("http", "//")) and "\\" not in s):
-                paths.add(s)
-    return {"imports": sorted(imports), "paths": sorted(paths)}
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imports.add(node.module)
+            for a in node.names:
+                imports.add(node.module + "." + a.name)
+    return imports
+
+
+def _path_literals(tree: ast.AST) -> set[str]:
+    """路径样字符串字面量（含 glob）集合。"""
+    paths: set[str] = set()
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Constant) and isinstance(node.value, str)):
+            continue
+        s = node.value
+        if ("/" in s and " " not in s and len(s) < 120
+                and not s.startswith(("http", "//")) and "\\" not in s):
+            paths.add(s)
+    return paths
+
+
+def static_face(path: str) -> dict[str, list[str]]:
+    """单文件静态面：import 名 + 路径样字符串字面量（含 glob）。"""
+    tree = ast.parse(Path(path).read_text(encoding="utf-8"))
+    return {"imports": sorted(_imports_of(tree)), "paths": sorted(_path_literals(tree))}
 
 
 def static_faces(root: str = ".") -> dict[str, list[str]]:
@@ -199,6 +211,21 @@ def load_manifest_doc(root: str = ".") -> dict[str, Any]:
     return doc if isinstance(doc, dict) else {}
 
 
+def _expert_issues(i: int, e: Any) -> list[str]:
+    """单专家声明 → 违例清单（空=合规）。"""
+    if not isinstance(e, dict):
+        return ["experts[%d] 须为对象" % i]
+    out: list[str] = []
+    if not str(e.get("id") or "").strip():
+        out.append("experts[%d] 缺 id" % i)
+    if not isinstance(e.get("reads"), list):
+        out.append("experts[%d] reads 须为数组（读面声明）" % i)
+    if e.get("skip_safety") not in SKIP_SAFETY:
+        out.append("experts[%d] skip_safety 须在 %s，实为 %r"
+                   % (i, list(SKIP_SAFETY), e.get("skip_safety")))
+    return out
+
+
 def validate_manifest(doc: Any) -> list[str]:
     """声明面形状校验 → 违例清单（空=合规）。fail-closed：缺字段/未知级别即违例。"""
     out: list[str] = []
@@ -210,16 +237,7 @@ def validate_manifest(doc: Any) -> list[str]:
     if not isinstance(experts, list):
         return out + ["experts 须为数组"]
     for i, e in enumerate(experts):
-        if not isinstance(e, dict):
-            out.append("experts[%d] 须为对象" % i)
-            continue
-        if not str(e.get("id") or "").strip():
-            out.append("experts[%d] 缺 id" % i)
-        if not isinstance(e.get("reads"), list):
-            out.append("experts[%d] reads 须为数组（读面声明）" % i)
-        if e.get("skip_safety") not in SKIP_SAFETY:
-            out.append("experts[%d] skip_safety 须在 %s，实为 %r"
-                       % (i, list(SKIP_SAFETY), e.get("skip_safety")))
+        out.extend(_expert_issues(i, e))
     return out
 
 

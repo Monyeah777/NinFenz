@@ -21,19 +21,26 @@ def _walk_scope(node: ast.AST) -> Iterable[ast.AST]:
 
 
 
+def _one_name(n: ast.AST) -> set:
+    """单目标注解赋值/增量赋值/循环变量/with 项声明的名字（其他形态空集）。"""
+    if isinstance(n, ast.AnnAssign) and isinstance(n.target, ast.Name):
+        return {n.target.id}
+    if isinstance(n, ast.AugAssign) and isinstance(n.target, ast.Name):
+        return {n.target.id}
+    if isinstance(n, (ast.For, ast.AsyncFor)) and isinstance(n.target, ast.Name):
+        return {n.target.id}
+    if isinstance(n, ast.withitem) and isinstance(n.optional_vars, ast.Name):
+        return {n.optional_vars.id}
+    return set()
+
+
 def _assigned_names(node: ast.AST) -> set:
     out = set()
     for n in _walk_scope(node):
         if isinstance(n, ast.Assign):
             out |= {t.id for t in n.targets if isinstance(t, ast.Name)}
-        elif isinstance(n, ast.AnnAssign) and isinstance(n.target, ast.Name):
-            out.add(n.target.id)
-        elif isinstance(n, ast.AugAssign) and isinstance(n.target, ast.Name):
-            out.add(n.target.id)
-        elif isinstance(n, (ast.For, ast.AsyncFor)) and isinstance(n.target, ast.Name):
-            out.add(n.target.id)
-        elif isinstance(n, ast.withitem) and isinstance(n.optional_vars, ast.Name):
-            out.add(n.optional_vars.id)
+        else:
+            out |= _one_name(n)
     return out
 
 
@@ -98,19 +105,27 @@ def _head_exprs(stmt: ast.AST) -> List[ast.AST]:
 
 
 
+def _deref_line(n: ast.AST, names: set) -> int | None:
+    """单个 AST 节点对「当前可证为 None」名字的解引用行号（非解引用 → None）。"""
+    if (isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name)
+            and n.value.id in names):
+        return n.lineno
+    if (isinstance(n, ast.Subscript) and isinstance(n.value, ast.Name)
+            and n.value.id in names):
+        return n.lineno
+    if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id in names:
+        return n.lineno
+    return None
+
+
 def _derefs(stmt: ast.AST, names: set) -> List[int]:
     """该语句头部对「当前可证为 None」的名字做的解引用行号（属性/下标/调用）。"""
     out = []
     for head in _head_exprs(stmt):
         for n in _walk_scope(head):
-            if (isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name)
-                    and n.value.id in names):
-                out.append(n.lineno)
-            elif (isinstance(n, ast.Subscript) and isinstance(n.value, ast.Name)
-                  and n.value.id in names):
-                out.append(n.lineno)
-            elif isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id in names:
-                out.append(n.lineno)
+            line = _deref_line(n, names)
+            if line is not None:
+                out.append(line)
     return out
 
 

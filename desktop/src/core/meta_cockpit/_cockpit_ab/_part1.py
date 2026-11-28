@@ -150,6 +150,35 @@ def preregister(document: dict, opts: PreregisterOptions | None = None) -> dict:
     return result
 
 
+def _trial_issues(trial: dict) -> list[str]:
+    issues = []
+    tid = trial["trial_id"]
+    if secret_guard.find(trial["output"], "$.trials[{}].output".format(tid)):
+        issues.append("sensitive data in output: " + tid)
+    if secret_guard.find(trial["prompt"], "$.trials[{}].prompt".format(tid)):
+        issues.append("sensitive data in prompt: " + tid)
+    actual = hashlib.sha256(trial["output"].encode("utf-8")).hexdigest()
+    if actual != trial["output_digest"]:
+        issues.append("output digest mismatch: " + tid)
+    return issues
+
+
+def _pair_issues(pair, paired: dict) -> list[str]:
+    left, right = paired[pair]
+    issues = []
+    if left["prompt"] != right["prompt"]:
+        issues.append(f"prompt mismatch: {pair}")
+    if left["generation"] != right["generation"]:
+        issues.append(f"generation settings mismatch: {pair}")
+    if left["resource_budget"] != right["resource_budget"]:
+        issues.append(f"resource budget mismatch: {pair}")
+    if any(item["status"] != "completed" for item in (left, right)):
+        issues.append(f"incomplete trial: {pair}")
+    if any(item["truncated"] for item in (left, right)):
+        issues.append(f"truncated trial: {pair}")
+    return issues
+
+
 def validate_experiment(document: dict) -> list[str]:
     issues = [error.message for error in VALIDATOR.iter_errors(document)]
     if issues:
@@ -173,30 +202,14 @@ def validate_experiment(document: dict) -> list[str]:
         pair = _pair_key(trial)
         grouped.setdefault(pair, []).append(trial["arm"])
         paired.setdefault(pair, []).append(trial)
-        if secret_guard.find(trial["output"], "$.trials[{}].output".format(trial["trial_id"])):
-            issues.append("sensitive data in output: " + trial["trial_id"])
-        if secret_guard.find(trial["prompt"], "$.trials[{}].prompt".format(trial["trial_id"])):
-            issues.append("sensitive data in prompt: " + trial["trial_id"])
-        actual = hashlib.sha256(trial["output"].encode("utf-8")).hexdigest()
-        if actual != trial["output_digest"]:
-            issues.append("output digest mismatch: " + trial["trial_id"])
+        issues.extend(_trial_issues(trial))
     if plan["planned_pairs"] != len(paired):
         issues.append("planned pair count mismatch")
     for pair, arms in grouped.items():
         if sorted(arms) != ["baseline", "guided"]:
             issues.append(f"unpaired or duplicate arm: {pair}")
             continue
-        left, right = paired[pair]
-        if left["prompt"] != right["prompt"]:
-            issues.append(f"prompt mismatch: {pair}")
-        if left["generation"] != right["generation"]:
-            issues.append(f"generation settings mismatch: {pair}")
-        if left["resource_budget"] != right["resource_budget"]:
-            issues.append(f"resource budget mismatch: {pair}")
-        if any(item["status"] != "completed" for item in (left, right)):
-            issues.append(f"incomplete trial: {pair}")
-        if any(item["truncated"] for item in (left, right)):
-            issues.append(f"truncated trial: {pair}")
+        issues.extend(_pair_issues(pair, paired))
     return issues
 
 

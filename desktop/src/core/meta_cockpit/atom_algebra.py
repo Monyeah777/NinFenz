@@ -60,15 +60,81 @@ def _distribute_seq(parts: list[dict]) -> dict:
     return seq(*parts)
 
 
+def _atom_signature(node: dict) -> dict:
+    c = ls.CONTRACTS[node["id"]]
+    return {
+        "pre": sorted(c["requires"]),
+        "adds": sorted(c["adds"]),
+        "removes": sorted(c["removes"]),
+    }
+
+
+def _check_par_sigs(sigs: list[dict]) -> None:
+    if any("choice" in s for s in sigs):
+        raise ValueError("parallel over choice")
+    for i, a in enumerate(sigs):
+        wa = set(a["adds"]) | set(a["removes"])
+        for b in sigs[i + 1 :]:
+            wb = set(b["adds"]) | set(b["removes"])
+            if wa & wb:
+                raise ValueError("parallel write conflict")
+
+
+def _union_sig(sigs: list[dict]) -> dict:
+    return {
+        "pre": sorted(set().union(*[set(x["pre"]) for x in sigs])) if sigs else [],
+        "adds": sorted(set().union(*[set(x["adds"]) for x in sigs])) if sigs else [],
+        "removes": sorted(set().union(*[set(x["removes"]) for x in sigs])) if sigs else [],
+    }
+
+
+def _par_signature(parts: list[dict]) -> dict:
+    if not parts:
+        return signature(IDENTITY)
+    if len(parts) == 1:
+        return signature(parts[0])
+    sigs = [signature(p) for p in parts]
+    if any("zero" in s for s in sigs):
+        return {"zero": True}
+    _check_par_sigs(sigs)
+    return _union_sig(sigs)
+
+
+def _seq_signature(parts: list[dict]) -> dict:
+    branches = [EMPTY]
+    for p in parts:
+        s = signature(p)
+        if "zero" in s:
+            return {"zero": True}
+        alts = s.get("choice", [s])
+        branches = _dedupe([_compose(b, a) for b in branches for a in alts])
+    return branches[0] if len(branches) == 1 else {"choice": branches}
+
+
+def _choice_signature(parts: list[dict]) -> dict:
+    sigs = []
+    for p in parts:
+        s = signature(p)
+        if "zero" in s:
+            continue
+        sigs.extend(s.get("choice", [s]))
+    sigs = _dedupe(sigs)
+    if not sigs:
+        return {"zero": True}
+    return sigs[0] if len(sigs) == 1 else {"choice": sigs}
+
+
+_NODE_HANDLERS = {
+    "par": _par_signature,
+    "seq": _seq_signature,
+    "choice": _choice_signature,
+}
+
+
 def signature(node: dict) -> dict:
     op = node["op"]
     if op == "atom":
-        c = ls.CONTRACTS[node["id"]]
-        return {
-            "pre": sorted(c["requires"]),
-            "adds": sorted(c["adds"]),
-            "removes": sorted(c["removes"]),
-        }
+        return _atom_signature(node)
     if op == "identity":
         return {"pre": [], "adds": [], "removes": []}
     if op == "zero":
@@ -76,48 +142,10 @@ def signature(node: dict) -> dict:
 
     raw = _flatten(node, op)
     parts = raw if op == "choice" else [p for p in raw if p["op"] != "identity"]
-    if op == "par":
-        if not parts:
-            return signature(IDENTITY)
-        if len(parts) == 1:
-            return signature(parts[0])
-        sigs = [signature(p) for p in parts]
-        if any("zero" in s for s in sigs):
-            return {"zero": True}
-        if any("choice" in s for s in sigs):
-            raise ValueError("parallel over choice")
-        for i, a in enumerate(sigs):
-            wa = set(a["adds"]) | set(a["removes"])
-            for b in sigs[i + 1 :]:
-                wb = set(b["adds"]) | set(b["removes"])
-                if wa & wb:
-                    raise ValueError("parallel write conflict")
-        return {
-            "pre": sorted(set().union(*[set(x["pre"]) for x in sigs])) if sigs else [],
-            "adds": sorted(set().union(*[set(x["adds"]) for x in sigs])) if sigs else [],
-            "removes": sorted(set().union(*[set(x["removes"]) for x in sigs])) if sigs else [],
-        }
-    if op == "seq":
-        branches = [EMPTY]
-        for p in parts:
-            s = signature(p)
-            if "zero" in s:
-                return {"zero": True}
-            alts = s.get("choice", [s])
-            branches = _dedupe([_compose(b, a) for b in branches for a in alts])
-        return branches[0] if len(branches) == 1 else {"choice": branches}
-    if op == "choice":
-        sigs = []
-        for p in parts:
-            s = signature(p)
-            if "zero" in s:
-                continue
-            sigs.extend(s.get("choice", [s]))
-        sigs = _dedupe(sigs)
-        if not sigs:
-            return {"zero": True}
-        return sigs[0] if len(sigs) == 1 else {"choice": sigs}
-    raise ValueError(f"unknown op: {op}")
+    handler = _NODE_HANDLERS.get(op)
+    if handler is None:
+        raise ValueError(f"unknown op: {op}")
+    return handler(parts)
 
 
 def equivalent(a: dict, b: dict) -> bool:

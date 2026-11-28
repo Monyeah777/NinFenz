@@ -29,6 +29,42 @@ class ProduceOptions:
     injections: dict[int, list[str]] | None = None
 
 
+def _journal_digest(journal_path) -> str | None:
+    if journal_path is None:
+        return None
+    document, status = session_journal.load(Path(journal_path))
+    if document is not None and status == "ok":
+        return document["digest"]
+    return None
+
+
+def _manifest(
+    prompt: str, run: dict, handoff: dict, journal_digest: str | None
+) -> dict:
+    return {
+        "schema": "nf-cockpit-manifest/1",
+        "prompt_digest": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        "machine_digest": runtime_executor.machine_digest(),
+        "runtime_digest": session_journal.runtime_digest(),
+        "journal_digest": journal_digest,
+        "handoff_digest": context_pack.digest(handoff),
+        "context_digest": handoff["provenance"]["context_digest"],
+        "status": run["status"],
+        "termination": run["termination"],
+        "complete": run["complete"],
+        "turns": run["turns"],
+        "context_units_spent": run.get("context_units_spent", 0),
+        "abstention_status": handoff["abstention"]["status"],
+        "human_action_required": handoff["abstention"]["human_action_required"],
+    }
+
+
+def _effective_policy(adapter, policy, providers):
+    if adapter is not None:
+        return loop.contextual_policy(adapter, providers=providers)
+    return policy or loop.first_policy
+
+
 def produce(prompt: str, opts: ProduceOptions | None = None) -> dict:
     opts = opts if opts is not None else ProduceOptions()
     adapter = opts.adapter
@@ -46,11 +82,7 @@ def produce(prompt: str, opts: ProduceOptions | None = None) -> dict:
         raise ValueError("prompt too large")
     if adapter is not None and policy is not None:
         raise ValueError("adapter and policy are mutually exclusive")
-    effective_policy = (
-        loop.contextual_policy(adapter, providers=providers)
-        if adapter is not None
-        else policy or loop.first_policy
-    )
+    effective_policy = _effective_policy(adapter, policy, providers)
     run = loop.run(
         prompt,
         effective_policy,
@@ -64,27 +96,8 @@ def produce(prompt: str, opts: ProduceOptions | None = None) -> dict:
         ),
     )
     handoff = cockpit_handoff.build_handoff(run["state"], termination=run["termination"])
-    journal_digest = None
-    if journal_path is not None:
-        document, status = session_journal.load(Path(journal_path))
-        if document is not None and status == "ok":
-            journal_digest = document["digest"]
-    manifest = {
-        "schema": "nf-cockpit-manifest/1",
-        "prompt_digest": hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
-        "machine_digest": runtime_executor.machine_digest(),
-        "runtime_digest": session_journal.runtime_digest(),
-        "journal_digest": journal_digest,
-        "handoff_digest": context_pack.digest(handoff),
-        "context_digest": handoff["provenance"]["context_digest"],
-        "status": run["status"],
-        "termination": run["termination"],
-        "complete": run["complete"],
-        "turns": run["turns"],
-        "context_units_spent": run.get("context_units_spent", 0),
-        "abstention_status": handoff["abstention"]["status"],
-        "human_action_required": handoff["abstention"]["human_action_required"],
-    }
+    journal_digest = _journal_digest(journal_path)
+    manifest = _manifest(prompt, run, handoff, journal_digest)
     issues = [error.message for error in MANIFEST_VALIDATOR.iter_errors(manifest)]
     if issues:
         raise ValueError("invalid manifest: {}".format("; ".join(issues)))

@@ -48,6 +48,42 @@ def _normalize(atoms: dict) -> dict:
     return atoms
 
 
+def _atom_type_issue(aid: str, rec: dict) -> str | None:
+    s, t, r = rec.get("successes"), rec.get("trials"), rec.get("reliability")
+    if (
+        not isinstance(s, (int, float))
+        or isinstance(s, bool)
+        or not isinstance(t, (int, float))
+        or isinstance(t, bool)
+        or not isinstance(r, (int, float))
+        or isinstance(r, bool)
+    ):
+        return f"types:{aid}"
+    return None
+
+
+def _atom_count_issues(aid: str, rec: dict) -> list[str]:
+    s, t, r = rec.get("successes"), rec.get("trials"), rec.get("reliability")
+    if s < 0 or t <= 0 or s > t:
+        return [f"counts:{aid}"]
+    if abs(float(r) - s / t) > 0.02:
+        return [f"reliability:{aid}"]
+    return []
+
+
+def _atom_issues(atoms: dict) -> list[str]:
+    issues: list[str] = []
+    for aid, rec in atoms.items():
+        if aid not in ATOM_IDS or not isinstance(rec, dict):
+            continue
+        bad = _atom_type_issue(aid, rec)
+        if bad:
+            issues.append(bad)
+            continue
+        issues.extend(_atom_count_issues(aid, rec))
+    return issues
+
+
 def _validate(doc: dict) -> list[str]:
     issues = []
     if doc.get("schema") != SCHEMA:
@@ -59,24 +95,7 @@ def _validate(doc: dict) -> list[str]:
         return issues + ["atoms"]
     if set(atoms) != ATOM_IDS:
         issues.append("atom-set")
-    for aid, rec in atoms.items():
-        if aid not in ATOM_IDS or not isinstance(rec, dict):
-            continue
-        s, t, r = rec.get("successes"), rec.get("trials"), rec.get("reliability")
-        if (
-            not isinstance(s, (int, float))
-            or isinstance(s, bool)
-            or not isinstance(t, (int, float))
-            or isinstance(t, bool)
-            or not isinstance(r, (int, float))
-            or isinstance(r, bool)
-        ):
-            issues.append(f"types:{aid}")
-            continue
-        if s < 0 or t <= 0 or s > t:
-            issues.append(f"counts:{aid}")
-        elif abs(float(r) - s / t) > 0.02:
-            issues.append(f"reliability:{aid}")
+    issues.extend(_atom_issues(atoms))
     if doc.get("digest") != _digest(doc):
         issues.append("digest")
     return issues

@@ -238,10 +238,9 @@ def frontier(graph: Dict[str, Any], loaded: Sequence[str], branch: str = "") -> 
     return sorted(out)
 
 
-def toposort(graph: Dict[str, Any]) -> List[str]:
-    """确定性拓扑序（Kahn；并列按 id 升序）。图有环 → 抛 ClosureError。"""
-    prereqs = prereqs_of(graph)
-    ids = sorted(prereqs)
+def _build_edges(ids: List[str], prereqs: Dict[str, List[str]]
+                 ) -> Tuple[Dict[str, int], Dict[str, List[str]]]:
+    """建入度/子表；包外前置不参与排序。"""
     indeg = {i: 0 for i in ids}
     children: Dict[str, List[str]] = {i: [] for i in ids}
     for i in ids:
@@ -249,6 +248,14 @@ def toposort(graph: Dict[str, Any]) -> List[str]:
             if p in indeg:                      # 包外前置不参与排序
                 indeg[i] += 1
                 children[p].append(i)
+    return indeg, children
+
+
+def toposort(graph: Dict[str, Any]) -> List[str]:
+    """确定性拓扑序（Kahn；并列按 id 升序）。图有环 → 抛 ClosureError。"""
+    prereqs = prereqs_of(graph)
+    ids = sorted(prereqs)
+    indeg, children = _build_edges(ids, prereqs)
     ready = [i for i in ids if indeg[i] == 0]
     heapq.heapify(ready)
     out: List[str] = []

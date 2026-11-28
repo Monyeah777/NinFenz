@@ -26,32 +26,44 @@ from ._reader import (
 )
 
 
+def _digest_issues(rel: str, data: bytes, e: dict[str, Any]) -> tuple[list[str], Any]:
+    """摘要/叶一致性 → (issues, 记录叶)。"""
+    digest = _sha256(data)
+    want = str(e.get("digest") or "")
+    out: list[str] = []
+    if digest != want:
+        out.append(f"成员摘要不符：{rel}（记录={want[:16]} 实测={digest[:16]}）"
+                   f"（{GUIDE}成员被改过或打包后被替换——请重新 nf evidence pack "
+                   "并向签发方核对）")
+    want_leaf = _leaf(rel, digest)
+    if want_leaf != str(e.get("leaf") or ""):
+        out.append(f"叶复算不符：{rel}（{GUIDE}叶定义须与 receipts 同源；"
+                   "包被改过就重打）")
+    return out, bytes.fromhex(want_leaf)
+
+
+def _one_member(rd: _Reader, e: dict[str, Any]) -> tuple[list[str], Any]:
+    """单成员：实体在场 + 摘要一致 + 叶复算一致 → (issues, 记录叶或 None)。"""
+    try:
+        rel = _safe_rel(str(e.get("path") or e.get("id") or ""))
+    except UnsafeBundleError as exc:
+        return [str(exc)], None
+    data = rd.read(PAYLOAD_DIR + rel) if rel else None
+    if data is None:
+        return [f"缺 payload：{rel or '?'}（{GUIDE}证据包必须自带成员实体——缺实体"
+                "的包算 invalid，不要改成只看清单）"], None
+    return _digest_issues(rel, data, e)
+
+
 def _check_members(rd: _Reader, entries: Sequence[dict[str, Any]],
                    issues: list[str]) -> list[bytes]:
     """成员实体在场 + 摘要一致 + 叶复算一致（三道一起判，任一不符即不可信）。"""
     leaves: list[bytes] = []
     for e in entries:
-        try:
-            rel = _safe_rel(str(e.get("path") or e.get("id") or ""))
-        except UnsafeBundleError as exc:
-            issues.append(str(exc))
-            continue
-        data = rd.read(PAYLOAD_DIR + rel) if rel else None
-        if data is None:
-            issues.append(f"缺 payload：{rel or '?'}（{GUIDE}证据包必须自带成员实体——缺实体"
-                          "的包算 invalid，不要改成只看清单）")
-            continue
-        digest = _sha256(data)
-        want = str(e.get("digest") or "")
-        if digest != want:
-            issues.append(f"成员摘要不符：{rel}（记录={want[:16]} 实测={digest[:16]}）"
-                          f"（{GUIDE}成员被改过或打包后被替换——请重新 nf evidence pack "
-                          "并向签发方核对）")
-        want_leaf = _leaf(rel, digest)
-        if want_leaf != str(e.get("leaf") or ""):
-            issues.append(f"叶复算不符：{rel}（{GUIDE}叶定义须与 receipts 同源；"
-                          "包被改过就重打）")
-        leaves.append(bytes.fromhex(want_leaf))
+        member_issues, leaf = _one_member(rd, e)
+        issues.extend(member_issues)
+        if leaf is not None:
+            leaves.append(leaf)
     # 读面在遍历过程中才发现的问题（超限成员/歧义结构）也要收进判定
     issues.extend(rd.issues)
     rd.issues.clear()

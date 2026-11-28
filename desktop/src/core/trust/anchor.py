@@ -27,6 +27,7 @@ from typing import Any
 
 from core import json_doc, json_schema
 from core.trust import canonical as tc
+from core.trust._anchor_checks import verify_anchor_set
 
 GUIDE = "修复指引："
 SCHEMA = "nf-anchor/1"
@@ -138,6 +139,56 @@ def sth_statement(sth: dict) -> str:
          "root": str(sth.get("root"))}))
 
 
+def _root_digest_issue(ca_path: Path, policy_root_digest: str) -> dict | None:
+    if not policy_root_digest:
+        return None
+    actual = hashlib.sha256(ca_path.read_bytes()).hexdigest()
+    if actual != policy_root_digest:
+        return {"ok": False, "reason": "TSA-ROOT-MISMATCH",
+                "detail": "CA 摘要与 policy.tsa_roots.digest 不符"}
+    return None
+
+
+def _subject_issue(subject_path: str, target_digest: str) -> dict | None:
+    if not subject_path:
+        return None
+    subject_digest = hashlib.sha256(Path(subject_path).read_bytes()).hexdigest()
+    if subject_digest != target_digest:
+        return {"ok": False, "reason": "SUBJECT-DIGEST-MISMATCH",
+                "detail": "被证文件摘要与 anchor.target_digest 不符"}
+    return None
+
+
+def _timestamp_check(
+    item: dict, target_digest: str, query_path: str, ca_file: str,
+    subject_path: str, policy_root_digest: str,
+) -> dict:
+    from core import timestamp
+    try:
+        token_bytes = _b64d(item.get("token"))
+    except ValueError as exc:
+        return {"ok": False, "reason": "ANCHOR-TOKEN-B64-INVALID", "detail": str(exc)}
+    ca_path = Path(ca_file)
+    if not ca_path.is_file():
+        return {"ok": False, "reason": "TSA-CA-MISSING",
+                "detail": "缺 CA 文件（" + GUIDE + "给 TSA 根/中间证书 PEM）"}
+    root_issue = _root_digest_issue(ca_path, policy_root_digest)
+    if root_issue is not None:
+        return root_issue
+    subject_issue = _subject_issue(subject_path, target_digest)
+    if subject_issue is not None:
+        return subject_issue
+    with tempfile.TemporaryDirectory() as tmp:
+        token_path = Path(tmp) / "token.tsr"
+        token_path.write_bytes(token_bytes)
+        res = timestamp.verify(str(token_path), query_path, ca_file=str(ca_path))
+    if not res.get("ok"):
+        return {"ok": False, "reason": "TIMESTAMP-INVALID",
+                "detail": "；".join(res.get("issues") or [])[:200]}
+    return {"ok": True, "gen_time": res.get("gen_time", ""),
+            "tsa": res.get("tsa", ""), "warnings": res.get("warnings") or []}
+
+
 def make_timestamp_verifier(query_path: str, ca_file: str, subject_path: str = "",
                             policy_root_digest: str = "") -> Callable[[dict, str], dict]:
     """返回 RFC3161 verifier：token 必须与 query 成对，且 subject 摘要=target_digest。
@@ -146,34 +197,9 @@ def make_timestamp_verifier(query_path: str, ca_file: str, subject_path: str = "
     （信任根不是「随便换个 CA 文件」就能换的）。
     """
     def verify(item: dict, target_digest: str) -> dict:
-        from core import timestamp
-        try:
-            token_bytes = _b64d(item.get("token"))
-        except ValueError as exc:
-            return {"ok": False, "reason": "ANCHOR-TOKEN-B64-INVALID", "detail": str(exc)}
-        ca_path = Path(ca_file)
-        if not ca_path.is_file():
-            return {"ok": False, "reason": "TSA-CA-MISSING",
-                    "detail": "缺 CA 文件（" + GUIDE + "给 TSA 根/中间证书 PEM）"}
-        if policy_root_digest:
-            actual = hashlib.sha256(ca_path.read_bytes()).hexdigest()
-            if actual != policy_root_digest:
-                return {"ok": False, "reason": "TSA-ROOT-MISMATCH",
-                        "detail": "CA 摘要与 policy.tsa_roots.digest 不符"}
-        if subject_path:
-            subject_digest = hashlib.sha256(Path(subject_path).read_bytes()).hexdigest()
-            if subject_digest != target_digest:
-                return {"ok": False, "reason": "SUBJECT-DIGEST-MISMATCH",
-                        "detail": "被证文件摘要与 anchor.target_digest 不符"}
-        with tempfile.TemporaryDirectory() as tmp:
-            token_path = Path(tmp) / "token.tsr"
-            token_path.write_bytes(token_bytes)
-            res = timestamp.verify(str(token_path), query_path, ca_file=str(ca_path))
-        if not res.get("ok"):
-            return {"ok": False, "reason": "TIMESTAMP-INVALID",
-                    "detail": "；".join(res.get("issues") or [])[:200]}
-        return {"ok": True, "gen_time": res.get("gen_time", ""),
-                "tsa": res.get("tsa", ""), "warnings": res.get("warnings") or []}
+        return _timestamp_check(
+            item, target_digest, query_path, ca_file, subject_path, policy_root_digest
+        )
     return verify
 
 
@@ -243,100 +269,3 @@ def make_git_commit_verifier(repo_path: str = "") -> Callable[[dict, str], dict]
         return {"ok": True, "commit": commit,
                 "warnings": ["git-commit 只证本地可达；公共可见性需公共锚（T4/G4）"]}
     return verify
-
-
-def _tsa_root(policy: dict, tsa_id: str) -> dict | None:
-    for item in (policy or {}).get("tsa_roots") or []:
-        if isinstance(item, dict) and str(item.get("id")) == tsa_id:
-            return item
-    return None
-
-
-def verify_anchor_set(doc: Any, target_digest: str, policy: dict,
-                      verifiers: dict | None = None,
-                      schema: dict | None = None,
-                      root: str = ".") -> dict:
-    """核验锚件 → {facts, details, issues}。facts 供 verify.decide 使用。"""
-    check_schema = schema if schema is not None else load_schema(root)
-    problems = json_schema.json_schema_check(doc, check_schema)
-    if problems:
-        return {"facts": {"time_token": "invalid", "transparency_sth": "invalid",
-                          "public_anchor": "none"},
-                "details": [], "issues": [{"code": "ANCHOR-SCHEMA-INVALID",
-                                           "message": problems[0],
-                                           "fix": "按 nf-anchor/1 修锚件后重验"}]}
-    if doc.get("target_digest") != target_digest:
-        return {"facts": {"time_token": "invalid", "transparency_sth": "invalid",
-                          "public_anchor": "none"},
-                "details": [], "issues": [{"code": "ANCHOR-TARGET-MISMATCH",
-                                           "message": "锚件 target_digest 与被证摘要不符",
-                                           "fix": "重新对正确摘要做锚，别把旧锚挂到新对象上"}]}
-    checks = verifiers or {}
-    details, issues = [], []
-    facts = {"time_token": "none", "transparency_sth": "none", "public_anchor": "none"}
-    status_by_kind: dict = {}
-    for item in doc.get("anchors") or []:
-        kind = str(item.get("kind"))
-        detail = {"kind": kind, "status": "none"}
-        if kind == "rfc3161":
-            tsa_id = str(item.get("tsa") or "")
-            root_item = _tsa_root(policy, tsa_id)
-            if root_item is None:
-                detail.update(status="none", reason="TSA-ROOT-MISSING")
-            elif not callable(checks.get("rfc3161")):
-                detail.update(status="none", reason="VERIFIER-MISSING")
-            else:
-                got = checks["rfc3161"](item, target_digest)
-                detail.update(status="ok" if got.get("ok") else "invalid",
-                              reason=got.get("reason", ""), gen_time=got.get("gen_time", ""))
-        elif kind == "transparency-sth":
-            if not callable(checks.get("transparency-sth")):
-                detail.update(status="none", reason="VERIFIER-MISSING")
-            else:
-                got = checks["transparency-sth"](item, target_digest)
-                detail.update(status="ok" if got.get("ok") else "invalid",
-                              reason=got.get("reason", ""))
-        elif kind == "witness":
-            if not callable(checks.get("witness")):
-                detail.update(status="none", reason="VERIFIER-MISSING")
-            else:
-                got = checks["witness"](item, target_digest)
-                detail.update(status="ok" if got.get("ok") else "invalid",
-                              reason=got.get("reason", ""))
-        elif kind == "git-commit":
-            if not callable(checks.get("git-commit")):
-                detail.update(status="none", reason="VERIFIER-MISSING")
-            else:
-                got = checks["git-commit"](item, target_digest)
-                detail.update(status="ok" if got.get("ok") else "invalid",
-                              reason=got.get("reason", ""),
-                              warnings=got.get("warnings") or [])
-        details.append(detail)
-        status_by_kind.setdefault(kind, []).append(detail["status"])
-    for kind, statuses in status_by_kind.items():
-        if kind == "rfc3161":
-            facts["time_token"] = ("invalid" if "invalid" in statuses
-                                   else "ok" if "ok" in statuses else "none")
-        elif kind == "transparency-sth":
-            facts["transparency_sth"] = ("invalid" if "invalid" in statuses
-                                         else "ok" if "ok" in statuses else "none")
-        elif kind == "witness":
-            witnesses = statuses
-            if "invalid" in witnesses:
-                facts["transparency_sth"] = "invalid"
-            threshold = int(((policy or {}).get("anchors") or {}).get(
-                "witness_threshold") or 0)
-            if (threshold > 0 and facts["transparency_sth"] == "ok"
-                    and witnesses.count("ok") < threshold):
-                facts["transparency_sth"] = "none"
-                issues.append({"code": "WITNESS-THRESHOLD-NOT-MET",
-                               "message": f"witness 有效 {witnesses.count('ok')} "
-                                          f"< 策略阈值 {threshold}",
-                               "fix": "收集足够 witness 签名后重验"})
-    for detail in details:
-        if detail["status"] == "invalid":
-            code = str(detail.get("reason") or "ANCHOR-INVALID")
-            issues.append({"code": code,
-                           "message": f"{detail['kind']} 锚核验失败",
-                           "fix": "修锚件/换正确信任根后重验；被篡改的锚必须拒"})
-    return {"facts": facts, "details": details, "issues": issues}

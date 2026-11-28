@@ -93,46 +93,79 @@ def _ref_role(role: str, refs: list[dict]) -> dict:
     }
 
 
+def _edge_briefs(edges: list[dict], kinds: set[str]) -> list[dict]:
+    return [
+        {"from": edge["from"], "to": edge["to"], "kind": edge["kind"], "source": edge["source"]}
+        for edge in edges
+        if edge["kind"] in kinds
+    ]
+
+
+def _current_state_role(state, artifact, graph, edges, refs):
+    if state.get("artifact") or state.get("goal"):
+        return [], ["session-state"]
+    return [], []
+
+
+def _fallback_role(state, artifact, graph, edges, refs):
+    if state.get("fallback") or artifact.get("risks"):
+        return [], ["session-state"]
+    return [], []
+
+
+def _relations_role(state, artifact, graph, edges, refs):
+    briefs = _edge_briefs(edges, {"nf-mapping", "state-relation"})
+    return briefs, (["session-state"] if artifact.get("relations") else [])
+
+
+def _prerequisites_role(state, artifact, graph, edges, refs):
+    return _edge_briefs(edges, {"domain-prerequisite"}), []
+
+
+def _budget_role(state, artifact, graph, edges, refs):
+    if state.get("budget") or state.get("budget_state"):
+        return [], ["session-budget"]
+    return [], []
+
+
+def _obligations_role(state, artifact, graph, edges, refs):
+    if epistemic_agenda.build_agenda(state)["obligations"]:
+        return [], ["epistemic-agenda"]
+    return [], []
+
+
+def _conflicts_role(state, artifact, graph, edges, refs):
+    source_ids = []
+    if state.get("open_questions"):
+        source_ids.append("open-questions")
+    if graph.get("warnings"):
+        source_ids.append("graph-warnings")
+    return [], source_ids
+
+
+def _anchors_role(state, artifact, graph, edges, refs):
+    return [], sorted({str(item["source"]) for item in refs})
+
+
+_STRUCTURAL_HANDLERS = {
+    "current-state": _current_state_role,
+    "fallback": _fallback_role,
+    "relations": _relations_role,
+    "prerequisites": _prerequisites_role,
+    "budget": _budget_role,
+    "acceptance-obligations": _obligations_role,
+    "unresolved-conflicts": _conflicts_role,
+    "source-anchors": _anchors_role,
+}
+
+
 def _structural_role(role: str, state: dict, context: dict) -> dict:
     artifact = state.get("artifact", {})
     graph = context.get("graph_slice", {})
     refs = context.get("references", [])
     edges = graph.get("edges", [])
-    graph_edges: list[dict] = []
-    source_ids: list[str] = []
-    if role == "current-state":
-        if state.get("artifact") or state.get("goal"):
-            source_ids.append("session-state")
-    elif role == "fallback":
-        if state.get("fallback") or artifact.get("risks"):
-            source_ids.append("session-state")
-    elif role == "relations":
-        graph_edges = [
-            {"from": edge["from"], "to": edge["to"], "kind": edge["kind"], "source": edge["source"]}
-            for edge in edges
-            if edge["kind"] in {"nf-mapping", "state-relation"}
-        ]
-        if artifact.get("relations"):
-            source_ids.append("session-state")
-    elif role == "prerequisites":
-        graph_edges = [
-            {"from": edge["from"], "to": edge["to"], "kind": edge["kind"], "source": edge["source"]}
-            for edge in edges
-            if edge["kind"] == "domain-prerequisite"
-        ]
-    elif role == "budget":
-        if state.get("budget") or state.get("budget_state"):
-            source_ids.append("session-budget")
-    elif role == "acceptance-obligations":
-        if epistemic_agenda.build_agenda(state)["obligations"]:
-            source_ids.append("epistemic-agenda")
-    elif role == "unresolved-conflicts":
-        if state.get("open_questions"):
-            source_ids.append("open-questions")
-        if graph.get("warnings"):
-            source_ids.append("graph-warnings")
-    elif role == "source-anchors":
-        source_ids = sorted({str(item["source"]) for item in refs})
+    handler = _STRUCTURAL_HANDLERS[role]
+    graph_edges, source_ids = handler(state, artifact, graph, edges, refs)
     available = bool(source_ids or graph_edges)
     if role == "unresolved-conflicts" and source_ids:
         status = "available"
