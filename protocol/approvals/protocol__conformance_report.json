@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-28",
   "approved_by": "Monyeah777",
-  "note": "0.3.8 Pro 离线授权落地（license-verify op/出错码/CLI.md）后重算一致性报告",
+  "note": "0.3.8 发布前最终重算（Pro 授权/站点口径/0.3.8 文档）",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "a6f71b3e606494f879ff2bf7dc8beabeefacb390fc7db0083ba559e325b88333"
+  "subject_digest": "e2af02697db754d1fa7e5c30d2eeae3662b715c6422eb52d7eab38aab321eb52"
 }
