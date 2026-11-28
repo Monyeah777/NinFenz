@@ -90,6 +90,23 @@ def build_spec_report(root: str = ".") -> Dict[str, Any]:
             "note": "由样例 intent 现算（committed==实时重算）"}
 
 
+def _layer_row(lid: str, name: str, spec: tuple, have) -> Dict[str, Any]:
+    """单层 QA 行：covered 但证据缺件时如实降为 partial（并给缺件清单）。"""
+    evidence, status, owner, next_step = spec
+    present = [rel for rel in evidence if have(rel)]
+    if status == "covered" and len(present) != len(evidence):
+        status, owner, next_step = "partial", "maintainers", "补缺证据：%s" % (
+            [rel for rel in evidence if rel not in present])
+    return {"layer": lid, "name": name, "status": status,
+            "evidence": evidence, "present": present,
+            "owner": owner, "next": next_step}
+
+
+def _layer_summary(rows: List[Dict[str, Any]]) -> Dict[str, int]:
+    """按状态词表统计行数（缺的状态记 0）。"""
+    return {status: sum(1 for row in rows if row["status"] == status) for status in STATUSES}
+
+
 def build_qa_layers(root: str = ".") -> Dict[str, Any]:
     r = Path(root)
     have = lambda rel: (r / rel).is_file()
@@ -125,15 +142,8 @@ def build_qa_layers(root: str = ".") -> Dict[str, Any]:
         "L20": (["docs/assurance/ASSURANCE_CASE.md", "protocol/raid.json"], "covered", "", ""),
     }
     for lid, name in LAYERS:
-        evidence, status, owner, next_step = mapping[lid]
-        present = [rel for rel in evidence if have(rel)]
-        if status == "covered" and len(present) != len(evidence):
-            status, owner, next_step = "partial", "maintainers", "补缺证据：%s" % (
-                [rel for rel in evidence if rel not in present])
-        rows.append({"layer": lid, "name": name, "status": status,
-                     "evidence": evidence, "present": present,
-                     "owner": owner, "next": next_step})
-    summary = {status: sum(1 for row in rows if row["status"] == status) for status in STATUSES}
+        rows.append(_layer_row(lid, name, mapping[lid], have))
+    summary = _layer_summary(rows)
     return {"schema": "nf-qa-layers/1", "layers": rows, "summary": summary,
             "status_vocabulary": list(STATUSES),
             "note": "§13A.2 L0–L20 映射既有 QA 产物；未做的层如实 partial（不写成 covered）",
@@ -158,6 +168,45 @@ def write(root: str = ".") -> Dict[str, Any]:
     return {"wiki": wiki, "spec": spec, "qa": qa}
 
 
+def _check_one_report(root: str, rel: str, doc: Dict[str, Any]) -> List[str]:
+    """在盘报告与实时重算逐字对比 → 0/1 条 issue。"""
+    path = Path(root) / rel
+    if not path.is_file():
+        return ["缺 %s（修复指引：跑 write()）" % rel]
+    try:
+        committed = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return ["%s 不可解析：%s" % (rel, exc)]
+    if json.dumps(committed, ensure_ascii=False, sort_keys=True) != \
+            json.dumps(doc, ensure_ascii=False, sort_keys=True):
+        return ["%s 与实时重算不一致（修复指引：重跑 write）" % rel]
+    return []
+
+
+def _qa_layer_issues(qa: Dict[str, Any]) -> List[str]:
+    """QA 层：必须恰为 L0–L20、status 合法、partial/gap/open 带 owner+next。"""
+    issues: List[str] = []
+    rows = qa.get("layers") or []
+    ids = [row["layer"] for row in rows]
+    if ids != [lid for lid, _ in LAYERS]:
+        issues.append("QA 层必须恰为 L0–L20（当前 %s）" % ids)
+    for row in rows:
+        if row["status"] not in STATUSES:
+            issues.append("%s status 非法" % row["layer"])
+        if row["status"] in ("partial", "gap", "open"):
+            if not row.get("owner") or not row.get("next"):
+                issues.append("%s partial/gap/open 缺 owner/next" % row["layer"])
+    return issues
+
+
+def _boundary_issues(qa: Dict[str, Any]) -> List[str]:
+    """claims_boundary 必须写明「不是认证」。"""
+    boundary = " ".join(str(x) for x in qa.get("claims_boundary") or [])
+    if "不是认证" not in boundary:
+        return ["claims_boundary 必须写明不是认证"]
+    return []
+
+
 def check(root: str = ".") -> List[str]:
     issues: List[str] = []
     live_wiki = build_wiki_report(root)
@@ -165,31 +214,9 @@ def check(root: str = ".") -> List[str]:
     live_qa = build_qa_layers(root)
     for rel, doc in ((WIKI_REPORT_REL, live_wiki), (SPEC_REPORT_REL, live_spec),
                      (QA_REL, live_qa)):
-        path = Path(root) / rel
-        if not path.is_file():
-            issues.append("缺 %s（修复指引：跑 write()）" % rel)
-            continue
-        try:
-            committed = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError) as exc:
-            issues.append("%s 不可解析：%s" % (rel, exc))
-            continue
-        if json.dumps(committed, ensure_ascii=False, sort_keys=True) != \
-                json.dumps(doc, ensure_ascii=False, sort_keys=True):
-            issues.append("%s 与实时重算不一致（修复指引：重跑 write）" % rel)
-    qa = live_qa
-    ids = [row["layer"] for row in qa.get("layers") or []]
-    if ids != [lid for lid, _ in LAYERS]:
-        issues.append("QA 层必须恰为 L0–L20（当前 %s）" % ids)
-    for row in qa.get("layers") or []:
-        if row["status"] not in STATUSES:
-            issues.append("%s status 非法" % row["layer"])
-        if row["status"] in ("partial", "gap", "open"):
-            if not row.get("owner") or not row.get("next"):
-                issues.append("%s partial/gap/open 缺 owner/next" % row["layer"])
+        issues.extend(_check_one_report(root, rel, doc))
+    issues.extend(_qa_layer_issues(live_qa))
     if not live_wiki.get("ok") or not live_spec.get("ok"):
         issues.append("wiki/spec 报告含 issues（修复指引：先修 wiki/spec 校验）")
-    boundary = " ".join(str(x) for x in qa.get("claims_boundary") or [])
-    if "不是认证" not in boundary:
-        issues.append("claims_boundary 必须写明不是认证")
+    issues.extend(_boundary_issues(live_qa))
     return issues

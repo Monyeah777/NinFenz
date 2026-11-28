@@ -127,7 +127,6 @@ def _delegate(opts: _DelegateSpec) -> Callable[[Path], Verdict]:
       - 无论上面结果如何，err==0 时再补一条 `ok(总结)`（verify.sh 的 `if [ $err -eq 0 ]` 分支）；
       - 退出码/统计行不进 verdict 面，只做统计信息。
     """
-
     num = opts.num
     title = opts.title
     module = opts.module
@@ -137,50 +136,86 @@ def _delegate(opts: _DelegateSpec) -> Callable[[Path], Verdict]:
 
     def run(root: Path) -> Verdict:
         v = Verdict(name="check%d" % num, title=title, status=PASS)
-        try:
-            mod = importlib.import_module("core.{}".format(module))
-            fn = getattr(mod, func)
-        except Exception as exc:
-            v.verdicts.append((FAIL, "{}异常——import 失败：{}".format(labels.success, exc)))
-            v.status = FAIL
-            return v
-        try:
-            res = fn(str(root))
-        except Exception as exc:
-            v.verdicts.append((FAIL, "{}异常——{}".format(labels.success, exc)))
-            v.status = FAIL
-            return v
-        # 两种既有返回形状都要支持（都是生产实现的真实签名）：
-        #   (issues, stats)          —— 多数 check
-        #   (issues, warns, stats)   —— check40 的 asset_contract.scan
-        warns: list[str] = []
-        if isinstance(res, tuple) and len(res) == 3:
-            issues, warns, stats = res
-        elif isinstance(res, tuple) and len(res) == 2:
-            issues, stats = res
-        else:
-            issues, stats = res, {}
-        issues = list(issues or [])
-        warns = list(warns or [])
-        v.stats = {} if not show_stats else (
-            {k: stats[k] for k in sorted(stats)} if isinstance(stats, dict) else {})
-        for w in warns:
-            v.verdicts.append((WARN, str(w)))
-        if issues:
-            tail = " ".join(str(i) for i in issues[-2:])
-            v.verdicts.append((FAIL, "{}{}".format(labels.fail_prefix or "{}异常——".format(labels.success),
-                                               tail)))
-            v.status = FAIL
-        else:
-            for msg in labels.pass_lines:
-                v.verdicts.append((PASS, _resolve_vars(msg, root)))
-            if not v.verdicts:
-                v.verdicts.append((PASS, "check%d 通过（verify.sh 未给文案）" % num))
-        if warns and not issues:
-            v.status = WARN
+        fn, err = _import_target(module, func)
+        if err is not None:
+            return _fail_verdict(v, labels,
+                                 "{}异常——import 失败：{}".format(labels.success, err))
+        res, err = _call_target(fn, root)
+        if err is not None:
+            return _fail_verdict(v, labels, "{}异常——{}".format(labels.success, err))
+        issues, warns, stats = _result_parts(res)
+        v.stats = _stats_face(stats, show_stats)
+        _record_verdict(v, issues, warns, labels, root, num)
         return v
 
     return run
+
+
+def _import_target(module: str, func: str):
+    """按名导入 → (callable, 异常)；异常非 None 即导入失败。"""
+    try:
+        mod = importlib.import_module("core.{}".format(module))
+        return getattr(mod, func), None
+    except Exception as exc:
+        return None, exc
+
+
+def _call_target(fn, root: Path):
+    """调用目标函数 → (返回值, 异常)。"""
+    try:
+        return fn(str(root)), None
+    except Exception as exc:
+        return None, exc
+
+
+def _result_parts(res):
+    """兼容两种既有返回形状：(issues, stats) / (issues, warns, stats)。"""
+    warns: list[str] = []
+    if isinstance(res, tuple) and len(res) == 3:
+        issues, warns, stats = res
+    elif isinstance(res, tuple) and len(res) == 2:
+        issues, stats = res
+    else:
+        issues, stats = res, {}
+    return list(issues or []), list(warns or []), stats
+
+
+def _stats_face(stats, show_stats: bool) -> dict:
+    """统计面（非 dict 或不允许展示 → 空 dict）。"""
+    if not show_stats:
+        return {}
+    return {k: stats[k] for k in sorted(stats)} if isinstance(stats, dict) else {}
+
+
+def _fail_verdict(v: Verdict, labels, msg: str) -> Verdict:
+    """失败 verdict（置 FAIL 并返回同一对象）。"""
+    v.verdicts.append((FAIL, msg))
+    v.status = FAIL
+    return v
+
+
+def _record_verdict(v: Verdict, issues: list, warns: list, labels, root: Path,
+                    num: int) -> None:
+    """warn/fail/pass 三面 verdict 行（verify.sh 语义）。"""
+    for w in warns:
+        v.verdicts.append((WARN, str(w)))
+    if issues:
+        tail = " ".join(str(i) for i in issues[-2:])
+        v.verdicts.append((FAIL, "{}{}".format(
+            labels.fail_prefix or "{}异常——".format(labels.success), tail)))
+        v.status = FAIL
+    else:
+        _pass_lines(v, labels, root, num)
+    if warns and not issues:
+        v.status = WARN
+
+
+def _pass_lines(v: Verdict, labels, root: Path, num: int) -> None:
+    """全部 pass 文案行（无文案时给兜底行）。"""
+    for msg in labels.pass_lines:
+        v.verdicts.append((PASS, _resolve_vars(msg, root)))
+    if not v.verdicts:
+        v.verdicts.append((PASS, "check%d 通过（verify.sh 未给文案）" % num))
 
 
 #: 统计面白名单：只有这些 check 的 stats 值得进人读输出。

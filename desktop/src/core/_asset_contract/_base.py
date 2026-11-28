@@ -7,7 +7,7 @@ from __future__ import annotations
 import functools
 import os
 from pathlib import Path
-from typing import List
+from typing import Any, Dict, List, Optional, Tuple
 
 from core import json_doc, repo_face
 from core.atoms import hash as hash_atom
@@ -161,23 +161,43 @@ def resolve(root: str, spec: Dict[str, Any]) -> List[str]:
     r = Path(root)
     if spec.get("path"):
         rel = str(spec["path"]).replace("\\", "/")
-        key = (str(r.resolve()), "path", rel)
-        if _RESOLVE_MEMO is not None and key in _RESOLVE_MEMO:
-            return list(_RESOLVE_MEMO[key])
-        got = [rel] if (r / rel).is_file() else []
-        if _RESOLVE_MEMO is not None:
-            _RESOLVE_MEMO[key] = list(got)
-        return got
+        return _resolve_path(r, rel)
     pat = str(spec.get("glob") or "")
     if not pat:
         return []
-    key = (str(r.resolve()), "glob", pat)
+    return _resolve_glob(r, root, pat)
+
+
+def _memo_key(r: Path, kind: str, value: str) -> tuple:
+    """解析结果缓存键（根绝对路径 + 声明种类 + 值）。"""
+    return (str(r.resolve()), kind, value)
+
+
+def _resolve_path(r: Path, rel: str) -> List[str]:
+    """`path` 单件声明解析（缓存命中优先）。"""
+    key = _memo_key(r, "path", rel)
+    if _RESOLVE_MEMO is not None and key in _RESOLVE_MEMO:
+        return list(_RESOLVE_MEMO[key])
+    got = [rel] if (r / rel).is_file() else []
+    if _RESOLVE_MEMO is not None:
+        _RESOLVE_MEMO[key] = list(got)
+    return got
+
+
+def _glob_repo(repo_files, pat: str) -> List[str]:
+    """受跟踪件面里按 glob 匹配（稳定排序）。"""
+    from core import conformance_scan as csc
+    return sorted(rel for rel in repo_files if csc.match_rel(rel, pat))
+
+
+def _resolve_glob(r: Path, root: str, pat: str) -> List[str]:
+    """`glob` 多件声明解析（缓存命中优先；命中面按受跟踪件收窄）。"""
+    key = _memo_key(r, "glob", pat)
     if _RESOLVE_MEMO is not None and key in _RESOLVE_MEMO:
         return list(_RESOLVE_MEMO[key])
     repo_files = _repo_files(root)
     if repo_files is not None:
-        from core import conformance_scan as csc
-        got = sorted(rel for rel in repo_files if csc.match_rel(rel, pat))
+        got = _glob_repo(repo_files, pat)
     else:
         got = sorted(p.relative_to(r).as_posix()
                      for p in r.glob(pat) if p.is_file())

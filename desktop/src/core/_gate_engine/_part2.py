@@ -35,6 +35,16 @@ from ._part1 import (
     emit,
 )
 
+from ._cli import (
+    _apply_trust_env,
+    _json_payload,
+    _only_ids,
+    _parser,
+    _print_summary,
+    _quiet_flags,
+    _restore_trust_env,
+)
+
 # ---------------------------------------------------------------- 内容寻址 memo
 
 def _digest_file(p: Path) -> str:
@@ -94,6 +104,64 @@ def _verify_sh() -> str | None:
         return None
 
 
+def _run_exact(num: int, title: str, labels: Labels, root: Path,
+               body_text: str) -> Verdict:
+    """整段 check 体进程内执行 → Verdict。"""
+    v = Verdict(name="check%d" % num, title=title, status=PASS)
+    _code, passes, out = gate_inproc.run_check_inproc(body_text, root, "check%d" % num)
+    if not passes and "[FAIL]" not in out:
+        # 成功分支是 `:`（空壳，如 check8 / check20）：正文没产出 PASS 文案，
+        # 但**也没报 FAIL** ⇒ 判定通过。此时用从 verify.sh 抽到的成功文案补齐，
+        # 否则与 bash 收尾那条 ok 对不上。
+        passes = list(labels.pass_lines)
+    for msg in passes:
+        v.verdicts.append((PASS, _resolve_vars(msg, root)))
+    if not v.verdicts:
+        # 真失败：按 bash 的 `no "<前缀>$(tail -3 log | tr '\n' ' ')"` 逐字复刻——
+        # **前缀要带**（bash 就是先打前缀，再拼 log 的末几行），
+        # 且 log 要按 tail 截断（否则会把统计行也带进来，实测 check35 因此对不上）。
+        tail = gate_inproc.tail(out, 3)
+        v.verdicts.append((FAIL, "{}{}".format(labels.fail_prefix, tail) if tail else
+                           "check%d：整段体既未产出 PASS 也未报 FAIL"
+                           "（修复指引：核对 check 体）" % num))
+        v.status = FAIL
+    return v
+
+
+def _run_heredoc(num: int, title: str, labels: Labels, root: Path,
+                 text: str) -> Verdict:
+    """退化路径：只跑首个 heredoc + 从 verify.sh 抽文案 → Verdict。"""
+    v = Verdict(name="check%d" % num, title=title, status=PASS)
+    got = gate_inproc.extract_heredoc(text, num)
+    if not got:
+        v.verdicts.append((FAIL, "check%d：verify.sh 里未找到 heredoc"
+                                 "（修复指引：核对排版）" % num))
+        v.status = FAIL
+        return v
+    src, logname = got
+    code, out = gate_inproc.run_inproc(src, root, "check%d" % num)
+    v.note = logname
+    if code == 0:
+        for msg in labels.pass_lines:
+            v.verdicts.append((PASS, _resolve_vars(msg, root)))
+        if not v.verdicts:      # 极端情形：verify.sh 未给任何成功文案
+            v.verdicts.append((PASS, "check%d 通过（verify.sh 未给文案）" % num))
+        return v
+    # 与 bash 逐字同形：`no "<前缀>$(tail -3 log | tr '\n' ' ')"`。
+    # 两处细节都不能省（都实测踩过）：
+    #  ① 不能逐行发 FAIL——脚本自己写出的 `[FAIL] …` 行也是日志内容的一部分，
+    #     bash 把它们（按 tail 截取后）**拼成一条**诊断串（check35 即三行拼一条）；
+    #  ② 当那段拼接串**本身就以 `[FAIL]` 开头**时，**不再叠 `no` 的前缀**——
+    #     bash 打出来就是对得上（前缀会把同一件事说两遍）。实测 check35 因此红了。
+    tail = gate_inproc.tail(out, 3)
+    if tail.lstrip().startswith("[FAIL]"):
+        v.verdicts.append((FAIL, tail))
+    else:
+        v.verdicts.append((FAIL, "{}{}".format(labels.fail_prefix, tail)))
+    v.status = FAIL
+    return v
+
+
 def _inproc(num: int, title: str, labels: Labels) -> Callable[[Path], Verdict]:
     """通用「进程内」执行体：优先跑**整段 check 体**，退化为只跑 heredoc。
 
@@ -116,57 +184,9 @@ def _inproc(num: int, title: str, labels: Labels) -> Callable[[Path], Verdict]:
         refused = _trust_gate(num, title, root)
         if refused is not None:
             return refused
-        v = Verdict(name="check%d" % num, title=title, status=PASS)
-        text = _verify_sh() or ""
         if exact:
-            _code, passes, out = gate_inproc.run_check_inproc(body_text, root, "check%d" % num)
-            if not passes and "[FAIL]" not in out:
-                # 成功分支是 `:`（空壳，如 check8 / check20）：正文没产出 PASS 文案，
-                # 但**也没报 FAIL** ⇒ 判定通过。此时用从 verify.sh 抽到的成功文案补齐，
-                # 否则与 bash 收尾那条 ok 对不上。
-                passes = list(labels.pass_lines)
-            for msg in passes:
-                v.verdicts.append((PASS, _resolve_vars(msg, root)))
-            if not v.verdicts:
-                # 真失败：按 bash 的 `no "<前缀>$(tail -3 log | tr '\n' ' ')"` 逐字复刻——
-                # **前缀要带**（bash 就是先打前缀，再拼 log 的末几行），
-                # 且 log 要按 tail 截断（否则会把统计行也带进来，实测 check35 因此对不上）。
-                tail = gate_inproc.tail(out, 3)
-                v.verdicts.append((FAIL, "{}{}".format(labels.fail_prefix, tail) if tail else
-                                   "check%d：整段体既未产出 PASS 也未报 FAIL"
-                                   "（修复指引：核对 check 体）" % num))
-                v.status = FAIL
-            return v
-
-        got = gate_inproc.extract_heredoc(text, num)
-        if not got:
-            v.verdicts.append((FAIL, "check%d：verify.sh 里未找到 heredoc"
-                                     "（修复指引：核对排版）" % num))
-            v.status = FAIL
-            return v
-        src, logname = got
-        code, out = gate_inproc.run_inproc(src, root, "check%d" % num)
-        v.note = logname
-        if code == 0:
-            for msg in labels.pass_lines:
-                v.verdicts.append((PASS, _resolve_vars(msg, root)))
-            if not v.verdicts:      # 极端情形：verify.sh 未给任何成功文案
-                v.verdicts.append((PASS, "check%d 通过（verify.sh 未给文案）" % num))
-        else:
-            # 与 bash 逐字同形：`no "<前缀>$(tail -3 log | tr '\n' ' ')"`。
-            # 两处细节都不能省（都实测踩过）：
-            #  ① 不能逐行发 FAIL——脚本自己写出的 `[FAIL] …` 行也是日志内容的一部分，
-            #     bash 把它们（按 tail 截取后）**拼成一条**诊断串（check35 即三行拼一条）；
-            #  ② 当那段拼接串**本身就以 `[FAIL]` 开头**时，**不再叠 `no` 的前缀**——
-            #     bash 打出来就是对得上（前缀会把同一件事说两遍）。实测 check35 因此红了。
-            tail = gate_inproc.tail(out, 3)
-            prefix = labels.fail_prefix
-            if tail.lstrip().startswith("[FAIL]"):
-                v.verdicts.append((FAIL, tail))
-            else:
-                v.verdicts.append((FAIL, "{}{}".format(prefix, tail)))
-            v.status = FAIL
-        return v
+            return _run_exact(num, title, labels, root, body_text)
+        return _run_heredoc(num, title, labels, root, _verify_sh() or "")
 
     return run
 
@@ -287,83 +307,36 @@ def run_checks(root: Path, only: Sequence[int] | None = None,
     return out
 
 
-def main(argv: Sequence[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="门禁单进程引擎（骨架）")
-    ap.add_argument("--only", default="", help="逗号分隔的 check 号（默认全部已迁入）")
-    ap.add_argument("--memo", action="store_true", help="打开内容寻址 memo（默认关）")
-    ap.add_argument("--json", action="store_true", help="机器面")
-    ap.add_argument("--repeat", type=int, default=1, help="连跑 N 遍（看 memo 收益）")
-    ap.add_argument("--trust-repo", dest="trust_repo", action="store_true",
-                    help="显式信任目标仓库（H1）：允许执行其 verify.sh 内嵌代码；外来仓库默认拒绝")
-    ap.add_argument("--quiet-time", action="store_true",
-                    help="输出里不带墙钟耗时（**确定性输出**用；见下）")
-    a = ap.parse_args(argv)
-
-    # 不确定性面**默认不进输出**（2026-10-15 实测教训）：`nf verify` 曾被
-    # test_daemon_parity 抓到「直跑 vs 守护」输出逐字节不同（3480 vs 3478 字节），
-    # 根因就是我在人读面里打了墙钟耗时——而守护与直跑的耗时必然不同。
-    # 机器可比面的纪律是「同输入同字节」，故耗时只在显式要（--repeat>1）或在
-    # 人读面且未被要求静默时才出现。
-    quiet = a.quiet_time or os.environ.get("NF_VERIFY_QUIET_TIME") == "1"
-    if os.environ.get("NF_VERIFY_QUIET_TIME") == "1":
-        a.quiet_time = True
-
-    root = ROOT
-    only = [int(x) for x in a.only.split(",") if x.strip()] if a.only else None
-    m = Memo() if a.memo else None
-
+def _run_repeated(root: Path, only, m: Any, a) -> list[Verdict]:
+    """按 --repeat 跑 N 遍 → 最后一遍结果（信任开关只在跑 check 区间内生效）。"""
     allv: list[Verdict] = []
-    wall0 = time.perf_counter()
-    # H1 修复（2026-11-04 实测）：--trust-repo 此前直接写进程级 NF_TRUST_REPO=1 且**从不还原**
-    # ——同进程里后续任何一次信任门判定都会被这条残留放行（信任门被环境泄漏绕过；分片实测
-    # 当场抓到：一个先跑过 --trust-repo 的用例让后面的「拒绝不可信仓库」判据失效）。
-    # 改成「只在真正跑 check 的区间内生效，出区间按原值还原」。
-    _saved_trust = os.environ.get(repo_trust.ENV_TRUST)
-    if getattr(a, "trust_repo", False):
-        os.environ[repo_trust.ENV_TRUST] = "1"
+    _saved_trust = _apply_trust_env(getattr(a, "trust_repo", False))
     try:
         for _ in range(max(1, a.repeat)):
             allv = run_checks(root, only, m)
             if not a.json and a.repeat > 1 and _ < a.repeat - 1:
                 continue
     finally:
-        if _saved_trust is None:
-            os.environ.pop(repo_trust.ENV_TRUST, None)
-        else:
-            os.environ[repo_trust.ENV_TRUST] = _saved_trust
+        _restore_trust_env(_saved_trust)
+    return allv
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    a = _parser().parse_args(argv)
+    quiet = _quiet_flags(a)
+    root = ROOT
+    only = _only_ids(a.only)
+    m = Memo() if a.memo else None
+    wall0 = time.perf_counter()
+    allv = _run_repeated(root, only, m, a)
     wall = time.perf_counter() - wall0
-
     if a.json:
-        payload: dict[str, Any] = {
-            "checks": [{"name": v.name, "status": v.status, "cached": v.cached,
-                        "fails": v.fails, "warns": v.warns} for v in allv],
-            "pending": len(PENDING),
-        }
-        if not quiet:
-            payload["wall_seconds"] = round(wall, 4)
-            payload["memo"] = None if m is None else {"hits": m.hits, "misses": m.misses}
-        else:
-            payload["checks"] = [
-                {"name": v.name, "status": v.status, "cached": v.cached,
-                 "fails": v.fails, "warns": v.warns} for v in allv]
-        print(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+        print(json.dumps(_json_payload(allv, quiet, wall, m),
+                         ensure_ascii=False, indent=2, sort_keys=True))
         return 0
-
     build_registry()
     for v in allv:
         emit(v)
     pf = sum(v.fails for v in allv)
-    print("=" * 50)
-    if quiet:
-        print("引擎结果：已迁入 %d 条 / 未迁入 %d 条；FAIL=%d"
-              % (len(allv), len(PENDING), pf))
-    else:
-        print("引擎结果：已迁入 %d 条 / 未迁入 %d 条；FAIL=%d WARN=%d"
-              % (len(allv), len(PENDING), pf, sum(v.warns for v in allv)))
-        print("墙钟 %.3f s（repeat=%d%s）"
-              % (wall, a.repeat, "" if m is None else
-                 "，memo 命中 %d / 未命中 %d" % (m.hits, m.misses)))
-        for v in sorted(allv, key=lambda x: -x.seconds)[:5]:
-            print("  最慢：%-10s %8.1f ms%s" % (v.name, v.seconds * 1000,
-                                              "（memo）" if v.cached else ""))
+    _print_summary(allv, pf, wall, a, m, quiet)
     return 1 if pf else 0

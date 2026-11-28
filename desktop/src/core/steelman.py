@@ -212,6 +212,62 @@ def _real_lines(sec_text: str, placeholder: str) -> List[str]:
     return real
 
 
+def _frontmatter_warns(fm: str) -> List[str]:
+    warns: List[str] = []
+    for key in ("decision:", "date:", "decider:", "context:"):
+        if f"{key} " not in fm and key not in fm:
+            warns.append(f"frontmatter 缺 {key.strip(':')}")
+    return warns
+
+
+def _reiteration_warns(body: str) -> List[str]:
+    real = [ln for ln in body.splitlines()
+            if ln.strip() and not ln.strip().startswith(">")
+            and not ln.strip().startswith("## ")]
+    if not real:
+        return ["问题重述未填（1 节需完整重述问题）"]
+    return []
+
+
+def _argument_warns(num: int, sec: str, body: str) -> List[str]:
+    if _count_list_items(body) < 3:
+        label = "支持侧" if num == 2 else "反对侧"
+        return [f"{label}论据 <3 条（{sec} 至少 3 条独立论据）"]
+    return []
+
+
+def _placeholder_warns(num: int, body: str) -> List[str]:
+    if _real_lines(body, SECTION_PLACEHOLDERS[num]):
+        return []
+    if num == 4:
+        return ["核心变量未填（4 节：改变结论的那个变量）"]
+    return ["回退路径未填（6 节）"]
+
+
+def _judgement_warns(body: str) -> List[str]:
+    if "**判断**" not in body:
+        return ["判断缺失（5 节需一句话判断）"]
+    if not _has_numbered_reason(body):
+        return ["判断无理由（5 节需 ≥1 条编号理由）"]
+    return []
+
+
+def _section_warns(text: str, lines: List[str], sec: str) -> List[str]:
+    num = int(sec.split(".", 1)[0])
+    if not any(ln.strip().startswith(f"## {sec}") for ln in lines):
+        return [f"缺节：{sec}"]
+    body = _section_text(text, sec)
+    if num == 1:
+        return _reiteration_warns(body)
+    if num in (2, 3):
+        return _argument_warns(num, sec, body)
+    if num in (4, 6):
+        return _placeholder_warns(num, body)
+    if num == 5:
+        return _judgement_warns(body)
+    return []
+
+
 def check_worksheet(text: str) -> List[str]:
     """结构自检：返回缺项 warn 列表（空 = 通过）。
 
@@ -223,37 +279,10 @@ def check_worksheet(text: str) -> List[str]:
     """
     warns: List[str] = []
     fm = text.split("---")[1] if text.startswith("---") else ""
-    for key in ("decision:", "date:", "decider:", "context:"):
-        if f"{key} " not in fm and key not in fm:
-            warns.append(f"frontmatter 缺 {key.strip(':')}")
+    warns += _frontmatter_warns(fm)
     lines = text.splitlines()
     for sec in STEELMAN_SECTIONS:
-        num = int(sec.split(".", 1)[0])
-        if not any(ln.strip().startswith(f"## {sec}") for ln in lines):
-            warns.append(f"缺节：{sec}")
-            continue
-        body = _section_text(text, sec)
-        if num == 1:
-            real = [ln for ln in body.splitlines()
-                    if ln.strip() and not ln.strip().startswith(">")
-                    and not ln.strip().startswith("## ")]
-            if not real:
-                warns.append("问题重述未填（1 节需完整重述问题）")
-        elif num in (2, 3):
-            if _count_list_items(body) < 3:
-                label = "支持侧" if num == 2 else "反对侧"
-                warns.append(f"{label}论据 <3 条（{sec} 至少 3 条独立论据）")
-        elif num in (4, 6):
-            if not _real_lines(body, SECTION_PLACEHOLDERS[num]):
-                if num == 4:
-                    warns.append("核心变量未填（4 节：改变结论的那个变量）")
-                else:
-                    warns.append("回退路径未填（6 节）")
-        elif num == 5:
-            if "**判断**" not in body:
-                warns.append("判断缺失（5 节需一句话判断）")
-            elif not _has_numbered_reason(body):
-                warns.append("判断无理由（5 节需 ≥1 条编号理由）")
+        warns += _section_warns(text, lines, sec)
     return warns
 
 

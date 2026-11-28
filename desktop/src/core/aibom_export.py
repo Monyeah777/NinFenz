@@ -136,37 +136,46 @@ def _secret_hits(text: str) -> List[str]:
     return hits
 
 
-def check(root: str = ".") -> List[str]:
-    """导出件判据：必填/哈希/属性闭合/无秘密/committed==live。"""
+def _export_presence_issues(root: str) -> List[str]:
     issues: List[str] = []
-    reg = load_registry(root)
     for rel in (CDX_REL, SPDX_REL):
         if not (Path(root) / rel).is_file():
             issues.append("缺导出件 %s（修复指引：跑 write() 重生成）" % rel)
-    if issues:
-        return issues
-    try:
-        cdx = json.loads((Path(root) / CDX_REL).read_text(encoding="utf-8"))
-        spdx = json.loads((Path(root) / SPDX_REL).read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        return ["导出件不可解析：%s（修复指引：重生成）" % exc]
+    return issues
+
+
+def _export_drift_issues(root: str, cdx: Any, spdx: Any) -> List[str]:
+    issues: List[str] = []
     live = build(root)
     if render(cdx) != render(live["cdx"]):
         issues.append("CycloneDX 导出与实时重算不一致（修复指引：重跑 write）")
     if render(spdx) != render(live["spdx"]):
         issues.append("SPDX 导出与实时重算不一致（修复指引：重跑 write）")
+    return issues
+
+
+def _required_issues(reg: Dict[str, Any], cdx: Any, spdx: Any) -> List[str]:
+    issues: List[str] = []
     for key in reg["exports"]["cyclonedx"]["required"]:
         if key not in cdx:
             issues.append("CycloneDX 缺必填：%s" % key)
     for key in reg["exports"]["spdx"]["required"]:
         if key not in spdx:
             issues.append("SPDX 缺必填：%s" % key)
-    sample = ae.load_sample(root)
-    card, lineage, review = sample["card"], sample["lineage"], sample["review"]
+    return issues
+
+
+def _cdx_hash_issues(cdx: Any, card: Any) -> List[str]:
     hashes = [h.get("content") for h in
               ((cdx.get("metadata") or {}).get("component") or {}).get("hashes") or []]
     if str(card.get("model_digest")) not in hashes:
-        issues.append("CycloneDX 组件 hash 与模型卡 model_digest 不一致")
+        return ["CycloneDX 组件 hash 与模型卡 model_digest 不一致"]
+    return []
+
+
+def _property_issues(reg: Dict[str, Any], cdx: Any, card: Any,
+                     lineage: Any, review: Any) -> List[str]:
+    issues: List[str] = []
     props = {str(p.get("name")): str(p.get("value")) for p in cdx.get("properties") or []}
     for name in reg.get("properties_required") or []:
         if name not in props:
@@ -178,6 +187,11 @@ def check(root: str = ".") -> List[str]:
         issues.append("properties.lineage_head 与血缘不一致")
     if props.get("nf:human_review_subject_digest") != str(review.get("subject_digest")):
         issues.append("properties.review subject 与复核不一致")
+    return issues
+
+
+def _spdx_issues(spdx: Any, card: Any) -> List[str]:
+    issues: List[str] = []
     checksums = [c.get("checksumValue") for c in
                  ((spdx.get("packages") or [{}])[0]).get("checksums") or []]
     if str(card.get("model_digest")) not in checksums:
@@ -185,11 +199,43 @@ def check(root: str = ".") -> List[str]:
     rels = spdx.get("relationships") or []
     if not any(r.get("relationshipType") == "DESCRIBES" for r in rels):
         issues.append("SPDX 缺 DESCRIBES 关系")
+    return issues
+
+
+def _secret_leak_issues(cdx: Any, spdx: Any) -> List[str]:
+    issues: List[str] = []
     for text, label in ((render(cdx), "CycloneDX"), (render(spdx), "SPDX")):
         hits = _secret_hits(text)
         if hits:
             issues.append("%s 导出含秘密形状：%s（修复指引：移除敏感字段）" % (label, hits[:2]))
+    return issues
+
+
+def _claims_boundary_issues(reg: Dict[str, Any]) -> List[str]:
     boundary = " ".join(str(x) for x in reg.get("claims_boundary") or [])
     if "不声称" not in boundary:
-        issues.append("claims_boundary 必须写明不声称认证/合规")
+        return ["claims_boundary 必须写明不声称认证/合规"]
+    return []
+
+
+def check(root: str = ".") -> List[str]:
+    """导出件判据：必填/哈希/属性闭合/无秘密/committed==live。"""
+    reg = load_registry(root)
+    issues: List[str] = _export_presence_issues(root)
+    if issues:
+        return issues
+    try:
+        cdx = json.loads((Path(root) / CDX_REL).read_text(encoding="utf-8"))
+        spdx = json.loads((Path(root) / SPDX_REL).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return ["导出件不可解析：%s（修复指引：重生成）" % exc]
+    issues += _export_drift_issues(root, cdx, spdx)
+    issues += _required_issues(reg, cdx, spdx)
+    sample = ae.load_sample(root)
+    card, lineage, review = sample["card"], sample["lineage"], sample["review"]
+    issues += _cdx_hash_issues(cdx, card)
+    issues += _property_issues(reg, cdx, card, lineage, review)
+    issues += _spdx_issues(spdx, card)
+    issues += _secret_leak_issues(cdx, spdx)
+    issues += _claims_boundary_issues(reg)
     return issues

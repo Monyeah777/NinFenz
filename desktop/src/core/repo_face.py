@@ -89,6 +89,24 @@ def is_ignored(rel: str, ignored: Set[str]) -> bool:
     return False
 
 
+def _keep_dir(dirpath: str, rel_dir: str, name: str, ignored: Set[str]) -> bool:
+    if name in SKIP_DIR_NAMES:
+        return False
+    if os.path.islink(os.path.join(dirpath, name)):
+        return False
+    rel = ("%s/%s" % (rel_dir, name)) if rel_dir else name
+    return not is_ignored(rel, ignored)
+
+
+def _file_kept(dirpath: str, rel_dir: str, name: str, ignored: Set[str]) -> bool:
+    if name == ".git":          # 链接工作树：`.git` 是指针文件（见 docstring）
+        return False
+    if os.path.islink(os.path.join(dirpath, name)):
+        return False
+    rel = ("%s/%s" % (rel_dir, name)) if rel_dir else name
+    return not is_ignored(rel, ignored)
+
+
 def walk_repo_paths(root: str) -> Iterator[Path]:
     """遍历**仓库件**（跳过 `SKIP_DIR_NAMES` 与 `.gitignore` 覆盖面）→ 逐个产出 `Path`。
 
@@ -102,26 +120,10 @@ def walk_repo_paths(root: str) -> Iterator[Path]:
     for dirpath, dirnames, filenames in os.walk(root_abs):
         rel_dir = os.path.relpath(dirpath, root_abs).replace(os.sep, "/")
         rel_dir = "" if rel_dir == "." else rel_dir
-        keep = []
-        for name in dirnames:
-            if name in SKIP_DIR_NAMES:
-                continue
-            if os.path.islink(os.path.join(dirpath, name)):
-                continue
-            rel = ("%s/%s" % (rel_dir, name)) if rel_dir else name
-            if is_ignored(rel, ignored):
-                continue
-            keep.append(name)
-        dirnames[:] = keep
+        dirnames[:] = [n for n in dirnames if _keep_dir(dirpath, rel_dir, n, ignored)]
         for name in filenames:
-            if name == ".git":          # 链接工作树：`.git` 是指针文件（见 docstring）
-                continue
-            if os.path.islink(os.path.join(dirpath, name)):
-                continue
-            rel = ("%s/%s" % (rel_dir, name)) if rel_dir else name
-            if is_ignored(rel, ignored):
-                continue
-            yield Path(dirpath) / name
+            if _file_kept(dirpath, rel_dir, name, ignored):
+                yield Path(dirpath) / name
 
 
 def tracked_paths(root: str) -> list[Path]:

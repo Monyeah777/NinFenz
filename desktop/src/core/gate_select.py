@@ -72,6 +72,22 @@ def _rel(root: str, p: object) -> str | None:
     return None
 
 
+def _face_reads(root: str, rec: dict) -> list:
+    """观测读面 → 仓内相对 posix 列表（滤掉仓外、VCS/缓存与字节码）。"""
+    return [r for r in (_rel(root, p) for p in (rec.get("reads") or []))
+            if r and not r.startswith((".rivet/", ".git/", "__pycache__/"))
+            and not r.endswith((".pyc", ".pyo"))]
+
+
+def _face_record(root: str, rec: dict) -> dict:
+    """单模块读面记录归一（缺失字段按缺省值补齐）。"""
+    return {"status": rec.get("status"),
+            "seconds": rec.get("seconds") or 0,
+            "reads": _face_reads(root, rec),
+            "child_reads_captured": rec.get("child_reads_captured"),
+            "unobservable_children": rec.get("unobservable_children")}
+
+
 def load_faces(root: str = ".", path: Path | None = None) -> dict:
     """读并归一读面；**任何不可信**（缺件 / 坏 JSON / schema 不符）→ 空 dict（上层全跑）。"""
     try:
@@ -83,16 +99,8 @@ def load_faces(root: str = ".", path: Path | None = None) -> dict:
         return {}
     out: dict = {}
     for mod, rec in doc["modules"].items():
-        if not isinstance(rec, dict):
-            continue
-        reads = [r for r in (_rel(root, p) for p in (rec.get("reads") or []))
-                 if r and not r.startswith((".rivet/", ".git/", "__pycache__/"))
-                 and not r.endswith((".pyc", ".pyo"))]
-        out[str(mod)] = {"status": rec.get("status"),
-                         "seconds": rec.get("seconds") or 0,
-                         "reads": reads,
-                         "child_reads_captured": rec.get("child_reads_captured"),
-                         "unobservable_children": rec.get("unobservable_children")}
+        if isinstance(rec, dict):
+            out[str(mod)] = _face_record(root, rec)
     return out
 
 
@@ -145,6 +153,34 @@ def _covered(changed: list, reads: list) -> bool:
     return False
 
 
+def _posix_list(items) -> list:
+    """候选改动集 → posix 形态列表（缺省空表）。"""
+    return [_posix(c) for c in (items or [])]
+
+
+def _mod_run_reason(mod: str, rec: dict | None, changed_n: list, tdir: Path) -> str | None:
+    """该模块必须跑的理由；None = 读面未命中（可跳过）。"""
+    status = (rec or {}).get("status")
+    if status != "ok":
+        return "观测非 ok（fail-closed）"
+    if spawn_risk(mod, tdir, rec):
+        return "读面不可信（fail-closed）"
+    own = _posix(f"desktop/tests/{mod}.py").lower()
+    if any(own == c.lower() for c in changed_n):
+        return "本模块自身被改"
+    if _covered(changed_n, rec.get("reads") or []):
+        return "读面命中"
+    return None
+
+
+def _lane_split(run: list, mods: dict, tdir: Path) -> tuple[list, list, list]:
+    """按快/慢车道与可缓存性切三刀（顺序与口径同旧实现）。"""
+    quick = [(m, w) for m, w in run if lane_of(mods.get(m)) == "quick"]
+    slow = [(m, w) for m, w in run if lane_of(mods.get(m)) == "slow"]
+    uncacheable = [m for m, _w in run if not cacheable(m, mods.get(m), tdir)]
+    return quick, slow, uncacheable
+
+
 def select(changed: list, doc: dict | None = None, tests_dir: Path | None = None,
            root: str = ".") -> dict:
     """→ {run, skip, quick, slow, uncacheable}。
@@ -155,28 +191,16 @@ def select(changed: list, doc: dict | None = None, tests_dir: Path | None = None
     tdir = tests_dir or Path("desktop") / "tests"
     for p in sorted(tdir.glob("test_*.py")):
         mods.setdefault(p.stem, {"status": "unobserved", "reads": []})
-    changed_n = [_posix(c) for c in (changed or [])]
+    changed_n = _posix_list(changed)
     run: list = []
     skip: list = []
     for mod, rec in sorted(mods.items()):
-        status = (rec or {}).get("status")
-        if status != "ok":
-            run.append((mod, "观测非 ok（fail-closed）"))
-            continue
-        if spawn_risk(mod, tdir, rec):
-            run.append((mod, "读面不可信（fail-closed）"))
-            continue
-        own = _posix(f"desktop/tests/{mod}.py").lower()
-        if any(own == c.lower() for c in changed_n):
-            run.append((mod, "本模块自身被改"))
-            continue
-        if _covered(changed_n, rec.get("reads") or []):
-            run.append((mod, "读面命中"))
-        else:
+        why = _mod_run_reason(mod, rec, changed_n, tdir)
+        if why is None:
             skip.append(mod)
-    quick = [(m, w) for m, w in run if lane_of(mods.get(m)) == "quick"]
-    slow = [(m, w) for m, w in run if lane_of(mods.get(m)) == "slow"]
-    uncacheable = [m for m, _w in run if not cacheable(m, mods.get(m), tdir)]
+        else:
+            run.append((mod, why))
+    quick, slow, uncacheable = _lane_split(run, mods, tdir)
     return {"run": run, "skip": skip, "quick": quick, "slow": slow,
             "uncacheable": uncacheable}
 

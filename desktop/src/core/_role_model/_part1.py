@@ -112,18 +112,28 @@ def _glob_re(pattern: str) -> re.Pattern:
     return re.compile("^" + out + "$")
 
 
+def _rule_hit_globs(rule: Dict[str, Any]) -> List[str]:
+    """规则 glob 的字符串面（缺省空表）。"""
+    return [str(g) for g in rule.get("globs") or []]
+
+
+def _rule_hit_paths(rule: Dict[str, Any], files: List[str]) -> set:
+    """规则 glob 在已枚举文件面上的命中集合。"""
+    hits = set()
+    for pat in rule.get("globs") or []:
+        rx = _glob_re(str(pat).replace("\\", "/"))
+        hits |= {rel for rel in files if rx.match(rel)}
+    return hits
+
+
 def _rule_hits(roles: Dict[str, Any], files: List[str]) -> List[Dict[str, Any]]:
     """每条规则 → {id, role, globs, hits}（在**已枚举**的文件面上匹配，不重复走盘）。"""
     out = []
     for rule in roles.get("rules") or []:
         if not isinstance(rule, dict):
             continue
-        hits = set()
-        for pat in rule.get("globs") or []:
-            rx = _glob_re(str(pat).replace("\\", "/"))
-            hits |= {rel for rel in files if rx.match(rel)}
         out.append({"id": str(rule.get("id") or "?"), "role": str(rule.get("role") or ""),
-                    "globs": [str(g) for g in rule.get("globs") or []], "hits": hits})
+                    "globs": _rule_hit_globs(rule), "hits": _rule_hit_paths(rule, files)})
     return out
 
 
@@ -205,36 +215,56 @@ def self_line(root: str, rel: str) -> str:
     return result
 
 
-def _self_line_uncached(root: str, rel: str) -> str:
-    text = _text_of(root, rel)
-    if text is None:  # 可吞：读不到=无自述可推，① 覆盖判据另报缺口
+def _self_line_py(text: str) -> str:
+    """Python 件：docstring 首个非空行。"""
+    for line in _leading_docstring(text).splitlines():
+        if line.strip():
+            return line.strip()
+    return ""
+
+
+def _self_line_md(text: str) -> str:
+    """Markdown 件：首个标题行。"""
+    for line in text.splitlines():
+        if line.startswith("#"):
+            return line.lstrip("# ").strip()
+    return ""
+
+
+def _self_line_json(text: str, rel: str) -> str:
+    """JSON 件：note > title > schema > id 的首个非空字符串。"""
+    try:
+        doc = json_doc.loads(text, what=rel)
+    except ValueError:  # 可吞：坏 JSON=无自述可推；坏件由 schema 面另报
         return ""
-    if rel.endswith(".py"):
-        for line in _leading_docstring(text).splitlines():
-            if line.strip():
-                return line.strip()
-        return ""
-    if rel.endswith(".md"):
-        for line in text.splitlines():
-            if line.startswith("#"):
-                return line.lstrip("# ").strip()
-        return ""
-    if rel.endswith(".json"):
-        try:
-            doc = json_doc.loads(text, what=rel)
-        except ValueError:  # 可吞：坏 JSON=无自述可推；坏件由 schema 面另报
-            return ""
-        if isinstance(doc, dict):
-            for k in ("note", "title", "schema", "id"):
-                v = doc.get(k)
-                if isinstance(v, str) and v.strip():
-                    return v.strip()
-        return ""
+    if isinstance(doc, dict):
+        for k in ("note", "title", "schema", "id"):
+            v = doc.get(k)
+            if isinstance(v, str) and v.strip():
+                return v.strip()
+    return ""
+
+
+def _self_line_other(text: str) -> str:
+    """其它件：首个注释样式的非空行。"""
     for line in text.splitlines():
         s = line.strip()
         if s.startswith("#") and len(s) > 1:
             return s.lstrip("# ").strip()
     return ""
+
+
+def _self_line_uncached(root: str, rel: str) -> str:
+    text = _text_of(root, rel)
+    if text is None:  # 可吞：读不到=无自述可推，① 覆盖判据另报缺口
+        return ""
+    if rel.endswith(".py"):
+        return _self_line_py(text)
+    if rel.endswith(".md"):
+        return _self_line_md(text)
+    if rel.endswith(".json"):
+        return _self_line_json(text, rel)
+    return _self_line_other(text)
 
 
 def _signal_role(root: str, rel: str) -> str:

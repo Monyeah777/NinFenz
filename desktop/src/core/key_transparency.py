@@ -80,6 +80,50 @@ def build(keys: dict[str, str], prev: dict[str, Any] | None = None) -> dict[str,
                     "（nf evidence revocations trust kt-split）"}
 
 
+def _log_entry_error(item: Any, i: int, prev_root: str) -> tuple[str, str]:
+    """单条 log 的链式校验 → (错误文本, 本条 root)；错误为空表示通过。"""
+    if not isinstance(item, dict):
+        return ("log[" + str(i) + "] 不是对象（" + GUIDE + "重建目录）"), ""
+    if item.get("seq") != i:
+        return ("log 序号不连续（" + GUIDE + "第 " + str(i) + " 条 seq="
+                + str(item.get("seq")) + "）"), ""
+    if str(item.get("prev") or "") != prev_root:
+        return ("log 链断在第 " + str(i) + " 条（" + GUIDE +
+                "prev 必须等于上一条 root）"), ""
+    root = str(item.get("root") or "")
+    if len(root) != HEX64_LEN:
+        return ("log[" + str(i) + "].root 必须是 64 位十六进制（" + GUIDE +
+                "重建）"), ""
+    return "", root
+
+
+def _verify_log_chain(log: Any, version: Any, res: dict[str, Any]) -> str | None:
+    """版本 log 的条数 + 链式自洽校验；通过返回末条 root，不通过写 issue 并返回 None。"""
+    if not isinstance(log, list) or len(log) != version:
+        res["issues"].append("log 条数必须等于 version（" + GUIDE + "手改版本号会破坏链）")
+        return None
+    prev_root = ""
+    for i, item in enumerate(log, 1):
+        err, prev_root = _log_entry_error(item, i, prev_root)
+        if err:
+            res["issues"].append(err)
+            return None
+    return prev_root
+
+
+def _verify_root_chain(keys: Any, doc: dict[str, Any], prev_root: str,
+                       res: dict[str, Any]) -> str | None:
+    """根一致性校验：重算根 == 记录根 == 末条 log 根；通过返回重算根，否则 None。"""
+    recomputed = _root(keys)
+    if recomputed != str(doc.get("root") or ""):
+        res["issues"].append("重算根与记录不符（" + GUIDE + "keys 被改过或根被手改）")
+        return None
+    if recomputed != prev_root:
+        res["issues"].append("最新 log 根与 keys 重算根不一致（" + GUIDE + "目录与日志不同源）")
+        return None
+    return recomputed
+
+
 def verify(doc: Any) -> dict[str, Any]:
     """校验目录自洽 → {ok, verdict, version, root, issues, warnings}。"""
     res: dict[str, Any] = {"ok": False, "verdict": "invalid", "version": 0, "root": "",
@@ -97,34 +141,11 @@ def verify(doc: Any) -> dict[str, Any]:
         res["issues"].append("version 必须是 ≥1 的整数（" + GUIDE +
                 "由 build/append 生成，不手改）")
         return res
-    log = doc.get("log")
-    if not isinstance(log, list) or len(log) != version:
-        res["issues"].append("log 条数必须等于 version（" + GUIDE + "手改版本号会破坏链）")
+    prev_root = _verify_log_chain(doc.get("log"), version, res)
+    if prev_root is None:
         return res
-    prev_root = ""
-    for i, item in enumerate(log, 1):
-        if not isinstance(item, dict):
-            res["issues"].append("log[" + str(i) + "] 不是对象（" + GUIDE + "重建目录）")
-            return res
-        if item.get("seq") != i:
-            res["issues"].append("log 序号不连续（" + GUIDE + "第 " + str(i) + " 条 seq="
-                                 + str(item.get("seq")) + "）")
-            return res
-        if str(item.get("prev") or "") != prev_root:
-            res["issues"].append("log 链断在第 " + str(i) + " 条（" + GUIDE +
-                    "prev 必须等于上一条 root）")
-            return res
-        prev_root = str(item.get("root") or "")
-        if len(prev_root) != HEX64_LEN:
-            res["issues"].append("log[" + str(i) + "].root 必须是 64 位十六进制（" + GUIDE +
-                    "重建）")
-            return res
-    recomputed = _root(keys)
-    if recomputed != str(doc.get("root") or ""):
-        res["issues"].append("重算根与记录不符（" + GUIDE + "keys 被改过或根被手改）")
-        return res
-    if recomputed != prev_root:
-        res["issues"].append("最新 log 根与 keys 重算根不一致（" + GUIDE + "目录与日志不同源）")
+    recomputed = _verify_root_chain(keys, doc, prev_root, res)
+    if recomputed is None:
         return res
     res.update({"ok": True, "verdict": "ok", "version": version, "root": recomputed})
     res["warnings"].append("目录只证「这一版自洽」；是否被分叉需与另一份目录对比")
@@ -168,31 +189,34 @@ def verify_inclusion(bundle: dict[str, Any]) -> bool:
     return receipts.fold_proof(leaf, proof) == root
 
 
-def consistency(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
-    """新版本是否为旧版本的**合法追加** → {ok, kind, witness}。"""
-    res: dict[str, Any] = {"ok": False, "kind": "incomparable", "witness": {}, "issues": []}
+def _consistency_inputs(old: dict[str, Any], new: dict[str, Any],
+                        res: dict[str, Any]) -> bool:
+    """两侧目录都必须先自洽；不通过时写 issue 并返回 False。"""
     for doc, label in ((old, "old"), (new, "new")):
         checked = verify(doc)
         if not checked["ok"]:
             res["issues"].append(label + " 目录不可用：" + "；".join(checked["issues"][:2]))
-            return res
-    ov, nv = int(old["version"]), int(new["version"])
-    if nv < ov:
-        res["kind"] = "incomparable"
-        res["issues"].append("新版本号小于旧版本（" + GUIDE + "换参数再比）")
+            return False
+    return True
+
+
+def _consistency_same_version(ov: int, old_root: str, new: dict[str, Any],
+                              res: dict[str, Any]) -> dict[str, Any]:
+    """同版本的追加判定：根相同 = identical，否则 = split（分叉）。"""
+    if str(new["root"]) == old_root:
+        res.update({"ok": True, "kind": "identical"})
         return res
-    old_root = str(old["root"])
+    res.update({"kind": "split", "witness": {"version": ov,
+                                             "root_a": old_root,
+                                             "root_b": str(new["root"])}})
+    res["issues"].append("同一版本出现两个不同根——分叉（" + GUIDE + "比对双方 log 与来源）")
+    return res
+
+
+def _consistency_append(ov: int, nv: int, old_root: str, new: dict[str, Any],
+                        res: dict[str, Any]) -> dict[str, Any]:
+    """nv > ov：旧根必须出现在新 log 的第 ov 条，否则报历史改写。"""
     new_log = new["log"]
-    if nv == ov:
-        if str(new["root"]) == old_root:
-            res.update({"ok": True, "kind": "identical"})
-            return res
-        res.update({"kind": "split", "witness": {"version": ov,
-                                                 "root_a": old_root,
-                                                 "root_b": str(new["root"])}})
-        res["issues"].append("同一版本出现两个不同根——分叉（" + GUIDE + "比对双方 log 与来源）")
-        return res
-    # nv > ov：旧根必须出现在新 log 的第 ov 条
     entry = new_log[ov - 1] if isinstance(new_log, list) and len(new_log) >= ov else None
     if not isinstance(entry, dict) or str(entry.get("root")) != old_root:
         res.update({"kind": "fork", "witness": {"old_version": ov, "old_root": old_root,
@@ -205,6 +229,22 @@ def consistency(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
                 "witness": {"from": ov, "to": nv, "old_root": old_root,
                             "new_root": str(new["root"])}})
     return res
+
+
+def consistency(old: dict[str, Any], new: dict[str, Any]) -> dict[str, Any]:
+    """新版本是否为旧版本的**合法追加** → {ok, kind, witness}。"""
+    res: dict[str, Any] = {"ok": False, "kind": "incomparable", "witness": {}, "issues": []}
+    if not _consistency_inputs(old, new, res):
+        return res
+    ov, nv = int(old["version"]), int(new["version"])
+    if nv < ov:
+        res["kind"] = "incomparable"
+        res["issues"].append("新版本号小于旧版本（" + GUIDE + "换参数再比）")
+        return res
+    old_root = str(old["root"])
+    if nv == ov:
+        return _consistency_same_version(ov, old_root, new, res)
+    return _consistency_append(ov, nv, old_root, new, res)
 
 
 def split_witness(a: dict[str, Any], b: dict[str, Any]) -> dict[str, Any]:

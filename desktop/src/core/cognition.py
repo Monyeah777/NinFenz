@@ -32,6 +32,47 @@ def _text(root: str, rel: str) -> str:
     return p.read_text(encoding="utf-8") if p.is_file() else ""
 
 
+def _used_in_issues(root: str, term: str, ui) -> Tuple[List[str], int]:
+    """used_in 逐件在场 + 逐字出现（防登记没人用的行话）→ (issues, 命中数)。"""
+    issues: List[str] = []
+    uses = 0
+    if isinstance(ui, str):
+        ui = [ui]
+    for rel in ui:
+        rel = str(rel)
+        if not (Path(root) / rel).is_file():
+            issues.append("术语 %s 的 used_in 不存在：%s" % (term, rel))
+        elif term not in _text(root, rel):
+            issues.append("术语 %s 的 used_in 未逐字出现该术语：%s（防登记没人用的行话）"
+                          % (term, rel))
+        else:
+            uses += 1
+    return issues, uses
+
+
+def _glossary_term_issues(root: str, t: Dict[str, Any],
+                          seen: set) -> Tuple[List[str], int]:
+    """单条术语：term 唯一/definition 非空/source 在场且逐字出现/used_in 逐条在场。"""
+    issues: List[str] = []
+    term = str(t.get("term") or "")
+    if not term:
+        return ["存在无 term 的条目"], 0
+    if term in seen:
+        issues.append("术语重复：%s" % term)
+    seen.add(term)
+    if not str(t.get("definition") or "").strip():
+        issues.append("术语 %s 缺 definition" % term)
+    src = str(t.get("source") or "")
+    if not (Path(root) / src).is_file():
+        issues.append("术语 %s 的 source 不存在：%s" % (term, src))
+    elif term not in _text(root, src):
+        issues.append("术语 %s 未在其 source 中逐字出现：%s（定义必须落在真源里）"
+                      % (term, src))
+    used_issues, uses = _used_in_issues(root, term, t.get("used_in") or [])
+    issues.extend(used_issues)
+    return issues, uses
+
+
 def verify_glossary(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     issues: List[str] = []
     warns: List[str] = []
@@ -45,34 +86,47 @@ def verify_glossary(root: str = ".") -> Tuple[List[str], List[str], Dict[str, An
     seen = set()
     uses = 0
     for t in doc.get("terms") or []:
-        term = str(t.get("term") or "")
-        if not term:
-            issues.append("存在无 term 的条目")
-            continue
-        if term in seen:
-            issues.append("术语重复：%s" % term)
-        seen.add(term)
-        if not str(t.get("definition") or "").strip():
-            issues.append("术语 %s 缺 definition" % term)
-        src = str(t.get("source") or "")
-        if not (Path(root) / src).is_file():
-            issues.append("术语 %s 的 source 不存在：%s" % (term, src))
-        elif term not in _text(root, src):
-            issues.append("术语 %s 未在其 source 中逐字出现：%s（定义必须落在真源里）"
-                          % (term, src))
-        ui = t.get("used_in") or []
-        if isinstance(ui, str):
-            ui = [ui]
-        for rel in ui:
-            rel = str(rel)
-            if not (Path(root) / rel).is_file():
-                issues.append("术语 %s 的 used_in 不存在：%s" % (term, rel))
-            elif term not in _text(root, rel):
-                issues.append("术语 %s 的 used_in 未逐字出现该术语：%s（防登记没人用的行话）"
-                              % (term, rel))
-            else:
-                uses += 1
+        term_issues, term_uses = _glossary_term_issues(root, t, seen)
+        issues.extend(term_issues)
+        uses += term_uses
     return issues, warns, {"terms": len(seen), "uses": uses}
+
+
+def _mode_instance_issues(root: str, mid: str, blocks: List[str],
+                          rows) -> Tuple[List[str], int]:
+    """实例逐件：必须存在且逐字含全部必备结构块 → (issues, 合格件数)。"""
+    issues: List[str] = []
+    insts = 0
+    for rel in rows:
+        rel = str(rel)
+        if not (Path(root) / rel).is_file():
+            issues.append("mode %s 的实例不存在：%s" % (mid, rel))
+            continue
+        txt = _text(root, rel)
+        miss = [b for b in blocks if b not in txt]
+        if miss:
+            issues.append("实例 %s 不属于 %s 档：缺结构块 %s" % (rel, mid, "/".join(miss)))
+        else:
+            insts += 1
+    return issues, insts
+
+
+def _mode_issues(root: str, m: Dict[str, Any], seen: set) -> Tuple[List[str], int]:
+    """单档：id 唯一 / required_blocks 非空 / 实例在场且逐字含块。"""
+    issues: List[str] = []
+    mid = str(m.get("id") or "")
+    if mid in seen:
+        issues.append("mode id 重复：%s" % mid)
+    seen.add(mid)
+    blocks = [str(b) for b in (m.get("required_blocks") or [])]
+    if not blocks:
+        issues.append("mode %s 缺 required_blocks（该档必备结构必须成文）" % mid)
+    rows = m.get("instances") or []
+    if not rows:
+        issues.append("mode %s 无实例（声明了档却没有件属于它）" % mid)
+    inst_issues, insts = _mode_instance_issues(root, mid, blocks, rows)
+    issues.extend(inst_issues)
+    return issues, insts
 
 
 def verify_modes(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
@@ -86,27 +140,9 @@ def verify_modes(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]
     seen = set()
     insts = 0
     for m in doc.get("modes") or []:
-        mid = str(m.get("id") or "")
-        if mid in seen:
-            issues.append("mode id 重复：%s" % mid)
-        seen.add(mid)
-        blocks = [str(b) for b in (m.get("required_blocks") or [])]
-        if not blocks:
-            issues.append("mode %s 缺 required_blocks（该档必备结构必须成文）" % mid)
-        rows = m.get("instances") or []
-        if not rows:
-            issues.append("mode %s 无实例（声明了档却没有件属于它）" % mid)
-        for rel in rows:
-            rel = str(rel)
-            if not (Path(root) / rel).is_file():
-                issues.append("mode %s 的实例不存在：%s" % (mid, rel))
-                continue
-            txt = _text(root, rel)
-            miss = [b for b in blocks if b not in txt]
-            if miss:
-                issues.append("实例 %s 不属于 %s 档：缺结构块 %s" % (rel, mid, "/".join(miss)))
-            else:
-                insts += 1
+        mode_issues, mode_insts = _mode_issues(root, m, seen)
+        issues.extend(mode_issues)
+        insts += mode_insts
     return issues, warns, {"modes": len(seen), "instances_ok": insts}
 
 

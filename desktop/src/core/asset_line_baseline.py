@@ -74,6 +74,41 @@ def load(root: str = ".") -> Dict[str, Any]:
         return {}
 
 
+def _new_package_issues(live: Dict[str, Any], base: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
+    for d, cur in sorted(live.items()):
+        if d not in base:
+            issues.append("社区包资产未登记基线：%s（%d 文件 / %d 行）——"
+                          "新增包须重签基线（nf asset baseline --write）" % (d,
+ cur["files"],
+ cur["lines"]))
+    return issues
+
+
+def _drift_row_issues(d: str, cur: Dict[str, Any], want: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
+    for key, label in (("files", "文件数"), ("lines", "行数"), ("digest", "外形摘要")):
+        if cur.get(key) != want.get(key):
+            issues.append("%s 资产%s与基线不一致：实时=%s 基线=%s（修复指引：核对内容后显式重签"
+                " "
+                          "nf asset baseline --write）"
+                          % (want.get("package") or d, label, cur.get(key), want.get(key)))
+    return issues
+
+
+def _baseline_drift(live: Dict[str, Any], base: Dict[str, Any]) -> tuple[List[str], List[str]]:
+    issues: List[str] = []
+    warns: List[str] = []
+    for d, want in sorted(base.items()):
+        cur = live.get(d)
+        if cur is None:
+            warns.append("%s 不在场（跳过资产行数基线核对——对齐段 B 缺包只记 WARN）"
+                         % (want.get("package") or d))
+            continue
+        issues += _drift_row_issues(d, cur, want)
+    return issues, warns
+
+
 def verify(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     """→ (issues, warns, stats)。issues = FAIL 级；warns = 缺包跳过（部署语义）。"""
     doc = load(root)
@@ -85,27 +120,9 @@ def verify(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
                  % (SCHEMA, doc.get("schema"))], [], {})
     base = {str(e.get("dir") or ""): e for e in (doc.get("packages") or [])}
     live = {e["dir"]: e for e in scan(root)["packages"]}
-    issues: List[str] = []
-    warns: List[str] = []
-    # 新增包未登记（在场却不在基线）
-    for d, cur in sorted(live.items()):
-        if d not in base:
-            issues.append("社区包资产未登记基线：%s（%d 文件 / %d 行）——"
-                          "新增包须重签基线（nf asset baseline --write）" % (d,
- cur["files"],
- cur["lines"]))
-    for d, want in sorted(base.items()):
-        cur = live.get(d)
-        if cur is None:
-            warns.append("%s 不在场（跳过资产行数基线核对——对齐段 B 缺包只记 WARN）"
-                         % (want.get("package") or d))
-            continue
-        for key, label in (("files", "文件数"), ("lines", "行数"), ("digest", "外形摘要")):
-            if cur.get(key) != want.get(key):
-                issues.append("%s 资产%s与基线不一致：实时=%s 基线=%s（修复指引：核对内容后显式重签"
-                    " "
-                              "nf asset baseline --write）"
-                              % (want.get("package") or d, label, cur.get(key), want.get(key)))
+    issues: List[str] = _new_package_issues(live, base)
+    drift, warns = _baseline_drift(live, base)
+    issues += drift
     stats = {"packages": len(live), "baseline": len(base),
              "lines": {e["package"]: e["lines"] for e in live.values()},
              "files": {e["package"]: e["files"] for e in live.values()}}

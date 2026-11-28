@@ -142,20 +142,13 @@ def _markers(root: str) -> Optional[list]:
         return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
 
 
-def compare(current: Dict[str, Any], baseline: Dict[str, Any],
-            tolerance: float = 0.0,
-            exceptions: Optional[List[Dict[str, str]]] = None,
-            eps: float = 1e-9) -> Dict[str, Any]:
-    """当前 vs 基线 → {ok, delta, verdict, regressed[], exempted[]}。
+def _signal_values(doc: Dict[str, Any]) -> Dict[str, float]:
+    return {s["name"]: float(s.get("value") or 0.0)
+            for s in (doc.get("signals") or [])}
 
-    判定：整体 delta < -tolerance → 失败；任一**非豁免**信号回落 → 失败
-    （no silent worsening：分数不降掩盖不了单信号恶化）。
-    """
-    exc = {e.get("signal"): e for e in (exceptions or []) if e.get("signal")}
-    base_sig = {s["name"]: float(s.get("value") or 0.0)
-                for s in (baseline.get("signals") or [])}
-    cur_sig = {s["name"]: float(s.get("value") or 0.0)
-               for s in (current.get("signals") or [])}
+
+def _regressed_split(base_sig: Dict[str, float], cur_sig: Dict[str, float],
+                     exc: Dict[str, Any], eps: float):
     regressed, exempted = [], []
     for name in sorted(set(base_sig) & set(cur_sig)):
         b, c = base_sig[name], cur_sig[name]
@@ -167,26 +160,49 @@ def compare(current: Dict[str, Any], baseline: Dict[str, Any],
                 exempted.append(item)
             else:
                 regressed.append(item)
+    return regressed, exempted
+
+
+def _exempt_budget(current: Dict[str, Any], exempted: List[Dict[str, Any]]) -> float:
+    weights = {s["name"]: float(s.get("weight") or 0.0)
+               for s in (current.get("signals") or [])}
+    return sum(weights.get(e["signal"], 0.0) * e["drop"] * 100.0 for e in exempted)
+
+
+def _verdict(baseline: Dict[str, Any], ok: bool, regressed: List[Dict[str, Any]],
+             exempted: List[Dict[str, Any]], delta: float, tolerance: float) -> str:
+    if not baseline.get("signals"):
+        return "无基线（只报当前分值，未做回归判定）"
+    if not ok and regressed:
+        return "回归（信号回落）：%s" % "、".join(r["signal"] for r in regressed)
+    if not ok:
+        return "回归（整体分下降 %.2f > 容差 %.2f）" % (-delta, abs(tolerance))
+    if exempted:
+        return "通过（含 %d 项审计例外）" % len(exempted)
+    return "通过（无回归）"
+
+
+def compare(current: Dict[str, Any], baseline: Dict[str, Any],
+            tolerance: float = 0.0,
+            exceptions: Optional[List[Dict[str, str]]] = None,
+            eps: float = 1e-9) -> Dict[str, Any]:
+    """当前 vs 基线 → {ok, delta, verdict, regressed[], exempted[]}。
+
+    判定：整体 delta < -tolerance → 失败；任一**非豁免**信号回落 → 失败
+    （no silent worsening：分数不降掩盖不了单信号恶化）。
+    """
+    exc = {e.get("signal"): e for e in (exceptions or []) if e.get("signal")}
+    base_sig = _signal_values(baseline)
+    cur_sig = _signal_values(current)
+    regressed, exempted = _regressed_split(base_sig, cur_sig, exc, eps)
     base_score = float(baseline.get("score") or 0.0)
     cur_score = float(current.get("score") or 0.0)
     delta = round(cur_score - base_score, 2)
     # 审计例外同时释放整体门预算：被豁免的回落按 权重×跌幅 折算成额度，
     # 避免「已批准的单信号回归」被整体分二次判死（额度不外溢到未豁免信号）。
-    weights = {s["name"]: float(s.get("weight") or 0.0)
-               for s in (current.get("signals") or [])}
-    exempt_budget = sum(weights.get(e["signal"], 0.0) * e["drop"] * 100.0
-                        for e in exempted)
+    exempt_budget = _exempt_budget(current, exempted)
     ok = (delta >= -(abs(tolerance) + exempt_budget)) and not regressed
-    if not baseline.get("signals"):
-        verdict = "无基线（只报当前分值，未做回归判定）"
-    elif not ok and regressed:
-        verdict = "回归（信号回落）：%s" % "、".join(r["signal"] for r in regressed)
-    elif not ok:
-        verdict = "回归（整体分下降 %.2f > 容差 %.2f）" % (-delta, abs(tolerance))
-    elif exempted:
-        verdict = "通过（含 %d 项审计例外）" % len(exempted)
-    else:
-        verdict = "通过（无回归）"
+    verdict = _verdict(baseline, ok, regressed, exempted, delta, tolerance)
     return {"ok": ok, "delta": delta, "baseline_score": base_score,
             "current_score": cur_score, "regressed": regressed,
             "exempted": exempted, "verdict": verdict}

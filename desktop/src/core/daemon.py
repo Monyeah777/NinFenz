@@ -343,21 +343,8 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
                                   "（修复指引：用 scripts/nf 启动器，或 nf daemon status）\n"
                                   .encode("utf-8"))
         return False
-    op = req.get("op")
-    if op is not None:
-        if not isinstance(op, str):
-            send_framed(conn, 2, b"", "op 必须是字符串\n".encode())
-            return False
-        if op == "shutdown":
-            send_framed(conn, 0, b"", b"")
-            return True
-        if op == "stats":
-            # 观测面必须**在守护进程内**取：缓存与监听件都是守护的进程状态，客户端看不到。
-            payload = json.dumps(cache_stats(), ensure_ascii=False).encode("utf-8")
-            send_framed(conn, 0, payload, b"")
-            return False
-        send_framed(conn, 2, b"", "未知 op（允许 shutdown / stats）\n".encode())
-        return False
+    if req.get("op") is not None:
+        return _handle_conn_op(conn, req.get("op"))
     argv = req.get("argv")
     if not isinstance(argv, list) or not all(isinstance(a, str) for a in argv):
         send_framed(conn, 2, b"", "argv 必须是字符串列表\n".encode("utf-8"))
@@ -367,6 +354,29 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     except ValueError as exc:
         send_framed(conn, 2, b"", f"请求不可读：{exc}\n".encode())
         return False
+    _execute_framed(conn, argv, root, cwd)
+    return False
+
+
+def _handle_conn_op(conn, op) -> bool:
+    """处理 op 请求（shutdown / stats）→ 是否请求关闭守护。"""
+    if not isinstance(op, str):
+        send_framed(conn, 2, b"", "op 必须是字符串\n".encode())
+        return False
+    if op == "shutdown":
+        send_framed(conn, 0, b"", b"")
+        return True
+    if op == "stats":
+        # 观测面必须**在守护进程内**取：缓存与监听件都是守护的进程状态，客户端看不到。
+        payload = json.dumps(cache_stats(), ensure_ascii=False).encode("utf-8")
+        send_framed(conn, 0, payload, b"")
+        return False
+    send_framed(conn, 2, b"", "未知 op（允许 shutdown / stats）\n".encode())
+    return False
+
+
+def _execute_framed(conn, argv, root: Path, cwd) -> None:
+    """执行 argv → 回帧 → 回包后尽力落盘（单条请求失败不得杀死守护）。"""
     from core import disk_cache as _dc
     _dc.defer_begin()                # 请求期间：派生结果的写盘只入队
     try:
@@ -374,7 +384,7 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
     except SystemExit as exc:        # 请求级：裸 SystemExit 也归一（不得因它杀死守护）
         _dc.defer_drop()
         code, out, err = int(exc.code or 0), b"", b""
-    except Exception as exc:         # noqa: BLE001 - 单条请求失败不得杀死守护（见 _internal_error_frame）
+    except Exception as exc:  # noqa: BLE001 - 单条请求失败不得杀死守护（见 _internal_error_frame）
         _dc.defer_drop()             # 异常路径：丢队列（缓存不是事实，丢了只是下次重算）
         code, out, err = 1, b"", _internal_error_frame(exc)
     send_framed(conn, code, out, err)
@@ -384,7 +394,6 @@ def _handle_conn(conn: socket.socket, token: str, root: Path) -> bool:
         _dc.defer_flush()
     except Exception:                                    # noqa: BLE001 - 落盘尽力而为
         pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
-    return False
 
 if __name__ == "__main__":                                # pragma: no cover - 进程入口
     raise SystemExit(main())

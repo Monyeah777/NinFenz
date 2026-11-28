@@ -210,102 +210,182 @@ def _write_binding_table(root: str, spec: Dict[str, Any]) -> None:
 
 def manifest_verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     """名录机检：名录 ↔ 盘上实况一致 + 可机验占比 ≥ 门槛（check32 子扫描）。"""
-    issues: List[str] = []
     path = Path(root) / MANIFEST_REL
     if not path.is_file():
         return [], {"packs": 0, "note": "无域包名录（域包工程未启用）"}
     doc = json_doc.load(path, dict, what=MANIFEST_REL)
-    thr = float(doc.get("machine_verifiable_threshold") or 0.95)
-    cat = standards_catalog(root)
-    dens_min = float(doc.get("concept_density_threshold") or 1.0)
-    auth_min = float(doc.get("data_authenticity_threshold") or AUTHENTICITY_THRESHOLD)
-    reach_min = float(doc.get("reachable_ratio_threshold") or REACHABLE_RATIO_THRESHOLD)
-    stats = {"packs": 0, "faces": 0, "functional": 0}
-    reg = _read_json(Path(root) / REGISTRY_REL) or {}
-    by_id = {p.get("id"): p for p in reg.get("protocols") or []}
-    _bind = _read_json(Path(root) / BINDING_REL) or {}
-    bind_by = {b.get("code"): b for b in _bind.get("packs") or []}
-    for p in doc.get("packs") or []:
+    ctx = _manifest_ctx(root, doc)
+    _verify_packs(doc.get("packs") or [], ctx)
+    return ctx["issues"], ctx["stats"]
+
+
+def _manifest_ctx(root: str, doc: Dict[str, Any]) -> Dict[str, Any]:
+    """名录校验上下文（阈值/目录/登记索引/累计统计/issue 池）。"""
+    r = Path(root)
+    ctx: Dict[str, Any] = {"root": root, "r": r, "issues": [],
+                           "stats": {"packs": 0, "faces": 0, "functional": 0},
+                           "cat": standards_catalog(root)}
+    ctx.update(_manifest_limits(doc))
+    ctx["by_id"] = _registry_by_id(r)
+    ctx["bind_by"] = _bindings_by_code(r)
+    return ctx
+
+
+def _manifest_limits(doc: Dict[str, Any]) -> Dict[str, float]:
+    return {
+        "thr": float(doc.get("machine_verifiable_threshold") or 0.95),
+        "dens_min": float(doc.get("concept_density_threshold") or 1.0),
+        "auth_min": float(doc.get("data_authenticity_threshold") or AUTHENTICITY_THRESHOLD),
+        "reach_min": float(doc.get("reachable_ratio_threshold") or REACHABLE_RATIO_THRESHOLD),
+    }
+
+
+def _registry_by_id(r: Path) -> Dict[Any, Any]:
+    """registry protocols[] → {id: 记录}。"""
+    reg = _read_json(r / REGISTRY_REL) or {}
+    return {p.get("id"): p for p in reg.get("protocols") or []}
+
+
+def _bindings_by_code(r: Path) -> Dict[Any, Any]:
+    """绑定表 packs[] → {code: 记录}。"""
+    doc = _read_json(r / BINDING_REL) or {}
+    return {b.get("code"): b for b in doc.get("packs") or []}
+
+
+def _verify_packs(packs: List[Any], ctx: Dict[str, Any]) -> None:
+    """逐个域包核对名录 ↔ 登记 ↔ 盘上产出面。"""
+    issues = ctx["issues"]
+    stats = ctx["stats"]
+    for p in packs:
         pkg = str(p.get("package") or "")
-        bp = bind_by.get(p.get("code")) or {}
+        bp = ctx["bind_by"].get(p.get("code")) or {}
         stats["packs"] += 1
         stats["faces"] += int(p.get("output_faces") or 0)
         stats["functional"] += int(p.get("functional_faces") or 0)
-        regp = by_id.get(pkg)
-        if not regp:
-            issues.append("%s：registry protocols[] 无该包（名录 ↔ 登记不一致）" % pkg)
-        else:
-            if str(regp.get("pipeline")) != str(p.get("pipeline")):
-                issues.append("%s：管线不一致（名录 %s / registry %s）"
-                              % (pkg, p.get("pipeline"), regp.get("pipeline")))
-            if [str(x) for x in regp.get("module_ids") or []] != \
-                    [str(x) for x in p.get("module_ids") or []]:
-                issues.append("%s：模块 id 不一致（名录 ↔ registry）" % pkg)
-        proto = Path(root) / "community" / pkg / "protocol.yaml"
+        _check_registry_entry(pkg, p, ctx)
+        proto = ctx["r"] / "community" / pkg / "protocol.yaml"
         if not proto.is_file():
             issues.append("%s：包目录或 protocol.yaml 缺失" % pkg); continue
-        text = csc.read_text_cached(proto)
-        for tok in (str(p.get("pipeline")), str(p.get("category"))):
-            if tok not in text:
-                issues.append("%s：protocol.yaml 缺名录声明 %s" % (pkg, tok))
-        idx_path = Path(root) / "community" / pkg / "outputs" / "INDEX.json"
+        _check_protocol_text(pkg, p, csc.read_text_cached(proto), issues)
+        idx_path = ctx["r"] / "community" / pkg / "outputs" / "INDEX.json"
         if not idx_path.is_file():
             issues.append("%s：缺 outputs/INDEX.json" % pkg); continue
-        idx_doc = json_doc.loads(csc.read_text_cached(idx_path), dict, what=str(idx_path))
-        faces = (idx_doc.get("outputs") or [])
-        ratio = round(sum(1 for e in faces if e.get("tier") in ("T2", "T3", "T4"))
-                      / max(1, len(faces)), 4)
-        if ratio < thr:
-            issues.append("%s：可机验产出占比 %.4f < 门槛 %.2f（产出面必须 ≥95%% 可机验）"
-                          % (pkg, ratio, thr))
-        if not any(e.get("tier") == "T4" for e in faces):
-            issues.append("%s：无 T4 可复算面（域包必须有一个可重算产出）" % pkg)
-        if int(p.get("output_faces") or 0) != len(faces):
-            issues.append("%s：名录产出面数 %s ≠ INDEX 实况 %d"
-                          % (pkg, p.get("output_faces"), len(faces)))
-        # 可扩展标准绑定面（2026-09-23 对齐）：覆盖率 100% + 引用在册 + 概念密度不回落
-        spec_path = Path(root) / SPEC_DIR / ("%s.json" % p.get("code", ""))
-        if spec_path.is_file():
-            payload = _read_json(Path(root) / "community" / pkg / "outputs"
-                                 / "DOMAIN_SPEC.json") or {}
-            subs = payload.get("subdivisions") or []
-            bad_ref = [s["id"] for s in subs if str(s.get("standard_ref") or "") not in cat]
-            if bad_ref:
-                issues.append("%s：细分未绑可扩展标准或引用不在册：%s" % (pkg, bad_ref[:4]))
-            if subs and len(bad_ref) > 0:
-                pass
-            if float(p.get("standards_binding_coverage") or 0) < 1.0:
-                issues.append("%s：标准绑定覆盖率 %.2f < 1.0（每条细分须绑一个目录内标准）"
-                              % (pkg, float(p.get("standards_binding_coverage") or 0)))
-            if float(p.get("concept_density") or 0) < dens_min:
-                issues.append("%s：概念密度 %.3f < 门槛 %.3f（边/节点；含标准节点与绑定边）"
-                              % (pkg, float(p.get("concept_density") or 0), dens_min))
-            if int(p.get("standards_bound") or 0) < 3:
-                issues.append("%s：绑定标准数 %s < 3（单包至少要贴 3 条不同标准）"
-                              % (pkg, p.get("standards_bound")))
-            # 双锚 + 数据真实性（2026-09-24 对齐）：主锚/辅锚齐备、引用有本机实测证据
-            if float(p.get("support_binding_coverage") or 0) < 1.0:
-                issues.append("%s：辅锚覆盖率 %.2f < 1.0（每条细分须另绑一条产出承载标准）"
-                              % (pkg, float(p.get("support_binding_coverage") or 0)))
-            if int(p.get("standards_dep_edges") or 0) < 1:
-                issues.append("%s：概念图无标准依赖边（绑定标准的 depends_on 未入图）" % pkg)
-            auth = float(p.get("data_authenticity") or 0)
-            if auth < auth_min:
-                issues.append("%s：数据真实性分 %.4f < 门槛 %.2f（在册 × 实测可达 × 证据齐备）"
-                              % (pkg, auth, auth_min))
-            rr = float(p.get("standards_reachable_ratio") or 0)
-            if rr < reach_min:
-                issues.append("%s：绑定标准本机实测可达率 %.4f < 门槛 %.2f"
-                              % (pkg, rr, reach_min))
-            bad_binding = [r for r in (bp.get("bindings") or [])
-                           if str(r.get("standard") or "") not in cat
-                           or str(r.get("support_standard") or "") not in cat
-                           or not str(r.get("standard_probe_date") or "")
-                           or not str(r.get("support_standard_probe_date") or "")]
-            if bad_binding:
-                issues.append("%s：绑定表缺在册证明或实测记录：%s"
-                              % (pkg, [r.get("subdivision") for r in bad_binding[:4]]))
-    return issues, stats
+        _check_index(pkg, p, idx_path, issues, ctx["thr"])
+        _check_standards(pkg, p, bp, ctx)
+
+
+def _check_registry_entry(pkg: str, p: Dict[str, Any], ctx: Dict[str, Any]) -> None:
+    """名录条目 ↔ registry protocols[] 一致性。"""
+    issues = ctx["issues"]
+    regp = ctx["by_id"].get(pkg)
+    if not regp:
+        issues.append("%s：registry protocols[] 无该包（名录 ↔ 登记不一致）" % pkg)
+        return
+    if str(regp.get("pipeline")) != str(p.get("pipeline")):
+        issues.append("%s：管线不一致（名录 %s / registry %s）"
+                      % (pkg, p.get("pipeline"), regp.get("pipeline")))
+    if [str(x) for x in regp.get("module_ids") or []] != \
+            [str(x) for x in p.get("module_ids") or []]:
+        issues.append("%s：模块 id 不一致（名录 ↔ registry）" % pkg)
+
+
+def _check_protocol_text(pkg: str, p: Dict[str, Any], text: str,
+                         issues: List[str]) -> None:
+    """protocol.yaml 须含名录声明的管线/类别 token。"""
+    for tok in (str(p.get("pipeline")), str(p.get("category"))):
+        if tok not in text:
+            issues.append("%s：protocol.yaml 缺名录声明 %s" % (pkg, tok))
+
+
+def _check_index(pkg: str, p: Dict[str, Any], idx_path: Path,
+                 issues: List[str], thr: float) -> None:
+    """outputs/INDEX.json 的产出面数与可机验占比/可复算面。"""
+    idx_doc = json_doc.loads(csc.read_text_cached(idx_path), dict, what=str(idx_path))
+    faces = (idx_doc.get("outputs") or [])
+    ratio = round(sum(1 for e in faces if e.get("tier") in ("T2", "T3", "T4"))
+                  / max(1, len(faces)), 4)
+    if ratio < thr:
+        issues.append("%s：可机验产出占比 %.4f < 门槛 %.2f（产出面必须 ≥95%% 可机验）"
+                      % (pkg, ratio, thr))
+    if not any(e.get("tier") == "T4" for e in faces):
+        issues.append("%s：无 T4 可复算面（域包必须有一个可重算产出）" % pkg)
+    if int(p.get("output_faces") or 0) != len(faces):
+        issues.append("%s：名录产出面数 %s ≠ INDEX 实况 %d"
+                      % (pkg, p.get("output_faces"), len(faces)))
+
+
+def _check_standards(pkg: str, p: Dict[str, Any], bp: Dict[str, Any],
+                     ctx: Dict[str, Any]) -> None:
+    """可扩展标准绑定面（覆盖率 100% + 引用在册 + 概念密度不回落 + 双锚 + 真实性）。"""
+    issues = ctx["issues"]
+    spec_path = Path(ctx["root"]) / SPEC_DIR / ("%s.json" % p.get("code", ""))
+    if not spec_path.is_file():
+        return
+    subs, bad_ref = _load_subs_and_refs(ctx, pkg)
+    if bad_ref:
+        issues.append("%s：细分未绑可扩展标准或引用不在册：%s" % (pkg, bad_ref[:4]))
+    _binding_coverage_issues(pkg, p, ctx)
+    _authenticity_issues(pkg, p, ctx)
+    bad_binding = _bad_bindings(bp, ctx["cat"])
+    if bad_binding:
+        issues.append("%s：绑定表缺在册证明或实测记录：%s"
+                      % (pkg, [r.get("subdivision") for r in bad_binding[:4]]))
+
+
+def _load_subs_and_refs(ctx: Dict[str, Any],
+                        pkg: str) -> Tuple[List[Any], List[Any]]:
+    """DOMAIN_SPEC.json → (细分表, 未在册/未绑定的细分 id)。"""
+    payload = _read_json(Path(ctx["root"]) / "community" / pkg / "outputs"
+                         / "DOMAIN_SPEC.json") or {}
+    subs = payload.get("subdivisions") or []
+    cat = ctx["cat"]
+    bad_ref = [s["id"] for s in subs if str(s.get("standard_ref") or "") not in cat]
+    return subs, bad_ref
+
+
+def _binding_coverage_issues(pkg: str, p: Dict[str, Any],
+                             ctx: Dict[str, Any]) -> None:
+    """覆盖率/概念密度/绑定标准数门槛。"""
+    issues = ctx["issues"]
+    if float(p.get("standards_binding_coverage") or 0) < 1.0:
+        issues.append("%s：标准绑定覆盖率 %.2f < 1.0（每条细分须绑一个目录内标准）"
+                      % (pkg, float(p.get("standards_binding_coverage") or 0)))
+    if float(p.get("concept_density") or 0) < ctx["dens_min"]:
+        issues.append("%s：概念密度 %.3f < 门槛 %.3f（边/节点；含标准节点与绑定边）"
+                      % (pkg, float(p.get("concept_density") or 0), ctx["dens_min"]))
+    if int(p.get("standards_bound") or 0) < 3:
+        issues.append("%s：绑定标准数 %s < 3（单包至少要贴 3 条不同标准）"
+                      % (pkg, p.get("standards_bound")))
+
+
+def _authenticity_issues(pkg: str, p: Dict[str, Any], ctx: Dict[str, Any]) -> None:
+    """双锚 + 数据真实性（主锚/辅锚齐备、引用有本机实测证据、可达率）。"""
+    issues = ctx["issues"]
+    if float(p.get("support_binding_coverage") or 0) < 1.0:
+        issues.append("%s：辅锚覆盖率 %.2f < 1.0（每条细分须另绑一条产出承载标准）"
+                      % (pkg, float(p.get("support_binding_coverage") or 0)))
+    if int(p.get("standards_dep_edges") or 0) < 1:
+        issues.append("%s：概念图无标准依赖边（绑定标准的 depends_on 未入图）" % pkg)
+    auth = float(p.get("data_authenticity") or 0)
+    if auth < ctx["auth_min"]:
+        issues.append("%s：数据真实性分 %.4f < 门槛 %.2f（在册 × 实测可达 × 证据齐备）"
+                      % (pkg, auth, ctx["auth_min"]))
+    rr = float(p.get("standards_reachable_ratio") or 0)
+    if rr < ctx["reach_min"]:
+        issues.append("%s：绑定标准本机实测可达率 %.4f < 门槛 %.2f"
+                      % (pkg, rr, ctx["reach_min"]))
+
+
+def _bad_bindings(bp: Dict[str, Any], cat: Dict[str, Any]) -> List[Any]:
+    return [r for r in (bp.get("bindings") or []) if not _binding_ok(r, cat)]
+
+
+def _binding_ok(r: Dict[str, Any], cat: Dict[str, Any]) -> bool:
+    """绑定条目：主/辅锚在册且有本机实测记录。"""
+    return (str(r.get("standard") or "") in cat
+            and str(r.get("support_standard") or "") in cat
+            and bool(str(r.get("standard_probe_date") or ""))
+            and bool(str(r.get("support_standard_probe_date") or "")))
 
 
 

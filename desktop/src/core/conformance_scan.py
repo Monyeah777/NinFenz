@@ -105,6 +105,9 @@ from ._conformance._resident import (
     take_resident,
 )
 from ._conformance._scan import (
+    _export_issues,
+    _module_contract_issues,
+    _package_issues,
     scan,
 )
 from ._conformance._walk import (
@@ -161,6 +164,27 @@ def face_fingerprint(root: str, patterns) -> str:
     return face_digests(root, patterns)[0]
 
 
+def _incremental_face(ent: Dict[str, Any], root: str, pats: Tuple[str, ...]):
+    """已知缓存读面下尝试增量 → (指纹, 逐件摘要) 或 None（None = 须整面重建）。"""
+    known, changed = changed_paths()
+    if not known:
+        return None
+    relevant = [c for c in changed if matches_any(c, pats)]
+    if not relevant:
+        return ent["fp"], ent["digests"]          # ① 确知没变：连哈希都不算
+    # ② 只改内容 ⇒ 增量（成员集合不变）。比对必须**大小写不敏感**：监听的相对路径是小写，
+    # `iter_files` 是真实大小写（`M00_数据槽总线.md`）⇒ 否则一律误判成新增件、增量形同虚设。
+    members = [ent["index"].get(str(c).lower()) for c in relevant]
+    if not all(rel and os.path.isfile(os.path.join(str(root), *rel.split("/")))
+               for rel in members):
+        return None
+    for rel in members:
+        ent["digests"][rel] = _payload_digest(root, rel)
+    ent["fp"] = _hash_face(ent["rels"], ent["digests"])
+    _FACE_FP_STATS["incremental"] += 1
+    return ent["fp"], ent["digests"]
+
+
 def face_digests(root: str, patterns):
     """`(面指纹, {相对路径: 逐件摘要})`——一次枚举 + 一次摘要**服务两种口径**。
 
@@ -173,21 +197,9 @@ def face_digests(root: str, patterns):
     key = (os.path.normcase(os.path.abspath(str(root))), pats)
     ent = _FACE_CACHE.get(key)
     if ent is not None:
-        known, changed = changed_paths()
-        if known:
-            relevant = [c for c in changed if matches_any(c, pats)]
-            if not relevant:
-                return ent["fp"], ent["digests"]          # ① 确知没变：连哈希都不算
-            # ② 只改内容 ⇒ 增量（成员集合不变）。比对必须**大小写不敏感**：监听的相对路径是小写，
-            # `iter_files` 是真实大小写（`M00_数据槽总线.md`）⇒ 否则一律误判成新增件、增量形同虚设。
-            members = [ent["index"].get(str(c).lower()) for c in relevant]
-            if all(rel and os.path.isfile(os.path.join(str(root), *rel.split("/")))
-                   for rel in members):
-                for rel in members:
-                    ent["digests"][rel] = _payload_digest(root, rel)
-                ent["fp"] = _hash_face(ent["rels"], ent["digests"])
-                _FACE_FP_STATS["incremental"] += 1
-                return ent["fp"], ent["digests"]
+        inc = _incremental_face(ent, root, pats)
+        if inc is not None:
+            return inc
     rels: List[str] = []                                      # ③ 首次 / 成员集合变了：整面重建
     for pat in patterns:
         rels.extend(iter_files(root, str(pat)))
@@ -298,84 +310,15 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, int]]:
     evidence = set(_evidence_ids(root, reg))
     reg_ids = {p.get("id") for p in (reg or {}).get("protocols") or []}
 
-    modules_mc = 0
-    #: 模块 id 全局唯一（01 §1.6.11）——登记面由 check14 ⑤b 管；但**两个模块文件声明同一 mc.id**
-    #: 此前无判据，运行时索引 first-wins 静默择一（`mcp_runtime` / `pipelinerun`）会让编号指向不确定
-    #: 的模块。此处补文件级唯一判据（极端渗透 D3）。
     seen_mc_id: dict = {}
-    for doc in _module_docs(root):
-        rel = os.path.relpath(doc, root).replace(os.sep, "/")
-        try:
-            text = read_text_cached(doc)      # 共享语料：同一份模块文档一次只读一遍
-        except Exception as exc:
-            issues.append(f"{rel}: 读取失败 {exc}")
-            continue
-        parsed = _fence_yaml(text, "machine_contract")
-        if "machine_contract" not in parsed:
-            continue
-        mc = parsed["machine_contract"]
-        mid = str((mc or {}).get("id") or "")
-        if mid:
-            if mid in seen_mc_id:
-                issues.append("%s: 模块 id 与 %s 重复（mc.id=%s）——编号是全局寻址面，"
-                              "运行时索引会静默择一，须改号"
-                              "（修复指引：按 01 §1.6.11 换类内段号或 M91-M99 段号）"
-                              % (rel, seen_mc_id[mid], mid))
-            else:
-                seen_mc_id[mid] = rel
-        modules_mc += 1
-        declared = mc.get("conformance")
-        if declared not in ("L1", "L2", "L3"):
-            issues.append(f"{rel}: machine_contract 缺/非法 conformance 声明 {declared!r}")
-            continue
-        mid = mc.get("id")
-        provable = 2 if isinstance(mid, str) and mid in evidence else 1
-        order = {"L1": 1, "L2": 2, "L3": 3}
-        if order[declared] > provable:
-            issues.append(
-                f"{rel}: conformance 虚标 {declared} > 可证 L{provable}"
-                f"（{mid!r} 不在装配在册证据）"
-            )
+    modules_mc, mc_issues = _module_contract_issues(root, evidence, seen_mc_id)
+    issues.extend(mc_issues)
 
-    # community 协议包
-    packages = 0
-    # 走共享枚举器（目录清单已在常驻层）：实测 2026-09-29，`glob.glob(community/*/protocol.yaml)`
-    # 一次 **9–13 ms**（占该状态 stat 面的三分之一），同一张面走 `iter_files` 后 **~0.4 ms**。
-    for rel in iter_files(root, "community/*/protocol.yaml"):
-        proto = os.path.join(root, *rel.split("/"))
-        try:
-            # 共享语料 + 内容键解析（同一份 protocol.yaml 一轮只读一次、只解析一次）
-            data = load_yaml_cached(read_text_cached(proto))
-        except Exception as exc:
-            issues.append(f"{rel}: protocol.yaml 解析失败 {exc}")
-            continue
-        packages += 1
-        pkg = (data or {}).get("package") or {}
-        declared = pkg.get("conformance")
-        pid = pkg.get("id")
-        if declared not in ("L1", "L2", "L3"):
-            issues.append(f"{rel}: package 缺/非法 conformance 声明 {declared!r}")
-            continue
-        provable = 2 if isinstance(pid, str) and pid in reg_ids else 1
-        order = {"L1": 1, "L2": 2, "L3": 3}
-        if order[declared] > provable:
-            issues.append(f"{rel}: conformance 虚标 {declared} > 可证 L{provable}（包不在 registry p"
-                f"rotocols[]）")
+    packages, pkg_issues = _package_issues(root, reg_ids)
+    issues.extend(pkg_issues)
 
-    # 导出契约面 manifest（L3 = 导出契约门禁锁定面）
-    manifest_path = os.path.join(root, "protocol", "export_conformance.json")
-    manifest, err = _read_json(manifest_path)
-    export_items = 0
-    if not isinstance(manifest, dict):
-        issues.append(f"protocol/export_conformance.json 缺失/解析失败：{err}")
-    else:
-        verify_txt = ""
-        verify_path = os.path.join(root, "verify.sh")
-        if os.path.isfile(verify_path):
-            with open(verify_path, encoding="utf-8") as fh:
-                verify_txt = fh.read()
-        man_issues, export_items = export_manifest_issues(root, verify_txt, manifest)
-        issues.extend(man_issues)
+    export_items, export_issues = _export_issues(root)
+    issues.extend(export_issues)
 
     stats = {
         "modules_mc": modules_mc,

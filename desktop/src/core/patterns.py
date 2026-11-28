@@ -63,47 +63,86 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         if not fm:
             issues.append("%s 缺 frontmatter（修复指引：见 patterns/README.md）" % d)
             continue
-        for k in REQUIRED:
-            if not (fm.get(k) or fm.get(k) == []):
-                issues.append("%s 缺必填字段：%s" % (d, k))
-        pid = str(fm.get("id") or "")
-        if pid and pid != d:
-            issues.append("%s 的 id 与目录名不一致：%s vs %s" % (d, pid, d))
-        if pid:
-            if pid in seen:
-                issues.append("pattern id 重复：%s（%s / %s）" % (pid, seen[pid], d))
-            seen[pid] = d
-        st = str(fm.get("status") or "")
-        if st and st not in STATUSES:
-            issues.append("%s status 越词表：%s（%s）" % (d, st, "/".join(STATUSES)))
-        rules = _as_list(fm.get("rules"))
-        if not rules:
-            issues.append("%s 的 rules 为空（pattern 必须有可执行规则）" % d)
-        for pat in _as_list(fm.get("applies_to")):
-            pat_clean = pat.strip()
-            if any(ch in pat_clean for ch in "*?["):
-                hits = _glob.glob(os.path.join(root, pat_clean), recursive=True)
-                if not hits:
-                    issues.append("%s 的 applies_to 通配无匹配：%s"
-                                  "（修复指引：指向仓库内真实文件）" % (d, pat_clean))
-            elif not (Path(root) / pat_clean).exists():
-                issues.append("%s 的 applies_to 路径不存在：%s" % (d, pat_clean))
-        ev = _as_list(fm.get("evidence"))
-        if not ev:
-            warns.append("%s 缺 evidence（可证性弱：无法回溯规则来源）" % d)
-        for item in ev:
-            s = item.strip()
-            if not s:
-                warns.append("%s 的 evidence 有空项" % d)
-                continue
-            if _CHECK.match(s):
-                continue
-            # 任何带 / 的引用都按路径校验（此前只认 docs/ desktop/ protocol/ library/ 四个前缀，
-            # 其它前缀（如 handovers/）的悬空引用会被静默放过——实测抓到一个）。
-            if "/" in s and not (Path(root) / s).exists():
-                warns.append("%s 的 evidence 指向不存在的件：%s" % (d, s))
+        entry_issues, entry_warns = _pattern_entry(e, root, seen)
+        issues += entry_issues
+        warns += entry_warns
     stats = {"patterns": len(rows), "ids": sorted(seen)}
     return issues, warns, stats
+
+
+def _pattern_entry(e: Dict[str, Any], root: str,
+                   seen: Dict[str, str]) -> Tuple[List[str], List[str]]:
+    """单个 pattern 包的全部校验（issue/warn 文案与判定顺序不变）。"""
+    fm, d = e["fm"], e["dir"]
+    issues = _field_issues(fm, d)
+    issues += _id_issues(fm, d, seen)
+    issues += _rules_issues(fm, d)
+    issues += _applies_to_issues(fm, d, root)
+    return issues, _evidence_warns(fm, d, root)
+
+
+def _field_issues(fm: Dict[str, Any], d: str) -> List[str]:
+    issues: List[str] = []
+    for k in REQUIRED:
+        if not (fm.get(k) or fm.get(k) == []):
+            issues.append("%s 缺必填字段：%s" % (d, k))
+    return issues
+
+
+def _id_issues(fm: Dict[str, Any], d: str, seen: Dict[str, str]) -> List[str]:
+    issues: List[str] = []
+    pid = str(fm.get("id") or "")
+    if pid and pid != d:
+        issues.append("%s 的 id 与目录名不一致：%s vs %s" % (d, pid, d))
+    if pid:
+        if pid in seen:
+            issues.append("pattern id 重复：%s（%s / %s）" % (pid, seen[pid], d))
+        seen[pid] = d
+    return issues
+
+
+def _rules_issues(fm: Dict[str, Any], d: str) -> List[str]:
+    issues: List[str] = []
+    st = str(fm.get("status") or "")
+    if st and st not in STATUSES:
+        issues.append("%s status 越词表：%s（%s）" % (d, st, "/".join(STATUSES)))
+    rules = _as_list(fm.get("rules"))
+    if not rules:
+        issues.append("%s 的 rules 为空（pattern 必须有可执行规则）" % d)
+    return issues
+
+
+def _applies_to_issues(fm: Dict[str, Any], d: str, root: str) -> List[str]:
+    issues: List[str] = []
+    for pat in _as_list(fm.get("applies_to")):
+        pat_clean = pat.strip()
+        if any(ch in pat_clean for ch in "*?["):
+            hits = _glob.glob(os.path.join(root, pat_clean), recursive=True)
+            if not hits:
+                issues.append("%s 的 applies_to 通配无匹配：%s"
+                              "（修复指引：指向仓库内真实文件）" % (d, pat_clean))
+        elif not (Path(root) / pat_clean).exists():
+            issues.append("%s 的 applies_to 路径不存在：%s" % (d, pat_clean))
+    return issues
+
+
+def _evidence_warns(fm: Dict[str, Any], d: str, root: str) -> List[str]:
+    warns: List[str] = []
+    ev = _as_list(fm.get("evidence"))
+    if not ev:
+        warns.append("%s 缺 evidence（可证性弱：无法回溯规则来源）" % d)
+    for item in ev:
+        s = item.strip()
+        if not s:
+            warns.append("%s 的 evidence 有空项" % d)
+            continue
+        if _CHECK.match(s):
+            continue
+        # 任何带 / 的引用都按路径校验（此前只认 docs/ desktop/ protocol/ library/ 四个前缀，
+        # 其它前缀（如 handovers/）的悬空引用会被静默放过——实测抓到一个）。
+        if "/" in s and not (Path(root) / s).exists():
+            warns.append("%s 的 evidence 指向不存在的件：%s" % (d, s))
+    return warns
 
 
 def render_index(root: str = ".") -> str:
@@ -186,15 +225,18 @@ def for_path(root: str, target: str) -> List[Dict[str, str]]:
     for e in entries(root):
         fm = e["fm"]
         for pat in _as_list(fm.get("applies_to")):
-            p = pat.strip().replace("\\", "/")
-            if any(ch in p for ch in "*?["):
-                if _fnmatch.fnmatch(t, p):
-                    hit.append({"id": str(fm.get("id") or e["dir"]),
-                                "name": str(fm.get("name") or ""),
-                                "matched": p})
-                    break
-            elif t == p or t.startswith(p.rstrip("/") + "/"):
+            matched = _pattern_match(pat, t)
+            if matched:
                 hit.append({"id": str(fm.get("id") or e["dir"]),
-                            "name": str(fm.get("name") or ""), "matched": p})
+                            "name": str(fm.get("name") or ""),
+                            "matched": matched})
                 break
     return hit
+
+
+def _pattern_match(pat: str, t: str) -> str:
+    """一条 applies_to 是否命中目标 → 归一化 pattern（空串=未命中）。"""
+    p = pat.strip().replace("\\", "/")
+    if any(ch in p for ch in "*?["):
+        return p if _fnmatch.fnmatch(t, p) else ""
+    return p if t == p or t.startswith(p.rstrip("/") + "/") else ""

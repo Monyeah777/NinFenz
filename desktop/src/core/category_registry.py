@@ -169,15 +169,9 @@ def covered_by(root: str = ".", cat_id: str = "") -> List[str]:
     return _cover(mine, att)
 
 
-def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """注册表自检 → (issues, warns, stats)：id 唯一 / 缺真源件 / 归属缺口如实报。"""
+def _category_issues(cats: List[Dict[str, Any]],
+                      filemap: Dict[str, set]) -> Tuple[List[str], Dict[str, int], List[str]]:
     issues: List[str] = []
-    warns: List[str] = []
-    if not layers_doc(root):
-        issues.append("缺抽象阶梯真源 %s（品类表无从派生；修复指引：在 NF 仓库根运行）" % LAYERS_REL)
-    cats = categories(root)
-    filemap: Dict[str, set] = {str(c["id"]): set(files(root, str(c["id"]))) for c in cats}
-    att = {str(c["id"]): filemap[str(c["id"])] for c in cats if c.get("attributed")}
     seen: Dict[str, int] = {}
     empty: List[str] = []
     for c in cats:
@@ -187,17 +181,32 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
             issues.append("品类 %s 未声明任何 glob" % cid)
         elif not filemap[cid]:
             empty.append(cid)
+    return issues, seen, empty
+
+
+def _duplicate_id_issues(seen: Dict[str, int]) -> List[str]:
+    issues: List[str] = []
     for cid, n in sorted(seen.items()):
         if n > 1:
             issues.append("品类 id 重复 %d 次：%s" % (n, cid))
+    return issues
+
+
+def _glob_duplicate_issues(cats: List[Dict[str, Any]]) -> List[str]:
     by_globs: Dict[Tuple[str, ...], List[str]] = {}
     for c in cats:
         by_globs.setdefault(tuple(c["globs"]), []).append(str(c["id"]))
+    issues: List[str] = []
     for gl, ids in sorted(by_globs.items()):
         if len(ids) > 1:
-            issues.append("品类 glob 集合重复（同一件事多个 id——请并入 LAYERS 真源或改名）：%s -> %"
-                "s"
+            issues.append("品类 glob 集合重复（同一件事多个 id——请并入 LAYERS 真源或改名）：%s -> %s"
                           % ("、".join(sorted(ids)), " , ".join(gl)))
+    return issues
+
+
+def _attribution_warns(cats: List[Dict[str, Any]], filemap: Dict[str, set],
+                       att: Dict[str, set], empty: List[str]) -> List[str]:
+    warns: List[str] = []
     if empty:
         warns.append("以下品类 glob 未命中在場件（缺件或路径漂移）：%s" % "、".join(empty))
     unattributed = [str(c["id"]) for c in cats if not c.get("attributed")]
@@ -209,6 +218,24 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     if uncovered:
         warns.append("LAYERS 未归属品类 %d 个（待回填抽象阶梯）：%s"
                      % (len(uncovered), "、".join(uncovered)))
+    return warns
+
+
+def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
+    """注册表自检 → (issues, warns, stats)：id 唯一 / 缺真源件 / 归属缺口如实报。"""
+    warns: List[str] = []
+    issues: List[str] = []
+    if not layers_doc(root):
+        issues.append("缺抽象阶梯真源 %s（品类表无从派生；修复指引：在 NF 仓库根运行）" % LAYERS_REL)
+    cats = categories(root)
+    filemap: Dict[str, set] = {str(c["id"]): set(files(root, str(c["id"]))) for c in cats}
+    att = {str(c["id"]): filemap[str(c["id"])] for c in cats if c.get("attributed")}
+    cat_issues, seen, empty = _category_issues(cats, filemap)
+    issues += cat_issues
+    issues += _duplicate_id_issues(seen)
+    issues += _glob_duplicate_issues(cats)
+    warns += _attribution_warns(cats, filemap, att, empty)
+    unattributed = [str(c["id"]) for c in cats if not c.get("attributed")]
     stats = {"categories": len(cats), "attributed": len(cats) - len(unattributed),
              "unattributed": len(unattributed)}
     return issues, warns, stats

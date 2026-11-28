@@ -152,6 +152,19 @@ def search(store: Store, kind: Optional[str] = None,
     return hits[:limit]
 
 
+def _split_id(module_id: str):
+    return (module_id.split(":", 1)[0], module_id.split(":", 1)[1]) if ":" in module_id else ("", module_id)
+
+
+def _reference_hit(q: str, q_cat: str, q_bare: str, mid: str) -> bool:
+    m_cat, m_bare = _split_id(mid)
+    if not (mid and q):
+        return False
+    if not q_cat:
+        return m_bare == q_bare
+    return (m_cat == q_cat and m_bare == q_bare) or (not m_cat and m_bare == q_bare)
+
+
 def referenced_by(module_id: str, path=None) -> List[dict]:
     """反向引用查询（v2.2.0 A2）：registry protocols[].references 中引用该模块的包。
 
@@ -172,23 +185,11 @@ def referenced_by(module_id: str, path=None) -> List[dict]:
     except Exception:  # registry 不可用 ⇒ 空引用集（等价于「无引用」；registry 本身由 nf doctor 把关）
         return []
     q = str(module_id)
-    q_cat, q_bare = (q.split(":", 1)[0], q.split(":", 1)[1]) if ":" in q else ("", q)
+    q_cat, q_bare = _split_id(q)
     refs_out: List[dict] = []
     for p in (registry.protocols or []):
         for r in (p.get("references") or []):
-            mid = str(r.get("module_id", ""))
-            m_cat, m_bare = (mid.split(":",
- 1)[0],
- mid.split(":",
- 1)[1]) if ":" in mid else ("",
- mid)
-            hit = False
-            if mid and q:
-                if not q_cat:
-                    hit = m_bare == q_bare
-                else:
-                    hit = (m_cat == q_cat and m_bare == q_bare) or (not m_cat and m_bare == q_bare)
-            if hit:
+            if _reference_hit(q, q_cat, q_bare, str(r.get("module_id", ""))):
                 refs_out.append({
                     "referrer": p.get("id"),
                     "source_package": r.get("source_package"),

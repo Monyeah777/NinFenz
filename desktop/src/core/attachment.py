@@ -48,13 +48,9 @@ def modes(root: str = ".") -> Dict[str, Dict[str, Any]]:
     return {str(m.get("id")): m for m in reg.get("modes") or [] if isinstance(m, dict)}
 
 
-def check_registry(root: str = ".") -> List[str]:
+def _mode_rows_issues(table: Dict[str, Dict[str, Any]]) -> List[str]:
+    """模式行：必备三模式齐备、blocking 在场、min_level 合法。"""
     issues: List[str] = []
-    reg = load_registry(root)
-    table = {str(m.get("id")): m for m in reg.get("modes") or []}
-    vocab = [str(x) for x in reg.get("mode_vocabulary") or []]
-    if sorted(table) != sorted(vocab):
-        issues.append("modes 与 mode_vocabulary 不一致")
     for need in ("none", "observe", "require"):
         if need not in table:
             issues.append("缺模式：%s" % need)
@@ -63,17 +59,84 @@ def check_registry(root: str = ".") -> List[str]:
             issues.append("%s 缺 blocking" % mid)
         if str(mode.get("min_level") or "") and str(mode.get("min_level")) not in LEVELS:
             issues.append("%s min_level 非法：%s" % (mid, mode.get("min_level")))
+    return issues
+
+
+def _require_mode_issues(table: Dict[str, Dict[str, Any]]) -> List[str]:
+    """require 模式：必须阻塞且写明 min_level。"""
+    issues: List[str] = []
     require = table.get("require") or {}
     if not require.get("blocking"):
         issues.append("require 必须 blocking=true（修复指引：require 不阻塞就失去意义）")
     if not str(require.get("min_level") or ""):
         issues.append("require 必须写 min_level")
-    if not str(reg.get("independence_rule") or "").strip():
-        issues.append("缺 independence_rule")
+    return issues
+
+
+def _registry_index(reg: Dict[str, Any]) -> tuple[Dict[str, Dict[str, Any]], List[str]]:
+    """登记表与模式词表两视图（都源于同一份 registry）。"""
+    table = {str(m.get("id")): m for m in reg.get("modes") or []}
+    vocab = [str(x) for x in reg.get("mode_vocabulary") or []]
+    return table, vocab
+
+
+def _vocabulary_issues(table: Dict[str, Dict[str, Any]], vocab: List[str]) -> List[str]:
+    """modes 与 mode_vocabulary 必须逐项同集。"""
+    if sorted(table) != sorted(vocab):
+        return ["modes 与 mode_vocabulary 不一致"]
+    return []
+
+
+def _boundary_issues(reg: Dict[str, Any]) -> List[str]:
+    """claims_boundary 必须写明不替代适配层/审计包。"""
     boundary = " ".join(str(x) for x in reg.get("claims_boundary") or [])
     if "不替代" not in boundary:
-        issues.append("claims_boundary 必须写明不替代适配层/审计包")
+        return ["claims_boundary 必须写明不替代适配层/审计包"]
+    return []
+
+
+def check_registry(root: str = ".") -> List[str]:
+    issues: List[str] = []
+    reg = load_registry(root)
+    table, vocab = _registry_index(reg)
+    issues.extend(_vocabulary_issues(table, vocab))
+    issues.extend(_mode_rows_issues(table))
+    issues.extend(_require_mode_issues(table))
+    if not str(reg.get("independence_rule") or "").strip():
+        issues.append("缺 independence_rule")
+    issues.extend(_boundary_issues(reg))
     return issues
+
+
+def _observe_observations(present: bool, ok: bool, level: str) -> List[str]:
+    """observe 模式：只记录观察，绝不阻塞。"""
+    observations: List[str] = []
+    if not present:
+        observations.append("WARN 证据不在场（observe 不阻塞）")
+    elif not ok:
+        observations.append("WARN 验证未通过（observe 不阻塞）")
+    else:
+        observations.append("证据在场且验证通过（level=%s）" % (level or "T0"))
+    return observations
+
+
+def _require_outcome(table: Dict[str, Dict[str, Any]], mode: str, present: bool,
+                     ok: bool, level: str) -> tuple[bool, str, List[str]]:
+    """require 模式：证据在场 + 验证 ok + 等级 ≥ min_level，否则拒收（exit 2）。"""
+    min_level = str(table[mode].get("min_level") or "T1")
+    passed = True
+    code = ""
+    if not present:
+        passed, code = False, "ATTACHMENT-MISSING"
+    elif not ok:
+        passed, code = False, "ATTACHMENT-NOT-VERIFIED"
+    elif level not in LEVELS or LEVELS.index(level) < LEVELS.index(min_level):
+        passed, code = False, "ATTACHMENT-LEVEL-LOW"
+    observations: List[str] = []
+    if not passed:
+        observations.append("require 未满足：%s（修复指引：附证据并验证到 ≥%s）"
+                            % (code, min_level))
+    return passed, code, observations
 
 
 def evaluate(mode: str, evidence: Optional[Dict[str, Any]] = None,
@@ -98,23 +161,9 @@ def evaluate(mode: str, evidence: Optional[Dict[str, Any]] = None,
     if mode == "none":
         pass
     elif mode == "observe":
-        if not present:
-            observations.append("WARN 证据不在场（observe 不阻塞）")
-        elif not ok:
-            observations.append("WARN 验证未通过（observe 不阻塞）")
-        else:
-            observations.append("证据在场且验证通过（level=%s）" % (level or "T0"))
+        observations = _observe_observations(present, ok, level)
     else:  # require
-        min_level = str(table[mode].get("min_level") or "T1")
-        if not present:
-            passed, code = False, "ATTACHMENT-MISSING"
-        elif not ok:
-            passed, code = False, "ATTACHMENT-NOT-VERIFIED"
-        elif level not in LEVELS or LEVELS.index(level) < LEVELS.index(min_level):
-            passed, code = False, "ATTACHMENT-LEVEL-LOW"
-        if not passed:
-            observations.append("require 未满足：%s（修复指引：附证据并验证到 ≥%s）"
-                                % (code, min_level))
+        passed, code, observations = _require_outcome(table, mode, present, ok, level)
     report = {"schema": "nf-attachment-report/1", "mode": mode,
               "passed": passed, "exit_code": 0 if passed else 2,
               "observations": observations,

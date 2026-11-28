@@ -20,7 +20,7 @@
 """
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Dict
 
 SCHEMA = "nf-plugin-gate/1"
 #: 默认阈值。min_speedup=2.0 取「加速得看得见」的量级；max_toolchain_cost 用「新增工具链
@@ -32,6 +32,37 @@ _PASS_OUTCOMES = ("PASS",)
 
 def _criterion(ok: bool, detail: str, **extra: Any) -> dict[str, Any]:
     return {"ok": bool(ok), "detail": detail, **extra}
+
+
+def _speedup_criterion(base: Any, plug: Any, th: Dict[str, Any]):
+    if isinstance(base, (int, float)) and isinstance(plug, (int, float)) and plug > 0:
+        speedup = float(base) / float(plug)
+        a_ok = speedup >= float(th["min_speedup"])
+        return speedup, _criterion(a_ok, f"加速 {speedup:.2f}×（阈值 {th['min_speedup']:.2f}×）",
+                                   speedup=round(speedup, 4), value=speedup,
+                                   threshold=th["min_speedup"])
+    return None, _criterion(False, "缺可比耗时（baseline_ms / plugin_ms 至少一侧不可用）",
+                            speedup=None, value=None, threshold=th["min_speedup"])
+
+
+def _arbitration_criterion(arb: Dict[str, Any], th: Dict[str, Any]):
+    outcome = str(arb.get("outcome") or "UNKNOWN")
+    comparable = int(arb.get("comparable") or 0)
+    b_ok = outcome in _PASS_OUTCOMES and comparable >= 2 and outcome == th["require_arbitration"]
+    return _criterion(b_ok, "仲裁 {}（可比实现 {}，须 {} 且 ≥2 个可比）"
+                      .format(outcome, comparable, th["require_arbitration"]),
+                      outcome=outcome, comparable=comparable), b_ok
+
+
+def _toolchain_criterion(tc: Dict[str, Any], th: Dict[str, Any]) -> Dict[str, Any]:
+    cost = tc.get("toolchain_cost")
+    cap = int(th["max_toolchain_cost"])
+    c_ok = bool(tc.get("available")) and isinstance(cost, int) and cost <= cap
+    return _criterion(c_ok, "工具链 {} · 成本 {}（上限 {}）"
+                      .format("在场" if tc.get("available") else "缺席", cost,
+                              th["max_toolchain_cost"]),
+                      available=bool(tc.get("available")), toolchain_cost=cost,
+                      kind=tc.get("kind"))
 
 
 def decide(evidence: dict[str, Any], thresholds: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -49,32 +80,10 @@ def decide(evidence: dict[str, Any], thresholds: dict[str, Any] | None = None) -
     plug = evidence.get("plugin_ms")
     arb = evidence.get("arbitration") or {}
     tc = evidence.get("toolchain") or {}
-
-    if isinstance(base, (int, float)) and isinstance(plug, (int, float)) and plug > 0:
-        speedup = float(base) / float(plug)
-        a_ok = speedup >= float(th["min_speedup"])
-        a = _criterion(a_ok, f"加速 {speedup:.2f}×（阈值 {th['min_speedup']:.2f}×）",
-                       speedup=round(speedup, 4), value=speedup, threshold=th["min_speedup"])
-    else:
-        speedup = None
-        a = _criterion(False, "缺可比耗时（baseline_ms / plugin_ms 至少一侧不可用）",
-                       speedup=None, value=None, threshold=th["min_speedup"])
-
+    speedup, a = _speedup_criterion(base, plug, th)
+    b, b_ok = _arbitration_criterion(arb, th)
+    c = _toolchain_criterion(tc, th)
     outcome = str(arb.get("outcome") or "UNKNOWN")
-    comparable = int(arb.get("comparable") or 0)
-    b_ok = outcome in _PASS_OUTCOMES and comparable >= 2 and outcome == th["require_arbitration"]
-    b = _criterion(b_ok, "仲裁 {}（可比实现 {}，须 {} 且 ≥2 个可比）"
-                   .format(outcome, comparable, th["require_arbitration"]),
-                   outcome=outcome, comparable=comparable)
-
-    cost = tc.get("toolchain_cost")
-    cap = int(th["max_toolchain_cost"])
-    c_ok = bool(tc.get("available")) and isinstance(cost, int) and cost <= cap
-    c = _criterion(c_ok, "工具链 {} · 成本 {}（上限 {}）"
-                   .format("在场" if tc.get("available") else "缺席", cost,
-                           th["max_toolchain_cost"]),
-                   available=bool(tc.get("available")), toolchain_cost=cost, kind=tc.get("kind"))
-
     reasons = [k + "：" + v["detail"] for k, v in
                (("speedup", a), ("byte_equivalence", b), ("toolchain_cost", c)) if not v["ok"]]
     return {

@@ -41,6 +41,87 @@ def policy_digest(policy: dict[str, Any]) -> str:
     return hashlib.sha256(canonical(policy)).hexdigest()
 
 
+def _rule_header_issues(rule: dict[str, Any], i: int,
+                        seen: set[str]) -> tuple[list[str], str]:
+    """规则身份面：id 必填且唯一 → (issues, rid)。"""
+    issues: list[str] = []
+    rid = str(rule.get("id") or "").strip()
+    if not rid:
+        issues.append(f"第 {i} 条规则缺 id（{GUIDE}请给唯一 id，结论里要按 id 定位）")
+    elif rid in seen:
+        issues.append(f"规则 id 重复：{rid}（{GUIDE}请改成唯一 id——重复 id 让结论无法定位）")
+    else:
+        seen.add(rid)
+    return issues, rid
+
+
+def _rule_kind_issues(rule: dict[str, Any], label: Any) -> list[str]:
+    """规则类别/严重度/修复指引三面（封闭词表）。"""
+    issues: list[str] = []
+    kind = rule.get("kind")
+    if kind not in KINDS:
+        issues.append(f"规则 {label} 的 kind 不在词表（实得 {kind!r}；可选："
+                      f"{', '.join(KINDS)}）（{GUIDE}请改用词表内类别，不要自造 DSL）")
+    sev = rule.get("severity", "fail")
+    if sev not in SEVERITIES:
+        issues.append(f"规则 {label} 的 severity 不在词表（实得 {sev!r}；可选："
+                      f"{', '.join(SEVERITIES)}）（{GUIDE}请改成 fail 或 warn）")
+    if not str(rule.get("fix") or "").strip():
+        issues.append(f"规则 {label} 缺 fix（{GUIDE}每条规则都必须写修复指引——"
+                      "判失败却不说怎么改，等于把问题丢回给读者）")
+    return issues
+
+
+def _regex_rule_issues(rule: dict[str, Any], label: Any) -> list[str]:
+    """regex_present/regex_absent：pattern 必须是非空且可编译的正则。"""
+    issues: list[str] = []
+    pat = rule.get("pattern")
+    if not isinstance(pat, str) or not pat:
+        issues.append(f"规则 {label} 缺 pattern（{GUIDE}请给正则字符串）")
+        return issues
+    try:
+        re.compile(pat)
+    except re.error as exc:
+        issues.append(f"规则 {label} 的 pattern 不是合法正则：{exc}"
+                      f"（{GUIDE}请修正正则后重跑）")
+    return issues
+
+
+def _count_rule_issues(rule: dict[str, Any], label: Any) -> list[str]:
+    """count_at_least：field 在词表内 + n 为非负整数。"""
+    issues: list[str] = []
+    if rule.get("field") not in FIELDS:
+        issues.append(f"规则 {label} 的 field 不在词表（实得 {rule.get('field')!r}；"
+                      f"可选：{', '.join(FIELDS)}）（{GUIDE}请改用词表内字段）")
+    if not isinstance(rule.get("n"), int) or rule.get("n") < 0:
+        issues.append(f"规则 {label} 的 n 应为非负整数（{GUIDE}请给整数下界）")
+    return issues
+
+
+def _digest_rule_issues(rule: dict[str, Any], label: Any) -> list[str]:
+    """digest_pin：sha256 必须是 64 位十六进制。"""
+    if re.fullmatch(r"[0-9a-fA-F]{64}", str(rule.get("sha256") or "")):
+        return []
+    return [f"规则 {label} 的 sha256 应为 64 位十六进制（{GUIDE}请钉完整摘要）"]
+
+
+def _rule_issues(rule: Any, i: int, seen: set[str]) -> list[str]:
+    """单条规则：身份面 + 类别面 + 按 kind 的专项面。"""
+    if not isinstance(rule, dict):
+        return [f"第 {i} 条规则不是对象（{GUIDE}请写成规则对象）"]
+    issues, rid = _rule_header_issues(rule, i, seen)
+    label = rid or i
+    issues.extend(_rule_kind_issues(rule, label))
+    kind = rule.get("kind")
+    if kind in ("regex_present", "regex_absent"):
+        issues.extend(_regex_rule_issues(rule, label))
+    if kind == "count_at_least":
+        issues.extend(_count_rule_issues(rule, label))
+    if kind == "digest_pin":
+        issues.extend(_digest_rule_issues(rule, label))
+    return issues
+
+
 def validate(policy: Any) -> list[str]:
     """策略形状校验 → 问题列表（空 = 合法）。每条都给可执行指引。"""
     issues: list[str] = []
@@ -56,46 +137,7 @@ def validate(policy: Any) -> list[str]:
         return issues
     seen: set[str] = set()
     for i, rule in enumerate(rules, 1):
-        if not isinstance(rule, dict):
-            issues.append(f"第 {i} 条规则不是对象（{GUIDE}请写成规则对象）")
-            continue
-        rid = str(rule.get("id") or "").strip()
-        if not rid:
-            issues.append(f"第 {i} 条规则缺 id（{GUIDE}请给唯一 id，结论里要按 id 定位）")
-        elif rid in seen:
-            issues.append(f"规则 id 重复：{rid}（{GUIDE}请改成唯一 id——重复 id 让结论无法定位）")
-        else:
-            seen.add(rid)
-        kind = rule.get("kind")
-        if kind not in KINDS:
-            issues.append(f"规则 {rid or i} 的 kind 不在词表（实得 {kind!r}；可选："
-                          f"{', '.join(KINDS)}）（{GUIDE}请改用词表内类别，不要自造 DSL）")
-        sev = rule.get("severity", "fail")
-        if sev not in SEVERITIES:
-            issues.append(f"规则 {rid or i} 的 severity 不在词表（实得 {sev!r}；可选："
-                          f"{', '.join(SEVERITIES)}）（{GUIDE}请改成 fail 或 warn）")
-        if not str(rule.get("fix") or "").strip():
-            issues.append(f"规则 {rid or i} 缺 fix（{GUIDE}每条规则都必须写修复指引——"
-                          "判失败却不说怎么改，等于把问题丢回给读者）")
-        if kind in ("regex_present", "regex_absent"):
-            pat = rule.get("pattern")
-            if not isinstance(pat, str) or not pat:
-                issues.append(f"规则 {rid or i} 缺 pattern（{GUIDE}请给正则字符串）")
-            else:
-                try:
-                    re.compile(pat)
-                except re.error as exc:
-                    issues.append(f"规则 {rid or i} 的 pattern 不是合法正则：{exc}"
-                                  f"（{GUIDE}请修正正则后重跑）")
-        if kind == "count_at_least":
-            if rule.get("field") not in FIELDS:
-                issues.append(f"规则 {rid or i} 的 field 不在词表（实得 {rule.get('field')!r}；"
-                              f"可选：{', '.join(FIELDS)}）（{GUIDE}请改用词表内字段）")
-            if not isinstance(rule.get("n"), int) or rule.get("n") < 0:
-                issues.append(f"规则 {rid or i} 的 n 应为非负整数（{GUIDE}请给整数下界）")
-        if kind == "digest_pin" and not re.fullmatch(
-                r"[0-9a-fA-F]{64}", str(rule.get("sha256") or "")):
-            issues.append(f"规则 {rid or i} 的 sha256 应为 64 位十六进制（{GUIDE}请钉完整摘要）")
+        issues.extend(_rule_issues(rule, i, seen))
     return issues
 
 
@@ -124,6 +166,30 @@ def _text(raw: bytes) -> str | None:
         return None
 
 
+def _regex_verdict(rule: dict[str, Any], text: str) -> tuple[bool, str]:
+    """正则类规则判定（命中/未命中按 kind 反义）。"""
+    hit = re.search(str(rule.get("pattern") or ""), text) is not None
+    if rule.get("kind") == "regex_present":
+        return hit, "命中要求的内容" if hit else "缺要求的内容（pattern 未命中）"
+    return (not hit), "未出现禁止内容" if not hit else "出现了禁止内容（pattern 命中）"
+
+
+def _count_verdict(rule: dict[str, Any], raw: bytes, text: str | None) -> tuple[bool, str]:
+    """count_at_least 判定：按封闭字段集算实际值再比下界。"""
+    field = str(rule.get("field") or "")
+    n = int(rule.get("n") or 0)
+    actual = {"bytes": len(raw),
+              "lines": len((text or "").replace("\r\n", "\n").splitlines()),
+              "chars": len(text or "")}[field]
+    return actual >= n, f"{field}={actual}（下界 {n}）"
+
+
+def _digest_verdict(rule: dict[str, Any], digest: str) -> tuple[bool, str]:
+    """digest_pin 判定：对象摘要与钉住的 sha256 逐字比较。"""
+    want = str(rule.get("sha256") or "").lower()
+    return digest == want, f"摘要={'一致' if digest == want else '不符'}"
+
+
 def _one(rule: dict[str, Any], raw: bytes, text: str | None,
          digest: str) -> tuple[bool, str]:
     """单条规则判定 → (是否通过, 说明)。"""
@@ -135,35 +201,26 @@ def _one(rule: dict[str, Any], raw: bytes, text: str | None,
     if kind in ("regex_present", "regex_absent"):
         if text is None:
             return False, "对象不是 UTF-8 文本，正则类规则无从判定"
-        hit = re.search(str(rule.get("pattern") or ""), text) is not None
-        if kind == "regex_present":
-            return hit, "命中要求的内容" if hit else "缺要求的内容（pattern 未命中）"
-        return (not hit), "未出现禁止内容" if not hit else "出现了禁止内容（pattern 命中）"
+        return _regex_verdict(rule, text)
     if kind == "count_at_least":
-        field = str(rule.get("field") or "")
-        n = int(rule.get("n") or 0)
-        actual = {"bytes": len(raw),
-                  "lines": len((text or "").replace("\r\n", "\n").splitlines()),
-                  "chars": len(text or "")}[field]
-        return actual >= n, f"{field}={actual}（下界 {n}）"
+        return _count_verdict(rule, raw, text)
     if kind == "digest_pin":
-        want = str(rule.get("sha256") or "").lower()
-        return digest == want, f"摘要={'一致' if digest == want else '不符'}"
+        return _digest_verdict(rule, digest)
     return False, f"未知规则类别：{kind}"
 
 
-def check(obj: str, policy: dict[str, Any]) -> dict[str, Any]:
-    """单对象体检 → {verdict, policy_id, policy_digest, object, findings}。"""
-    issues = validate(policy)
-    if issues:
-        raise ValueError("策略不合法：" + "；".join(issues[:3]))
+def _read_object(obj: str) -> bytes:
+    """读体检对象字节；文件不存在即带指引拒绝。"""
     if not os.path.isfile(obj):
         raise ValueError(f"体检对象不存在：{obj}（{GUIDE}请先 ls 定位到具体文件；"
                          "本命令只收单个文件，目录请逐件跑）")
     with open(obj, "rb") as fh:
-        raw = fh.read()
-    text = _text(raw)
-    digest = hashlib.sha256(raw).hexdigest()
+        return fh.read()
+
+
+def _policy_findings(policy: dict[str, Any], raw: bytes, text: str | None,
+                     digest: str) -> list[dict[str, Any]]:
+    """逐条规则判定 → findings（保持策略内顺序）。"""
     findings: list[dict[str, Any]] = []
     for rule in policy.get("rules") or []:
         ok, detail = _one(rule, raw, text, digest)
@@ -172,6 +229,18 @@ def check(obj: str, policy: dict[str, Any]) -> dict[str, Any]:
                          "severity": rule.get("severity", "fail"),
                          "ok": ok, "detail": detail,
                          "fix": str(rule.get("fix") or "")})
+    return findings
+
+
+def check(obj: str, policy: dict[str, Any]) -> dict[str, Any]:
+    """单对象体检 → {verdict, policy_id, policy_digest, object, findings}。"""
+    issues = validate(policy)
+    if issues:
+        raise ValueError("策略不合法：" + "；".join(issues[:3]))
+    raw = _read_object(obj)
+    text = _text(raw)
+    digest = hashlib.sha256(raw).hexdigest()
+    findings = _policy_findings(policy, raw, text, digest)
     failed = [f for f in findings if not f["ok"] and f["severity"] == "fail"]
     return {"schema": "nf-check-result/1",
             "verdict": "ok" if not failed else "invalid",

@@ -28,13 +28,13 @@ def _md_row(cells: List[str]) -> str:
     return "| " + " | ".join(str(c) for c in cells) + " |"
 
 
-def collect(root: str) -> Dict[str, Any]:
-    """收集生成物 canonical 数据（全部来自 schema/协议件实时扫描，确定性排序）。"""
-    sl_issues, sl_stats = _sl.scan(root)
-    _, schemas = _sl.check_schema_files(root)
-    schema_ids = sorted(s.get("$id", "") for s in schemas if s.get("$id"))
+def _machine_contract(text: str):
+    parsed = _csc._fence_yaml(text, "machine_contract")
+    mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
+    return mc if isinstance(mc, dict) else None
 
-    evidence = sorted(_csc._evidence_ids(root))
+
+def _contract_entries(root: str) -> List[Dict[str, Any]]:
     contracts: List[Dict[str, Any]] = []
     for doc in _csc._module_docs(root):
         rel = os.path.relpath(doc, root).replace(os.sep, "/")
@@ -43,9 +43,8 @@ def collect(root: str) -> Dict[str, Any]:
                 text = fh.read()
         except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
             continue  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
-        parsed = _csc._fence_yaml(text, "machine_contract")
-        mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
-        if not isinstance(mc, dict):
+        mc = _machine_contract(text)
+        if mc is None:
             continue
         contracts.append({
             "id": mc.get("id"),
@@ -55,13 +54,10 @@ def collect(root: str) -> Dict[str, Any]:
             "source": rel,
         })
     contracts.sort(key=lambda x: (str(x["id"]), str(x["source"])))
+    return contracts
 
-    pipelines = sorted(os.path.basename(p) for p in _sl.discover(root)["pipeline_docs"])
-    packages = sorted(
-        os.path.relpath(p, root).replace(os.sep, "/")
-        for p in _sl.discover(root)["protocol_files"]
-    )
-    reg, _ = _sl._read_json(os.path.join(root, "desktop", "src", "core", "registry.json"))
+
+def _registry_module_entries(reg: Any) -> List[Dict[str, Any]]:
     registry_modules: List[Dict[str, Any]] = []
     for m in (reg or {}).get("modules") or []:
         registry_modules.append({
@@ -71,6 +67,25 @@ def collect(root: str) -> Dict[str, Any]:
             "layers": [mo.get("layer") for mo in (m.get("mounts") or [])],
         })
     registry_modules.sort(key=lambda x: str(x["id"]))
+    return registry_modules
+
+
+def collect(root: str) -> Dict[str, Any]:
+    """收集生成物 canonical 数据（全部来自 schema/协议件实时扫描，确定性排序）。"""
+    sl_issues, sl_stats = _sl.scan(root)
+    _, schemas = _sl.check_schema_files(root)
+    schema_ids = sorted(s.get("$id", "") for s in schemas if s.get("$id"))
+
+    evidence = sorted(_csc._evidence_ids(root))
+    contracts = _contract_entries(root)
+
+    pipelines = sorted(os.path.basename(p) for p in _sl.discover(root)["pipeline_docs"])
+    packages = sorted(
+        os.path.relpath(p, root).replace(os.sep, "/")
+        for p in _sl.discover(root)["protocol_files"]
+    )
+    reg, _ = _sl._read_json(os.path.join(root, "desktop", "src", "core", "registry.json"))
+    registry_modules = _registry_module_entries(reg)
     prov, _ = _sl._read_json(os.path.join(root, "05_资产库", "provenance.json"))
     asset_keys = sorted(a.get("key") for a in (prov or {}).get("assets") or [])
     _, closure_stats = _clos.scan(root)

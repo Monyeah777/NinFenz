@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import ast
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List
 
 from core import json_doc
 
@@ -48,9 +48,77 @@ def test_methods(root: str = ".") -> dict[str, set[str]]:
     return out
 
 
+def _field_issues(cid: str, item: Dict[str, Any]) -> List[str]:
+    out: List[str] = []
+    for field in ("module", "claim", "reverse_fixture"):
+        if not str(item.get(field) or "").strip():
+            out.append(cid + " 缺 " + field
+                       + "（" + GUIDE + "闭包必须有断言/反例）")
+    return out
+
+
+def _criterion_issues(cid: str, available: dict, ref: Any) -> List[str]:
+    if not isinstance(ref, (list, tuple)) or len(ref) != 2:
+        return [cid + " 的 criteria 条目必须是 [文件, 方法名]"]
+    fname, method = str(ref[0]), str(ref[1])
+    if fname not in available:
+        return [cid + " 引用了不存在的测试文件：" + fname]
+    if method not in available[fname]:
+        return [cid + " 引用了不存在的测试方法：" + fname + "::" + method]
+    return []
+
+
+def _criteria_issues(cid: str, available: dict, criteria: Any) -> List[str]:
+    if not isinstance(criteria, list) or not criteria:
+        return [cid + " 缺 criteria（" + GUIDE + "必须引用真实测试方法）"]
+    out: List[str] = []
+    for ref in criteria:
+        out += _criterion_issues(cid, available, ref)
+    return out
+
+
+def _evidence_issues(cid: str, evidence: Any) -> List[str]:
+    if not isinstance(evidence, list) or not evidence:
+        return [cid + " 缺 evidence（" + GUIDE + "给可跑命令）"]
+    out: List[str] = []
+    for cmd in evidence:
+        text = str(cmd)
+        if not (text.startswith("python ") or text.startswith("bash ")):
+            out.append(cid + " 的 evidence 不是可跑命令：" + text[:40])
+    return out
+
+
+def _closed_debt_issues(cid: str, status: str, item: Dict[str, Any]) -> List[str]:
+    out: List[str] = []
+    if status == "closed" and not item.get("criteria"):
+        out.append(cid + " 标 closed 却没有判据（" + GUIDE + "降为 debt 或补判据）")
+    if status == "debt" and not str(item.get("debt") or "").strip():
+        out.append(cid + " 标 debt 却没写债务原因")
+    return out
+
+
+def _entry_issues(available: dict, item: Any, seen: set) -> List[str]:
+    if not isinstance(item, dict):
+        return ["entries 里有非对象条目"]
+    cid = str(item.get("id") or "")
+    if not cid:
+        return ["有条目缺 id（" + GUIDE + "给 C-01/D-01 形式 id）"]
+    issues: List[str] = []
+    if cid in seen:
+        issues.append("闭包 id 重复：" + cid)
+    seen.add(cid)
+    status = str(item.get("status") or "")
+    if status not in STATUSES:
+        issues.append(cid + " 的 status 非法：" + status)
+    issues += _field_issues(cid, item)
+    issues += _criteria_issues(cid, available, item.get("criteria"))
+    issues += _evidence_issues(cid, item.get("evidence"))
+    issues += _closed_debt_issues(cid, status, item)
+    return issues
+
+
 def validate(doc: Any, root: str = ".") -> list[str]:
     """校验台账 → 问题列表（空 = 合法）。"""
-    issues: list[str] = []
     if not isinstance(doc, dict) or str(doc.get("schema")) != SCHEMA:
         return ["台账 schema 不匹配（" + GUIDE + "需要 " + SCHEMA + "）"]
     entries = doc.get("entries")
@@ -58,49 +126,9 @@ def validate(doc: Any, root: str = ".") -> list[str]:
         return ["台账没有 entries（" + GUIDE + "至少一条闭包断言）"]
     available = test_methods(root)
     seen: set[str] = set()
+    issues: list[str] = []
     for item in entries:
-        if not isinstance(item, dict):
-            issues.append("entries 里有非对象条目")
-            continue
-        cid = str(item.get("id") or "")
-        if not cid:
-            issues.append("有条目缺 id（" + GUIDE + "给 C-01/D-01 形式 id）")
-            continue
-        if cid in seen:
-            issues.append("闭包 id 重复：" + cid)
-        seen.add(cid)
-        status = str(item.get("status") or "")
-        if status not in STATUSES:
-            issues.append(cid + " 的 status 非法：" + status)
-        for field in ("module", "claim", "reverse_fixture"):
-            if not str(item.get(field) or "").strip():
-                issues.append(cid + " 缺 " + field
-                              + "（" + GUIDE + "闭包必须有断言/反例）")
-        criteria = item.get("criteria")
-        if not isinstance(criteria, list) or not criteria:
-            issues.append(cid + " 缺 criteria（" + GUIDE + "必须引用真实测试方法）")
-        else:
-            for ref in criteria:
-                if not isinstance(ref, (list, tuple)) or len(ref) != 2:
-                    issues.append(cid + " 的 criteria 条目必须是 [文件, 方法名]")
-                    continue
-                fname, method = str(ref[0]), str(ref[1])
-                if fname not in available:
-                    issues.append(cid + " 引用了不存在的测试文件：" + fname)
-                elif method not in available[fname]:
-                    issues.append(cid + " 引用了不存在的测试方法：" + fname + "::" + method)
-        evidence = item.get("evidence")
-        if not isinstance(evidence, list) or not evidence:
-            issues.append(cid + " 缺 evidence（" + GUIDE + "给可跑命令）")
-        else:
-            for cmd in evidence:
-                text = str(cmd)
-                if not (text.startswith("python ") or text.startswith("bash ")):
-                    issues.append(cid + " 的 evidence 不是可跑命令：" + text[:40])
-        if status == "closed" and not criteria:
-            issues.append(cid + " 标 closed 却没有判据（" + GUIDE + "降为 debt 或补判据）")
-        if status == "debt" and not str(item.get("debt") or "").strip():
-            issues.append(cid + " 标 debt 却没写债务原因")
+        issues += _entry_issues(available, item, seen)
     return issues
 
 

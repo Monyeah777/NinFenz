@@ -64,6 +64,29 @@ def can_reference(status: str, new_reference: bool = True, root: str = ".") -> b
     return False
 
 
+def _state_obligation_issues(doc: Dict[str, Any], status: str,
+                             state: Dict[str, Any]) -> List[str]:
+    """状态义务：evidence 下限 + acceptance 必须非空。"""
+    issues: List[str] = []
+    evidence = doc.get("evidence") or []
+    if len(evidence) < int(state.get("evidence_min") or 0):
+        issues.append("%s 契约要求 evidence ≥%s（当前 %d；修复指引：补证据引用）"
+                      % (status, state.get("evidence_min"), len(evidence)))
+    if state.get("acceptance_required") and not (doc.get("acceptance") or []):
+        issues.append("%s 契约要求 acceptance ≥1（修复指引：补验收引用）" % status)
+    return issues
+
+
+def _constraint_issues(status: str, constraints: List[Any]) -> List[str]:
+    """非 draft 状态下每条 constraint 必须写 rule。"""
+    issues: List[str] = []
+    if status in ("active", "deprecated", "retired"):
+        for rule in constraints:
+            if not str((rule or {}).get("rule") or "").strip():
+                issues.append("constraint %s 缺 rule" % (rule or {}).get("id"))
+    return issues
+
+
 def check_contract(doc: Dict[str, Any], root: str = ".") -> List[str]:
     """按状态义务校验 nf-contract/1（含 schema 校验）。返回 issues（不抛）。"""
     from core import json_schema
@@ -78,19 +101,37 @@ def check_contract(doc: Dict[str, Any], root: str = ".") -> List[str]:
     if state is None:
         issues.append("契约状态 %r 不在状态词表（修复指引：draft/active/deprecated/retired）" % status)
         return issues
-    evidence = doc.get("evidence") or []
-    if len(evidence) < int(state.get("evidence_min") or 0):
-        issues.append("%s 契约要求 evidence ≥%s（当前 %d；修复指引：补证据引用）"
-                      % (status, state.get("evidence_min"), len(evidence)))
-    if state.get("acceptance_required") and not (doc.get("acceptance") or []):
-        issues.append("%s 契约要求 acceptance ≥1（修复指引：补验收引用）" % status)
+    issues.extend(_state_obligation_issues(doc, status, state))
     constraints = doc.get("constraints") or []
-    if status in ("active", "deprecated", "retired"):
-        for rule in constraints:
-            if not str((rule or {}).get("rule") or "").strip():
-                issues.append("constraint %s 缺 rule" % (rule or {}).get("id"))
+    issues.extend(_constraint_issues(status, constraints))
     if status == "draft" and can_reference("draft", True, root):
         issues.append("draft 不应可被引用（registry 不一致）")
+    return issues
+
+
+def _state_row_issues(table: Dict[str, Dict[str, Any]]) -> List[str]:
+    """状态行：必备四状态齐备，每状态带 obligations/consumable/references_allowed。"""
+    issues: List[str] = []
+    for need in ("draft", "active", "deprecated", "retired"):
+        if need not in table:
+            issues.append("缺状态义务：%s" % need)
+    for sid, state in table.items():
+        if not state.get("obligations"):
+            issues.append("%s 缺 obligations" % sid)
+        if "consumable" not in state:
+            issues.append("%s 缺 consumable" % sid)
+        if "references_allowed" not in state:
+            issues.append("%s 缺 references_allowed" % sid)
+    return issues
+
+
+def _registry_tail_issues(reg: Dict[str, Any]) -> List[str]:
+    """义务→check 映射必须非空，claims_boundary 必须写明不替代。"""
+    issues: List[str] = []
+    if not reg.get("obligation_checks"):
+        issues.append("缺 obligation_checks（义务→check 映射）")
+    if not any("不替代" in str(x) for x in reg.get("claims_boundary") or []):
+        issues.append("claims_boundary 必须写明不替代治理 verify/附件模式")
     return issues
 
 
@@ -103,18 +144,6 @@ def check_registry(root: str = ".") -> List[str]:
     if sorted(table) != sorted(vocab):
         issues.append("states 与 status_vocabulary 不一致：%s / %s"
                       % (sorted(table), sorted(vocab)))
-    for need in ("draft", "active", "deprecated", "retired"):
-        if need not in table:
-            issues.append("缺状态义务：%s" % need)
-    for sid, state in table.items():
-        if not state.get("obligations"):
-            issues.append("%s 缺 obligations" % sid)
-        if "consumable" not in state:
-            issues.append("%s 缺 consumable" % sid)
-        if "references_allowed" not in state:
-            issues.append("%s 缺 references_allowed" % sid)
-    if not reg.get("obligation_checks"):
-        issues.append("缺 obligation_checks（义务→check 映射）")
-    if not any("不替代" in str(x) for x in reg.get("claims_boundary") or []):
-        issues.append("claims_boundary 必须写明不替代治理 verify/附件模式")
+    issues.extend(_state_row_issues(table))
+    issues.extend(_registry_tail_issues(reg))
     return issues

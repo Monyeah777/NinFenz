@@ -31,13 +31,8 @@ def decl(root: str = ".") -> Dict[str, Any]:
     return json_doc.load(p, dict, what=DECL_REL) if p.is_file() else {}
 
 
-def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """→ (issues, warns, stats)。"""
+def _decl_issues(d: Dict[str, Any]) -> List[str]:
     issues: List[str] = []
-    warns: List[str] = []
-    d = decl(root)
-    if not d:
-        return ["缺 B 线包装声明 %s" % DECL_REL], warns, {}
     if str(d.get("schema") or "") != SCHEMA:
         issues.append("包装声明 schema 不匹配（期望 %s）" % SCHEMA)
     if tuple(d.get("category_vocabulary") or ()) != CATEGORIES:
@@ -46,15 +41,21 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         issues.append("红线不得为空（上架包的纪律必须成文）")
     if str(d.get("status")) == "draft" and not (d.get("pending") or []):
         issues.append("status=draft 但 pending 为空——草案必须写明还差什么")
-    pkg_raw = d.get("package")
-    pkg: Dict[str, Any] = pkg_raw if isinstance(pkg_raw, dict) else {}
+    return issues
+
+
+def _pkg_issues(pkg: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     if not (pkg.get("name_candidates") or []):
         issues.append("缺命名候选（B-S1 须给候选）")
     if not (pkg.get("one_liner_candidates") or []):
         issues.append("缺一句话候选（B-S1 须给候选）")
     if str(pkg.get("category")) not in CATEGORIES:
         issues.append("类目越词表：%s" % pkg.get("category"))
-    # 红线「只读面不变」：与运行时逐名一致
+    return issues
+
+
+def _runtime_defs():
     tool_defs: List[Dict[str, Any]] = []
     prompt_defs: List[Dict[str, Any]] = []
     try:
@@ -64,14 +65,17 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         live_tools = [t["name"] for t in tool_defs]
         live_prompts = [p["name"] for p in prompt_defs]
     except Exception as exc:                      # 运行时可导入性本身也是判据
-        issues.append("mcp_runtime 不可导入，无法核对工具面：%s" % exc)
-        live_tools, live_prompts = [], []
-    got_tools = [str(x) for x in (pkg.get("tools") or [])]
-    got_prompts = [str(x) for x in (pkg.get("prompts") or [])]
+        return tool_defs, prompt_defs, [], [], ["mcp_runtime 不可导入，无法核对工具面：%s" % exc]
+    return tool_defs, prompt_defs, live_tools, live_prompts, []
+
+
+def _surface_hash_issues(pkg: Dict[str, Any], tool_defs, prompt_defs):
     tools_hash = surface_hash(tool_defs, ("name", "inputSchema"))
     prompts_hash = surface_hash(prompt_defs, ("name", "description"))
     want_tools_hash = str(pkg.get("tools_hash") or "")
     want_prompts_hash = str(pkg.get("prompts_hash") or "")
+    issues: List[str] = []
+    warns: List[str] = []
     if want_tools_hash and want_tools_hash != tools_hash:
         issues.append("工具面指纹漂移：声明 %s / 运行时 %s（修复指引：核对 TOOL_DEFS 的 "
                       "inputSchema 后重算 tools_hash）" % (want_tools_hash[:12], tools_hash[:12]))
@@ -82,6 +86,12 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
                                                               prompts_hash[:12]))
     elif not want_prompts_hash:
         warns.append("包装声明缺 prompts_hash（修复指引：补提示面指纹）")
+    return issues, warns, tools_hash, prompts_hash
+
+
+def _surface_issues(got_tools: List[str], got_prompts: List[str],
+                    live_tools: List[str], live_prompts: List[str]) -> List[str]:
+    issues: List[str] = []
     if sorted(got_tools) != sorted(live_tools):
         issues.append("工具面与运行时不一致（上架材料会漂移）：声明 %d 个 / 运行时 %d 个"
                       "（多：%s；少：%s）"
@@ -91,6 +101,29 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     if sorted(got_prompts) != sorted(live_prompts):
         issues.append("提示面与运行时不一致：声明 %s / 运行时 %s"
                       % (got_prompts, live_prompts))
+    return issues
+
+
+def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
+    """→ (issues, warns, stats)。"""
+    warns: List[str] = []
+    d = decl(root)
+    if not d:
+        return ["缺 B 线包装声明 %s" % DECL_REL], warns, {}
+    issues: List[str] = _decl_issues(d)
+    pkg_raw = d.get("package")
+    pkg: Dict[str, Any] = pkg_raw if isinstance(pkg_raw, dict) else {}
+    issues += _pkg_issues(pkg)
+    # 红线「只读面不变」：与运行时逐名一致
+    tool_defs, prompt_defs, live_tools, live_prompts, runtime_issues = _runtime_defs()
+    issues += runtime_issues
+    got_tools = [str(x) for x in (pkg.get("tools") or [])]
+    got_prompts = [str(x) for x in (pkg.get("prompts") or [])]
+    hash_issues, hash_warns, tools_hash, prompts_hash = _surface_hash_issues(
+        pkg, tool_defs, prompt_defs)
+    issues += hash_issues
+    warns += hash_warns
+    issues += _surface_issues(got_tools, got_prompts, live_tools, live_prompts)
     if (d.get("pending") or []):
         warns.append("包装声明为草案：%d 项待补（%s）"
                      % (len(d["pending"]), "；".join(d["pending"][:2])))

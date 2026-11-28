@@ -46,55 +46,71 @@ def _read_json(path: str) -> Any:
         return None  # best-effort 显式忽略（不可读/不可用属预期，由上层门禁另行报出）
 
 
-def compute(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
+def _registry_stats(root: str):
     issues: List[str] = []
-    stats: Dict[str, Any] = {}
-
     reg = _read_json(os.path.join(root, "desktop/src/core/registry.json"))
     if not isinstance(reg, dict):
         issues.append("取不到 registry.json（官方核心模块/登记包口径缺失）")
         reg = {}
-    stats["core_modules"] = len(reg.get("modules") or [])
-    stats["registered_packs"] = len(reg.get("protocols") or [])
+    stats = {"core_modules": len(reg.get("modules") or []),
+             "registered_packs": len(reg.get("protocols") or [])}
+    return stats, issues
 
+
+def _pipeline_stats(root: str) -> Dict[str, Any]:
     pipes = sorted(p.split("/")[-1][:3] for p in cr.files(root, "core-pipelines"))
-    stats["core_pipelines"] = pipes
+    return {"core_pipelines": pipes}
 
+
+def _pack_dir_stats(root: str, registered: int):
+    issues: List[str] = []
     if not cr.globs(root, "level:declaration"):
         issues.append("品类注册表缺 level:declaration（修复指引：protocol/LAYERS.json 的 asset_leve"
-            "ls "
-                      "须含 declaration；否则包目录口径会静默归零）")
+                      "ls 须含 declaration；否则包目录口径会静默归零）")
     pack_dirs = sorted(p.split("/")[1] for p in cr.files(root, "level:declaration"))
-    stats["pack_dirs"] = len(pack_dirs)
-    if pack_dirs and stats["pack_dirs"] != stats["registered_packs"]:
+    stats = {"pack_dirs": len(pack_dirs)}
+    if pack_dirs and stats["pack_dirs"] != registered:
         issues.append("盘上包目录 %d ≠ registry 登记 %d（登记三要件与盘上实况不一致）"
-                      % (stats["pack_dirs"], stats["registered_packs"]))
+                      % (stats["pack_dirs"], registered))
+    return stats, issues
 
-    stats["pack_assets"] = len(cr.files(root, "package-assets"))
-    stats["concept_graphs"] = len(cr.files(root, "concept-graphs"))
 
+def _asset_stats(root: str) -> Dict[str, Any]:
+    return {"pack_assets": len(cr.files(root, "package-assets")),
+            "concept_graphs": len(cr.files(root, "concept-graphs"))}
+
+
+def _catalog_stats(root: str):
+    issues: List[str] = []
     cat = _read_json(os.path.join(root, "protocol/standards_catalog.json")) or {}
     cov = cat.get("coverage") or {}
     for key in ("standards", "reachable", "unreachable", "bodies", "depends_edges", "by_layer"):
         if key not in cov:
             issues.append("标准目录 coverage 缺 %s（口径不完整）" % key)
-    stats["standards_total"] = cov.get("standards", 0)
-    stats["standards_reachable"] = cov.get("reachable", 0)
-    stats["standards_unreachable"] = cov.get("unreachable", 0)
-    stats["standards_bodies"] = cov.get("bodies", 0)
-    stats["standards_edges"] = cov.get("depends_edges", 0)
-    stats["standards_by_layer"] = cov.get("by_layer", {})
+    stats = {"standards_total": cov.get("standards", 0),
+             "standards_reachable": cov.get("reachable", 0),
+             "standards_unreachable": cov.get("unreachable", 0),
+             "standards_bodies": cov.get("bodies", 0),
+             "standards_edges": cov.get("depends_edges", 0),
+             "standards_by_layer": cov.get("by_layer", {})}
+    return stats, issues
 
+
+def _binding_stats(root: str) -> Dict[str, Any]:
     bind = _read_json(os.path.join(root, "protocol/standards_binding.json")) or {}
-    stats["standard_bindings"] = bind.get("bindings_total", 0)
-
     manifest = _read_json(os.path.join(root, "protocol/domain_packs.json")) or {}
-    stats["domain_packs"] = manifest.get("count", 0)
-    stats["subdivisions_total"] = manifest.get("subdivisions_total", 0)
+    return {"standard_bindings": bind.get("bindings_total", 0),
+            "domain_packs": manifest.get("count", 0),
+            "subdivisions_total": manifest.get("subdivisions_total", 0)}
 
+
+def _library_stats(root: str) -> Dict[str, Any]:
     lib = [p.split("/")[-1] for p in cr.files(root, "library-items")]
-    stats["library_items"] = len([f for f in lib if f not in ("INDEX.md", "ALIAS.md")])
+    return {"library_items": len([f for f in lib if f not in ("INDEX.md", "ALIAS.md")])}
 
+
+def _verify_sh_stats(root: str):
+    issues: List[str] = []
     vpath = os.path.join(root, "verify.sh")
     try:
         with open(vpath, encoding="utf-8") as fh:
@@ -102,30 +118,63 @@ def compute(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
     except Exception:  # noqa: BLE001
         vtext = ""
         issues.append("取不到 verify.sh（质量凭证口径缺失）")
-    stats["verify_checks"] = len(re.findall(r"^check[0-9]+\(\)", vtext, re.M))
+    checks = len(re.findall(r"^check[0-9]+\(\)", vtext, re.M))
     m = re.search(r"^# 版本\s*:\s*v([0-9][0-9.]*)", vtext, re.M)
-    stats["verify_version"] = m.group(1) if m else ""
-    if not stats["verify_version"]:
+    version = m.group(1) if m else ""
+    if not version:
         issues.append("verify.sh 头部缺「# 版本 : vX」版本行")
-    if stats["verify_checks"] < 1:
+    if checks < 1:
         issues.append("verify.sh 未扫到任何 checkN() 定义")
+    return {"verify_checks": checks, "verify_version": version}, issues
 
-    # 质量基线真源：quality_baseline.EXPECTED_*（与 verify.sh 版本共同构成基线句）
+
+def _baseline_stats(root: str, verify_checks: int):
+    issues: List[str] = []
+    stats: Dict[str, Any] = {}
     try:
         sys.path.insert(0, os.path.join(root, "desktop", "src"))
         from core import quality_baseline as qb  # type: ignore
-        stats["baseline_checks"] = int(getattr(qb, "EXPECTED_CHECKS", stats["verify_checks"]))
-        stats["baseline_pass"] = int(getattr(qb, "EXPECTED_PASS", 0))
-        stats["check_label"] = str(getattr(qb, "CHECK_LABEL", None)
-                                     or ("check1-" + str(stats["baseline_checks"])))
+        baseline_checks = int(getattr(qb, "EXPECTED_CHECKS", verify_checks))
+        baseline_pass = int(getattr(qb, "EXPECTED_PASS", 0))
+        check_label = str(getattr(qb, "CHECK_LABEL", None)
+                          or ("check1-" + str(baseline_checks)))
+        stats["check_label"] = check_label
     except Exception as exc:  # noqa: BLE001
-        stats["baseline_checks"] = stats["verify_checks"]
-        stats["baseline_pass"] = 0
+        baseline_checks = verify_checks
+        baseline_pass = 0
         issues.append("取不到 quality_baseline.EXPECTED_*：%s（基线句无法生成）" % exc)
-    if stats["baseline_checks"] != stats["verify_checks"]:
+    stats["baseline_checks"] = baseline_checks
+    stats["baseline_pass"] = baseline_pass
+    if baseline_checks != verify_checks:
         issues.append("基线 check 数 %d ≠ verify.sh 实扫 %d（同步 quality_baseline.EXPECTED_CHECKS"
-            "）"
-                      % (stats["baseline_checks"], stats["verify_checks"]))
+                      "）" % (baseline_checks, verify_checks))
+    return stats, issues
+
+
+def compute(root: str = ".") -> Tuple[Dict[str, Any], List[str]]:
+    issues: List[str] = []
+    stats: Dict[str, Any] = {}
+
+    reg_stats, reg_issues = _registry_stats(root)
+    stats.update(reg_stats)
+    issues += reg_issues
+    stats.update(_pipeline_stats(root))
+    pack_stats, pack_issues = _pack_dir_stats(root, stats["registered_packs"])
+    stats.update(pack_stats)
+    issues += pack_issues
+    stats.update(_asset_stats(root))
+    cat_stats, cat_issues = _catalog_stats(root)
+    stats.update(cat_stats)
+    issues += cat_issues
+    stats.update(_binding_stats(root))
+    stats.update(_library_stats(root))
+    verify_stats, verify_issues = _verify_sh_stats(root)
+    stats.update(verify_stats)
+    issues += verify_issues
+    # 质量基线真源：quality_baseline.EXPECTED_*（与 verify.sh 版本共同构成基线句）
+    base_stats, base_issues = _baseline_stats(root, stats["verify_checks"])
+    stats.update(base_stats)
+    issues += base_issues
 
     stats["schema"] = "nf-repo-stats/1"
     return stats, issues

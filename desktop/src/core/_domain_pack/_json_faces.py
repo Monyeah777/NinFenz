@@ -19,36 +19,8 @@ from ._io import (
 
 def domain_spec_json(spec: Dict[str, Any], root: str = ".") -> str:
     cat = standards_catalog(root)
-    subs = []
-    _bd = bindings_full(spec, cat)
     probe_dates: List[str] = []
-    for s in spec["subdivisions"]:
-        sid, why = _bd[s["id"]]["primary"]
-        anchors = []
-        for role in ("primary", "support"):
-            rid, rwhy = _bd[s["id"]][role]
-            if not rid:
-                continue
-            std = cat.get(rid) or {}
-            ev = std.get("evidence") or {}
-            if ev.get("probe_date"):
-                probe_dates.append(str(ev["probe_date"]))
-            anchors.append({
-                "ref": rid, "role": role, "why": rwhy,
-                "layer": std.get("layer", ""), "body": std.get("body", ""),
-                "reachable": bool(ev.get("reachable")),
-                "http_status": int(ev.get("http_status") or 0),
-                "probe_date": str(ev.get("probe_date") or ""),
-                "depends_on": list(std.get("depends_on") or []),
-            })
-        subs.append({
-            "id": s["id"], "name": s["name"], "definition": s["definition"],
-            "anchor": s["anchor"], "anchor_kind": s.get("anchor_kind", "spec"),
-            "anchor_status": int(s.get("anchor_status") or 0),
-            "standard_ref": sid, "standard_why": why,
-            "standards": anchors,
-            "check": s["check"], "pitfall": s["pitfall"],
-        })
+    subs = _spec_subdivisions(spec, cat, probe_dates)
     auth = authenticity(spec, cat)
     doc = {
         "kind": "nf-domain-spec/1",
@@ -74,6 +46,45 @@ def domain_spec_json(spec: Dict[str, Any], root: str = ".") -> str:
     return json.dumps(doc, ensure_ascii=False, indent=2) + "\n"
 
 
+def _spec_subdivisions(spec, cat, probe_dates):
+    """各细分的标准锚（主锚/辅锚）与口径字段 → 机读投影行。"""
+    subs = []
+    _bd = bindings_full(spec, cat)
+    for s in spec["subdivisions"]:
+        sid, why = _bd[s["id"]]["primary"]
+        anchors = _role_anchors(_bd[s["id"]], cat, probe_dates)
+        subs.append({
+            "id": s["id"], "name": s["name"], "definition": s["definition"],
+            "anchor": s["anchor"], "anchor_kind": s.get("anchor_kind", "spec"),
+            "anchor_status": int(s.get("anchor_status") or 0),
+            "standard_ref": sid, "standard_why": why,
+            "standards": anchors,
+            "check": s["check"], "pitfall": s["pitfall"],
+        })
+    return subs
+
+
+def _role_anchors(bd: Dict[str, Any], cat: Dict[str, Any],
+                  probe_dates: List[str]) -> List[Dict[str, Any]]:
+    """单细分的主锚 + 辅锚（可扩展标准目录条目）。"""
+    anchors: List[Dict[str, Any]] = []
+    for role in ("primary", "support"):
+        rid, rwhy = bd[role]
+        if not rid:
+            continue
+        std = cat.get(rid) or {}
+        ev = std.get("evidence") or {}
+        if ev.get("probe_date"):
+            probe_dates.append(str(ev["probe_date"]))
+        anchors.append({
+            "ref": rid, "role": role, "why": rwhy,
+            "layer": std.get("layer", ""), "body": std.get("body", ""),
+            "reachable": bool(ev.get("reachable")),
+            "http_status": int(ev.get("http_status") or 0),
+            "probe_date": str(ev.get("probe_date") or ""),
+            "depends_on": list(std.get("depends_on") or []),
+        })
+    return anchors
 
 
 def domain_spec_schema(spec: Dict[str, Any]) -> str:

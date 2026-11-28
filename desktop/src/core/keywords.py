@@ -71,10 +71,8 @@ def used_tags(root: str) -> Dict[str, List[str]]:
     return out
 
 
-def check(root: str = ".") -> List[str]:
+def _tag_table_issues(tags: List[Any]) -> List[str]:
     issues: List[str] = []
-    reg = load_registry(root)
-    tags = reg.get("tags") or []
     ids = [str(t.get("id")) for t in tags]
     if len(ids) != len(set(ids)):
         issues.append("标签 id 重复")
@@ -88,12 +86,20 @@ def check(root: str = ".") -> List[str]:
             issues.append("%s 缺 owner" % tid)
         if str(tag.get("status")) not in ("active", "planned", "retired"):
             issues.append("%s status 非法" % tid)
-    defined = _defined_tags(reg)
-    used = used_tags(root)
+    return issues
+
+
+def _orphan_tag_issues(defined: set, used: Dict[str, List[str]]) -> List[str]:
+    issues: List[str] = []
     for tag, places in used.items():
         if not _tag_known(tag, defined):
-            issues.append("孤儿标签 [%s]（%s）%s" % (tag, places[0], "修复指引：在 protocol/keywords.json 登记")
-                          )
+            issues.append("孤儿标签 [%s]（%s）%s" % (tag, places[0],
+                                                    "修复指引：在 protocol/keywords.json 登记"))
+    return issues
+
+
+def _index_issues(reg: Dict[str, Any], defined: set) -> List[str]:
+    issues: List[str] = []
     index = reg.get("keyword_index") or []
     if not index:
         issues.append("缺 keyword_index")
@@ -105,50 +111,99 @@ def check(root: str = ".") -> List[str]:
             issues.append("%s 缺 keywords" % tag)
         if not str(item.get("owner") or ""):
             issues.append("%s 缺 owner" % tag)
-    synonyms = reg.get("synonyms") or []
-    pairs = {(str(s.get("cn")), str(s.get("en"))) for s in synonyms}
+    return issues
+
+
+def _synonym_issues(reg: Dict[str, Any]) -> List[str]:
+    pairs = {(str(s.get("cn")), str(s.get("en"))) for s in (reg.get("synonyms") or [])}
+    issues: List[str] = []
     for cn, en in (("生产装配", "assembly"), ("规范", "spec"), ("契约", "contract"),
                    ("治理", "governance"), ("证据", "evidence"), ("信任等级", "trust level"),
                    ("不可抵赖", "non-repudiation")):
         if (cn, en) not in pairs:
             issues.append("中英对照缺：%s/%s" % (cn, en))
-    openings = reg.get("extension_openings") or []
+    return issues
+
+
+def _closed_evidence_issues(opening: Dict[str, Any], oid: str, root: str) -> List[str]:
+    issues: List[str] = []
+    evidence = opening.get("evidence") or []
+    if not evidence:
+        issues.append("%s 标 closed 但无证据（修复指引：给在场证据或退回 open）" % oid)
+    for rel in evidence:
+        if not (Path(root) / rel).exists():
+            issues.append("%s 证据不在场：%s" % (oid, rel))
+    return issues
+
+
+def _opening_row_issues(opening: Dict[str, Any], root: str) -> List[str]:
+    oid = str(opening.get("id"))
+    status = str(opening.get("status"))
+    issues: List[str] = []
+    if not oid.startswith("OPEN-"):
+        issues.append("%s 必须以 OPEN- 开头" % oid)
+    if status not in STATUSES:
+        issues.append("%s status 非法" % oid)
+    if not str(opening.get("owner") or ""):
+        issues.append("%s 缺 owner（OPEN 不得无名）" % oid)
+    if not str(opening.get("interface") or ""):
+        issues.append("%s 缺 interface" % oid)
+    if status == "closed":
+        issues += _closed_evidence_issues(opening, oid, root)
+    return issues
+
+
+def _opening_issues(openings: List[Any], root: str) -> List[str]:
+    issues: List[str] = []
     if len(openings) < 12:
         issues.append("扩展口少于 12（§18 表）")
     ids_open = [str(o.get("id")) for o in openings]
     if len(ids_open) != len(set(ids_open)):
         issues.append("扩展口 id 重复")
     for opening in openings:
-        oid = str(opening.get("id"))
-        status = str(opening.get("status"))
-        if not oid.startswith("OPEN-"):
-            issues.append("%s 必须以 OPEN- 开头" % oid)
-        if status not in STATUSES:
-            issues.append("%s status 非法" % oid)
-        if not str(opening.get("owner") or ""):
-            issues.append("%s 缺 owner（OPEN 不得无名）" % oid)
-        if not str(opening.get("interface") or ""):
-            issues.append("%s 缺 interface" % oid)
-        if status == "closed":
-            evidence = opening.get("evidence") or []
-            if not evidence:
-                issues.append("%s 标 closed 但无证据（修复指引：给在场证据或退回 open）" % oid)
-            for rel in evidence:
-                if not (Path(root) / rel).exists():
-                    issues.append("%s 证据不在场：%s" % (oid, rel))
-    # 禁用词需 [HONESTY] 或否定语境
+        issues += _opening_row_issues(opening, root)
+    return issues
+
+
+def _forbidden_line_issues(rel: str, lineno: int, line: str, forbidden: List[Any],
+                           negative: List[str], honesty_marker: Any) -> List[str]:
+    issues: List[str] = []
+    for phrase in forbidden:
+        if phrase in line and honesty_marker not in line:
+            if not any(word in line for word in negative):
+                issues.append("%s:%d 禁用词「%s」缺 [HONESTY]/否定语境"
+                              "（修复指引：改写或标注 [HONESTY]）" % (rel, lineno, phrase))
+    return issues
+
+
+def _forbidden_doc_issues(reg: Dict[str, Any], root: str) -> List[str]:
     forbidden = reg.get("forbidden_claims") or []
     negative = [str(w) for w in reg.get("negative_context") or []]
+    honesty_marker = reg.get("honesty_marker")
+    issues: List[str] = []
     for rel in reg.get("scan_docs") or []:
         path = Path(root) / rel
         if not path.is_file():
             continue
         for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            for phrase in forbidden:
-                if phrase in line and reg.get("honesty_marker") not in line:
-                    if not any(word in line for word in negative):
-                        issues.append("%s:%d 禁用词「%s」缺 [HONESTY]/否定语境"
-                                      "（修复指引：改写或标注 [HONESTY]）" % (rel, lineno, phrase))
+            issues += _forbidden_line_issues(rel, lineno, line, forbidden, negative, honesty_marker)
+    return issues
+
+
+def check(root: str = ".") -> List[str]:
+    issues: List[str] = []
+    reg = load_registry(root)
+    tags = reg.get("tags") or []
+    issues += _tag_table_issues(tags)
+    defined = _defined_tags(reg)
+    used = used_tags(root)
+    issues += _orphan_tag_issues(defined, used)
+    issues += _index_issues(reg, defined)
+    issues += _synonym_issues(reg)
+    openings = reg.get("extension_openings") or []
+    issues += _opening_issues(openings, root)
+    # 禁用词需 [HONESTY] 或否定语境
+    issues += _forbidden_doc_issues(reg, root)
     boundary = " ".join(str(x) for x in reg.get("claims_boundary") or [])
     if "不是认证" not in boundary:
         issues.append("claims_boundary 必须写明不是认证/合规声明")

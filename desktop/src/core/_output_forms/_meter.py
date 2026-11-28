@@ -3,6 +3,7 @@
 门面 core.output_forms 按原 API 重新导出；本文件只承载实现，不改变对外面。
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Sequence, Tuple
 
 import json
 
@@ -30,39 +31,54 @@ def meter(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     # 资产档面一次枚举（共享枚举器：走查/子树清单复用），替代「每个包各一次 glob」——
     # 实测本仓 111 个包各 glob 一次 `assets/*.md`（106 次落盘遍历），而这一面本来就要被
     # asset_density / 指纹走一遍。
-    prose_by_pkg: Dict[str, List[str]] = {}
+    prose_by_pkg = _prose_by_pkg(root)
+    for pkg in _pack_dirs(root):
+        stats["packages"][pkg] = _package_face(root, pkg, prose_by_pkg)
+    pkgs = stats["packages"]
+    if pkgs:
+        stats["totals"] = _totals(pkgs)
+    return [], stats
+
+
+def _prose_by_pkg(root: str) -> Dict[str, List[str]]:
+    """community/*/assets/*.md → {包名: 资产文件名}。"""
+    out: Dict[str, List[str]] = {}
     for rel in _csc.iter_files(root, "community/*/assets/*.md"):
         parts = rel.split("/")
         if len(parts) == 4 and parts[3] != "README.md":
-            prose_by_pkg.setdefault(parts[1], []).append(parts[3])
-    for pkg in _pack_dirs(root):
-        idx, _err = _read_json(_rel(root, "community/%s/%s" % (pkg, INDEX_REL)))
-        entries = (idx or {}).get("outputs") or []
-        mv = [e for e in entries if e.get("tier") in ("T2", "T3", "T4")]
-        fn_faces = [e for e in entries if e.get("tier") == "T4"]
-        prose = prose_by_pkg.get(pkg, [])
-        denom = len(mv) + len(prose)
-        stats["packages"][pkg] = {
-            "machine_verifiable": len(mv),
-            "functional": len(fn_faces),
-            "prose_assets": len(prose),
-            "machine_verifiable_ratio": round(len(mv) / denom, 4) if denom else 0.0,
-            "roles": _count([{"r": e.get("role")} for e in entries], "r"),
-            "tiers": _count([{"t": e.get("tier")} for e in entries], "t"),
-        }
-    pkgs = stats["packages"]
-    if pkgs:
-        stats["totals"] = {
-            "machine_verifiable": sum(p["machine_verifiable"] for p in pkgs.values()),
-            "functional": sum(p["functional"] for p in pkgs.values()),
-            "prose_assets": sum(p["prose_assets"] for p in pkgs.values()),
-            "machine_verifiable_ratio": round(
-                sum(p["machine_verifiable"] for p in pkgs.values())
-                / max(1,
- sum(p["machine_verifiable"] + p["prose_assets"] for p in pkgs.values())),
- 4),
-        }
-    return [], stats
+            out.setdefault(parts[1], []).append(parts[3])
+    return out
+
+
+def _package_face(root: str, pkg: str,
+                  prose_by_pkg: Dict[str, List[str]]) -> Dict[str, Any]:
+    """单包的机验率/功能面/角色档统计。"""
+    idx, _err = _read_json(_rel(root, "community/%s/%s" % (pkg, INDEX_REL)))
+    entries = (idx or {}).get("outputs") or []
+    mv = [e for e in entries if e.get("tier") in ("T2", "T3", "T4")]
+    fn_faces = [e for e in entries if e.get("tier") == "T4"]
+    prose = prose_by_pkg.get(pkg, [])
+    denom = len(mv) + len(prose)
+    return {
+        "machine_verifiable": len(mv),
+        "functional": len(fn_faces),
+        "prose_assets": len(prose),
+        "machine_verifiable_ratio": round(len(mv) / denom, 4) if denom else 0.0,
+        "roles": _count([{"r": e.get("role")} for e in entries], "r"),
+        "tiers": _count([{"t": e.get("tier")} for e in entries], "t"),
+    }
+
+
+def _totals(pkgs: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    """全仓合计（与单包口径同源）。"""
+    mv = sum(p["machine_verifiable"] for p in pkgs.values())
+    prose = sum(p["prose_assets"] for p in pkgs.values())
+    return {
+        "machine_verifiable": mv,
+        "functional": sum(p["functional"] for p in pkgs.values()),
+        "prose_assets": prose,
+        "machine_verifiable_ratio": round(mv / max(1, mv + prose), 4),
+    }
 
 
 

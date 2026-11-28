@@ -61,33 +61,58 @@ def _fingerprint_issues(trace: Dict[str, Any], root: Path) -> List[str]:
     return issues
 
 
+def _read_trace(trace_path: str):
+    raw, err = _read_bounded(Path(trace_path), MAX_TRACE_BYTES)
+    if err is not None:
+        return None, [err]
+    try:
+        trace = json_doc.loads(raw or "", None, what=str(trace_path), strict_constants=True)
+    except ValueError as exc:
+        return None, ["trace 不是合法 JSON：%s（修复指引：用 nf assemble --check --trace 产物）"
+                      % exc]
+    # 审计 N3（P2）：顶层非对象时此前会在 trace.get 抛 AttributeError，一路冒成「内部错误：
+    # 'list' object has no attribute 'get'」——设计好的诊断分支因此不可达。这里先判形状。
+    if not isinstance(trace, dict):
+        return None, ["trace 顶层不是 JSON 对象（实为 %s）"
+                      "（修复指引：喂 nf assemble --check --trace 落盘的 trace 件，"
+                      "形如 {tool, phase, source, requirement, ok}）" % type(trace).__name__]
+    return trace, []
+
+
+def _source_text(trace: Dict[str, Any], r: Path):
+    source = trace.get("source")
+    if not source:
+        return None, ["trace 缺 source（须由 nf assemble --check --trace 生成）"]
+    transcript = Path(source) if Path(source).is_absolute() else r / source
+    if not transcript.is_file():
+        return None, ["trace.source 文件不存在：%s" % source]
+    text, err = _read_bounded(transcript, MAX_SOURCE_BYTES)
+    if err is not None:
+        return None, [err]
+    return text, []
+
+
+def _round_verdict(trace: Dict[str, Any]):
+    """→ (不适用说明或 None, expected_ok, verdict_scope)。"""
+    scope = trace.get("rounds") if isinstance(trace.get("rounds"), dict) else None
+    if scope is not None and scope.get("checked") is False:
+        return (["trace 未含回合级判定（写时未加 --rounds）⇒ 不做漂移断言"], None, "none")
+    if scope is not None and scope.get("checked") and scope.get("ok") is not None:
+        return (None, bool(scope["ok"]), "rounds")
+    return (None, bool(trace.get("ok")), "overall")
+
+
 def analyze(trace_path: str, root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     r = Path(root)
     issues: List[str] = []
     # utf-8-sig：容忍外来件开头 BOM（审计 N4）——否则带 BOM 的 trace 被误报成「不是 JSON」。
-    raw, err = _read_bounded(Path(trace_path), MAX_TRACE_BYTES)
-    if err is not None:
-        return ([err], {})
-    try:
-        trace = json_doc.loads(raw or "", None, what=str(trace_path), strict_constants=True)
-    except ValueError as exc:
-        return (["trace 不是合法 JSON：%s（修复指引：用 nf assemble --check --trace 产物）" % exc], {})
-    # 审计 N3（P2）：顶层非对象时此前会在 trace.get 抛 AttributeError，一路冒成「内部错误：
-    # 'list' object has no attribute 'get'」——设计好的诊断分支因此不可达。这里先判形状。
-    if not isinstance(trace, dict):
-        return (["trace 顶层不是 JSON 对象（实为 %s）"
-                 "（修复指引：喂 nf assemble --check --trace 落盘的 trace 件，"
-                 "形如 {tool, phase, source, requirement, ok}）" % type(trace).__name__], {})
-    source = trace.get("source")
+    trace, load_issues = _read_trace(trace_path)
+    if trace is None:
+        return load_issues, {}
     requirement = trace.get("requirement") or ""
-    if not source:
-        return ["trace 缺 source（须由 nf assemble --check --trace 生成）"], {}
-    transcript = Path(source) if Path(source).is_absolute() else r / source
-    if not transcript.is_file():
-        return ["trace.source 文件不存在：%s" % source], {}
-    text, err = _read_bounded(transcript, MAX_SOURCE_BYTES)
-    if err is not None:
-        return ([err], {})
+    text, source_issues = _source_text(trace, r)
+    if text is None:
+        return source_issues, {}
 
     from core import assemble_plan as ap
     from core import round_drill as rd
@@ -100,17 +125,11 @@ def analyze(trace_path: str, root: str = ".") -> Tuple[List[str], Dict[str, Any]
     # `--rounds` 时才含回合级；新写法的 trace 逐字带 `rounds:{checked,ok}`。有它就用它
     # （checked=False ⇒ **不适用**，不做漂移断言，详见返回的 verdict_scope），
     # 老 trace（无该键）沿用总判定，保持向后兼容。
-    scope = trace.get("rounds") if isinstance(trace.get("rounds"), dict) else None
-    if scope is not None and scope.get("checked") is False:
-        return (["trace 未含回合级判定（写时未加 --rounds）⇒ 不做漂移断言"],
+    verdict_issues, expected_ok, verdict_scope = _round_verdict(trace)
+    if verdict_issues is not None:
+        return (verdict_issues,
                 {"transcript_turns": r_stats["turns"], "expected_ok": None,
                  "actual_ok": not r_issues, "verdict_scope": "none"})
-    if scope is not None and scope.get("checked") and scope.get("ok") is not None:
-        expected_ok = bool(scope["ok"])
-        verdict_scope = "rounds"
-    else:
-        expected_ok = bool(trace.get("ok"))
-        verdict_scope = "overall"
     actual_ok = not r_issues
     if actual_ok != expected_ok:
         issues.append("verdict 漂移：trace 记录 %s（口径=%s）· 重跑判定 %s（issue=%s）"

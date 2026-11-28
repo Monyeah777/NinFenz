@@ -46,26 +46,35 @@ def write_message(stream, msg: Dict[str, Any]) -> None:
         flush()
 
 
-def read_message(stream) -> Any:
-    """读一条 LSP 消息；EOF → None，坏帧 → BAD_FRAME（调用方据此回错误码后继续）。"""
-    src = binary_stream(stream)
+def _read_header(src) -> tuple[bool, Any]:
+    """读表头 → (是否非 EOF, content-length 或 BAD_FRAME)。"""
     length = None
     while True:
         line = src.readline(MAX_MESSAGE_BYTES + 1)
         if not line:
-            return None
+            return False, None
         if len(line) > MAX_MESSAGE_BYTES:
-            return BAD_FRAME           # 表头行本身超限 ⇒ 直接判坏帧（内存有界，不读完）
+            return True, BAD_FRAME           # 表头行本身超限 ⇒ 直接判坏帧（内存有界，不读完）
         if isinstance(line, bytes):
             line = line.decode("utf-8", "replace")
         line = line.strip()
         if not line:
-            break
+            return True, length
         if line.lower().startswith("content-length:"):
             try:
                 length = int(line.split(":", 1)[1].strip())
             except ValueError:
-                return BAD_FRAME
+                return True, BAD_FRAME
+
+
+def read_message(stream) -> Any:
+    """读一条 LSP 消息；EOF → None，坏帧 → BAD_FRAME（调用方据此回错误码后继续）。"""
+    src = binary_stream(stream)
+    has_header, length = _read_header(src)
+    if not has_header:
+        return None
+    if length is BAD_FRAME:
+        return BAD_FRAME
     if length is None or length < 0 or length > MAX_MESSAGE_BYTES:
         return BAD_FRAME
     body = src.read(length)

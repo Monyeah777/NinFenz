@@ -70,44 +70,68 @@ def verify_ledger_dir(ledger_dir: str, ledger_path: str | None = None) -> tuple:
     seen_keys = set()
     seen_files = set()
     for e in entries:
-        key = str(e.get("key", "") or "")
-        frel = str(e.get("file", "") or "").replace("\\", "/")
-        if not key:
-            issues.append("[%s] 条目缺 key" % lp)
-        if key in seen_keys:
-            issues.append("[%s] 键重复（键无孤儿前提：键唯一）: %s" % (lp, key))
-        seen_keys.add(key)
-        if not frel or frel in seen_files:
-            issues.append("[%s] 文件重复/为空: %r" % (lp, frel))
-            continue
-        seen_files.add(frel)
-        try:
-            full = _safe_join(ledger_dir, frel)
-        except AssetLedgerError as exc:
-            issues.append(f"[{lp}] {exc}")
-            continue
-        if not os.path.isfile(full):
-            issues.append("[%s] 在册文件缺失（可发现性断裂）: %s" % (lp, frel))
-            continue
-        with open(full, encoding="utf-8") as f:
-            text = f.read()
-        try:
-            header = parse_header(text)
-        except AssetLedgerError as exc:
-            issues.append("[%s] %s" % (lp, exc))
-            continue
-        if header is None:
-            issues.append("[%s] 台账条目缺文件头（双源不一致）: %s" % (lp, frel))
-        elif header["key"] != key or header["status"] != e.get("status"):
-            issues.append("[%s] 文件头与台账不一致（台账 key=%s status=%s / 头=%s）: %s"
-                          % (lp, key, e.get("status"), header, frel))
-        if not str(e.get("source") or "").strip():
-            issues.append("[%s] 条目缺 source（不可溯源）: %s" % (lp, key))
-        if not str(e.get("version") or "").strip():
-            issues.append("[%s] 条目缺 version（版本位必填）: %s" % (lp, key))
-        if e.get("status") not in VALID_STATUS:
-            issues.append("[%s] status 非法: %s" % (lp, e.get("status")))
+        _verify_entry(lp, ledger_dir, e, issues, seen_keys, seen_files)
     # 反向闭合：目录内带头 md 的键必须 ∈ 台账（键无孤儿）
+    _scan_orphans(lp, ledger_dir, issues, stats, seen_files)
+    return issues, stats
+
+
+def _verify_entry(lp: str, ledger_dir: str, e: dict, issues: list[str],
+                  seen_keys: set, seen_files: set) -> None:
+    """台账单条目的正/反向校验（键唯一、文件在场、文件头一致、字段齐全）。"""
+    key = str(e.get("key", "") or "")
+    frel = str(e.get("file", "") or "").replace("\\", "/")
+    if not key:
+        issues.append("[%s] 条目缺 key" % lp)
+    if key in seen_keys:
+        issues.append("[%s] 键重复（键无孤儿前提：键唯一）: %s" % (lp, key))
+    seen_keys.add(key)
+    if not frel or frel in seen_files:
+        issues.append("[%s] 文件重复/为空: %r" % (lp, frel))
+        return
+    seen_files.add(frel)
+    try:
+        full = _safe_join(ledger_dir, frel)
+    except AssetLedgerError as exc:
+        issues.append(f"[{lp}] {exc}")
+        return
+    if not os.path.isfile(full):
+        issues.append("[%s] 在册文件缺失（可发现性断裂）: %s" % (lp, frel))
+        return
+    with open(full, encoding="utf-8") as f:
+        text = f.read()
+    _entry_header_issues(lp, e, key, frel, text, issues)
+    _entry_field_issues(lp, e, key, issues)
+
+
+def _entry_header_issues(lp: str, e: dict, key: str, frel: str,
+                         text: str, issues: list[str]) -> None:
+    """文件头在场且与台账一致（双源核对）。"""
+    try:
+        header = parse_header(text)
+    except AssetLedgerError as exc:
+        issues.append("[%s] %s" % (lp, exc))
+        return
+    if header is None:
+        issues.append("[%s] 台账条目缺文件头（双源不一致）: %s" % (lp, frel))
+    elif header["key"] != key or header["status"] != e.get("status"):
+        issues.append("[%s] 文件头与台账不一致（台账 key=%s status=%s / 头=%s）: %s"
+                      % (lp, key, e.get("status"), header, frel))
+
+
+def _entry_field_issues(lp: str, e: dict, key: str, issues: list[str]) -> None:
+    """source / version / status 必填与词表。"""
+    if not str(e.get("source") or "").strip():
+        issues.append("[%s] 条目缺 source（不可溯源）: %s" % (lp, key))
+    if not str(e.get("version") or "").strip():
+        issues.append("[%s] 条目缺 version（版本位必填）: %s" % (lp, key))
+    if e.get("status") not in VALID_STATUS:
+        issues.append("[%s] status 非法: %s" % (lp, e.get("status")))
+
+
+def _scan_orphans(lp: str, ledger_dir: str, issues: list[str], stats: dict,
+                  seen_files: set) -> None:
+    """反向闭合：目录内带头 md 的键必须 ∈ 台账（键无孤儿）。"""
     for cand in _iter_md_candidates(ledger_dir):
         rel = os.path.relpath(cand, ledger_dir).replace("\\", "/")
         if rel in seen_files:
@@ -125,7 +149,6 @@ def verify_ledger_dir(ledger_dir: str, ledger_path: str | None = None) -> tuple:
         stats["orphans"] += 1
         issues.append("[%s] 孤儿文件头（键不在台账）: %s（key=%s）——nf asset rm 后需手动清理旧头"
                       % (lp, rel, header["key"]))
-    return issues, stats
 
 
 def _walk_repo(root: str):

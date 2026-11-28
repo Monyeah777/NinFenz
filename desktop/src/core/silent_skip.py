@@ -59,6 +59,48 @@ def _falsy(v) -> bool:
         getattr(v, "elts", None) or getattr(v, "keys", None))
 
 
+def _parents(tree) -> dict:
+    parents = {}
+    for n in ast.walk(tree):
+        for ch in ast.iter_child_nodes(n):
+            parents[ch] = n
+    return parents
+
+
+def _enclosing_fn(node: ast.AST, parents: dict) -> ast.AST:
+    fn: ast.AST = node
+    while fn in parents and not isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        fn = parents[fn]
+    return fn
+
+
+def _fn_doc(fn: ast.AST) -> str:
+    return ast.get_docstring(fn) or "" if isinstance(
+        fn, (ast.FunctionDef, ast.AsyncFunctionDef)) else ""
+
+
+def _silent_handler(node: ast.Try, h: ast.ExceptHandler, lines: list, doc: str) -> bool:
+    body = h.body
+    if len(body) != 1 or not isinstance(body[0], ast.Return):
+        return False
+    if not _falsy(body[0].value):
+        return False
+    if any(isinstance(x, ast.Constant) and isinstance(x.value, str)
+           for x in ast.walk(body[0])):
+        return False                   # 带了消息 ⇒ 不是静默
+    if _handler_has_comment(node, body, lines):
+        return False                   # 行内理由
+    if any(m in doc for m in DOC_MARKS):
+        return False                   # 文档级理由
+    return True
+
+
+def _handler_has_comment(node: ast.Try, body: list, lines: list) -> bool:
+    """该 except/try/其上三行是否带注释（行内理由）。"""
+    lo, hi = node.lineno - 1, body[0].lineno - 1
+    return not any("#" in ln for ln in lines[lo:hi + 1] + lines[max(0, lo - 3):lo])
+
+
 def silent_returns(text: str) -> list:
     """→ `except → return <空值>` **且完全不留痕**的站点（纯函数）。
 
@@ -71,32 +113,13 @@ def silent_returns(text: str) -> list:
         tree = ast.parse(text)
     except SyntaxError:                    # 同上：交给语法级判据
         return []
-    parents = {}
-    for n in ast.walk(tree):
-        for ch in ast.iter_child_nodes(n):
-            parents[ch] = n
+    parents = _parents(tree)
     out = []
     for node in ast.walk(tree):
         if not isinstance(node, ast.Try):
             continue
-        fn: ast.AST = node
-        while fn in parents and not isinstance(fn, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            fn = parents[fn]
-        doc = ast.get_docstring(fn) or "" if isinstance(
-            fn, (ast.FunctionDef, ast.AsyncFunctionDef)) else ""
+        doc = _fn_doc(_enclosing_fn(node, parents))
         for h in node.handlers:
-            body = h.body
-            if len(body) != 1 or not isinstance(body[0], ast.Return):
-                continue
-            if not _falsy(body[0].value):
-                continue
-            if any(isinstance(x, ast.Constant) and isinstance(x.value, str)
-                   for x in ast.walk(body[0])):
-                continue                   # 带了消息 ⇒ 不是静默
-            lo, hi = node.lineno - 1, body[0].lineno - 1
-            if any("#" in ln for ln in lines[lo:hi + 1] + lines[max(0, lo - 3):lo]):
-                continue                   # 行内理由
-            if any(m in doc for m in DOC_MARKS):
-                continue                   # 文档级理由
-            out.append((node.lineno, h.lineno))
+            if _silent_handler(node, h, lines, doc):
+                out.append((node.lineno, h.lineno))
     return out

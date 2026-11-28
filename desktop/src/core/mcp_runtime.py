@@ -128,13 +128,7 @@ from ._mcp._wire import (
 )
 
 
-def load_snapshot(path: str) -> Dict[str, Any]:
-    """读 mcp.json 静态快照 → 运行时数据源 dict（mcp{name, version, resources[]}）。
-
-    形状不合规一律抛**带修复指引的 ValueError**（用户输入问题不得冒成「内部错误」——
-    实测修复前：不存在 / 非法 JSON / 缺 mcp / `resources` 非列表，四种都报「内部错误」rc=1）。
-    文件不存在抛 `OSError`（由调用方给指引）。
-    """
+def _read_snapshot(path: str) -> Dict[str, Any]:
     p = Path(path)
     try:
         with p.open("rb") as fh:
@@ -143,34 +137,53 @@ def load_snapshot(path: str) -> Dict[str, Any]:
             raise ValueError(f"快照超过上限 {MAX_SNAPSHOT_BYTES} 字节"
                              "（修复指引：删除未使用资源后重新导出）")
         # 用单一实现（N11）：顶层形状在下方就地判；这里只要「合法 JSON 才回」。
-        data = json_doc.loads(raw.decode("utf-8"), None, what=path)
+        return json_doc.loads(raw.decode("utf-8"), None, what=path)
     except OSError:
         raise
     except ValueError as exc:
         raise ValueError("快照不是合法 JSON：%s（修复指引：用 `nf run --fmt mcp --dest <目录>` 重生"
-            "成）"
-                         % exc) from exc
+                         "成）" % exc) from exc
+
+
+def _snapshot_resources(data: Any, p: Path) -> List[Any]:
     if not isinstance(data, dict) or "mcp" not in data:
         raise ValueError("快照缺 mcp 顶层键（非 mcp.json 产物）：%s"
                          "（修复指引：用 `nf run --fmt mcp` 重生成；或直接 `nf serve` 走实时仓库面"
-                             "）" % p)
+                         "）" % p)
     if not isinstance(data.get("mcp"), dict):
         raise ValueError("快照的 mcp 键须为对象（修复指引：同上）")
     resources = data["mcp"].get("resources") or []
     if not isinstance(resources, list):
         raise ValueError("快照的 mcp.resources 须为列表（修复指引：同上）")
+    return resources
+
+
+def _check_resources(resources: List[Any]) -> None:
     for idx, item in enumerate(resources, 1):
         if not isinstance(item, dict) or not str(item.get("uri") or "").strip():
             raise ValueError(f"快照第 {idx} 条 resource 缺 uri 或不是对象（修复指引：同上）")
         text = item.get("text")
-        if text is not None:
-            if not isinstance(text, str):
-                raise ValueError(f"快照第 {idx} 条 resource.text 须为字符串（修复指引：同上）")
-            if len(text.encode()) > MAX_SNAPSHOT_RESOURCE_TEXT_BYTES:
-                raise ValueError(
-                    f"快照第 {idx} 条 resource.text 超过上限 "
-                    f"{MAX_SNAPSHOT_RESOURCE_TEXT_BYTES} 字节（修复指引：拆分资源）"
-                )
+        if text is None:
+            continue
+        if not isinstance(text, str):
+            raise ValueError(f"快照第 {idx} 条 resource.text 须为字符串（修复指引：同上）")
+        if len(text.encode()) > MAX_SNAPSHOT_RESOURCE_TEXT_BYTES:
+            raise ValueError(
+                f"快照第 {idx} 条 resource.text 超过上限 "
+                f"{MAX_SNAPSHOT_RESOURCE_TEXT_BYTES} 字节（修复指引：拆分资源）"
+            )
+
+
+def load_snapshot(path: str) -> Dict[str, Any]:
+    """读 mcp.json 静态快照 → 运行时数据源 dict（mcp{name, version, resources[]}）。
+
+    形状不合规一律抛**带修复指引的 ValueError**（用户输入问题不得冒成「内部错误」——
+    实测修复前：不存在 / 非法 JSON / 缺 mcp / `resources` 非列表，四种都报「内部错误」rc=1）。
+    文件不存在抛 `OSError`（由调用方给指引）。
+    """
+    p = Path(path)
+    data = _read_snapshot(path)
+    _check_resources(_snapshot_resources(data, p))
     return data
 
 

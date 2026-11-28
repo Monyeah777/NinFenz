@@ -41,6 +41,67 @@ def _surface_params(items) -> list:
 
 
 
+def _surface_source() -> dict:
+    """source 段：拷贝一份——不许把模块级常量交出去当可写对象。"""
+    return {k: (list(v) if isinstance(v, list) else v)
+            for k, v in SURFACE_SOURCE.items()}
+
+
+def _surface_action(a: dict) -> dict:
+    """单动作目录项（视图侧不许私加语义）。"""
+    return {"key": str(a["key"]), "title": str(a["title"]),
+            "argv": [str(t) for t in a.get("argv") or ()],
+            "params": _surface_params(a.get("params")),
+            "note": str(a.get("note") or "")}
+
+
+def _surface_zone(z: dict) -> dict:
+    """单能力区（`forms: True` = 本区动作由 FORMS 投影，视图据此识别表单区）。"""
+    return {"key": str(z["key"]), "id": str(z["id"]), "title": str(z["title"]),
+            "family": str(z.get("family") or ""), "summary": str(z.get("summary") or ""),
+            "examples": [str(e) for e in z.get("examples") or ()],
+            "forms": bool(z.get("forms")),
+            "actions": [_surface_action(a) for a in zone_action_dicts(z)]}
+
+
+def _surface_zones() -> list:
+    return [_surface_zone(z) for z in ZONES]
+
+
+def _surface_family(f: dict) -> dict:
+    return {"id": str(f["id"]), "name": str(f["name"]),
+            "summary": str(f.get("summary") or ""),
+            "commands": [str(c) for c in f.get("commands") or ()]}
+
+
+def _surface_families() -> list:
+    return [_surface_family(f) for f in FAMILIES]
+
+
+def _surface_step(s: dict) -> dict:
+    return {"key": str(s["key"]), "prompt": str(s.get("prompt") or ""),
+            "required": bool(s.get("required")),
+            "hint": str(s.get("hint") or "")}
+
+
+def _surface_form(f: dict) -> dict:
+    return {"id": str(f["id"]), "title": str(f["title"]),
+            "summary": str(f.get("summary") or ""),
+            "steps": [_surface_step(s) for s in f.get("steps") or ()],
+            "argv": [str(t) for t in f.get("argv") or ()]}
+
+
+def _surface_forms() -> list:
+    return [_surface_form(f) for f in FORMS]
+
+
+def _surface_gates() -> dict:
+    """写盘闸门三表（flags / verbs / pairs），逐项字符串化。"""
+    return {"flags": [str(x) for x in CONFIRM_FLAGS],
+            "verbs": [[str(a), str(b)] for a, b in CONFIRM_VERBS],
+            "pairs": [[str(a), str(b)] for a, b in CONFIRM_FLAG_PAIRS]}
+
+
 def surface_payload(commands=(), root_flags=()) -> dict:
     """终端面机器快照——**唯一**投影源，四个视图都由它派生（JSON 原生类型，可序列化）。
 
@@ -49,42 +110,16 @@ def surface_payload(commands=(), root_flags=()) -> dict:
     不直接执行的动词与指引 / `commands`·`root_flags` 来自 argparse 面（存在性真源）。
     `digest` 是除自身外全量的规范摘要——视图侧可用它做一次廉价对账。
     """
-    zones = [{"key": str(z["key"]), "id": str(z["id"]), "title": str(z["title"]),
-              "family": str(z.get("family") or ""), "summary": str(z.get("summary") or ""),
-              "examples": [str(e) for e in z.get("examples") or ()],
-              # `forms: True` = 本区动作由 FORMS 投影（视图据此识别表单区，不必猜 id）
-              "forms": bool(z.get("forms")),
-              "actions": [{"key": str(a["key"]), "title": str(a["title"]),
-                           "argv": [str(t) for t in a.get("argv") or ()],
-                           "params": _surface_params(a.get("params")),
-                           "note": str(a.get("note") or "")}
-                          for a in zone_action_dicts(z)]}
-             for z in ZONES]
-    families = [{"id": str(f["id"]), "name": str(f["name"]),
-                 "summary": str(f.get("summary") or ""),
-                 "commands": [str(c) for c in f.get("commands") or ()]}
-                for f in FAMILIES]
-    forms = [{"id": str(f["id"]), "title": str(f["title"]), "summary": str(f.get("summary") or ""),
-              "steps": [{"key": str(s["key"]), "prompt": str(s.get("prompt") or ""),
-                         "required": bool(s.get("required")),
-                         "hint": str(s.get("hint") or "")}
-                        for s in f.get("steps") or ()],
-              "argv": [str(t) for t in f.get("argv") or ()]}
-             for f in FORMS]
     payload = {
         "kind": "nf-terminal-surface",
         "schema": SURFACE_SCHEMA,
-        # 拷贝一份：投影是可被调用方改写的数据，不许把模块级常量交出去当可写对象
-        "source": {k: (list(v) if isinstance(v, list) else v)
-                   for k, v in SURFACE_SOURCE.items()},
+        "source": _surface_source(),
         "commands": sorted(str(c) for c in commands or ()),
         "root_flags": sorted(str(f) for f in root_flags or ()),
-        "zones": zones,
-        "families": families,
-        "forms": forms,
-        "gates": {"flags": [str(x) for x in CONFIRM_FLAGS],
-                  "verbs": [[str(a), str(b)] for a, b in CONFIRM_VERBS],
-                  "pairs": [[str(a), str(b)] for a, b in CONFIRM_FLAG_PAIRS]},
+        "zones": _surface_zones(),
+        "families": _surface_families(),
+        "forms": _surface_forms(),
+        "gates": _surface_gates(),
         "blocked": {str(k): str(v) for k, v in sorted(BLOCKED_IN_SHELL.items())},
     }
     payload["digest"] = surface_digest(payload)
@@ -148,19 +183,31 @@ def surface_sync_issues(module_text: str, commands=(), root_flags=()) -> list:
 
 
 
-def render_surface(payload, width=None, color: bool = False) -> str:
-    """人读面：逐区列出动作与示例条数（机器面用 `--surface --json`）。"""
-    w = term_width(width)
-    lines = [style("== NF 终端面投影（%s · 命令 %d · 能力族 %d · 表单 %d）=="
-                   % (payload.get("schema"), len(payload.get("commands") or []),
-                      len(payload.get("families") or []), len(payload.get("forms") or [])),
-                   "head", color)]
+def _surface_head(payload, color: bool) -> str:
+    """人读面首行：投影版本 + 命令/能力族/表单计数。"""
+    return style("== NF 终端面投影（%s · 命令 %d · 能力族 %d · 表单 %d）=="
+                 % (payload.get("schema"), len(payload.get("commands") or []),
+                    len(payload.get("families") or []), len(payload.get("forms") or [])),
+                 "head", color)
+
+
+def _surface_zone_lines(payload, w, color: bool) -> list:
+    """逐区一行：区间标识 + 族/动作数/动作标题。"""
+    lines = []
     for z in payload.get("zones") or []:
         acts = z.get("actions") or []
         lines.append(_row("[%s] %s" % (z["key"], z["title"]),
                           "%s · 动作 %d：%s" % (z.get("family") or "", len(acts),
                                                 "、".join(str(a["title"]) for a in acts)),
                           w, color))
+    return lines
+
+
+def render_surface(payload, width=None, color: bool = False) -> str:
+    """人读面：逐区列出动作与示例条数（机器面用 `--surface --json`）。"""
+    w = term_width(width)
+    lines = [_surface_head(payload, color)]
+    lines.extend(_surface_zone_lines(payload, w, color))
     g = payload.get("gates") or {}
     lines.append("  写盘闸门：旗标 %d · 动词 %d · 命令+旗标 %d · 会话内不直跑 %d"
                  % (len(g.get("flags") or []), len(g.get("verbs") or []),

@@ -81,6 +81,36 @@ def verify_reproducible(root: str = ".") -> tuple:
     return issues, stats
 
 
+def _verdict(a: dict, b: dict, removed: list) -> str:
+    if a.get("doc_id") and b.get("doc_id") and a["doc_id"] != b["doc_id"]:
+        return "破坏（文档编号变更）"
+    if removed:
+        return "需评审（存在移除项：引用/章节收缩）"
+    if a.get("version") != b.get("version"):
+        return "兼容（版本演进）"
+    return "兼容"
+
+
+def _impact(a: dict, b: dict, removed_any: list, added_any: list) -> str:
+    # 43 A3 —— 影响度三档：bump > additive > editorial（protocol/EXTENSION.md 判据表）
+    version_bump = a.get("version") != b.get("version")
+    if a.get("doc_id") != b.get("doc_id") or removed_any or version_bump:
+        return "bump"
+    if added_any:
+        return "additive"
+    return "editorial"
+
+
+def _change_groups(changes: list) -> tuple[list, list, list]:
+    removed = [
+        c for c in changes
+        if c["kind"] == "移除" and c["field"] in ("refs", "headings", "field_paths")
+    ]
+    removed_any = [c for c in changes if c["kind"] == "移除"]
+    added_any = [c for c in changes if c["kind"] == "新增"]
+    return removed, removed_any, added_any
+
+
 def diff_signatures(a: dict, b: dict) -> dict:
     """C2：任意两签名 → 字段级差异 + 兼容判定（判定规则自含文档化）。"""
     changes = []
@@ -98,27 +128,7 @@ def diff_signatures(a: dict, b: dict) -> dict:
             changes.append({"field": f, "from": x, "to": None, "kind": "移除"})
         for x in sorted(sb - sa):
             changes.append({"field": f, "from": None, "to": x, "kind": "新增"})
-    removed = [
-        c for c in changes
-        if c["kind"] == "移除" and c["field"] in ("refs", "headings", "field_paths")
-    ]
-    removed_any = [c for c in changes if c["kind"] == "移除"]
-    added_any = [c for c in changes if c["kind"] == "新增"]
-    if a.get("doc_id") and b.get("doc_id") and a["doc_id"] != b["doc_id"]:
-        verdict = "破坏（文档编号变更）"
-    elif removed:
-        verdict = "需评审（存在移除项：引用/章节收缩）"
-    elif a.get("version") != b.get("version"):
-        verdict = "兼容（版本演进）"
-    else:
-        verdict = "兼容"
-    # 43 A3 —— 影响度三档：bump > additive > editorial（protocol/EXTENSION.md 判据表）
-    version_bump = a.get("version") != b.get("version")
-    if a.get("doc_id") != b.get("doc_id") or removed_any or version_bump:
-        impact = "bump"
-    elif added_any:
-        impact = "additive"
-    else:
-        impact = "editorial"
+    removed, removed_any, added_any = _change_groups(changes)
     return {"from": a.get("path"), "to": b.get("path"),
-            "verdict": verdict, "impact": impact, "changes": changes}
+            "verdict": _verdict(a, b, removed),
+            "impact": _impact(a, b, removed_any, added_any), "changes": changes}

@@ -108,22 +108,41 @@ def check_anchor(entries: Sequence[dict[str, Any]], meta: dict[str, Any],
     declared = meta.get("anchor")
     if isinstance(declared, dict) and declared:
         res["anchor_ref"] = {"count": declared.get("count"), "head": declared.get("head")}
+    ctx = _anchor_precheck(anchor, res)
+    if ctx is None:
+        return
+    cnt, head = ctx
+    if res["anchor_ref"] and _anchor_ref_mismatch(res["anchor_ref"], cnt, head):
+        res["issues"].append("包内 anchor 与外部锚点不一致（" + GUIDE +
+                             "声称的锚点与证据互相矛盾——请以外部锚点为准重新打包）")
+        return
+    _anchor_chain(entries, cnt, head, res)
+
+
+def _anchor_precheck(anchor, res: dict[str, Any]):
+    """锚点材料形状校验 → (count, head) 或 None（不判死，已写 issue/warning）。"""
     if anchor is None:
         if res["anchor_ref"]:
             res["warnings"].append("包声明了外部锚点但未提供锚点材料（" + GUIDE +
                                    "无法证明未被截断：请向发布方索要锚点文件并加 --anchor）")
-        return
+        return None
     cnt = anchor.get("count")
     head = str(anchor.get("head") or "")
     if not isinstance(cnt, int) or cnt < 0 or not head:
         res["issues"].append("锚点材料形状不对（" + GUIDE +
                              "需要 {count: 非负整数, head: 非空字符串}）")
-        return
-    if res["anchor_ref"] and (res["anchor_ref"].get("count") != cnt
-                               or res["anchor_ref"].get("head") != head):
-        res["issues"].append("包内 anchor 与外部锚点不一致（" + GUIDE +
-                             "声称的锚点与证据互相矛盾——请以外部锚点为准重新打包）")
-        return
+        return None
+    return cnt, head
+
+
+def _anchor_ref_mismatch(ref: dict[str, Any], cnt: Any, head: str) -> bool:
+    """包内声明的 anchor 与外部锚点材料是否矛盾。"""
+    return ref.get("count") != cnt or ref.get("head") != head
+
+
+def _anchor_chain(entries: Sequence[dict[str, Any]], cnt: int, head: str,
+                  res: dict[str, Any]) -> None:
+    """截断检查 + 链头一致性（通过则标记 verified）。"""
     if len(entries) < cnt:
         res["issues"].append(f"证据包被截断：包只有 {len(entries)} 条，锚点记录 {cnt} 条"
                              f"（{GUIDE}截断的历史不能当现在——请索要完整包）")

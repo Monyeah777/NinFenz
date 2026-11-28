@@ -56,75 +56,212 @@ def _exists(root: str, rel: str) -> bool:
     return (Path(root) / str(rel)).exists()
 
 
-def validate_claims(doc: Dict[str, Any], root: str = ".") -> List[str]:
-    issues: List[str] = []
+def _goals_head_issues(doc: Dict[str, Any]) -> List[str]:
+    """goals 清单与 id 完整性判据。"""
     goals = doc.get("goals") or []
     gids = [str(g.get("id")) for g in goals if isinstance(g, dict)]
     if gids != list(GOALS):
-        issues.append("goals 必须恰为 %s（实际 %s；%s 补/改）" % (list(GOALS), gids, GUIDE))
+        return ["goals 必须恰为 %s（实际 %s；%s 补/改）" % (list(GOALS), gids, GUIDE)]
+    return []
+
+
+def _arguments_head_issues(doc: Dict[str, Any]) -> List[str]:
+    """arguments 清单与 id 唯一性判据。"""
     args = doc.get("arguments") or []
     aids = [str(a.get("id")) for a in args if isinstance(a, dict)]
+    out: List[str] = []
     if aids != list(ARGUMENTS):
-        issues.append("arguments 必须恰为 %s（实际 %s）" % (list(ARGUMENTS), aids))
+        out.append("arguments 必须恰为 %s（实际 %s）" % (list(ARGUMENTS), aids))
     if len(aids) != len(set(aids)):
-        issues.append("argument id 重复：%s" % aids)
+        out.append("argument id 重复：%s" % aids)
+    return out
+
+
+def _claim_graph(doc: Dict[str, Any]) -> Tuple[List[Any], Dict[str, Any], Dict[str, Any]]:
+    """goals / argument id→对象 / 缺口 id→对象 三视图。"""
+    goals = doc.get("goals") or []
+    args = doc.get("arguments") or []
     arg_map = {str(a.get("id")): a for a in args if isinstance(a, dict)}
-    for goal in goals:
-        if not isinstance(goal, dict):
-            issues.append("goals 含非对象")
-            continue
-        gid = str(goal.get("id"))
-        if not str(goal.get("claim") or "").strip():
-            issues.append("%s 缺 claim" % gid)
-        if str(goal.get("status")) not in STATUSES:
-            issues.append("%s 的 status 非法：%s" % (gid, goal.get("status")))
-        for aid in goal.get("arguments") or []:
-            if aid not in arg_map:
-                issues.append("%s 引用了不存在的论证：%s" % (gid, aid))
-        for gap in goal.get("open") or []:
-            if not any(str(g.get("id")) == gap for g in doc.get("gaps") or []):
-                issues.append("%s 的 open 缺口未在 gaps 登记：%s" % (gid, gap))
     gaps = {str(g.get("id")): g for g in doc.get("gaps") or [] if isinstance(g, dict)}
-    for gap_id, gap in gaps.items():
-        if not str(gap.get("text") or "").strip():
-            issues.append("缺口 %s 缺 text" % gap_id)
-        if not str(gap.get("owner") or "").strip():
-            issues.append("缺口 %s 缺 owner（%s 未关闭项必须有 owner）" % (gap_id, GUIDE))
-        if str(gap.get("status")) not in ("open", "accepted-risk", "closed"):
-            issues.append("缺口 %s 的 status 非法：%s" % (gap_id, gap.get("status")))
-    for aid, arg in arg_map.items():
-        if str(arg.get("status")) not in STATUSES:
-            issues.append("%s 的 status 非法：%s" % (aid, arg.get("status")))
-        evidence = arg.get("evidence") or []
-        if not isinstance(evidence, list) or not evidence:
-            issues.append("%s 缺 evidence（%s 论证必须有真实证据）" % (aid, GUIDE))
-        for rel in evidence:
-            if not _exists(root, str(rel)):
-                issues.append("%s 的 evidence 不在场：%s" % (aid, rel))
-        if str(arg.get("status")) == "supported":
-            if len(evidence) < 2:
-                issues.append("%s 标 supported 但证据少于 2 件" % aid)
-            if not any(str(x).startswith(TEST_EVIDENCE) for x in evidence):
-                issues.append("%s 标 supported 但缺测试/门禁证据（%s 测试通过不能替代论证）"
-                              % (aid, GUIDE))
-        else:
-            open_ref = str(arg.get("open") or "")
-            if not open_ref:
-                issues.append("%s 标 %s 但缺 open（缺口 id）" % (aid, arg.get("status")))
-            elif open_ref not in gaps:
-                issues.append("%s 的 open 缺口未在 gaps 登记：%s" % (aid, open_ref))
-        if not str(arg.get("assumption") or "").strip():
-            issues.append("%s 缺 assumption（论证须写成立假设）" % aid)
-        if not str(arg.get("rebuttal") or "").strip():
-            issues.append("%s 缺 rebuttal（论证须可被反驳）" % aid)
+    return goals, arg_map, gaps
+
+
+def _goal_gap_issues(gid: str, goal: Dict[str, Any], doc: Dict[str, Any]) -> List[str]:
+    """目标 open 缺口必须在 gaps 登记。"""
+    out: List[str] = []
+    for gap in goal.get("open") or []:
+        if not any(str(g.get("id")) == gap for g in doc.get("gaps") or []):
+            out.append("%s 的 open 缺口未在 gaps 登记：%s" % (gid, gap))
+    return out
+
+
+def _goal_issues(goal: Any, arg_map: Dict[str, Any], doc: Dict[str, Any]) -> List[str]:
+    """单目标判据（claim/status/引用论证/open 缺口登记）。"""
+    if not isinstance(goal, dict):
+        return ["goals 含非对象"]
+    gid = str(goal.get("id"))
+    out: List[str] = []
+    if not str(goal.get("claim") or "").strip():
+        out.append("%s 缺 claim" % gid)
+    if str(goal.get("status")) not in STATUSES:
+        out.append("%s 的 status 非法：%s" % (gid, goal.get("status")))
+    for aid in goal.get("arguments") or []:
+        if aid not in arg_map:
+            out.append("%s 引用了不存在的论证：%s" % (gid, aid))
+    out.extend(_goal_gap_issues(gid, goal, doc))
+    return out
+
+
+def _gap_issues(gap_id: str, gap: Dict[str, Any]) -> List[str]:
+    """单缺口判据（text / owner / status 词表）。"""
+    out: List[str] = []
+    if not str(gap.get("text") or "").strip():
+        out.append("缺口 %s 缺 text" % gap_id)
+    if not str(gap.get("owner") or "").strip():
+        out.append("缺口 %s 缺 owner（%s 未关闭项必须有 owner）" % (gap_id, GUIDE))
+    if str(gap.get("status")) not in ("open", "accepted-risk", "closed"):
+        out.append("缺口 %s 的 status 非法：%s" % (gap_id, gap.get("status")))
+    return out
+
+
+def _arg_evidence_issues(aid: str, evidence: Any, root: str) -> List[str]:
+    """论证证据判据（列表非空 / 逐件在场）。"""
+    out: List[str] = []
+    if not isinstance(evidence, list) or not evidence:
+        out.append("%s 缺 evidence（%s 论证必须有真实证据）" % (aid, GUIDE))
+    for rel in evidence:
+        if not _exists(root, str(rel)):
+            out.append("%s 的 evidence 不在场：%s" % (aid, rel))
+    return out
+
+
+def _arg_support_issues(aid: str, arg: Dict[str, Any], evidence: list,
+                        gaps: Dict[str, Any]) -> List[str]:
+    """supported / 非 supported 的支撑与缺口登记判据。"""
+    if str(arg.get("status")) == "supported":
+        out: List[str] = []
+        if len(evidence) < 2:
+            out.append("%s 标 supported 但证据少于 2 件" % aid)
+        if not any(str(x).startswith(TEST_EVIDENCE) for x in evidence):
+            out.append("%s 标 supported 但缺测试/门禁证据（%s 测试通过不能替代论证）"
+                       % (aid, GUIDE))
+        return out
+    open_ref = str(arg.get("open") or "")
+    if not open_ref:
+        return ["%s 标 %s 但缺 open（缺口 id）" % (aid, arg.get("status"))]
+    if open_ref not in gaps:
+        return ["%s 的 open 缺口未在 gaps 登记：%s" % (aid, open_ref)]
+    return []
+
+
+def _arg_text_issues(aid: str, arg: Dict[str, Any]) -> List[str]:
+    """论证假设/反驳文本判据。"""
+    out: List[str] = []
+    if not str(arg.get("assumption") or "").strip():
+        out.append("%s 缺 assumption（论证须写成立假设）" % aid)
+    if not str(arg.get("rebuttal") or "").strip():
+        out.append("%s 缺 rebuttal（论证须可被反驳）" % aid)
+    return out
+
+
+def _arg_issues(aid: str, arg: Dict[str, Any], root: str,
+                gaps: Dict[str, Any]) -> List[str]:
+    """单论证判据（status / 证据 / 支撑 / 假设 / 反驳）。"""
+    out: List[str] = []
+    if str(arg.get("status")) not in STATUSES:
+        out.append("%s 的 status 非法：%s" % (aid, arg.get("status")))
+    evidence = arg.get("evidence") or []
+    out.extend(_arg_evidence_issues(aid, evidence, root))
+    out.extend(_arg_support_issues(aid, arg, evidence, gaps))
+    out.extend(_arg_text_issues(aid, arg))
+    return out
+
+
+def _dup_id_issues(doc: Dict[str, Any]) -> List[str]:
+    """assumptions / rebuttals 的 id 唯一性判据。"""
+    out: List[str] = []
     for group in ("assumptions", "rebuttals"):
         ids = [str(x.get("id")) for x in doc.get(group) or [] if isinstance(x, dict)]
         if len(ids) != len(set(ids)):
-            issues.append("%s id 重复：%s" % (group, ids))
+            out.append("%s id 重复：%s" % (group, ids))
+    return out
+
+
+def _assumption_owner_issues(doc: Dict[str, Any]) -> List[str]:
+    """假设 owner 判据。"""
+    out: List[str] = []
     for asm in doc.get("assumptions") or []:
         if not str(asm.get("owner") or "").strip():
-            issues.append("假设 %s 缺 owner" % asm.get("id"))
+            out.append("假设 %s 缺 owner" % asm.get("id"))
+    return out
+
+
+def validate_claims(doc: Dict[str, Any], root: str = ".") -> List[str]:
+    issues: List[str] = []
+    issues.extend(_goals_head_issues(doc))
+    issues.extend(_arguments_head_issues(doc))
+    goals, arg_map, gaps = _claim_graph(doc)
+    for goal in goals:
+        issues.extend(_goal_issues(goal, arg_map, doc))
+    for gap_id, gap in gaps.items():
+        issues.extend(_gap_issues(gap_id, gap))
+    for aid, arg in arg_map.items():
+        issues.extend(_arg_issues(aid, arg, root, gaps))
+    issues.extend(_dup_id_issues(doc))
+    issues.extend(_assumption_owner_issues(doc))
     return issues
+
+
+def _risk_issues(risk: Any) -> List[str]:
+    """单条风险形状 → 问题清单。"""
+    if not isinstance(risk, dict):
+        return ["risks 含非对象"]
+    rid = str(risk.get("id"))
+    out: List[str] = []
+    for field in ("title", "owner", "trigger", "mitigation", "review"):
+        if not str(risk.get(field) or "").strip():
+            out.append("风险 %s 缺 %s" % (rid, field))
+    for field in ("probability", "impact"):
+        if str(risk.get(field)) not in SCALE:
+            out.append("风险 %s 的 %s 非法：%s" % (rid, field, risk.get(field)))
+    if str(risk.get("status")) not in RAID_STATUSES:
+        out.append("风险 %s 的 status 非法：%s" % (rid, risk.get("status")))
+    return out
+
+
+def _group_issues(group: str, prefix: str, fields: Tuple[str, ...],
+                  doc: Dict[str, Any]) -> List[str]:
+    """RAID 单个登记类（assumptions/issues/dependencies）→ 问题清单。"""
+    items = doc.get(group) or []
+    out: List[str] = []
+    if not items:
+        out.append("缺 %s（%s RAID 四类都要登记）" % (group, GUIDE))
+    for item in items:
+        if not isinstance(item, dict):
+            out.append("%s 含非对象" % group)
+            continue
+        iid = str(item.get("id"))
+        if not iid.startswith(prefix):
+            out.append("%s 的 id 前缀应 %s：%s" % (group, prefix, iid))
+        for field in fields:
+            if not str(item.get(field) or "").strip():
+                out.append("%s %s 缺 %s" % (group, iid, field))
+    return out
+
+
+def _raid_tail_issues(doc: Dict[str, Any], root: str) -> List[str]:
+    """stakeholders + change_control 判据。"""
+    out: List[str] = []
+    stakeholders = doc.get("stakeholders") or []
+    if len(stakeholders) < 3:
+        out.append("stakeholders 至少 3 类（%s）" % GUIDE)
+    change = doc.get("change_control") or {}
+    for field in ("process", "record", "evidence"):
+        if not str(change.get(field) or "").strip():
+            out.append("change_control 缺 %s" % field)
+    if not _exists(root, str(change.get("evidence") or "")):
+        out.append("change_control.evidence 不在场：%s" % change.get("evidence"))
+    return out
 
 
 def validate_raid(doc: Dict[str, Any], root: str = ".") -> List[str]:
@@ -137,44 +274,13 @@ def validate_raid(doc: Dict[str, Any], root: str = ".") -> List[str]:
     if rids != list(RISK_IDS):
         issues.append("risks 必须恰为 %s（实际 %s）" % (list(RISK_IDS), rids))
     for risk in risks:
-        if not isinstance(risk, dict):
-            issues.append("risks 含非对象")
-            continue
-        rid = str(risk.get("id"))
-        for field in ("title", "owner", "trigger", "mitigation", "review"):
-            if not str(risk.get(field) or "").strip():
-                issues.append("风险 %s 缺 %s" % (rid, field))
-        for field in ("probability", "impact"):
-            if str(risk.get(field)) not in SCALE:
-                issues.append("风险 %s 的 %s 非法：%s" % (rid, field, risk.get(field)))
-        if str(risk.get("status")) not in RAID_STATUSES:
-            issues.append("风险 %s 的 status 非法：%s" % (rid, risk.get("status")))
+        issues.extend(_risk_issues(risk))
     for group, prefix, fields in (
             ("assumptions", "AS", ("title", "owner", "trigger", "mitigation", "review")),
             ("issues", "I", ("title", "owner", "status")),
             ("dependencies", "D", ("title", "owner", "trigger", "mitigation", "review"))):
-        items = doc.get(group) or []
-        if not items:
-            issues.append("缺 %s（%s RAID 四类都要登记）" % (group, GUIDE))
-        for item in items:
-            if not isinstance(item, dict):
-                issues.append("%s 含非对象" % group)
-                continue
-            iid = str(item.get("id"))
-            if not iid.startswith(prefix):
-                issues.append("%s 的 id 前缀应 %s：%s" % (group, prefix, iid))
-            for field in fields:
-                if not str(item.get(field) or "").strip():
-                    issues.append("%s %s 缺 %s" % (group, iid, field))
-    stakeholders = doc.get("stakeholders") or []
-    if len(stakeholders) < 3:
-        issues.append("stakeholders 至少 3 类（%s）" % GUIDE)
-    change = doc.get("change_control") or {}
-    for field in ("process", "record", "evidence"):
-        if not str(change.get(field) or "").strip():
-            issues.append("change_control 缺 %s" % field)
-    if not _exists(root, str(change.get("evidence") or "")):
-        issues.append("change_control.evidence 不在场：%s" % change.get("evidence"))
+        issues.extend(_group_issues(group, prefix, fields, doc))
+    issues.extend(_raid_tail_issues(doc, root))
     return issues
 
 

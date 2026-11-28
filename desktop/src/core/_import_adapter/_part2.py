@@ -78,6 +78,39 @@ def parse_ccv3(chara: dict, world: Optional[dict] = None) -> Ccv3ParseResult:
     asset_refs；无 NF 层位注释的外部条目归 extra（不静默丢）。
     chara 顶层字段（personality/scenario 等）透传 chara_meta，不冒充语义理解。
     """
+    _validate_ccv3(chara)
+    warnings: List[str] = []
+    name = str(chara.get("name") or "")
+    desc = str(chara.get("description") or "")
+    # v3 真形状：内容字段在 `data` 内（外部实证 2026-09-21）；v2 旧形状仍兼容（顶层字段）
+    body = _chara_body(chara)
+    cb = body.get("character_book") or chara.get("character_book") or {}
+    entries = list(cb.get("entries") or [])
+
+    # pipeline 字段：chara description 若为 NF 导出格式则回填（round-trip 对称）
+    pipeline_id, pipeline_name = _pipeline_fields(desc, warnings)
+    layers, extra, asset_refs = _ingest_all(entries, world, warnings)
+
+    if not name:
+        warnings.append("chara 缺少 name，IR title 留空")
+    ir = IRDocument(
+        type="narrative", title=name,
+        pipeline_id=pipeline_id, pipeline_name=pipeline_name,
+        layers=layers, extra_modules=extra,
+        asset_refs=asset_refs, asset_missing=[],
+        warnings=warnings,
+        meta={"adapter_in": "parse_ccv3",
+              "source": "chara_card_v3"
+                        + (" + world" if world is not None else ""),
+              "spec": chara.get("spec"),
+              "spec_version": chara.get("spec_version")},
+    )
+    return Ccv3ParseResult(ok=True, ir=ir, chara_meta=_chara_meta(chara, world),
+                           warnings=warnings)
+
+
+def _validate_ccv3(chara: dict) -> None:
+    """v3 必填面校验（不符 → ValueError）。"""
     if not isinstance(chara, dict):
         raise ValueError("chara 应为 dict（chara_card_v3 JSON 对象）")
     if chara.get("spec") != "chara_card_v3":
@@ -85,30 +118,30 @@ def parse_ccv3(chara: dict, world: Optional[dict] = None) -> Ccv3ParseResult:
     if not chara.get("spec_version"):
         raise ValueError("缺少 spec_version（chara_card_v3 必填）")
 
-    warnings: List[str] = []
-    name = str(chara.get("name") or "")
-    desc = str(chara.get("description") or "")
-    # v3 真形状：内容字段在 `data` 内（外部实证 2026-09-21）；v2 旧形状仍兼容（顶层字段）
+
+def _chara_body(chara: dict):
+    """内容字段所在层（v3 在 `data`，v2 兼容顶层）。"""
     body_raw = chara.get("data")
-    body: Any = body_raw if isinstance(body_raw, dict) else chara
-    cb = body.get("character_book") or chara.get("character_book") or {}
-    entries = list(cb.get("entries") or [])
+    return body_raw if isinstance(body_raw, dict) else chara
 
-    # pipeline 字段：chara description 若为 NF 导出格式则回填（round-trip 对称）
-    pipeline_id = pipeline_name = ""
+
+def _pipeline_fields(desc: str, warnings: List[str]) -> tuple:
+    """description 若为 NF 导出格式 → (pipeline_id, pipeline_name)。"""
     mdesc = _RE_DESC_CCV3.match(desc)
-    if mdesc:
-        pipeline_name = mdesc.group(1).strip()
-        pipeline_id = mdesc.group(2).strip()
-    else:
+    if not mdesc:
         warnings.append("description 非 NF 装配产物格式，pipeline 字段留空")
+        return "", ""
+    return mdesc.group(2).strip(), mdesc.group(1).strip()
 
+
+def _ingest_all(entries: list, world: Optional[dict],
+                warnings: List[str]) -> tuple:
+    """chara entries + world entries 补充 → (layers, extra, asset_refs)。"""
     seen: set = set()
     layers: List[IRLayer] = []
     extra: List[IRModule] = []
     asset_refs: dict = {}
     layer_map: dict = {}
-
     # chara entries
     _ingest_entries(
         entries,
@@ -125,8 +158,7 @@ def parse_ccv3(chara: dict, world: Optional[dict] = None) -> Ccv3ParseResult:
     # world entries 补充（chara 内嵌 character_book 与独立 world 通常同源，
     # 重复条目按 full_id 去重——不重复入 IR）
     if world is not None:
-        if not isinstance(world, dict):
-            raise ValueError("world 应为 dict")
+        _validate_world(world)
         _ingest_entries(
             list(world.get('entries') or []),
             opts=_IngestContext(
@@ -139,25 +171,19 @@ def parse_ccv3(chara: dict, world: Optional[dict] = None) -> Ccv3ParseResult:
                 dedupe=True,
             ),
         )
+    return layers, extra, asset_refs
 
-    if not name:
-        warnings.append("chara 缺少 name，IR title 留空")
-    ir = IRDocument(
-        type="narrative", title=name,
-        pipeline_id=pipeline_id, pipeline_name=pipeline_name,
-        layers=layers, extra_modules=extra,
-        asset_refs=asset_refs, asset_missing=[],
-        warnings=warnings,
-        meta={"adapter_in": "parse_ccv3",
-              "source": "chara_card_v3"
-                        + (" + world" if world is not None else ""),
-              "spec": chara.get("spec"),
-              "spec_version": chara.get("spec_version")},
-    )
-    chara_meta = {
+
+def _validate_world(world) -> None:
+    """world 形状校验。"""
+    if not isinstance(world, dict):
+        raise ValueError("world 应为 dict")
+
+
+def _chara_meta(chara: dict, world: Optional[dict]) -> dict:
+    """chara 透传面（顶层字段 + 世界名）。"""
+    return {
         "chara": {k: v for k, v in chara.items()
                   if k not in ("character_book",)},
         "world_name": (world or {}).get("name") if world else None,
     }
-    return Ccv3ParseResult(ok=True, ir=ir, chara_meta=chara_meta,
-                           warnings=warnings)

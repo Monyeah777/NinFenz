@@ -134,6 +134,76 @@ def _ir_content(m: Module) -> str:
     return normalize_module_body(body)
 
 
+def _ir_module(m) -> IRModule:
+    return IRModule(full_id=m.full_id, name=m.name, layer=m.layer,
+                    content=_ir_content(m),
+                    source_path=getattr(m, "source_path", ""))
+
+
+def _group_by_layer(ordered) -> dict:
+    by_layer: dict = {}
+    for m in ordered:
+        by_layer.setdefault(m.layer, []).append(m)
+    return by_layer
+
+
+def _layers_ir(pipeline: Pipeline, by_layer: dict) -> List[IRLayer]:
+    layers_ir: List[IRLayer] = []
+    for lid in pipeline.layer_ids:
+        layer = pipeline.layer(lid)
+        lm = by_layer.pop(lid, [])
+        if not lm:
+            continue
+        layers_ir.append(IRLayer(
+            id=lid,
+            name=layer.name if layer else "",
+            description=layer.description if layer else "",
+            modules=[_ir_module(m) for m in lm]))
+    return layers_ir
+
+
+def _extra_modules(by_layer: dict) -> List[IRModule]:
+    extra: List[IRModule] = []
+    for lm in by_layer.values():
+        extra.extend(_ir_module(m) for m in lm)
+    return extra
+
+
+def _asset_keys(ordered) -> List[str]:
+    keys: List[str] = []
+    for m in ordered:
+        for k in m.assets or []:
+            if k not in keys:
+                keys.append(k)
+    return keys
+
+
+def _asset_refs(keys: List[str], asset_pack: Optional[AssetPack]):
+    entries = (asset_pack.entries if asset_pack else {}) or {}
+    refs: dict = {}
+    missing: List[str] = []
+    for k in keys:
+        if k in entries:
+            refs[k] = entries[k]
+        else:
+            refs[k] = None
+            missing.append(k)
+    return refs, missing
+
+
+def _doc_meta(asset_pack: Optional[AssetPack], doc_semantics: Optional[str]) -> dict:
+    meta: dict = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),  # noqa: DTZ005 - 产物墙钟时间戳是有意语义（本地时间，供人读）
+        "generator": "nf-ir-v1",
+        "asset_text": asset_pack.name if asset_pack else "无",
+    }
+    if doc_semantics is not None:
+        from .semantics import PROJECT_RULES, SKILL
+        if doc_semantics in (PROJECT_RULES, SKILL):
+            meta["doc_semantics"] = doc_semantics
+    return meta
+
+
 def render_ir(pipeline: Pipeline,
               modules: List[Module],
               asset_pack: Optional[AssetPack] = None,
@@ -152,56 +222,12 @@ def render_ir(pipeline: Pipeline,
     """
     ordered, warnings = order_modules(modules, pipeline)
     title = title or _doc_title(pipeline)
-
-    by_layer: dict = {}
-    for m in ordered:
-        by_layer.setdefault(m.layer, []).append(m)
-
-    layers_ir: List[IRLayer] = []
-    for lid in pipeline.layer_ids:
-        layer = pipeline.layer(lid)
-        lm = by_layer.pop(lid, [])
-        if not lm:
-            continue
-        layers_ir.append(IRLayer(
-            id=lid,
-            name=layer.name if layer else "",
-            description=layer.description if layer else "",
-            modules=[IRModule(full_id=m.full_id, name=m.name, layer=m.layer,
-                              content=_ir_content(m),
-                              source_path=getattr(m, "source_path", "")) for m in lm]))
-
-    extra: List[IRModule] = []
-    for lm in by_layer.values():
-        extra.extend(IRModule(full_id=m.full_id, name=m.name, layer=m.layer,
-                              content=_ir_content(m),
-                              source_path=getattr(m, "source_path", "")) for m in lm)
-
-    keys: List[str] = []
-    for m in ordered:
-        for k in m.assets or []:
-            if k not in keys:
-                keys.append(k)
-    entries = (asset_pack.entries if asset_pack else {}) or {}
-    refs: dict = {}
-    missing: List[str] = []
-    for k in keys:
-        if k in entries:
-            refs[k] = entries[k]
-        else:
-            refs[k] = None
-            missing.append(k)
-
-    meta: dict = {
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M"),  # noqa: DTZ005 - 产物墙钟时间戳是有意语义（本地时间，供人读）
-        "generator": "nf-ir-v1",
-        "asset_text": asset_pack.name if asset_pack else "无",
-    }
-    if doc_semantics is not None:
-        from .semantics import PROJECT_RULES, SKILL
-        if doc_semantics in (PROJECT_RULES, SKILL):
-            meta["doc_semantics"] = doc_semantics
-
+    by_layer = _group_by_layer(ordered)
+    layers_ir = _layers_ir(pipeline, by_layer)
+    extra = _extra_modules(by_layer)
+    keys = _asset_keys(ordered)
+    refs, missing = _asset_refs(keys, asset_pack)
+    meta = _doc_meta(asset_pack, doc_semantics)
     return IRDocument(
         type="techdoc" if pipeline.structure_type == "techdoc" else "narrative",
         title=title,

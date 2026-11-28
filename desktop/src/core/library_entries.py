@@ -17,43 +17,59 @@ from core import atomic_write
 
 ENTRY_GLOB = "library/NF-*.md"
 
-def parse_frontmatter(text: str) -> Tuple[Dict[str, Any], str]:
-    """极简 YAML frontmatter 解析（key: value / key: [a, b] / key: 换行 - item）。"""
-    if not text.startswith("---"):
-        return {}, text
-    lines = text.splitlines()
-    end = None
+def _frontmatter_end(lines: List[str]) -> Optional[int]:
     for i in range(1, len(lines)):
         if lines[i].strip() == "---":
-            end = i
-            break
-    if end is None:
-        return {}, text
+            return i
+    return None
+
+
+def _append_list_item(fm: Dict[str, Any], key: str, ln: str) -> None:
+    item = ln.strip()
+    if item.startswith("- "):
+        item = item[2:].strip()
+    if not isinstance(fm.get(key), list):
+        fm[key] = [] if not fm.get(key) else [fm[key]]
+    fm[key].append(item.strip("'\""))
+
+
+def _set_scalar(fm: Dict[str, Any], ln: str) -> Optional[str]:
+    k, v = ln.split(":", 1)
+    key = k.strip()
+    v = v.strip()
+    if not v:
+        fm[key] = []
+    elif v.startswith("[") and v.endswith("]"):
+        fm[key] = [x.strip().strip("'\"") for x in v[1:-1].split(",")
+                   if x.strip()]
+    else:
+        fm[key] = v.strip("'\"")
+    return key
+
+
+def _parse_frontmatter_body(lines: List[str], end: int) -> Dict[str, Any]:
     fm: Dict[str, Any] = {}
     key: Optional[str] = None
     for ln in lines[1:end]:
         if not ln.strip() or ln.strip().startswith("#"):
             continue
         if ln.startswith(("  ", "\t")) and key:
-            item = ln.strip()
-            if item.startswith("- "):
-                item = item[2:].strip()
-            if not isinstance(fm.get(key), list):
-                fm[key] = [] if not fm.get(key) else [fm[key]]
-            fm[key].append(item.strip("'\""))
+            _append_list_item(fm, key, ln)
             continue
         if ":" in ln:
-            k, v = ln.split(":", 1)
-            key = k.strip()
-            v = v.strip()
-            if not v:
-                fm[key] = []
-            elif v.startswith("[") and v.endswith("]"):
-                fm[key] = [x.strip().strip("'\"") for x in v[1:-1].split(",")
-                           if x.strip()]
-            else:
-                fm[key] = v.strip("'\"")
-    return fm, "\n".join(lines[end + 1:])
+            key = _set_scalar(fm, ln)
+    return fm
+
+
+def parse_frontmatter(text: str) -> Tuple[Dict[str, Any], str]:
+    """极简 YAML frontmatter 解析（key: value / key: [a, b] / key: 换行 - item）。"""
+    if not text.startswith("---"):
+        return {}, text
+    lines = text.splitlines()
+    end = _frontmatter_end(lines)
+    if end is None:
+        return {}, text
+    return _parse_frontmatter_body(lines, end), "\n".join(lines[end + 1:])
 
 
 def read_entry(path: str) -> Dict[str, Any]:

@@ -109,19 +109,16 @@ def render_search(index, query: str, limit: int = 8, width=None,
 
 
 def render_commands(index, filt: str = "", limit: int = 0, width=None,
-                    color: bool = False) -> str:
+                     color: bool = False) -> str:
     """列出全部可达命令（可按子串过滤）——把「最全功能」摊开成一张可检视的表。"""
     f = str(filt or "").strip().lower()
-    rows = sorted((e for e in index or []
-                   if not f or f in str(e.get("path")).lower()
-                   or f in str(e.get("summary") or "").lower()),
-                  key=lambda e: str(e.get("path")))
+    rows = _filtered_rows(index, f)
     tops = {str(e.get("path")).split(" ")[0] for e in index or []}
     w = term_width(width)
     lines = [style("== nf 命令面（顶层 %d · 含二级 %d 条%s）=="
                    % (len(tops), len(rows), ("，过滤：%s" % filt) if f else ""),
                    "head", color)]
-    shown = rows if not limit or int(limit) <= 0 else rows[:int(limit)]
+    shown = _shown_rows(rows, limit)
     for e in shown:
         lines.append(_row("nf " + str(e.get("path")), str(e.get("summary") or ""), w, color))
     if len(shown) < len(rows):
@@ -129,6 +126,19 @@ def render_commands(index, filt: str = "", limit: int = 0, width=None,
                            % (len(rows) - len(shown)), "dim", color))
     lines.append("  检索：/find <词>（或 nf shell --search <词>）；菜单：/menu")
     return "\n".join(lines)
+
+
+def _filtered_rows(index, f: str) -> list:
+    """按过滤词收窄并排序的命令行。"""
+    return sorted((e for e in index or []
+                   if not f or f in str(e.get("path")).lower()
+                   or f in str(e.get("summary") or "").lower()),
+                  key=lambda e: str(e.get("path")))
+
+
+def _shown_rows(rows, limit) -> list:
+    """limit=0/未给 → 全量；否则取前 limit 条。"""
+    return rows if not limit or int(limit) <= 0 else rows[:int(limit)]
 
 
 

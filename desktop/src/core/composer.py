@@ -116,17 +116,7 @@ def build_assembly(store: Store, pipeline: Pipeline,
     （False 剔除）——运行时按条件动态裁剪装配集，不扩展 references schema
     （条件作装配选择参数，同 34 变体纪律）。未声明的模块默认包含。
     """
-    def _included(m: Module) -> bool:
-        if not conditions:
-            return True
-        num = m.id.split(":")[-1] if ":" in m.id else m.id
-        if m.full_id in conditions:
-            return bool(conditions[m.full_id])
-        if num in conditions:
-            return bool(conditions[num])
-        return True
-
-    mods = [m for m in selected if _included(m)]
+    mods = [m for m in selected if _module_included(m, conditions)]
     if not include_references:
         return mods
     combo = resolve_combination(store, pipeline)
@@ -134,8 +124,20 @@ def build_assembly(store: Store, pipeline: Pipeline,
     for rm in combo.reference_modules:
         if fid_key(rm.full_id) in seen:
             continue
-        if not _included(rm):
+        if not _module_included(rm, conditions):
             continue
         mods.append(rm)
         seen.add(fid_key(rm.full_id))
     return mods
+
+
+def _module_included(m: Module, conditions: Optional[Dict[str, bool]]) -> bool:
+    """单模块的条件包含判定（未声明默认包含）。"""
+    if not conditions:
+        return True
+    num = m.id.split(":")[-1] if ":" in m.id else m.id
+    if m.full_id in conditions:
+        return bool(conditions[m.full_id])
+    if num in conditions:
+        return bool(conditions[num])
+    return True

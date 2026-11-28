@@ -9,6 +9,15 @@ import re
 
 from ._base import CONTRACT_REL, LICENSE_NAME, RECEIPTS_REL, _DEP_ALIAS, _pinned_versions, _read_json
 from ._docs_a import sbom_doc
+from ._prov import (
+    _add_node,
+    _asset_entities,
+    _library_nodes,
+    _prov_counts,
+    _receipt_entities,
+    _transform_activities,
+    _verify_agent,
+)
 
 
 
@@ -24,52 +33,15 @@ def prov_document(root: str = ".") -> Dict[str, Any]:
     transform = _read_json(root, "protocol/transform_log.json")
     rec = _read_json(root, RECEIPTS_REL)
     nodes: Dict[str, Dict[str, Any]] = {}
-
-    def add(node: Dict[str, Any]) -> None:
-        """去重入图（同 id 只留一次——同一投稿人/同一文件会自然重复出现）。"""
-        nodes.setdefault(str(node.get("@id")), node)
-
-    # ① 实体：资产（键 / 归属模块 / 状态）
-    for a in prov.get("assets") or []:
-        add({"@id": "nf:asset/%s" % a.get("key"), "@type": "prov:Entity",
-             "prov:label": str(a.get("key") or ""),
-             "nf:file": str(a.get("file") or ""),
-             "nf:module": str(a.get("module") or ""),
-             "nf:status": str(a.get("status") or ""),
-             "nf:version": str(a.get("version") or "")})
-    # ② 实体 + 入库活动：馆藏条目（活动与代理来自 INDEX 行的真值）
-    idx = os.path.join(root, "library", "INDEX.md")
-    if os.path.isfile(idx):
-        with open(idx, encoding="utf-8") as fh:
-            for line in fh:
-                if not re.match(r"^\|\s*NF-[A-Za-z0-9\-]+\s*\|", line):
-                    continue
-                cells = [c.strip() for c in line.strip().strip("|").split("|")]
-                if len(cells) < 6:
-                    continue
-                eid, author, date, lic = cells[0], cells[3], cells[4], cells[5]
-                add({"@id": "nf:library/%s" % eid, "@type": "prov:Entity",
-                     "prov:label": cells[1], "nf:license": lic})
-                add({"@id": "nf:activity/library-ingest/%s" % eid,
-                     "@type": "prov:Activity", "prov:endedAtTime": date,
-                     "prov:wasAssociatedWith": "nf:agent/%s" % author,
-                     "prov:generated": "nf:library/%s" % eid})
-                add({"@id": "nf:agent/%s" % author, "@type": "prov:Person",
-                     "prov:label": author})
-    # ③ 实体：回执绑定的协议层文件（内容寻址）
-    for e in rec.get("entries") or []:
-        add({"@id": "nf:file/%s" % e.get("path"), "@type": "prov:Entity",
-             "nf:sha256": str(e.get("digest") or "")})
-    # ④ 活动：消化记录（把「参考级源 → 本地产物」的转换写成活动，逐条绑 digest）
-    for i, t in enumerate(transform.get("entries") or [], 1):
-        add({"@id": "nf:transform/%d" % i, "@type": "prov:Activity",
-             "prov:used": "nf:file/%s" % (t.get("source") or t.get("from") or ""),
-             "prov:generated": "nf:file/%s" % (t.get("product") or t.get("to") or ""),
-             "nf:digest": str(t.get("digest") or "")})
-    # ⑤ 代理：仓本体（软件代理）
-    add({"@id": "nf:agent/verify-sh", "@type": "prov:SoftwareAgent",
-         "prov:label": "NinFenz verify.sh 门禁",
-         "nf:present": os.path.isfile(os.path.join(root, "verify.sh"))})
+    for node in _asset_entities(prov):
+        _add_node(nodes, node)
+    for node in _library_nodes(root):
+        _add_node(nodes, node)
+    for node in _receipt_entities(rec):
+        _add_node(nodes, node)
+    for node in _transform_activities(transform):
+        _add_node(nodes, node)
+    _add_node(nodes, _verify_agent(root))
     graph = [nodes[k] for k in sorted(nodes)]
     return {
         "@context": {"prov": "http://www.w3.org/ns/prov#",
@@ -78,10 +50,7 @@ def prov_document(root: str = ".") -> Dict[str, Any]:
         "note": "由仓内声明件派生（资产 / 馆藏 / 消化记录 / 回执）；本文件非真源，"
                 "空面即如实为空。",
         "@graph": graph,
-        "x-nf-counts": {"entities": sum(1 for n in graph if n["@type"] == "prov:Entity"),
-                        "activities": sum(1 for n in graph if n["@type"] == "prov:Activity"),
-                        "agents": sum(1 for n in graph
-                                      if n["@type"] in ("prov:Person", "prov:SoftwareAgent"))},
+        "x-nf-counts": _prov_counts(graph),
     }
 
 
@@ -148,6 +117,24 @@ def cyclonedx_doc(root: str = ".") -> Dict[str, Any]:
 
 
 
+def _approvals(root: str) -> List[Dict[str, Any]]:
+    """protocol/approvals/*.json 的在场审批记录（读不出的跳过）。"""
+    approvals: List[Dict[str, Any]] = []
+    adir = os.path.join(root, "protocol", "approvals")
+    if os.path.isdir(adir):
+        for name in sorted(os.listdir(adir)):
+            if name.endswith(".json"):
+                a = _read_json(root, os.path.join("protocol", "approvals", name))
+                if a:
+                    approvals.append(a)
+    return approvals
+
+
+def _first_approval_field(approvals: List[Dict[str, Any]], field: str) -> str:
+    """首条审批记录的某字段（无审批 → 空串）。"""
+    return str((approvals[0].get(field) if approvals else "") or "")
+
+
 def vc_document(root: str = ".") -> Dict[str, Any]:
     """W3C Verifiable Credential（VC Data Model 2.0 形状）——内容绑定的「一致性凭证」。
 
@@ -158,16 +145,9 @@ def vc_document(root: str = ".") -> Dict[str, Any]:
     """
     rec = _read_json(root, RECEIPTS_REL)
     rep = _read_json(root, "protocol/conformance_report.json")
-    approvals = []
-    adir = os.path.join(root, "protocol", "approvals")
-    if os.path.isdir(adir):
-        for name in sorted(os.listdir(adir)):
-            if name.endswith(".json"):
-                a = _read_json(root, os.path.join("protocol", "approvals", name))
-                if a:
-                    approvals.append(a)
-    issuer = str((approvals[0].get("approved_by") if approvals else "") or "NinFenz")
-    valid_from = str((approvals[0].get("approved_at") if approvals else "") or "")
+    approvals = _approvals(root)
+    issuer = _first_approval_field(approvals, "approved_by") or "NinFenz"
+    valid_from = _first_approval_field(approvals, "approved_at")
     return {
         "@context": ["https://www.w3.org/ns/credentials/v2",
                      "https://ninfenz.dev/ns/credentials/v1"],
@@ -254,6 +234,55 @@ def cid_index(root: str = ".") -> Dict[str, Any]:
 
 
 
+def _audit_record(path: str) -> dict | None:
+    """单个公开审计件的 frontmatter 记录（无 id / 非 frontmatter / 读不到 → None）。"""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            head = fh.read(1200)
+    except OSError:            # 尽力而为：读不到该审计件就跳过（缺件由 check35 回执门报出）
+        return None
+    if not head.startswith("---"):
+        return None
+    block = head.split("---", 2)[1]
+    rec: dict[str, str] = {}
+    for line in block.splitlines():
+        if ":" in line:
+            k, v = line.split(":", 1)
+            rec[k.strip()] = v.strip()
+    return rec if rec.get("id") else None
+
+
+def _public_decision_index(root: str) -> list[dict]:
+    """results/audit/*.md frontmatter → 公开决策与裁决索引。"""
+    import glob as _glob
+    out: list[dict] = []
+    for p in sorted(_glob.glob(os.path.join(root, "results", "audit", "*.md"))):
+        rec = _audit_record(p)
+        if rec is not None:
+            out.append({"id": rec.get("id"), "title": rec.get("title", ""),
+                        "date": rec.get("date", ""), "verdict": rec.get("verdict", "")})
+    return out
+
+
+def _adapter_rows(decl: dict) -> list[dict]:
+    """decision_layer.adapters → 决策面适配器行。"""
+    return [{"id": a.get("id"), "kind": a.get("kind"),
+             "inGatePath": a.get("in_gate_path"),
+             "calibrated": a.get("calibrated")}
+            for a in (decl.get("adapters") or [])]
+
+
+def _candidate_rows(decl: dict) -> list[dict]:
+    """decision_layer.candidates → 决策面候选行。"""
+    return [{"id": c.get("id"), "source": c.get("source"),
+             "license": c.get("license"), "pulled": c.get("pulled"),
+             "evidence": str(c.get("evidence") or "")[:200],
+             "local": ({"runtime": (c.get("local") or {}).get("runtime"),
+                        "servedBy": (c.get("local") or {}).get("served_by")}
+                       if c.get("local") else None)}
+            for c in (decl.get("candidates") or [])]
+
+
 def decision_surface(root: str = ".") -> Dict[str, Any]:
     """决策面（派生）：外部工具链能读到「本仓有哪些决策能力、按什么规则、模型拉取状态如何」。
 
@@ -262,41 +291,14 @@ def decision_surface(root: str = ".") -> Dict[str, Any]:
     **不导出逐次工单**：工单与收口件留在内部档案（`STRATEGY §四` 计划内部消化），
     本面显式声明这一点（门禁判该声明必须在位），避免"看起来什么都导出了"的错觉。
     """
-    import glob as _glob
     decl = _read_json(root, "protocol/decision_layer.json")
-    audits = []
-    for p in sorted(_glob.glob(os.path.join(root, "results", "audit", "*.md"))):
-        try:
-            with open(p, encoding="utf-8") as fh:
-                head = fh.read(1200)
-        except OSError:            # 尽力而为：读不到该审计件就跳过（缺件由 check35 回执门报出）
-            continue
-        if not head.startswith("---"):
-            continue
-        block = head.split("---", 2)[1]
-        rec: Dict[str, str] = {}
-        for line in block.splitlines():
-            if ":" in line:
-                k, v = line.split(":", 1)
-                rec[k.strip()] = v.strip()
-        if rec.get("id"):
-            audits.append({"id": rec.get("id"), "title": rec.get("title", ""),
-                           "date": rec.get("date", ""), "verdict": rec.get("verdict", "")})
+    audits = _public_decision_index(root)
     return {
         "schema": "nf-decision-surface/1",
         "primitives": decl.get("primitives") or {},
         "responseContract": decl.get("response_contract") or {},
-        "adapters": [{"id": a.get("id"), "kind": a.get("kind"),
-                      "inGatePath": a.get("in_gate_path"),
-                      "calibrated": a.get("calibrated")}
-                     for a in (decl.get("adapters") or [])],
-        "candidates": [{"id": c.get("id"), "source": c.get("source"),
-                        "license": c.get("license"), "pulled": c.get("pulled"),
-                        "evidence": str(c.get("evidence") or "")[:200],
-                        "local": ({"runtime": (c.get("local") or {}).get("runtime"),
-                                   "servedBy": (c.get("local") or {}).get("served_by")}
-                                  if c.get("local") else None)}
-                       for c in (decl.get("candidates") or [])],
+        "adapters": _adapter_rows(decl),
+        "candidates": _candidate_rows(decl),
         "boundaries": decl.get("boundaries") or [],
         "workloop": decl.get("workloop") or {},
         "publicDecisionIndex": audits,

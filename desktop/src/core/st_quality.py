@@ -55,15 +55,14 @@ def _check_checklist(root: str, d: Dict[str, Any]) -> List[str]:
     return (["自查清单未覆盖规则：%s" % "、".join(miss)] if miss else [])
 
 
-def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """→ (issues, warns, stats)。M→fail；S 的现状项进 warns；R 只计数。"""
-    issues: List[str] = []
-    warns: List[str] = []
-    d = decl(root)
-    if not d:
-        return ["缺 ST 制卡质量规范 %s" % DECL_REL], warns, {}
+def _header_issues(d: Dict[str, Any]) -> List[str]:
     if str(d.get("schema") or "") != SCHEMA:
-        issues.append("规范 schema 不匹配（期望 %s）" % SCHEMA)
+        return ["规范 schema 不匹配（期望 %s）" % SCHEMA]
+    return []
+
+
+def _vocab_issues(d: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     levels = tuple(d.get("level_vocabulary") or ())
     scopes = tuple(d.get("scope_vocabulary") or ())
     checks = tuple(d.get("check_vocabulary") or ())
@@ -75,37 +74,84 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         issues.append("check 词表必须为 declaration/artifact")
     if str(d.get("status")) == "draft" and not (d.get("pending") or []):
         issues.append("status=draft 但 pending 为空——草案必须写明还差什么")
-    seen = set()
-    by_level: Dict[str, int] = {k: 0 for k in levels}
-    arts: List[str] = []
-    for r in d.get("rules") or []:
-        rid = str(r.get("id") or "")
-        tag = rid or "(无名)"
-        if rid in seen:
-            issues.append("规则 id 重复：%s" % rid)
-        seen.add(rid)
-        scope = str(r.get("scope") or "")
-        if scope not in scopes:
-            issues.append("%s scope 越词表：%s" % (tag, scope))
-        elif rid and not rid.startswith(scope):
-            issues.append("%s 的 id 前缀与 scope 不一致（应 %s 开头）" % (tag, scope))
-        lv = str(r.get("level") or "")
-        if lv not in levels:
-            issues.append("%s level 越词表：%s" % (tag, lv))
-        else:
-            by_level[lv] = by_level.get(lv, 0) + 1
-        for k in ("rule", "basis", "check"):
-            if not str(r.get(k) or "").strip():
-                issues.append("%s 缺必填字段：%s" % (tag, k))
-        if str(r.get("check")) == "artifact":
-            arts.append(rid)
+    return issues
+
+
+def _rule_scope_issues(rid: str, tag: str, r: Dict[str, Any],
+                       scopes: Tuple[str, ...]) -> List[str]:
+    scope = str(r.get("scope") or "")
+    if scope not in scopes:
+        return ["%s scope 越词表：%s" % (tag, scope)]
+    if rid and not rid.startswith(scope):
+        return ["%s 的 id 前缀与 scope 不一致（应 %s 开头）" % (tag, scope)]
+    return []
+
+
+def _rule_level_issues(tag: str, r: Dict[str, Any], levels: Tuple[str, ...],
+                       by_level: Dict[str, int]) -> List[str]:
+    lv = str(r.get("level") or "")
+    if lv not in levels:
+        return ["%s level 越词表：%s" % (tag, lv)]
+    by_level[lv] = by_level.get(lv, 0) + 1
+    return []
+
+
+def _rule_issues(r: Dict[str, Any], seen: set, levels: Tuple[str, ...],
+                 scopes: Tuple[str, ...], by_level: Dict[str, int]) -> List[str]:
+    issues: List[str] = []
+    rid = str(r.get("id") or "")
+    tag = rid or "(无名)"
+    if rid in seen:
+        issues.append("规则 id 重复：%s" % rid)
+    seen.add(rid)
+    issues += _rule_scope_issues(rid, tag, r, scopes)
+    issues += _rule_level_issues(tag, r, levels, by_level)
+    for k in ("rule", "basis", "check"):
+        if not str(r.get(k) or "").strip():
+            issues.append("%s 缺必填字段：%s" % (tag, k))
+    return issues
+
+
+def _artifact_issues(arts: List[str], root: str) -> List[str]:
+    issues: List[str] = []
     for rid in arts:
         if rid == "V2":
             issues += _check_v2(root)
+    return issues
+
+
+def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
+    """→ (issues, warns, stats)。M→fail；S 的现状项进 warns；R 只计数。"""
+    issues: List[str] = []
+    warns: List[str] = []
+    d = decl(root)
+    if not d:
+        return ["缺 ST 制卡质量规范 %s" % DECL_REL], warns, {}
+    issues += _header_issues(d)
+    levels = tuple(d.get("level_vocabulary") or ())
+    scopes = tuple(d.get("scope_vocabulary") or ())
+    issues += _vocab_issues(d)
+    seen: set = set()
+    by_level: Dict[str, int] = {k: 0 for k in levels}
+    arts: List[str] = []
+    for r in d.get("rules") or []:
+        issues += _rule_issues(r, seen, levels, scopes, by_level)
+        if str(r.get("check")) == "artifact":
+            arts.append(str(r.get("id") or ""))
+    issues += _artifact_issues(arts, root)
     issues += _check_checklist(root, d)
-    if (d.get("pending") or []):
-        warns.append("规范为草案：%d 项待补（%s）" % (len(d["pending"]),
- "；".join(d["pending"][:2])))
-    stats = {"rules": len(seen), "by_level": by_level,
-             "artifact_checked": sum(1 for r in arts)}
+    warns += _draft_warns(d)
+    stats = _scan_stats(seen, by_level, arts)
     return issues, warns, stats
+
+
+def _draft_warns(d: Dict[str, Any]) -> List[str]:
+    if not (d.get("pending") or []):
+        return []
+    return ["规范为草案：%d 项待补（%s）" % (len(d["pending"]),
+ "；".join(d["pending"][:2]))]
+
+
+def _scan_stats(seen: set, by_level: Dict[str, int], arts: List[str]) -> Dict[str, object]:
+    return {"rules": len(seen), "by_level": by_level,
+            "artifact_checked": sum(1 for r in arts)}

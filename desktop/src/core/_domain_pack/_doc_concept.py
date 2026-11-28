@@ -56,37 +56,8 @@ def concept_graph_md(spec: Dict[str, Any], root: str = ".") -> str:
         "| 条目键 | 概念 | 层 | 直接前置 | 证据 |",
         "|---|---|---|---|---|",
     ]
-    prereq: Dict[str, List[str]] = {s["id"]: [] for s in subs}
-    for a, b in edges:
-        prereq.setdefault(b, []).append(a)
-    for s in std_ids:                    # 标准节点：概念 → 标准（该概念依据的标准）
-        prereq["STD-%s" % s] = []
-    for sid, std in bound.items():
-        if std:
-            prereq.setdefault("STD-%s" % std, []).append(sid)
-    for sid, std in supp.items():        # 概念 → 辅锚（产出承载标准）
-        if std:
-            prereq.setdefault("STD-%s" % std, []).append(sid)
-    for dep, sid in _ci["dep_edges"]:    # 标准依赖边：被依赖 → 依赖
-        prereq.setdefault("STD-%s" % sid, []).append("STD-%s" % dep)
-    for s in subs:
-        layer = "P40" if (subs.index(s) % 2 == 0) else "P60"
-        pre = "、".join("`%s`" % x for x in prereq.get(s["id"], [])) or "—"
-        lines.append("| `%s` | %s | %s | %s | %s |"
-                     % (s["id"], s["name"], layer, pre, legend_key))
-    for sid in std_ids:                  # 标准节点入条目键表（可寻址）
-        std_entry = cat.get(sid) or {}
-        ev = std_entry.get("evidence") or {}
-        lines.append("| `STD-%s` | 标准 · %s（%s｜%s｜实测 %s） | P80 | %s | std-catalog |"
-                     % (sid,
- std_entry.get("title",
- sid),
- std_entry.get("body",
- ""),
- std_entry.get("layer",
- ""),
-                        ("✓" if ev.get("reachable") else "✗"),
-                        "、".join("`%s`" % x for x in prereq.get("STD-%s" % sid, [])) or "—"))
+    prereq = _concept_prereqs(subs, edges, std_ids, bound, supp, _ci)
+    _concept_rows(subs, prereq, std_ids, cat, legend_key, lines)
     for i, s in enumerate(subs):
         pass                             # 概念行已在上方输出
     lines += [
@@ -96,29 +67,9 @@ def concept_graph_md(spec: Dict[str, Any], root: str = ".") -> str:
         "| 别名 | 概念 id |",
         "|---|---|",
     ]
-    for s in subs:
-        alias = "%s-%s" % (code, re.sub(r"[\s（）()]+", "-", s["name"].strip()))[:48]
-        lines.append("| `%s` | `%s` |" % (alias, s["id"]))
-    for sid in std_ids:
-        lines.append("| `std-%s` | `STD-%s` |" % (sid, sid))
-    nodes = []
-    for i, s in enumerate(subs):
-        layer = "P40" if i % 2 == 0 else "P60"
-        nodes.append({
-            "id": s["id"], "name": s["name"], "layer": layer,
-            "branch": "domain",
-            "prereqs": prereq.get(s["id"], []),
-            "provenance": [legend_key],
-        })
+    _alias_rows(subs, std_ids, code, lines)
+    nodes = _concept_nodes(subs, prereq, std_ids, cat, legend_key)
     cs = "std-catalog"
-    for sid in std_ids:
-        std_entry = cat.get(sid) or {}
-        nodes.append({
-            "id": "STD-%s" % sid, "name": "标准 · %s" % std_entry.get("title", sid),
-            "layer": "P80", "branch": "standards",
-            "prereqs": prereq.get("STD-%s" % sid, []),
-            "provenance": [cs],
-        })
     block = {
         "concept_graph": {
             "version": "1.0",
@@ -157,4 +108,76 @@ def concept_graph_md(spec: Dict[str, Any], root: str = ".") -> str:
         "- 包外前置族（%s-00）不随包交付，装载方须自备领域基础。" % code,
     ]
     return "\n".join(lines) + "\n"
+
+
+def _concept_prereqs(subs, edges, std_ids, bound, supp, _ci):
+    prereq: Dict[str, List[str]] = {s["id"]: [] for s in subs}
+    for a, b in edges:
+        prereq.setdefault(b, []).append(a)
+    for s in std_ids:                    # 标准节点：概念 → 标准（该概念依据的标准）
+        prereq["STD-%s" % s] = []
+    for sid, std in bound.items():
+        if std:
+            prereq.setdefault("STD-%s" % std, []).append(sid)
+    for sid, std in supp.items():        # 概念 → 辅锚（产出承载标准）
+        if std:
+            prereq.setdefault("STD-%s" % std, []).append(sid)
+    for dep, sid in _ci["dep_edges"]:    # 标准依赖边：被依赖 → 依赖
+        prereq.setdefault("STD-%s" % sid, []).append("STD-%s" % dep)
+    return prereq
+
+
+def _concept_rows(subs, prereq, std_ids, cat, legend_key, lines):
+    for s in subs:
+        layer = "P40" if (subs.index(s) % 2 == 0) else "P60"
+        pre = "、".join("`%s`" % x for x in prereq.get(s["id"], [])) or "—"
+        lines.append("| `%s` | %s | %s | %s | %s |"
+                     % (s["id"], s["name"], layer, pre, legend_key))
+    _std_rows(std_ids, cat, prereq, lines)
+
+
+def _std_rows(std_ids, cat, prereq, lines):
+    for sid in std_ids:                  # 标准节点入条目键表（可寻址）
+        std_entry = cat.get(sid) or {}
+        ev = std_entry.get("evidence") or {}
+        lines.append("| `STD-%s` | 标准 · %s（%s｜%s｜实测 %s） | P80 | %s | std-catalog |"
+                     % (sid,
+                        std_entry.get("title",
+                        sid),
+                        std_entry.get("body",
+                        ""),
+                        std_entry.get("layer",
+                        ""),
+                        ("✓" if ev.get("reachable") else "✗"),
+                        "、".join("`%s`" % x for x in prereq.get("STD-%s" % sid, [])) or "—"))
+
+
+def _alias_rows(subs, std_ids, code, lines):
+    for s in subs:
+        alias = "%s-%s" % (code, re.sub(r"[\s（）()]+", "-", s["name"].strip()))[:48]
+        lines.append("| `%s` | `%s` |" % (alias, s["id"]))
+    for sid in std_ids:
+        lines.append("| `std-%s` | `STD-%s` |" % (sid, sid))
+
+
+def _concept_nodes(subs, prereq, std_ids, cat, legend_key):
+    nodes = []
+    for i, s in enumerate(subs):
+        layer = "P40" if i % 2 == 0 else "P60"
+        nodes.append({
+            "id": s["id"], "name": s["name"], "layer": layer,
+            "branch": "domain",
+            "prereqs": prereq.get(s["id"], []),
+            "provenance": [legend_key],
+        })
+    cs = "std-catalog"
+    for sid in std_ids:
+        std_entry = cat.get(sid) or {}
+        nodes.append({
+            "id": "STD-%s" % sid, "name": "标准 · %s" % std_entry.get("title", sid),
+            "layer": "P80", "branch": "standards",
+            "prereqs": prereq.get("STD-%s" % sid, []),
+            "provenance": [cs],
+        })
+    return nodes
 # ruff: noqa: UP035 — 拆分产物按需重复 typing 注解 import（债未新增）

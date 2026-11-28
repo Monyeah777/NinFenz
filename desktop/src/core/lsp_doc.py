@@ -100,6 +100,71 @@ def outline(text: str) -> List[Dict[str, Any]]:
 
 
 # ---------------------------------------------------------------- 折叠
+def _headings(lines: List[str]) -> List[tuple]:
+    """标题行 → (行号, 级别)；围栏里的 # 不算标题。"""
+    heads: List[tuple] = []
+    in_fence = False
+    for i, raw in enumerate(lines):
+        if _FENCE.match(raw):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        m = HEADING.match(raw)
+        if m:
+            heads.append((i, len(m.group(1))))
+    return heads
+
+
+def _fence_pairs(lines: List[str]) -> List[tuple]:
+    """成对代码围栏 → [(起行, 止行)]。"""
+    fences: List[tuple] = []
+    in_fence = False
+    fence_start = -1
+    for i, raw in enumerate(lines):
+        if not _FENCE.match(raw):
+            continue
+        if in_fence:
+            fences.append((fence_start, i))
+            in_fence = False
+        else:
+            in_fence = True
+            fence_start = i
+    return fences
+
+
+def _heading_end(lines: List[str], heads: List[tuple], idx: int, line: int,
+                 level: int) -> int:
+    """某标题的折叠末行：下一个同级或更高级标题的前一行，再去掉尾部空行。"""
+    end = len(lines) - 1
+    for nxt_line, nxt_level in heads[idx + 1:]:
+        if nxt_level <= level:
+            end = nxt_line - 1
+            break
+    while end > line and not lines[end].strip():
+        end -= 1                      # 尾部空行不折（折了也看不见内容，只是噪声）
+    return end
+
+
+def _heading_ranges(lines: List[str], heads: List[tuple]) -> List[Dict[str, Any]]:
+    """标题小节的折叠区间（单行区间不给——规范允许客户端忽略，给了只是噪声）。"""
+    out: List[Dict[str, Any]] = []
+    for idx, (line, level) in enumerate(heads):
+        end = _heading_end(lines, heads, idx, line, level)
+        if end > line:
+            out.append({"startLine": line, "endLine": end, "kind": "region"})
+    return out
+
+
+def _fence_folding_ranges(fences: List[tuple]) -> List[Dict[str, Any]]:
+    """代码围栏整段的折叠区间（单行围栏不给）。"""
+    out: List[Dict[str, Any]] = []
+    for start, end in fences:
+        if end > start:
+            out.append({"startLine": start, "endLine": end, "kind": "region"})
+    return out
+
+
 def folding_ranges(text: str) -> List[Dict[str, Any]]:
     """Markdown 折叠区间（行号 0 基；LSP FoldingRange 口径）。
 
@@ -111,38 +176,8 @@ def folding_ranges(text: str) -> List[Dict[str, Any]]:
     所以它是「派生自既有真源的能力」，不是新造事实。
     """
     lines = text.split("\n")
-    heads: List[tuple] = []              # (行号, 级别)
-    fences: List[tuple] = []
-    in_fence = False
-    fence_start = -1
-    for i, raw in enumerate(lines):
-        if _FENCE.match(raw):
-            if in_fence:
-                fences.append((fence_start, i))
-                in_fence = False
-            else:
-                in_fence = True
-                fence_start = i
-            continue
-        if in_fence:
-            continue
-        m = HEADING.match(raw)
-        if m:
-            heads.append((i, len(m.group(1))))
-    out: List[Dict[str, Any]] = []
-    for idx, (line, level) in enumerate(heads):
-        end = len(lines) - 1
-        for nxt_line, nxt_level in heads[idx + 1:]:
-            if nxt_level <= level:
-                end = nxt_line - 1
-                break
-        while end > line and not lines[end].strip():
-            end -= 1                      # 尾部空行不折（折了也看不见内容，只是噪声）
-        if end > line:
-            out.append({"startLine": line, "endLine": end, "kind": "region"})
-    for start, end in fences:
-        if end > start:
-            out.append({"startLine": start, "endLine": end, "kind": "region"})
+    out: List[Dict[str, Any]] = (_heading_ranges(lines, _headings(lines))
+                                 + _fence_folding_ranges(_fence_pairs(lines)))
     out.sort(key=lambda r: (r["startLine"], r["endLine"]))
     return out
 
@@ -171,6 +206,21 @@ def diagnose(path: str, text: str, root: str = ".") -> List[Dict[str, Any]]:
     return out
 
 
+def _guard_condition(raw: str) -> tuple | None:
+    """解析一行 `condition: = <expr>` → (表达式起始列, 表达式跨度, 表达式)；非 guard 行返回 None。"""
+    m = re.match(r"^\s*condition:\s*(.+?)\s*$", raw)
+    if not m:
+        return None
+    val = m.group(1)
+    if len(val) >= 2 and val[0] in "\"'" and val[-1] == val[0]:
+        val = val[1:-1]
+    if not val.startswith("="):
+        return None
+    expr = val[1:].strip()
+    start = max(0, raw.find("="))
+    return start, len(val), expr
+
+
 def _guard_diags(path: str, text: str, root: str, lines: List[str]) -> List[Dict[str, Any]]:
     """管线 condition（nf-expr guard）静态检查 → 诊断（源 nfal-guard）。
 
@@ -187,20 +237,14 @@ def _guard_diags(path: str, text: str, root: str, lines: List[str]) -> List[Dict
         return []
     out: List[Dict[str, Any]] = []
     for i, raw in enumerate(lines):
-        m = re.match(r"^\s*condition:\s*(.+?)\s*$", raw)
-        if not m:
+        parsed = _guard_condition(raw)
+        if parsed is None:
             continue
-        val = m.group(1)
-        if len(val) >= 2 and val[0] in "\"'" and val[-1] == val[0]:
-            val = val[1:-1]
-        if not val.startswith("="):
-            continue
-        expr = val[1:].strip()
-        start = max(0, raw.find("="))
+        start, span, expr = parsed
         res = nfal.check_expression(expr, sym)
         for d in res["diagnostics"]:
             out.append({
-                "range": _range_of(lines, i, start, start + len(val)),
+                "range": _range_of(lines, i, start, start + span),
                 "severity": SEVERITY_ERROR if d["severity"] == "fail" else SEVERITY_WARNING,
                 "source": "nfal-guard", "code": d["code"], "message": d["message"]})
     return out

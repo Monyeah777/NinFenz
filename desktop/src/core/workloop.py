@@ -62,10 +62,9 @@ def state(root: str = ".") -> Dict[str, Any]:
     }
 
 
-def items(root: str = ".", limit: int = 0, source: str = "") -> List[Dict[str, Any]]:
-    """工作项清单（来自公开声明件；每条带 id/kind/title/detail/落点提示/完成判据）。"""
+def _backlog_items(backlog: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """type_backlog → 补类型证据工单项。"""
     out: List[Dict[str, Any]] = []
-    backlog = _read(root, "protocol/type_backlog.json")
     for i, f in enumerate(backlog.get("fields") or [], 1):
         ev, fld = str(f.get("event") or ""), str(f.get("field") or "")
         out.append({
@@ -76,7 +75,12 @@ def items(root: str = ".", limit: int = 0, source: str = "") -> List[Dict[str, A
             "where_hint": "事件发布方模块正文（%s 的载荷表）" % (ev or "?"),
             "done_when": ["模块正文补出该字段的类型证据", "nf lint / verify 全绿"],
         })
-    advisory = _read(root, "protocol/pipeline_advisory.json")
+    return out
+
+
+def _advisory_items(advisory: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """pipeline_advisory → 收敛 advisory 工单项。"""
+    out: List[Dict[str, Any]] = []
     for i, a in enumerate(advisory.get("items") or [], 1):
         out.append({
             "id": "PA-%03d:%s" % (i, str(a.get("pipeline") or "?")),
@@ -87,6 +91,14 @@ def items(root: str = ".", limit: int = 0, source: str = "") -> List[Dict[str, A
             "where_hint": "对应管线声明与所涉模块的 references/事件声明",
             "done_when": ["该类别计数下降或转为在册机制", "nf pipeline dryrun --all 零 hard"],
         })
+    return out
+
+
+def items(root: str = ".", limit: int = 0, source: str = "") -> List[Dict[str, Any]]:
+    """工作项清单（来自公开声明件；每条带 id/kind/title/detail/落点提示/完成判据）。"""
+    out: List[Dict[str, Any]] = []
+    out.extend(_backlog_items(_read(root, "protocol/type_backlog.json")))
+    out.extend(_advisory_items(_read(root, "protocol/pipeline_advisory.json")))
     out += capability_gaps(root)
     if source:
         out = [it for it in out if it["source"] == source]
@@ -96,24 +108,40 @@ def items(root: str = ".", limit: int = 0, source: str = "") -> List[Dict[str, A
 def capability_gaps(root: str = ".") -> List[Dict[str, Any]]:
     """现有功能的延伸/深化/创新候选（**全部机械派生**，每条附缺口事实）。
 
-    设计纪律：候选不是"我觉得可以做 XXX"，而是**仓库状态里可核验的缺口**——
-    ① 已有只读面未接 MCP（extend）；② 同一份事实在两处声明却无一致性判据（deepen，
-    实例：CLI 可选值 ↔ 声明件曾两次漏同步）；③ 两个既有面之间尚未接线（innovate）。
+    设计纪律：候选不是"我觉得可以做 XXX"，而是**仓库状态里可核验的缺口**——① 已有只读面未接 MCP（extend）；② 同一份事实在两处声明却无一致性判据（deepen）；③ 两个既有面之间尚未接线（innovate）。
     """
-    import re
-    out: List[Dict[str, Any]] = []
-
-    # ① extend：只读治理面未接 MCP
     nf_path = os.path.join(root, "scripts", "nf.py")
+    cmds = _cli_commands(nf_path)
+    out: List[Dict[str, Any]] = []
+    out.extend(_extend_candidate(cmds))          # ① extend：只读治理面未接 MCP
+    interop_decl = _interop_decl()
+    out.extend(_deepen_candidate(nf_path, cmds, interop_decl))   # ② deepen
+    out.extend(_innovate_candidate(interop_decl))                # ③ innovate
+    return out
+
+
+def _cli_commands(nf_path: str) -> List[str]:
+    """scripts/nf.py 里的 sub.add_parser 命令名（去重排序）。"""
+    import re
     cmds: List[str] = []
     if os.path.isfile(nf_path):
         with open(nf_path, encoding="utf-8") as fh:
             cmds = sorted(set(re.findall(r'sub\.add_parser\(\s*"([a-z0-9-]+)"', fh.read())))
+    return cmds
+
+
+def _mcp_tools() -> set:
+    """MCP 工具名集合（运行时面不可读 → 空集，不干扰候选生成）。"""
     try:
         from core import mcp_runtime as _mcp
-        tools = {t["name"] for t in _mcp.TOOL_DEFS}
+        return {t["name"] for t in _mcp.TOOL_DEFS}
     except Exception:  # pragma: no cover
-        tools = set()
+        return set()
+
+
+def _extend_candidate(cmds: List[str]) -> List[Dict[str, Any]]:
+    """① extend：只读治理面未接 MCP（缺失即产候选）。"""
+    tools = _mcp_tools()
     readonly_governance = [c for c in cmds if c in (
         "decisions", "handover", "postmortem", "audit", "transparency", "score",
         "conformance", "assertions", "model", "cognition", "events", "rfc",
@@ -121,27 +149,31 @@ def capability_gaps(root: str = ".") -> List[Dict[str, Any]]:
         "who-refers", "impact")]
     covered = {"receipts", "endpoint", "driver", "patterns", "knowledge"}
     missing = [c for c in readonly_governance if c not in covered]
-    if missing:
-        out.append({
-            "id": "CAP-EXTEND-MCP-READONLY",
-            "source": "capability-gaps", "family": "extend",
+    if not missing:
+        return []
+    return [{
+            "id": "CAP-EXTEND-MCP-READONLY", "source": "capability-gaps", "family": "extend",
             "kind": "capability-extension",
-            "title": "把只读治理面接入 MCP（当前 %d 个只读面未暴露，工具仅 %d 个）"
-                     % (len(missing), len(tools)),
+            "title": "把只读治理面接入 MCP（当前 %d 个只读面未暴露，工具仅 %d 个）" % (len(missing), len(tools)),
             "detail": "未接 MCP 的只读面：%s" % "、".join(missing[:8]),
-            "where_hint": "core/mcp_runtime.py（TOOL_DEFS + 只读白名单）+ protocol/"
-                          "mcp_package.json 登记",
-            "done_when": ["新增工具逐名与实现一致", "check33 新面扫描含逐名一致断言",
-                          "MCP 工具仍全只读（无写路径）"],
-        })
+            "where_hint": "core/mcp_runtime.py（TOOL_DEFS + 只读白名单）+ protocol/mcp_package.json 登记",
+            "done_when": ["新增工具逐名与实现一致", "check33 新面扫描含逐名一致断言", "MCP 工具仍全只读（无写路径）"],
+        }]
 
-    # ② deepen：同一事实两处声明、却无「一致性判据」的实例（先报已证实的那个）
-    interop_decl: List[str] = []
+
+def _interop_decl() -> List[str]:
+    """导出面声明的 kind 列表（不可读 → 空表，本轮不产候选）。"""
     try:
         from core import interop_export as _ie
-        interop_decl = sorted(_ie.KINDS)
-    except Exception:  # pragma: no cover —— 导出面声明不可读：本轮不产 innovate 候选（不静默：候选缺失即结果为少一条）  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-        pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
+        return sorted(_ie.KINDS)
+    except Exception:  # pragma: no cover —— 导出面声明不可读：本轮不产 innovate 候选（不静默：候选缺失即结果为少一条）
+        return []
+
+
+def _deepen_candidate(nf_path: str, cmds: List[str],
+                      interop_decl: List[str]) -> List[Dict[str, Any]]:
+    """② deepen：CLI 可选值 ↔ 声明件无一致性判据（抓到差异才产候选）。"""
+    import re
     cli_kinds: List[str] = []
     if cmds:
         with open(nf_path, encoding="utf-8") as fh:
@@ -150,37 +182,30 @@ def capability_gaps(root: str = ".") -> List[Dict[str, Any]]:
                       text)
         if m:
             cli_kinds = sorted(re.findall(r'"([a-z]+)"', m.group(1)))
-    if interop_decl and cli_kinds and cli_kinds != interop_decl:
-        out.append({
-            "id": "CAP-DEEPEN-DECL-CONSISTENCY",
-            "source": "capability-gaps", "family": "deepen",
+    if not (interop_decl and cli_kinds and cli_kinds != interop_decl):
+        return []
+    return [{
+            "id": "CAP-DEEPEN-DECL-CONSISTENCY", "source": "capability-gaps", "family": "deepen",
             "kind": "judgement-deepening",
-            "title": "加「CLI 可选值 ↔ 声明件」一致性判据（已抓到实例：缺 %s）"
-                     % "、".join(sorted(set(interop_decl) - set(cli_kinds))),
-            "detail": "interop CLI kinds=%s / 导出面声明=%s —— 同类漏同步此前已发生一次"
-                      "（slsa/a2a），属可机检的判据缺口" % (cli_kinds, interop_decl),
+            "title": "加「CLI 可选值 ↔ 声明件」一致性判据（已抓到实例：缺 %s）" % "、".join(sorted(set(interop_decl) - set(cli_kinds))),
+            "detail": "interop CLI kinds=%s / 导出面声明=%s —— 同类漏同步此前已发生一次（slsa/a2a），属可机检的判据缺口" % (cli_kinds, interop_decl),
             "where_hint": "scripts/nf.py 的 choices + core/interop_export.KINDS（判据落 check33）",
-            "done_when": ["修掉实例差异", "新增通用判据：CLI choices ⊆ 声明件（或相等）",
-                          "负例单测：故意漏一个 kind 应被抓"],
-        })
+            "done_when": ["修掉实例差异", "新增通用判据：CLI choices ⊆ 声明件（或相等）", "负例单测：故意漏一个 kind 应被抓"],
+        }]
 
-    # ③ innovate：两个既有面之间尚未接线（**接线完成即自动撤单**——候选池必须反映当前状态）
-    if "decisions" not in interop_decl:
-        out.append({
-            "id": "CAP-INNOVATE-DECISION-INTEROP",
-            "source": "capability-gaps", "family": "innovate",
+
+def _innovate_candidate(interop_decl: List[str]) -> List[Dict[str, Any]]:
+    """③ innovate：两个既有面之间尚未接线（**接线完成即自动撤单**——候选池必须反映当前状态）。"""
+    if "decisions" in interop_decl:
+        return []
+    return [{
+            "id": "CAP-INNOVATE-DECISION-INTEROP", "source": "capability-gaps", "family": "innovate",
             "kind": "capability-innovation",
             "title": "把决策层/工单面接进互操作导出（决策可被外部工具链读）",
-            "detail": "现状：decision_layer.json 与 workloop 工单都在仓内，互操作导出面"
-                      "（%d 面）尚无「决策面」投影；外部工具链读不到「谁按什么概率决定了什么」"
-                      % len(interop_decl),
-            "where_hint": "core/interop_export.py 新增 kind（纯派生自 decision_layer.json + 公开裁"
-                "决索引）",
-            "done_when": ["新导出面纯派生（不改真源）",
-                          "外部 schema 校验口径成立或如实记 no-schema",
-                          "check33 入仓面逐字节一致"],
-        })
-    return out
+            "detail": "现状：decision_layer.json 与 workloop 工单都在仓内，互操作导出面（%d 面）尚无「决策面」投影；外部工具链读不到「谁按什么概率决定了什么」" % len(interop_decl),
+            "where_hint": "core/interop_export.py 新增 kind（纯派生自 decision_layer.json + 公开裁决索引）",
+            "done_when": ["新导出面纯派生（不改真源）", "外部 schema 校验口径成立或如实记 no-schema", "check33 入仓面逐字节一致"],
+        }]
 
 
 def questions(root: str = ".", top: int = 5, source: str = "") -> Dict[str, Any]:
@@ -246,24 +271,16 @@ def plan(root: str = ".", adapter: str = "stub", top: int = 5, endpoint: str = "
         "schema": "nf-workorder/1", "status": "ok",
         "order_id": _order_id(chosen_id, st),
         "state": st,
-        "decision": {"adapter": out["meta"].get("adapter"),
-                     "calibrated": out["meta"].get("calibrated"),
+        "decision": {"adapter": out["meta"].get("adapter"), "calibrated": out["meta"].get("calibrated"),
                      "non_gate": out["meta"].get("non_gate"),
-                     "next_item_prob": answers["next_item"]["probs"][
-                         answers["next_item"]["options"].index(chosen_id)],
+                     "next_item_prob": answers["next_item"]["probs"][answers["next_item"]["options"].index(chosen_id)],
                      "risk_level": risk.get("value"), "risk_probs": risk.get("probs"),
-                     "gate_safe_p": safe.get("p"),
-                     "note": "决策层只给选择与概率；**它不写内容**"},
+                     "gate_safe_p": safe.get("p"), "note": "决策层只给选择与概率；**它不写内容**"},
         "chosen": chosen,
-        "worker_brief": {
-            "goal": chosen["title"],
-            "item": chosen["id"],
-            "evidence": chosen["detail"],
-            "where": chosen["where_hint"],
-            "done_when": chosen["done_when"],
-            "accept": "bash verify.sh（全绿）+ nf conformance（conformant）",
-            "worker_role": "生成式 worker（人 / Codex / 生成式模型）——决策模型不落笔",
-        },
+        "worker_brief": {"goal": chosen["title"], "item": chosen["id"], "evidence": chosen["detail"],
+                         "where": chosen["where_hint"], "done_when": chosen["done_when"],
+                         "accept": "bash verify.sh（全绿）+ nf conformance（conformant）",
+                         "worker_role": "生成式 worker（人 / Codex / 生成式模型）——决策模型不落笔"},
     }
 
 
@@ -275,8 +292,7 @@ def write_order(root: str, doc: Dict[str, Any]) -> str:
     path = os.path.join(root, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     from core import atomic_write  # 内部档案件：原子写（worker 读到半截即误判，2026-10-01）
-    atomic_write.write_text(path, json.dumps(doc, ensure_ascii=False, indent=2,
-                                             sort_keys=True) + "\n")
+    atomic_write.write_text(path, json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
     return rel
 
 
@@ -286,12 +302,9 @@ def render_brief(doc: Dict[str, Any], closed: Optional[Dict[str, Any]] = None) -
         return "工单未成形：%s" % doc.get("reason")
     b = doc["worker_brief"]
     lines = ["# 工单 %s" % doc["order_id"], "",
-             "- 目标：%s" % b["goal"],
-             "- 条目：`%s`（%s）" % (b["item"], doc["chosen"]["source"]),
-             "- 证据/背景：%s" % b["evidence"],
-             "- 落点提示：%s" % b["where"],
-             "- 完成判据：%s" % "；".join(b["done_when"]),
-             "- 验收：%s" % b["accept"],
+             "- 目标：%s" % b["goal"], "- 条目：`%s`（%s）" % (b["item"], doc["chosen"]["source"]),
+             "- 证据/背景：%s" % b["evidence"], "- 落点提示：%s" % b["where"],
+             "- 完成判据：%s" % "；".join(b["done_when"]), "- 验收：%s" % b["accept"],
              "- 决策层（只选择、不写内容）：%s · 风险期望 %.2f · gate_safe=%.2f"
              % (doc["decision"]["adapter"], doc["decision"]["risk_level"] or 0.0,
                 doc["decision"]["gate_safe_p"] or 0.0), ""]
@@ -309,16 +322,13 @@ def close(root: str, order_id: str, outcome: str, gate: str, note: str = "") -> 
     path = os.path.join(root, rel)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     from core import atomic_write  # 内部档案件：原子写（2026-10-01）
-    atomic_write.write_text(path, json.dumps(rec, ensure_ascii=False, indent=2,
-                                             sort_keys=True) + "\n")
+    atomic_write.write_text(path, json.dumps(rec, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
     return rel
 
 
-def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
-    """回路体检（离线）：待办真源可读 + 问题形状合法 + 工单只落内部档案 + stub 确定性。"""
+def _item_face_issues(all_items: List[Dict[str, Any]]) -> List[str]:
+    """待办面：真源非空 + id 唯一 + 前五项字段齐。"""
     issues: List[str] = []
-    st = state(root)
-    all_items = items(root)
     if not all_items:
         issues.append("待办真源为空（%s 均无条目）——回路无活可挑"
                       % "、".join(rel for _n, rel in SOURCES))
@@ -331,6 +341,13 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
             if not it.get(k):
                 issues.append("工作项 %s 缺字段 %s（工单须能自述怎么干、怎么验收）"
                               % (it.get("id"), k))
+    return issues
+
+
+def _plan_face_issues(root: str,
+                      all_items: List[Dict[str, Any]]) -> Tuple[List[str], Dict[str, Any]]:
+    """问题面/工单面：问题形状合法 + stub 确定性 + 工单自述齐 → (issues, stub 工单)。"""
+    issues: List[str] = []
     qs = questions(root, top=3)
     if not qs:
         issues.append("问题面为空（无法向决策层提问）")
@@ -344,6 +361,13 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         issues.append("stub 工单非确定性（同输入两次结果不一致）")
     if p1.get("status") != "ok" and all_items:
         issues.append("stub 工单未成形：%s" % p1.get("reason"))
+    issues.extend(_order_face_issues(p1, all_items))
+    return issues, p1
+
+
+def _order_face_issues(p1: Dict[str, Any], all_items: List[Dict[str, Any]]) -> List[str]:
+    """stub 工单成形时：所选在候选集内 + worker_brief 四键齐。"""
+    issues: List[str] = []
     if p1.get("status") == "ok":
         if p1["chosen"]["id"] not in [it["id"] for it in all_items[:3]]:
             issues.append("工单所选工作项不在候选集内（%s）" % p1["chosen"]["id"])
@@ -351,18 +375,25 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         for k in ("goal", "done_when", "accept", "worker_role"):
             if not brief.get(k):
                 issues.append("工单缺 %s（缺判据的工单等于没有验收）" % k)
+    return issues
+
+
+def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
+    """回路体检（离线）：待办真源可读 + 问题形状合法 + 工单只落内部档案 + stub 确定性。"""
+    issues: List[str] = []
+    st = state(root)
+    all_items = items(root)
+    issues.extend(_item_face_issues(all_items))
+    plan_issues, p1 = _plan_face_issues(root, all_items)
+    issues.extend(plan_issues)
     if not ORDER_DIR.startswith(ARCHIVE_PREFIX):
         issues.append("工单目录不在内部档案前缀 %s 下（计划类产品不得入公开仓）"
                       % ARCHIVE_PREFIX)
-    stats = {"items": len(all_items), "untyped": st["untyped_fields"],
-             "advisories": st["advisories"], "adapters": len(st["adapters"]),
-             "pulled_candidates": st["candidates_pulled"],
-             "stub_order": (p1.get("order_id") if p1.get("status") == "ok" else ""),
-             "issues": len(issues)}
+    stats = {"items": len(all_items), "untyped": st["untyped_fields"], "advisories": st["advisories"],
+             "adapters": len(st["adapters"]), "pulled_candidates": st["candidates_pulled"],
+             "stub_order": (p1.get("order_id") if p1.get("status") == "ok" else ""), "issues": len(issues)}
     return issues, stats
 
 
 def summary(stats: Dict[str, Any]) -> str:
-    return ("待办 %(items)d 项（未定型字段 %(untyped)d · advisory %(advisories)d）· "
-            "适配器 %(adapters)d · 已拉取候选 %(pulled_candidates)s · stub 工单 %(stub_order)s"
-            % stats)
+    return ("待办 %(items)d 项（未定型字段 %(untyped)d · advisory %(advisories)d）· 适配器 %(adapters)d · 已拉取候选 %(pulled_candidates)s · stub 工单 %(stub_order)s" % stats)

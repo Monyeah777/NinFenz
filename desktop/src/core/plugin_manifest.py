@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List
 
 from core import json_doc
 from core import paths as _paths
@@ -52,11 +52,8 @@ def wit_exports(text: str) -> list[str]:
     return sorted(set(_WIT_EXPORT.findall(body)))
 
 
-def validate(doc: Any) -> list[str]:
-    """→ 装载问题清单（空表 = 可装）。纯函数，便于变异自证。"""
-    issues: list[str] = []
-    if not isinstance(doc, dict):
-        return ["清单不是对象"]
+def _header_issues(doc: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     for key in _REQUIRED:
         if not doc.get(key):
             issues.append(f"缺字段：{key}")
@@ -67,7 +64,27 @@ def validate(doc: Any) -> list[str]:
     ver = str(doc.get("version") or "")
     if ver and not re.match(r"^\d+\.\d+\.\d+", ver):
         issues.append(f"version 不是 x.y.z 形态：{ver!r}")
+    return issues
 
+
+def _artifact_issues(doc: Dict[str, Any]) -> List[str]:
+    art = doc.get("artifact")
+    if art is None:
+        return []
+    if not isinstance(art, dict) or not art.get("path"):
+        return ["artifact 存在但无 path"]
+    try:
+        _paths.validate_path(".", str(art["path"]))
+    except _paths.PathEscapeError as exc:
+        return [f"artifact.path 逃逸仓库根：{exc}"]
+    return []
+
+
+def validate(doc: Any) -> list[str]:
+    """→ 装载问题清单（空表 = 可装）。纯函数，便于变异自证。"""
+    if not isinstance(doc, dict):
+        return ["清单不是对象"]
+    issues: list[str] = _header_issues(doc)
     methods = doc.get("methods")
     if not isinstance(methods, list) or not methods:
         issues.append("methods 必须是非空列表")
@@ -75,16 +92,7 @@ def validate(doc: Any) -> list[str]:
     seen: set = set()
     for i, m in enumerate(methods):
         issues.extend(_method_issues(i, m, str(doc.get("abi") or ""), seen))
-
-    art = doc.get("artifact")
-    if art is not None:
-        if not isinstance(art, dict) or not art.get("path"):
-            issues.append("artifact 存在但无 path")
-        else:
-            try:
-                _paths.validate_path(".", str(art["path"]))
-            except _paths.PathEscapeError as exc:
-                issues.append(f"artifact.path 逃逸仓库根：{exc}")
+    issues.extend(_artifact_issues(doc))
     return issues
 
 

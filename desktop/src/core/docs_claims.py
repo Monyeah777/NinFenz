@@ -54,6 +54,87 @@ def _expected() -> Dict[str, Any]:
             "baseline_pass": int(qb.EXPECTED_PASS)}
 
 
+def _pass_count_claims(rel: str, lineno: int, line: str, pattern: str,
+                        expected: Dict[str, Any]):
+    claims: List[Dict[str, Any]] = []
+    violations: List[Dict[str, Any]] = []
+    for m in re.finditer(pattern, line):
+        value = int(m.group(1))
+        ok = value == expected["pass_count"]
+        claims.append({"doc": rel, "line": lineno, "kind": "pass_count",
+                       "value": value, "expected": expected["pass_count"], "ok": ok})
+        if not ok:
+            violations.append({"doc": rel, "line": lineno, "kind": "pass_count",
+                                "detail": "PASS=%d 与实测 PASS=%d 不一致（修复指引：同步文档数字）"
+                                          % (value, expected["pass_count"])})
+    return claims, violations
+
+
+def _check_label_claims(rel: str, lineno: int, line: str, pattern: str,
+                        expected: Dict[str, Any]):
+    claims: List[Dict[str, Any]] = []
+    violations: List[Dict[str, Any]] = []
+    for m in re.finditer(pattern, line):
+        value = str(m.group(0))
+        ok = value == expected["check_label"]
+        claims.append({"doc": rel, "line": lineno, "kind": "check_label",
+                       "value": value, "expected": expected["check_label"], "ok": ok})
+        if not ok:
+            violations.append({"doc": rel, "line": lineno, "kind": "check_label",
+                                "detail": "check 标签 %s 与实测 %s 不一致（修复指引：同步文档标签）"
+                                          % (value, expected["check_label"])})
+    return claims, violations
+
+
+def _baseline_key_claims(rel: str, lineno: int, line: str, pattern: str,
+                         expected: Dict[str, Any]):
+    claims: List[Dict[str, Any]] = []
+    violations: List[Dict[str, Any]] = []
+    for m in re.finditer(pattern, line):
+        key, raw = m.group(1), int(m.group(2))
+        ok = raw == expected[key]
+        claims.append({"doc": rel, "line": lineno, "kind": "baseline_keys",
+                       "value": raw, "expected": expected[key], "ok": ok,
+                       "key": key})
+        if not ok:
+            violations.append({"doc": rel, "line": lineno, "kind": "baseline_keys",
+                                "detail": "%s=%d 与实测 %d 不一致（修复指引：同步矩阵数字）"
+                                          % (key, raw, expected[key])})
+    return claims, violations
+
+
+def _line_kind_claims(rel: str, lineno: int, line: str, item: Dict[str, Any],
+                      patterns: Dict[str, str], expected: Dict[str, Any]):
+    claims: List[Dict[str, Any]] = []
+    violations: List[Dict[str, Any]] = []
+    kinds = item.get("kinds") or []
+    if "pass_count" in kinds:
+        c, v = _pass_count_claims(rel, lineno, line, patterns["pass_count"], expected)
+        claims += c
+        violations += v
+    if "check_label" in kinds:
+        c, v = _check_label_claims(rel, lineno, line, patterns["check_label"], expected)
+        claims += c
+        violations += v
+    if "baseline_keys" in kinds:
+        c, v = _baseline_key_claims(rel, lineno, line, patterns["baseline_keys"], expected)
+        claims += c
+        violations += v
+    return claims, violations
+
+
+def _forbidden_claims(rel: str, lineno: int, line: str, reg: Dict[str, Any]) -> List[Dict[str, Any]]:
+    violations: List[Dict[str, Any]] = []
+    for phrase in reg.get("forbidden_claims") or []:
+        if re.search(phrase, line):
+            negative = [w for w in reg.get("negative_context") or [] if w in line]
+            if not negative:
+                violations.append({"doc": rel, "line": lineno, "kind": "forbidden-claim",
+                                    "detail": "禁用措辞「%s」出现在非否定语境"
+                                              "（修复指引：删掉认证/合规表述或改为否定语境）" % phrase})
+    return violations
+
+
 def build(root: str = ".") -> Dict[str, Any]:
     reg = load_registry(root)
     expected = _expected()
@@ -69,44 +150,10 @@ def build(root: str = ".") -> Dict[str, Any]:
             continue
         lines = path.read_text(encoding="utf-8").splitlines()
         for lineno, line in enumerate(lines, 1):
-            if "pass_count" in (item.get("kinds") or []):
-                for m in re.finditer(patterns["pass_count"], line):
-                    value = int(m.group(1))
-                    ok = value == expected["pass_count"]
-                    claims.append({"doc": rel, "line": lineno, "kind": "pass_count",
-                                   "value": value, "expected": expected["pass_count"], "ok": ok})
-                    if not ok:
-                        violations.append({"doc": rel, "line": lineno, "kind": "pass_count",
-                                            "detail": "PASS=%d 与实测 PASS=%d 不一致（修复指引：同步文档数字）"
-                                                      % (value, expected["pass_count"])})
-            if "check_label" in (item.get("kinds") or []):
-                for m in re.finditer(patterns["check_label"], line):
-                    value = str(m.group(0))
-                    ok = value == expected["check_label"]
-                    claims.append({"doc": rel, "line": lineno, "kind": "check_label",
-                                   "value": value, "expected": expected["check_label"], "ok": ok})
-                    if not ok:
-                        violations.append({"doc": rel, "line": lineno, "kind": "check_label",
-                                            "detail": "check 标签 %s 与实测 %s 不一致（修复指引：同步文档标签）"
-                                                      % (value, expected["check_label"])})
-            if "baseline_keys" in (item.get("kinds") or []):
-                for m in re.finditer(patterns["baseline_keys"], line):
-                    key, raw = m.group(1), int(m.group(2))
-                    ok = raw == expected[key]
-                    claims.append({"doc": rel, "line": lineno, "kind": "baseline_keys",
-                                   "value": raw, "expected": expected[key], "ok": ok,
-                                   "key": key})
-                    if not ok:
-                        violations.append({"doc": rel, "line": lineno, "kind": "baseline_keys",
-                                            "detail": "%s=%d 与实测 %d 不一致（修复指引：同步矩阵数字）"
-                                                      % (key, raw, expected[key])})
-            for phrase in reg.get("forbidden_claims") or []:
-                if re.search(phrase, line):
-                    negative = [w for w in reg.get("negative_context") or [] if w in line]
-                    if not negative:
-                        violations.append({"doc": rel, "line": lineno, "kind": "forbidden-claim",
-                                            "detail": "禁用措辞「%s」出现在非否定语境"
-                                                      "（修复指引：删掉认证/合规表述或改为否定语境）" % phrase})
+            c, v = _line_kind_claims(rel, lineno, line, item, patterns, expected)
+            claims += c
+            violations += v
+            violations += _forbidden_claims(rel, lineno, line, reg)
     report = {"schema": REPORT_SCHEMA, "expected": expected,
               "claims": claims, "violations": violations,
               "counts": {"documents": len(reg.get("documents") or []),

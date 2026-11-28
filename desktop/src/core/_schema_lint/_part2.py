@@ -47,27 +47,46 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, int]]:
     """真算（未命中缓存时走这里）。"""
     issues: List[str] = []
     if _csc.yaml is None:                     # PyYAML 惰性（见 `core.lazy_yaml`）：只在这里问一次
-        issues.append("PyYAML 不在（schema_lint 依赖仓库既有 yaml 依赖）")
-        stats = {"schema_files": 0, "module_docs": 0, "contract_covered": 0,
-                 "pipelines": 0, "protocols": 0, "asset_entries": 0}
-        return issues, stats
-
+        return _yaml_missing()
     schema_issues, schemas = check_schema_files(root)
     issues += schema_issues
     by_name = {os.path.basename(s["$id"]): s for s in schemas if "$id" in s}
-
     paths = discover(root)
     module_docs = paths["module_docs"]
     pipeline_docs = paths["pipeline_docs"]
     protocol_files = paths["protocol_files"]
+    contract_covered = _module_contract_issues(root, module_docs,
+                                               by_name.get("contract.schema.json"), issues)
+    reg_modules = _registry_modules(root, issues)
+    if by_name.get("module.schema.json") is not None:
+        issues += _registry_value_issues(reg_modules, by_name["module.schema.json"])
+    issues += _pipeline_doc_issues(root, pipeline_docs, by_name.get("pipeline.schema.json"))
+    issues += _protocol_doc_issues(root, protocol_files, by_name.get("protocol.schema.json"))
+    prov_entries = _provenance_entries(root, issues)
+    if by_name.get("asset.schema.json") is not None:
+        issues += _asset_value_issues(prov_entries, by_name["asset.schema.json"])
+    stats = {
+        "schema_files": len(schemas),
+        "module_docs": len(module_docs),
+        "contract_covered": contract_covered,
+        "pipelines": len(pipeline_docs),
+        "protocols": len(protocol_files),
+        "asset_entries": len(prov_entries),
+    }
+    return issues, stats
 
-    contract_schema = by_name.get("contract.schema.json")
-    module_schema = by_name.get("module.schema.json")
-    pipeline_schema = by_name.get("pipeline.schema.json")
-    protocol_schema = by_name.get("protocol.schema.json")
-    asset_schema = by_name.get("asset.schema.json")
 
-    contract_covered = 0
+def _yaml_missing() -> Tuple[List[str], Dict[str, int]]:
+    """PyYAML 不在时的空结果。"""
+    stats = {"schema_files": 0, "module_docs": 0, "contract_covered": 0,
+             "pipelines": 0, "protocols": 0, "asset_entries": 0}
+    return ["PyYAML 不在（schema_lint 依赖仓库既有 yaml 依赖）"], stats
+
+
+def _module_contract_issues(root: str, module_docs: List[str],
+                            contract_schema, issues: List[str]) -> int:
+    """module docs 的 machine_contract 校验 → 覆盖数。"""
+    covered = 0
     contract_fp = _schema_fp(contract_schema)
     for doc in module_docs:
         rel = os.path.relpath(doc, root).replace(os.sep, "/")
@@ -80,23 +99,35 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, int]]:
                                 f"{rel} machine_contract")
         if msgs is None:
             continue  # 存量旧格式模块（check16 过渡策略：缺块不阻断）
-        contract_covered += 1
+        covered += 1
         issues += msgs
+    return covered
 
-    # registry 投影（module.schema.json）
+
+def _registry_modules(root: str, issues: List[str]) -> List[Dict[str, Any]]:
+    """registry.json modules[]（读失败 → 空表并记 issue）。"""
     reg_path = os.path.join(root, "desktop", "src", "core", "registry.json")
     reg, err = _read_json(reg_path)
     if reg is None:
         issues.append(f"registry.json 读取/解析失败：{err}")
-        reg_modules: List[Dict[str, Any]] = []
-    else:
-        reg_modules = reg.get("modules") or []
-    if module_schema is not None:
-        module_fp = _schema_fp(module_schema)
-        for entry in reg_modules:
-            issues += _lint_obj_cached(entry, module_schema, module_fp, "registry.modules")
+        return []
+    return reg.get("modules") or []
 
-    # 管线声明（pipeline.schema.json）
+
+def _registry_value_issues(reg_modules: List[Dict[str, Any]],
+                           module_schema) -> List[str]:
+    """registry.modules 的 module.schema.json 校验。"""
+    issues: List[str] = []
+    module_fp = _schema_fp(module_schema)
+    for entry in reg_modules:
+        issues += _lint_obj_cached(entry, module_schema, module_fp, "registry.modules")
+    return issues
+
+
+def _pipeline_doc_issues(root: str, pipeline_docs: List[str],
+                         pipeline_schema) -> List[str]:
+    """管线声明的 pipeline.schema.json 校验。"""
+    issues: List[str] = []
     pipeline_fp = _schema_fp(pipeline_schema)
     for doc in pipeline_docs:
         rel = os.path.relpath(doc, root).replace(os.sep, "/")
@@ -111,8 +142,13 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, int]]:
             issues.append(f"{rel}: Pipeline yaml 缺失/解析失败")
             continue
         issues += msgs
+    return issues
 
-    # community 协议声明（protocol.schema.json）
+
+def _protocol_doc_issues(root: str, protocol_files: List[str],
+                         protocol_schema) -> List[str]:
+    """community 协议声明的 protocol.schema.json 校验。"""
+    issues: List[str] = []
     protocol_fp = _schema_fp(protocol_schema)
     for proto in protocol_files:
         rel = os.path.relpath(proto, root).replace(os.sep, "/")
@@ -123,29 +159,26 @@ def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, int]]:
             issues.append(f"{rel}: protocol.yaml 解析失败 {exc}")
             continue
         issues += _lint_obj_cached(data, protocol_schema, protocol_fp, rel)
+    return issues
 
-    # 资产台账（asset.schema.json）
+
+def _provenance_entries(root: str, issues: List[str]) -> List[Dict[str, Any]]:
+    """05_资产库/provenance.json assets[]（读失败 → 空表并记 issue）。"""
     prov_path = os.path.join(root, "05_资产库", "provenance.json")
     prov, err = _read_json(prov_path)
-    prov_entries: List[Dict[str, Any]] = []
     if prov is None:
         issues.append(f"provenance.json 读取/解析失败：{err}")
-    else:
-        prov_entries = prov.get("assets") or []
-    if asset_schema is not None:
-        asset_fp = _schema_fp(asset_schema)
-        for i, entry in enumerate(prov_entries):
-            issues += _lint_obj_cached(entry, asset_schema, asset_fp, f"provenance.assets[{i}]")
+        return []
+    return prov.get("assets") or []
 
-    stats = {
-        "schema_files": len(schemas),
-        "module_docs": len(module_docs),
-        "contract_covered": contract_covered,
-        "pipelines": len(pipeline_docs),
-        "protocols": len(protocol_files),
-        "asset_entries": len(prov_entries),
-    }
-    return issues, stats
+
+def _asset_value_issues(prov_entries: List[Dict[str, Any]], asset_schema) -> List[str]:
+    """资产台账的 asset.schema.json 校验。"""
+    issues: List[str] = []
+    asset_fp = _schema_fp(asset_schema)
+    for i, entry in enumerate(prov_entries):
+        issues += _lint_obj_cached(entry, asset_schema, asset_fp, f"provenance.assets[{i}]")
+    return issues
 
 
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, int]]:

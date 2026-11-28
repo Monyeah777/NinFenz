@@ -242,6 +242,29 @@ def render_markdown(doc: Dict[str, Any]) -> str:
     lines: List[str] = []
     lines.append("### 抽象轴：四阶")
     lines.append("")
+    rows = _render_tier_rows(doc)
+    lines += _table(rows, ["阶", "真源面", "接口面（跨阶唯一可依赖）", "既有判据", "状态 / 变更档"])
+    lines.append("")
+    lines.append("### 资产阶五子级（同一格内异质，分开看代价）")
+    lines.append("")
+    rows = _render_level_rows(doc)
+    lines += _table(rows, ["子级", "真源面", "既有判据", "口径"])
+    lines.append("")
+    lines.append("### 入口面（只登记角色，永不作为真源）")
+    lines.append("")
+    rows = _render_surface_rows(doc)
+    lines += _table(rows, ["面", "入口件", "服务阶", "口径"])
+    lines.append("")
+    lines.append("### 验证纵切（贯穿四阶，不是层）")
+    lines.append("")
+    rows = _render_cross_rows(doc)
+    lines += _table(rows, ["件", "落点", "既有判据"])
+    lines.append("")
+    lines.append("> 本区由 `nf layers --write` 渲染，禁止手改；真源 = `protocol/LAYERS.json`。")
+    return "\n".join(lines)
+
+
+def _render_tier_rows(doc):
     rows = []
     for t in doc.get("tiers") or []:
         rows.append([
@@ -251,39 +274,36 @@ def render_markdown(doc: Dict[str, Any]) -> str:
             "、".join(t.get("judged_by") or []),
             "%s（%s）" % (t.get("status"), t.get("change_tier")),
         ])
-    lines += _table(rows, ["阶", "真源面", "接口面（跨阶唯一可依赖）", "既有判据", "状态 / 变更档"])
-    lines.append("")
-    lines.append("### 资产阶五子级（同一格内异质，分开看代价）")
-    lines.append("")
+    return rows
+
+
+def _render_level_rows(doc):
     rows = []
     for lv in doc.get("asset_levels") or []:
         rows.append(["**%s**" % lv.get("name"),
                      "、".join("`%s`" % g for g in lv.get("globs") or []),
                      "、".join(lv.get("judged_by") or []),
                      str(lv.get("note") or "")])
-    lines += _table(rows, ["子级", "真源面", "既有判据", "口径"])
-    lines.append("")
-    lines.append("### 入口面（只登记角色，永不作为真源）")
-    lines.append("")
+    return rows
+
+
+def _render_surface_rows(doc):
     rows = []
     for sf in doc.get("surfaces") or []:
         rows.append(["**%s**" % sf.get("name"),
                      "、".join("`%s`" % e for e in sf.get("entries") or []),
                      "、".join(sf.get("serves") or []),
                      str(sf.get("note") or "")])
-    lines += _table(rows, ["面", "入口件", "服务阶", "口径"])
-    lines.append("")
-    lines.append("### 验证纵切（贯穿四阶，不是层）")
-    lines.append("")
+    return rows
+
+
+def _render_cross_rows(doc):
     cross = doc.get("crosscut") or {}
     rows = []
     for comp in cross.get("components") or []:
         rows.append(["**%s**" % comp.get("id"), "`%s`" % comp.get("artifact"),
                      "、".join(comp.get("judged_by") or [])])
-    lines += _table(rows, ["件", "落点", "既有判据"])
-    lines.append("")
-    lines.append("> 本区由 `nf layers --write` 渲染，禁止手改；真源 = `protocol/LAYERS.json`。")
-    return "\n".join(lines)
+    return rows
 
 
 def _rule_l10(root: str, doc: Dict[str, Any], issues: List[str]) -> None:

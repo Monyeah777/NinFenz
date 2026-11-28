@@ -57,14 +57,35 @@ def patterns(root: str = ".") -> Tuple[str, ...]:
         doc = load(root)
     except ValueError:
         return tuple(pats)
+    _tier_pats(doc, pats)
+    _level_pats(doc, pats)
+    _crosscut_pats(doc, pats)
+    _derived_pats(doc, pats)
+    out = _pattern_paths(pats, root)
+    return tuple(dict.fromkeys(out))
+
+
+def _tier_pats(doc, pats):
     for tier in doc.get("tiers") or []:
         pats += [str(g) for g in ((tier.get("source") or {}).get("globs") or [])]
+
+
+def _level_pats(doc, pats):
     for level in doc.get("asset_levels") or []:
         pats += [str(g) for g in (level.get("globs") or [])]
+
+
+def _crosscut_pats(doc, pats):
     for comp in ((doc.get("crosscut") or {}).get("components") or []):
         if comp.get("artifact"):
             pats.append(str(comp["artifact"]))
+
+
+def _derived_pats(doc, pats):
     pats += [str(p) for p in (doc.get("derived") or [])]
+
+
+def _pattern_paths(pats, root):
     out = []
     for pat in pats:
         pat = pat.strip()
@@ -75,7 +96,7 @@ def patterns(root: str = ".") -> Tuple[str, ...]:
         if not any(ch in pat for ch in "*?[" ) and os.path.isdir(os.path.join(str(root), pat)):
             pat = pat.rstrip("/") + "/**/*"
         out.append(pat)
-    return tuple(dict.fromkeys(out))
+    return out
 
 
 def face_fingerprint(root: str = ".") -> str:

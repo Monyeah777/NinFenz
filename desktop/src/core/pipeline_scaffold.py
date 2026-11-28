@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import re
+from typing import List, Tuple
 
 
 def normalize_pipeline_id(raw: str) -> str:
@@ -29,6 +30,58 @@ def default_filename(pid: str, name: str) -> str:
     return "%s_%s.md" % (pid, safe or "派生管线")
 
 
+def _domain_tags(domain: str) -> List[str]:
+    d = (domain or "").strip().rstrip("包").rstrip("领域")
+    return ["%s领域" % d] if d else []
+
+
+def _yaml_line(ln: str, pid: str, name: str, tags_extra: List[str]) -> Tuple[str, str]:
+    """yaml 块内单行替换 → (新行, 命中的键名或空串)。"""
+    if re.fullmatch(r"  id: P\d{2,4}\s*", ln):
+        return "  id: %s" % pid, "id"
+    if ln.startswith("  name: "):
+        return "  name: %s" % name, "name"
+    if ln.strip().startswith("tags: "):
+        inner = ln.split(":", 1)[1].strip()
+        items = [x.strip().strip("[]") for x in inner.split(",") if x.strip()]
+        for t in tags_extra:
+            if t not in items:
+                items.append(t)
+        return "  tags: [%s]" % ", ".join(items), "tags"
+    return ln, ""
+
+
+def _rewrite_yaml_block(new: str, pid: str, name: str,
+                        tags_extra: List[str]) -> Tuple[str, bool, bool, bool]:
+    out: List[str] = []
+    in_block = False
+    done = {"id": False, "name": False, "tags": False}
+    for ln in new.split("\n"):
+        if not in_block:
+            if ln.strip().startswith("```"):
+                in_block = True
+            out.append(ln)
+            continue
+        if ln.strip().startswith("```"):
+            in_block = False
+            out.append(ln)
+            continue
+        replaced_line, kind = _yaml_line(ln, pid, name, tags_extra)
+        if kind and not done[kind]:
+            done[kind] = True
+            out.append(replaced_line)
+            continue
+        out.append(ln)
+    return "\n".join(out), done["id"], done["name"], done["tags"]
+
+
+def _source_note(note: str, domain: str) -> str:
+    src = note or "由 `nf pipeline new` 自 P00 通用骨架派生"
+    if domain:
+        src = "由 `nf pipeline new --from P00 --domain %s` 派生" % domain.strip()
+    return src
+
+
 def scaffold_pipeline(template_text: str, pipeline_id: str, name: str,
                       domain: str = "", note: str = "") -> str:
     """把模板管线文本派生为新管线文本。
@@ -48,50 +101,13 @@ def scaffold_pipeline(template_text: str, pipeline_id: str, name: str,
         raise ValueError("模板缺少管线标题行（期望 `# 管线 Pxx · 名称`）")
 
     # 2) yaml 顶层 id/name/tags（层位 id 行带 `- id:` 前缀，不受影响）
-    tags_extra = []
-    d = (domain or "").strip().rstrip("包").rstrip("领域")
-    if d:
-        tags_extra.append("%s领域" % d)
-    lines = new.split("\n")
-    out, in_block = [], False
-    replaced_id = replaced_name = replaced_tags = False
-    for ln in lines:
-        if ln.strip().startswith("```") and not in_block:
-            in_block = True
-            out.append(ln)
-            continue
-        if in_block and ln.strip().startswith("```"):
-            in_block = False
-            out.append(ln)
-            continue
-        if in_block:
-            if re.fullmatch(r"  id: P\d{2,4}\s*", ln) and not replaced_id:
-                out.append("  id: %s" % pid)
-                replaced_id = True
-                continue
-            if ln.startswith("  name: ") and not replaced_name:
-                out.append("  name: %s" % name)
-                replaced_name = True
-                continue
-            if ln.strip().startswith("tags: ") and not replaced_tags:
-                inner = ln.split(":", 1)[1].strip()
-                items = [x.strip().strip("[]") for x in inner.split(",") if x.strip()]
-                for t in tags_extra:
-                    if t not in items:
-                        items.append(t)
-                out.append("  tags: [%s]" % ", ".join(items))
-                replaced_tags = True
-                continue
-        out.append(ln)
+    text, replaced_id, replaced_name, replaced_tags = _rewrite_yaml_block(
+        new, pid, name, _domain_tags(domain))
     if not (replaced_id and replaced_name and replaced_tags):
         raise ValueError("模板 yaml 块缺少顶层 id / name / tags 键（模板结构变更？）")
-    text = "\n".join(out)
 
     # 3) 派生来源注记（标题下插一行）
-    src = note or "由 `nf pipeline new` 自 P00 通用骨架派生"
-    if domain:
-        src = "由 `nf pipeline new --from P00 --domain %s` 派生" % domain.strip()
+    src = _source_note(note, domain)
     header = "# 管线 %s · %s" % (pid, name)
     idx = text.index(header) + len(header)
-    text = text[:idx] + "\n> %s（v2.8.0 波B S4 脚手架：按 01 §2 填层名/挂载 → 02 登记即调度，I5）" % src + text[idx:]
-    return text
+    return text[:idx] + "\n> %s（v2.8.0 波B S4 脚手架：按 01 §2 填层名/挂载 → 02 登记即调度，I5）" % src + text[idx:]

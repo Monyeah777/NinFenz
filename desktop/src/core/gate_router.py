@@ -59,17 +59,17 @@ def route(root: str, changed: Sequence[str], experts: dict[str, Any] | None = No
     return [], plan, stats
 
 
-def audit_route(root: str, plan: dict[str, Any],
-                experts: dict[str, Any] | None = None) -> list[str]:
-    """路由表自检：覆盖完整、休眠有理由、UNSAFE 未被裁（三条硬纪律）。"""
-    decl = experts if experts is not None else gf.load_manifest(root)
+def _dormant_issues(plan: dict[str, Any]) -> list[str]:
     issues: list[str] = []
-    routed_ids = {str(r.get("id")) for r in (plan.get("routed") or [])}
-    dormant_ids = {str(d.get("id")) for d in (plan.get("dormant") or [])}
-    dense_ids = {str(x) for x in (plan.get("dense") or [])}
     for d in (plan.get("dormant") or []):
         if not str(d.get("reason") or "").strip():
             issues.append("休眠缺理由：%s（INV-5：无静默跳过）" % d.get("id"))
+    return issues
+
+
+def _expert_issues(root: str, decl: dict[str, Any], routed_ids: set,
+                   dormant_ids: set, dense_ids: set) -> list[str]:
+    issues: list[str] = []
     for eid, e in sorted(decl.items()):
         if eid not in routed_ids and eid not in dormant_ids:
             issues.append("专家既未路由也不休眠：%s（路由表不完整）" % eid)
@@ -79,6 +79,18 @@ def audit_route(root: str, plan: dict[str, Any],
             why = "UNSAFE 专家被裁（INV-10：先证不丢）" if level == "UNSAFE" \
                 else "读面未验证的专家被裁（M2：声明面须由观测面生成）"
             issues.append("%s：%s" % (why, eid))
+    return issues
+
+
+def audit_route(root: str, plan: dict[str, Any],
+                experts: dict[str, Any] | None = None) -> list[str]:
+    """路由表自检：覆盖完整、休眠有理由、UNSAFE 未被裁（三条硬纪律）。"""
+    decl = experts if experts is not None else gf.load_manifest(root)
+    routed_ids = {str(r.get("id")) for r in (plan.get("routed") or [])}
+    dormant_ids = {str(d.get("id")) for d in (plan.get("dormant") or [])}
+    dense_ids = {str(x) for x in (plan.get("dense") or [])}
+    issues: list[str] = _dormant_issues(plan)
+    issues += _expert_issues(root, decl, routed_ids, dormant_ids, dense_ids)
     return issues
 
 

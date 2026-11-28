@@ -111,34 +111,57 @@ def scan(root: str = ".", today: _dt.date | None = None
     ev = doc.get("evidence") or {}
     over = 0
     for e in entries:
-        eid = str((e or {}).get("id") or "")
-        if not eid:
-            issues.append("%s 有声明项缺 id（修复指引：补齐 id/cmd/budget_ms）" % DECL_REL)
-            continue
-        rec = ev.get(eid)
-        if not isinstance(rec, dict):
-            issues.append("性能目标 %s（%s）无实测记录（修复指引：python scripts/"
-                          "perf_budget.py --record）" % (eid, e.get("cmd")))
-            continue
-        budget = float(e.get("budget_ms") or 0)
-        val, field = _judged(rec)
-        if budget and val > budget:
-            over += 1
-            label = "P95" if field == "p95_ms" else "中位（旧记录无 P95）"
-            issues.append("性能超预算 %s：%s %.0f ms > 预算 %.0f ms（超出 %.0f%%）"
-                          "（修复指引：先定位退化点，再 --record 重测；确因预算定得过紧须评审后改预"
-                              "算）"
-                          % (eid, label, val, budget, (val - budget) / budget * 100))
-        age = _age_days(str(rec.get("measured_at") or ""), today)
-        max_age = int(e.get("max_age_days", 30) or 30)
-        if age > max_age:
-            issues.append("性能记录过期 %s：%d 天 > 上限 %d 天（修复指引：python scripts/"
-                          "perf_budget.py --record --only %s）" % (eid, age, max_age, eid))
-    known = {str((e or {}).get("id") or "") for e in entries}
+        entry_issues, entry_over = _entry_issues(e, ev, today)
+        issues += entry_issues
+        over += entry_over
+    known = _known_ids(entries)
     for eid in sorted(set(ev) - known):
         issues.append("记录 %s 无对应声明（修复指引：在 %s 声明它，或删掉记录）" % (eid, DECL_REL))
     stats = {"declared": len(known), "recorded": len(set(ev) & known), "over_budget": over}
     return issues, warns, stats
+
+
+def _known_ids(entries: List[Any]) -> set:
+    """声明项 id 集合。"""
+    return {str((e or {}).get("id") or "") for e in entries}
+
+
+def _entry_issues(e: Dict[str, Any], ev: Dict[str, Any],
+                  today: _dt.date) -> Tuple[List[str], int]:
+    """单条声明项的 issue 与「超预算」计数（文案/顺序与逐条口径不变）。"""
+    issues: List[str] = []
+    eid = str((e or {}).get("id") or "")
+    if not eid:
+        issues.append("%s 有声明项缺 id（修复指引：补齐 id/cmd/budget_ms）" % DECL_REL)
+        return issues, 0
+    rec = ev.get(eid)
+    if not isinstance(rec, dict):
+        issues.append("性能目标 %s（%s）无实测记录（修复指引：python scripts/"
+                      "perf_budget.py --record）" % (eid, e.get("cmd")))
+        return issues, 0
+    issue, over = _budget_issue(e, rec, eid)
+    if issue:
+        issues.append(issue)
+    age = _age_days(str(rec.get("measured_at") or ""), today)
+    max_age = int(e.get("max_age_days", 30) or 30)
+    if age > max_age:
+        issues.append("性能记录过期 %s：%d 天 > 上限 %d 天（修复指引：python scripts/"
+                      "perf_budget.py --record --only %s）" % (eid, age, max_age, eid))
+    return issues, over
+
+
+def _budget_issue(e: Dict[str, Any], rec: Dict[str, Any],
+                  eid: str) -> Tuple[str, int]:
+    """超预算判定 → (issue 文案或空串, 计数)。"""
+    budget = float(e.get("budget_ms") or 0)
+    val, field = _judged(rec)
+    if not (budget and val > budget):
+        return "", 0
+    label = "P95" if field == "p95_ms" else "中位（旧记录无 P95）"
+    return ("性能超预算 %s：%s %.0f ms > 预算 %.0f ms（超出 %.0f%%）"
+            "（修复指引：先定位退化点，再 --record 重测；确因预算定得过紧须评审后改预"
+                "算）"
+            % (eid, label, val, budget, (val - budget) / budget * 100), 1)
 
 
 def record(root: str = ".", only: str = "", runner=None, today: _dt.date | None = None
@@ -154,30 +177,48 @@ def record(root: str = ".", only: str = "", runner=None, today: _dt.date | None 
     ev = doc.setdefault("evidence", {})
     bad: List[str] = []
     for e in doc.get("entries") or []:
-        eid = str((e or {}).get("id") or "")
-        if not eid:
-            continue
-        if only and only not in ("all", eid):
-            continue
-        cmd = str(e.get("cmd") or "")
-        warm = int(e.get("warmups", 1) or 0)
-        if warm > 0:
-            # 预热：不计入证据（审计 F2——否则「守护还没起」的冷读数会与稳态差一个数量级，
-            # 让同一个 id 的结论取决于当时守护是否在线）。
-            runner(cmd, warm)
-        code, times = runner(cmd, int(e.get("runs", 3) or 3))
-        times = sorted(float(t) for t in times) or [0.0]
-        rec = {"cmd": e.get("cmd"), "exit_code": int(code), "measured_at": today.isoformat(),
-               "median_ms": round(_median(times), 1), "p95_ms": round(_percentile(times, 0.95), 1),
-               "stdev_ms": round(_stdev(times), 1), "min_ms": round(times[0], 1),
-               "max_ms": round(times[-1], 1), "runs": len(times), "warmups": warm,
-               "budget_ms": e.get("budget_ms")}
-        ev[eid] = rec
-        val, _field = _judged(rec)
-        if float(e.get("budget_ms") or 0) and val > float(e.get("budget_ms") or 0):
-            bad.append(eid)
+        if _is_bad_entry(e, only, ev, runner, today):
+            bad.append(str((e or {}).get("id") or ""))
     p = Path(root) / DECL_REL
     from core import atomic_write              # 在仓协议件：原子落盘（2026-10-01）
     atomic_write.write_text(p, json.dumps(doc, ensure_ascii=False, indent=2,
                                           sort_keys=True) + "\n")
     return bad, doc
+
+
+def _is_bad_entry(e: Dict[str, Any], only: str, ev: Dict[str, Any], runner,
+                  today: _dt.date) -> bool:
+    """筛出本次要真跑的声明项并记录 → 是否超预算。"""
+    eid = str((e or {}).get("id") or "")
+    if not eid:
+        return False
+    if only and only not in ("all", eid):
+        return False
+    return _record_entry(e, eid, ev, runner, today)
+
+
+def _record_entry(e: Dict[str, Any], eid: str, ev: Dict[str, Any], runner,
+                  today: _dt.date) -> bool:
+    """真跑一条声明命令并写回证据 → 是否超预算。"""
+    cmd = str(e.get("cmd") or "")
+    warm = int(e.get("warmups", 1) or 0)
+    if warm > 0:
+        # 预热：不计入证据（审计 F2——否则「守护还没起」的冷读数会与稳态差一个数量级，
+        # 让同一个 id 的结论取决于当时守护是否在线）。
+        runner(cmd, warm)
+    code, times = runner(cmd, int(e.get("runs", 3) or 3))
+    times = sorted(float(t) for t in times) or [0.0]
+    rec = {"cmd": e.get("cmd"), "exit_code": int(code), "measured_at": today.isoformat(),
+           "median_ms": round(_median(times), 1), "p95_ms": round(_percentile(times, 0.95), 1),
+           "stdev_ms": round(_stdev(times), 1), "min_ms": round(times[0], 1),
+           "max_ms": round(times[-1], 1), "runs": len(times), "warmups": warm,
+           "budget_ms": e.get("budget_ms")}
+    ev[eid] = rec
+    val, _field = _judged(rec)
+    return _budget_exceeded(e, val)
+
+
+def _budget_exceeded(e: Dict[str, Any], val: float) -> bool:
+    """实测值是否超声明预算。"""
+    budget = float(e.get("budget_ms") or 0)
+    return bool(budget) and val > budget

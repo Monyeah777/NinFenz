@@ -38,6 +38,16 @@ def _exists(root: str, rel: str) -> bool:
     return (Path(root) / rel).is_file()
 
 
+def _expected_agreement(pairs: List[Tuple[str, str]], labels: List[str], n: int) -> float:
+    """期望一致率 pe = Σ 各标签边际占比之积。"""
+    pe = 0.0
+    for label in labels:
+        ca = sum(1 for a, _b in pairs if a == label) / n
+        cb = sum(1 for _a, b in pairs if b == label) / n
+        pe += ca * cb
+    return pe
+
+
 def cohen_kappa(pairs: List[Tuple[str, str]]) -> float:
     """两名评分者的 Cohen's kappa（标签任意字符串；空样本/单标签退化 → ValueError/1.0）。"""
     if not pairs:
@@ -46,11 +56,7 @@ def cohen_kappa(pairs: List[Tuple[str, str]]) -> float:
     labels = sorted({a for pair in pairs for a in pair})
     agree = sum(1 for a, b in pairs if a == b)
     po = agree / n
-    pe = 0.0
-    for label in labels:
-        ca = sum(1 for a, _b in pairs if a == label) / n
-        cb = sum(1 for _a, b in pairs if b == label) / n
-        pe += ca * cb
+    pe = _expected_agreement(pairs, labels, n)
     if pe >= 1.0:
         return 1.0 if po >= 1.0 else 0.0
     return round((po - pe) / (1.0 - pe), 6)
@@ -84,79 +90,165 @@ def interrater(doc: Dict[str, Any], root: str = ".") -> Dict[str, Any]:
             "items": len(pairs), "status": "pass" if kappa >= minimum else "fail"}
 
 
-def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
-    issues: List[str] = []
+def _protocol_rel_issues(doc: Dict[str, Any], root: str) -> List[str]:
+    """concrete_protocols 判据（至少一个、逐个在场）。"""
+    out: List[str] = []
     protocols = doc.get("concrete_protocols") or []
     if not protocols:
-        issues.append("缺 concrete_protocols（%s 至少绑一个预注册协议）" % GUIDE)
+        out.append("缺 concrete_protocols（%s 至少绑一个预注册协议）" % GUIDE)
     for rel in protocols:
         if not _exists(root, str(rel)):
-            issues.append("concrete_protocols 不在场：%s" % rel)
-    pre = doc.get("preregistration") or {}
-    required = pre.get("required_fields") or []
+            out.append("concrete_protocols 不在场：%s" % rel)
+    return out
+
+
+def _required_fields_issues(required: Any) -> List[str]:
+    """preregistration.required_fields 判据。"""
+    out: List[str] = []
     if not isinstance(required, list) or len(required) < 8:
-        issues.append("preregistration.required_fields 至少 8 项（%s）" % GUIDE)
+        out.append("preregistration.required_fields 至少 8 项（%s）" % GUIDE)
     if "frozen_before_run" not in required:
-        issues.append("preregistration.required_fields 必须含 frozen_before_run")
+        out.append("preregistration.required_fields 必须含 frozen_before_run")
+    return out
+
+
+def _prereg_issues(doc: Dict[str, Any], root: str) -> List[str]:
+    """preregistration 判据（字段表 / 冻结规则 / 证据在场）。"""
+    pre = doc.get("preregistration") or {}
+    out = _required_fields_issues(pre.get("required_fields") or [])
     if not str(pre.get("freeze_rule") or "").strip():
-        issues.append("preregistration 缺 freeze_rule（跑前冻结、改协议=新版本）")
+        out.append("preregistration 缺 freeze_rule（跑前冻结、改协议=新版本）")
     if not _exists(root, str(pre.get("evidence") or "")):
-        issues.append("preregistration.evidence 不在场：%s" % pre.get("evidence"))
-    power = doc.get("power") or {}
-    n = power.get("min_samples_per_task")
+        out.append("preregistration.evidence 不在场：%s" % pre.get("evidence"))
+    return out
+
+
+def _power_issues(doc: Dict[str, Any]) -> List[str]:
+    """power.min_samples_per_task 判据。"""
+    n = (doc.get("power") or {}).get("min_samples_per_task")
     if not isinstance(n, int) or isinstance(n, bool) or n < 3:
-        issues.append("power.min_samples_per_task 必须是 ≥3 的整数（不足只描述统计）")
+        return ["power.min_samples_per_task 必须是 ≥3 的整数（不足只描述统计）"]
+    return []
+
+
+def _inter_rater_issues(doc: Dict[str, Any], root: str) -> List[str]:
+    """inter_rater 判据（方法词表 / kappa 区间 / 样本在场）。"""
     ir = doc.get("inter_rater") or {}
+    out: List[str] = []
     if str(ir.get("method")) not in METHODS:
-        issues.append("inter_rater.method 非法：%s" % ir.get("method"))
+        out.append("inter_rater.method 非法：%s" % ir.get("method"))
     try:
         minimum = float(ir.get("min_kappa"))
         if not 0.0 < minimum <= 1.0:
             raise ValueError
     except (TypeError, ValueError):
-        issues.append("inter_rater.min_kappa 必须在 (0,1] 内")
+        out.append("inter_rater.min_kappa 必须在 (0,1] 内")
     if not _exists(root, str(ir.get("sample") or "")):
-        issues.append("inter_rater.sample 不在场：%s" % ir.get("sample"))
+        out.append("inter_rater.sample 不在场：%s" % ir.get("sample"))
+    return out
+
+
+def _metric_issues(metric: Any, counters: set) -> List[str]:
+    """单个指标判据（反指标挂接 / name）。"""
+    if not isinstance(metric, dict):
+        return ["metrics 含非对象"]
+    out: List[str] = []
+    if str(metric.get("countermetric")) not in counters:
+        out.append("指标 %s 未挂反指标（%s 每个指标必须有 countermetric）"
+                   % (metric.get("id"), GUIDE))
+    if not str(metric.get("name") or "").strip():
+        out.append("指标 %s 缺 name" % metric.get("id"))
+    return out
+
+
+def _metric_each_issues(metrics: List[Any], counters: set) -> List[str]:
+    """逐指标判据。"""
+    out: List[str] = []
+    for metric in metrics:
+        out.extend(_metric_issues(metric, counters))
+    return out
+
+
+def _counter_issues(cm: Dict[str, Any], root: str) -> List[str]:
+    """单个反指标判据（guards/metric / 证据在场）。"""
+    out: List[str] = []
+    if not str(cm.get("guards") or "").strip() or not str(cm.get("metric") or "").strip():
+        out.append("countermetric %s 缺 guards/metric" % cm.get("id"))
+    if not _exists(root, str(cm.get("evidence") or "")):
+        out.append("countermetric %s 的 evidence 不在场：%s"
+                   % (cm.get("id"), cm.get("evidence")))
+    return out
+
+
+def _counter_each_issues(doc: Dict[str, Any], root: str) -> List[str]:
+    """逐反指标判据。"""
+    out: List[str] = []
+    for cm in doc.get("countermetrics") or []:
+        out.extend(_counter_issues(cm, root))
+    return out
+
+
+def _threat_issues(threat: Any, root: str) -> List[str]:
+    """单条效度威胁判据（三字段 / 证据在场）。"""
+    if not isinstance(threat, dict):
+        return ["validity_threats 含非对象"]
+    out: List[str] = []
+    for field in ("threat", "check", "evidence"):
+        if not str(threat.get(field) or "").strip():
+            out.append("威胁 %s 缺 %s" % (threat.get("id"), field))
+    if not _exists(root, str(threat.get("evidence") or "")):
+        out.append("威胁 %s 的 evidence 不在场：%s"
+                   % (threat.get("id"), threat.get("evidence")))
+    return out
+
+
+def _threats_issues(doc: Dict[str, Any], root: str) -> List[str]:
+    """validity_threats 判据（至少 4 条 / id 唯一 / 逐条）。"""
+    threats = doc.get("validity_threats") or []
+    tids = [str(t.get("id")) for t in threats if isinstance(t, dict)]
+    out: List[str] = []
+    if len(tids) < 4:
+        out.append("validity_threats 至少 4 条")
+    if len(tids) != len(set(tids)):
+        out.append("validity_threats id 重复：%s" % tids)
+    for threat in threats:
+        out.extend(_threat_issues(threat, root))
+    return out
+
+
+def _metrics_head(doc: Dict[str, Any]) -> tuple[List[Any], List[str]]:
+    """metrics 列表 + id 唯一性判据 → (metrics, issues)。"""
     metrics = doc.get("metrics") or []
     mids = [str(m.get("id")) for m in metrics if isinstance(m, dict)]
+    out: List[str] = []
     if not metrics:
-        issues.append("缺 metrics（%s 至少一个指标）" % GUIDE)
+        out.append("缺 metrics（%s 至少一个指标）" % GUIDE)
     if len(mids) != len(set(mids)):
-        issues.append("metrics id 重复：%s" % mids)
+        out.append("metrics id 重复：%s" % mids)
+    return metrics, out
+
+
+def _counter_head(doc: Dict[str, Any]) -> tuple[set, List[str]]:
+    """countermetrics id 集合 + 唯一性判据 → (counters, issues)。"""
     counters = {str(c.get("id")) for c in doc.get("countermetrics") or []
                 if isinstance(c, dict)}
     cids = [str(c.get("id")) for c in doc.get("countermetrics") or [] if isinstance(c, dict)]
     if len(cids) != len(set(cids)):
-        issues.append("countermetrics id 重复：%s" % cids)
-    for cm in doc.get("countermetrics") or []:
-        if not str(cm.get("guards") or "").strip() or not str(cm.get("metric") or "").strip():
-            issues.append("countermetric %s 缺 guards/metric" % cm.get("id"))
-        if not _exists(root, str(cm.get("evidence") or "")):
-            issues.append("countermetric %s 的 evidence 不在场：%s"
-                          % (cm.get("id"), cm.get("evidence")))
-    for metric in metrics:
-        if not isinstance(metric, dict):
-            issues.append("metrics 含非对象")
-            continue
-        if str(metric.get("countermetric")) not in counters:
-            issues.append("指标 %s 未挂反指标（%s 每个指标必须有 countermetric）"
-                          % (metric.get("id"), GUIDE))
-        if not str(metric.get("name") or "").strip():
-            issues.append("指标 %s 缺 name" % metric.get("id"))
-    threats = doc.get("validity_threats") or []
-    tids = [str(t.get("id")) for t in threats if isinstance(t, dict)]
-    if len(tids) < 4:
-        issues.append("validity_threats 至少 4 条")
-    if len(tids) != len(set(tids)):
-        issues.append("validity_threats id 重复：%s" % tids)
-    for threat in threats:
-        if not isinstance(threat, dict):
-            issues.append("validity_threats 含非对象")
-            continue
-        for field in ("threat", "check", "evidence"):
-            if not str(threat.get(field) or "").strip():
-                issues.append("威胁 %s 缺 %s" % (threat.get("id"), field))
-        if not _exists(root, str(threat.get("evidence") or "")):
-            issues.append("威胁 %s 的 evidence 不在场：%s"
-                          % (threat.get("id"), threat.get("evidence")))
+        return counters, ["countermetrics id 重复：%s" % cids]
+    return counters, []
+
+
+def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
+    issues: List[str] = []
+    issues.extend(_protocol_rel_issues(doc, root))
+    issues.extend(_prereg_issues(doc, root))
+    issues.extend(_power_issues(doc))
+    issues.extend(_inter_rater_issues(doc, root))
+    metrics, head_issues = _metrics_head(doc)
+    issues.extend(head_issues)
+    counters, counter_head_issues = _counter_head(doc)
+    issues.extend(counter_head_issues)
+    issues.extend(_counter_each_issues(doc, root))
+    issues.extend(_metric_each_issues(metrics, counters))
+    issues.extend(_threats_issues(doc, root))
     return issues

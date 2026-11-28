@@ -16,7 +16,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from typing import Any
+from typing import Any, Dict, List
 
 SCHEMA = "nf-check-intent-draft/1"
 INTENT_SCHEMA = "nf-check-intent/1"
@@ -89,6 +89,46 @@ def _params(rule: str, body: str) -> dict[str, Any]:
     return {}
 
 
+def _hits(clause: Dict[str, Any]) -> List[tuple]:
+    return [kw for kw in KEYWORDS if kw[0] in clause["body"]]
+
+
+def _clause_records(clause: Dict[str, Any], hits: List[tuple], start_id: int, check_compile):
+    """单条 → (items, pending, unsupported, covered)；items 的 id 从 start_id + 1 起算。"""
+    items: list[dict[str, Any]] = []
+    pending: list[dict[str, Any]] = []
+    unsupported: list[dict[str, Any]] = []
+    covered: list[dict[str, Any]] = []
+    seen_rules: set[str] = set()
+    for _word, rule, why, needs in hits:
+        if rule in seen_rules:
+            continue
+        seen_rules.add(rule)
+        params = _params(rule, clause["body"])
+        missing = [n for n in needs if n not in params]
+        if rule in check_compile.UNSUPPORTED:
+            unsupported.append({"clause": clause["label"], "line": clause["line"],
+                                "rule": rule,
+                                "why": check_compile.UNSUPPORTED[rule]["why"],
+                                "needs": check_compile.UNSUPPORTED[rule]["needs"],
+                                "evidence": clause["body"][:80]})
+            continue
+        if missing:
+            pending.append({"clause": clause["label"], "rule": rule,
+                            "missing_params": missing, "line": clause["line"],
+                            "source": clause["body"][:120]})
+        else:
+            req = {"id": f"R{start_id + len(items) + 1}", "rule": rule,
+                   "clause": clause["label"], "source": clause["body"][:120]}
+            req.update(params)
+            items.append(req)
+        covered.append({"clause": clause["label"], "rule": rule, "why": why,
+                        "confidence": 0.9 if not missing else 0.55,
+                        "needs_human": bool(missing), "missing_params": missing,
+                        "line": clause["line"]})
+    return items, pending, unsupported, covered
+
+
 def draft(text: str, source: str = "") -> dict[str, Any]:
     """法规文本 → 意图草稿（含覆盖/不可表达/未覆盖三张账）。"""
     if len(text.encode("utf-8")) > MAX_TEXT_BYTES:
@@ -103,38 +143,17 @@ def draft(text: str, source: str = "") -> dict[str, Any]:
     unsupported: list[dict[str, Any]] = []
     uncovered: list[dict[str, Any]] = []
     for clause in clauses:
-        hits = [kw for kw in KEYWORDS if kw[0] in clause["body"]]
+        hits = _hits(clause)
         if not hits:
             uncovered.append({"clause": clause["label"], "line": clause["line"],
                               "why": "没有匹配到任何封闭规则关键词"})
             continue
-        seen_rules: set[str] = set()
-        for _word, rule, why, needs in hits:
-            if rule in seen_rules:
-                continue
-            seen_rules.add(rule)
-            params = _params(rule, clause["body"])
-            missing = [n for n in needs if n not in params]
-            if rule in check_compile.UNSUPPORTED:
-                unsupported.append({"clause": clause["label"], "line": clause["line"],
-                                    "rule": rule,
-                                    "why": check_compile.UNSUPPORTED[rule]["why"],
-                                    "needs": check_compile.UNSUPPORTED[rule]["needs"],
-                                    "evidence": clause["body"][:80]})
-                continue
-            if missing:
-                pending.append({"clause": clause["label"], "rule": rule,
-                                "missing_params": missing, "line": clause["line"],
-                                "source": clause["body"][:120]})
-            else:
-                req = {"id": f"R{len(items) + 1}", "rule": rule,
-                       "clause": clause["label"], "source": clause["body"][:120]}
-                req.update(params)
-                items.append(req)
-            covered.append({"clause": clause["label"], "rule": rule, "why": why,
-                            "confidence": 0.9 if not missing else 0.55,
-                            "needs_human": bool(missing), "missing_params": missing,
-                            "line": clause["line"]})
+        clause_items, clause_pending, clause_unsupported, clause_covered = _clause_records(
+            clause, hits, len(items), check_compile)
+        items += clause_items
+        pending += clause_pending
+        unsupported += clause_unsupported
+        covered += clause_covered
     return {"schema": SCHEMA,
             "source": {"path": source,
                        "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),

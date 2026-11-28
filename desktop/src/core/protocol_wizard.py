@@ -42,25 +42,13 @@ class ProtocolForm:
 def build_protocol_yaml(form: ProtocolForm) -> str:
     """表单 → 合规 protocol.yaml 文本（结构对齐真实实例）。"""
     # A1 补遗：产出语义声明非空时校验值域并写入 package 段（空=不写，兼容真实实例）
-    sem_line = ""
-    if form.doc_semantics:
-        from .semantics import PROJECT_RULES, SKILL
-        if form.doc_semantics not in (PROJECT_RULES, SKILL):
-            raise ValueError(
-                f"doc_semantics 应为 '{PROJECT_RULES}' 或 '{SKILL}'"
-                f"（产物×适配矩阵：AGENTS=项目约定 / SKILL=能力包），实际 {form.doc_semantics}")
-        sem_line = f"  doc_semantics: {form.doc_semantics}\n"
+    sem_line = _sem_line(form)
     core = list(form.core_modules) if form.core_modules else DEFAULT_CORE_MODULES
     mod_l = "\n".join(
         f'    - id: "{i}"\n      desc: {d}' for i, d in form.modules)
     ids_l = "\n".join(f'    - "{i}"' for i in form.module_id_range)
     cat_l = "\n".join(f"    - {c}" for c in form.categories)
-    mount_l = ""
-    for layer, spec in form.mount_layers.items():
-        d = ", ".join(f'"{x}"' for x in (spec.get("default") or []))
-        a = ", ".join(f'"{x}"' for x in (spec.get("available") or []))
-        mount_l += f"    {layer}: {{default: [{d}], available: [{a}]}}\n"
-    mount_l = mount_l.rstrip("\n")
+    mount_l = _mount_layers(form)
     n_asset = 0  # 向导新包默认零资产（机制包先例）；用户后续补资产手改 count
     return f"""# protocol.yaml — 第三方协议声明（{form.name}，由宁封子协议定义向导生成）
 # 依据 01 §6.1 Schema 模板骨架 + 02 §8.3 第三方协议登记；机读真相 = 本文件，人读速览 = README.md（双源一致，check14 ⑥ / check15 ⑤ 断言）
@@ -76,7 +64,7 @@ package:
 {cat_l}
   dependencies:
     core_only: {str(form.core_only).lower()}
-    core_modules: [{', '.join(f'"{c}"' if ':' in c or c == 'M00' else c for c in core)}]
+    core_modules: [{_core_modules_text(core)}]
     cross_package: []
   references: []
   modules:
@@ -89,40 +77,104 @@ package:
 """
 
 
+def _sem_line(form: ProtocolForm) -> str:
+    """doc_semantics 行（空声明=不写，兼容真实实例）。"""
+    if not form.doc_semantics:
+        return ""
+    from .semantics import PROJECT_RULES, SKILL
+    if form.doc_semantics not in (PROJECT_RULES, SKILL):
+        raise ValueError(
+            f"doc_semantics 应为 '{PROJECT_RULES}' 或 '{SKILL}'"
+            f"（产物×适配矩阵：AGENTS=项目约定 / SKILL=能力包），实际 {form.doc_semantics}")
+    return f"  doc_semantics: {form.doc_semantics}\n"
+
+
+def _mount_layers(form: ProtocolForm) -> str:
+    """挂载层段（各层 default/available 列表）。"""
+    mount_l = ""
+    for layer, spec in form.mount_layers.items():
+        d = ", ".join(f'"{x}"' for x in (spec.get("default") or []))
+        a = ", ".join(f'"{x}"' for x in (spec.get("available") or []))
+        mount_l += f"    {layer}: {{default: [{d}], available: [{a}]}}\n"
+    return mount_l.rstrip("\n")
+
+
+def _core_modules_text(core: List[str]) -> str:
+    """core_modules 行内列表（带类别限定的加引号）。"""
+    return ', '.join(f'"{c}"' if ':' in c or c == 'M00' else c for c in core)
+
+
 def self_check(yaml_text: str) -> List[str]:
     """自检（对齐 verify check14 ①-⑤ 粗校验）。返回警告/失败列表；空 = 通过。"""
+    data, err = _parse_yaml(yaml_text)
+    if err is not None:
+        return [f"yaml 解析失败：{err}"]
+    pkg = (data or {}).get("package") or {}
+    proto = (data or {}).get("protocol") or {}
     warns: List[str] = []
+    warns += _header_warns(proto, pkg)
+    warns += _module_warns(pkg)
+    # A1 裁决规则集成（25 方案）：协议若声明产出语义（doc_semantics），
+    # 校验值域并提示出口——project_rules → AGENTS/CLAUDE，skill → SKILL。
+    warns += _sem_warns(pkg, proto)
+    return warns
+
+
+def _parse_yaml(yaml_text: str):
+    """去注释后按 YAML 解析 → (data, 异常)；异常非 None 即解析失败。"""
     try:
         body = "\n".join(l for l in yaml_text.splitlines()
                          if not l.strip().startswith("#"))
         import yaml
-        data = yaml.safe_load(body)
+        return yaml.safe_load(body), None
     except Exception as exc:
-        return [f"yaml 解析失败：{exc}"]
-    pkg = (data or {}).get("package") or {}
-    proto = (data or {}).get("protocol") or {}
+        return None, exc
+
+
+def _header_warns(proto, pkg) -> List[str]:
+    """schema_version / module_id_range 的粗校验。"""
+    warns: List[str] = []
     if proto.get("schema_version") not in ("2",):
         warns.append(f"schema_version 应为 '2'，实际 {proto.get('schema_version')}")
     if not pkg.get("module_id_range"):
-            warns.append("module_id_range 为空——需声明模块编号（M91-M99 机制段或 <独占类别>:Mxx 类"
-                "内段，02 §8.3）")
-    mods = pkg.get("modules") or []
-    for m in mods:
+        warns.append("module_id_range 为空——需声明模块编号（M91-M99 机制段或 <独占类别>:Mxx 类"
+                     "内段，02 §8.3）")
+    return warns
+
+
+def _module_warns(pkg) -> List[str]:
+    """模块 desc 与挂载层的粗校验。"""
+    return _module_desc_warns(pkg) + _mount_warns(pkg)
+
+
+def _module_desc_warns(pkg) -> List[str]:
+    """每个模块必须有 desc。"""
+    warns: List[str] = []
+    for m in pkg.get("modules") or []:
         if not m.get("desc"):
             warns.append(f"模块 {m.get('id')} 缺 desc")
-    # 挂载 default ⊆ module_id_range（允许类别前缀命中）
+    return warns
+
+
+def _mount_warns(pkg) -> List[str]:
+    """挂载 default ⊆ module_id_range（允许类别前缀命中）。"""
+    warns: List[str] = []
     id_range = [str(x).split(":")[-1] for x in (pkg.get("module_id_range") or [])]
     for layer, spec in (pkg.get("mount_layers") or {}).items():
         for d in (spec.get("default") or []):
             if str(d).split(":")[-1] not in id_range:
                 warns.append(f"挂载层 {layer} default {d} 不在 module_id_range 内")
-    # A1 裁决规则集成（25 方案）：协议若声明产出语义（doc_semantics），
-    # 校验值域并提示出口——project_rules → AGENTS/CLAUDE，skill → SKILL。
-    sem = pkg.get("doc_semantics") or proto.get("doc_semantics")
-    if sem is not None:
-        from .semantics import PROJECT_RULES, SKILL
-        if sem not in (PROJECT_RULES, SKILL):
-            warns.append(
-                f"doc_semantics 应为 '{PROJECT_RULES}' 或 '{SKILL}'，"
-                f"实际 {sem}（产物×适配矩阵：AGENTS=项目约定 / SKILL=能力包）")
     return warns
+
+
+def _sem_warns(pkg, proto) -> List[str]:
+    """doc_semantics 值域校验（AGENTS=项目约定 / SKILL=能力包）。"""
+    sem = pkg.get("doc_semantics") or proto.get("doc_semantics")
+    if sem is None:
+        return []
+    from .semantics import PROJECT_RULES, SKILL
+    if sem not in (PROJECT_RULES, SKILL):
+        return [
+            f"doc_semantics 应为 '{PROJECT_RULES}' 或 '{SKILL}'，"
+            f"实际 {sem}（产物×适配矩阵：AGENTS=项目约定 / SKILL=能力包）"]
+    return []

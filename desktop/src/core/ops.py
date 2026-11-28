@@ -62,175 +62,19 @@ def _exists(root: str, rel: str) -> bool:
     return (Path(root) / rel).exists()
 
 
+from ._ops_checks import _ops_issues, _vendor_issues_all
+
+
 def validate_ops(doc: Dict[str, Any], root: str = ".") -> List[str]:
     issues: List[str] = []
     sev = doc.get("severity_vocabulary")
     if not isinstance(sev, dict) or list(sev.keys()) != list(SEVERITIES):
         return ["severity_vocabulary 必须恰为 S0/S1/S2/S3（%s 补齐）" % GUIDE]
-    for key in SEVERITIES:
-        entry = sev.get(key) or {}
-        for field in ("definition", "response", "disclosure"):
-            if not str(entry.get(field) or "").strip():
-                issues.append("%s 缺 %s（%s 分级必须可执行）" % (key, field, GUIDE))
-    runbook = doc.get("incident_runbook") or {}
-    steps = runbook.get("steps") or []
-    ids = [str(s.get("id")) for s in steps if isinstance(s, dict)]
-    if not steps:
-        issues.append("incident_runbook 缺 steps（%s 至少 5 步）" % GUIDE)
-    if len(ids) != len(set(ids)):
-        issues.append("incident_runbook step id 重复：%s" % ids)
-    if tuple(ids) != EXPECTED_RUNBOOK:
-        issues.append("incident_runbook 步骤必须恰为 %s（实际 %s；%s 补齐缺失步骤）"
-                      % (list(EXPECTED_RUNBOOK), ids, GUIDE))
-    for step in steps:
-        if not isinstance(step, dict):
-            issues.append("runbook step 含非对象")
-            continue
-        for field in ("id", "name", "action", "evidence"):
-            if not str(step.get(field) or "").strip():
-                issues.append("runbook %s 缺 %s" % (step.get("id"), field))
-        rel = str(step.get("evidence") or "")
-        if rel and not _exists(root, rel):
-            issues.append("runbook %s 的 evidence 不在场：%s" % (step.get("id"), rel))
-    disc = doc.get("disclosure") or {}
-    if not str(disc.get("channel") or "").strip():
-        issues.append("disclosure 缺 channel（私密通道）")
-    ref = str(disc.get("policy_ref") or "")
-    if not ref or not _exists(root, ref):
-        issues.append("disclosure.policy_ref 不在场：%s（%s 指向 SECURITY.md）" % (ref, GUIDE))
-    ack = disc.get("ack_within_days")
-    disclose = disc.get("disclose_within_days")
-    if not (isinstance(ack, int) and not isinstance(ack, bool) and 0 < ack <= 30):
-        issues.append("disclosure.ack_within_days 必须是 1..30 的整数（逻辑口径）")
-    if not (isinstance(disclose, int) and not isinstance(disclose, bool)
-            and isinstance(ack, int) and ack <= disclose <= 365):
-        issues.append("disclosure.disclose_within_days 必须 ≥ ack 且 ≤365（逻辑口径）")
-    if not str(disc.get("logic_note") or "").strip():
-        issues.append("disclosure 缺 logic_note（天数是流程口径，不是修复 SLA）")
-    slo = doc.get("slo") or []
-    if not slo:
-        issues.append("缺 slo（本地优先工具至少有正确/可复现/离线目标）")
-    sno = [str(s.get("id")) for s in slo if isinstance(s, dict)]
-    if len(sno) != len(set(sno)):
-        issues.append("slo id 重复：%s" % sno)
-    for item in slo:
-        if not isinstance(item, dict):
-            issues.append("slo 含非对象")
-            continue
-        for field in ("id", "name", "objective", "measurement", "evidence"):
-            if not str(item.get(field) or "").strip():
-                issues.append("slo %s 缺 %s" % (item.get("id"), field))
-        rel = str(item.get("evidence") or "")
-        if rel and not _exists(root, rel):
-            issues.append("slo %s 的 evidence 不在场：%s" % (item.get("id"), rel))
-    bcp = doc.get("bcp") or {}
-    assets = bcp.get("assets") or []
-    scenarios = bcp.get("scenarios") or []
-    if not assets:
-        issues.append("bcp 缺 assets（备份/RTO/RPO 要有对象）")
-    if not scenarios:
-        issues.append("bcp 缺 scenarios（至少覆盖磁盘/密钥/外部依赖）")
-    for asset in assets:
-        if not isinstance(asset, dict):
-            issues.append("bcp.assets 含非对象")
-            continue
-        for field in ("id", "name", "backup", "rto", "rpo", "restore"):
-            if not str(asset.get(field) or "").strip():
-                issues.append("bcp 资产 %s 缺 %s" % (asset.get("id"), field))
-    for scen in scenarios:
-        if not isinstance(scen, dict):
-            issues.append("bcp.scenarios 含非对象")
-            continue
-        for field in ("id", "trigger", "impact", "expected", "drill"):
-            if not str(scen.get(field) or "").strip():
-                issues.append("bcp 场景 %s 缺 %s" % (scen.get("id"), field))
-        if scen.get("drill") not in ("recovery", "tabletop"):
-            issues.append("bcp 场景 %s 的 drill 非法：%s" % (scen.get("id"), scen.get("drill")))
-        if not isinstance(scen.get("steps"), list) or not scen.get("steps"):
-            issues.append("bcp 场景 %s 缺 steps" % scen.get("id"))
-    drills = doc.get("drills") or []
-    kinds = {str(d.get("kind")) for d in drills if isinstance(d, dict)}
-    if kinds != set(DR_KINDS):
-        issues.append("drills 必须覆盖 %s（实际 %s）" % (list(DR_KINDS), sorted(kinds)))
-    for drill in drills:
-        if not isinstance(drill, dict):
-            issues.append("drills 含非对象")
-            continue
-        if not str(drill.get("id")) or not str(drill.get("runner")):
-            issues.append("drill 缺 id/runner：%s" % drill.get("id"))
-        if not isinstance(drill.get("covers"), list) or not drill.get("covers"):
-            issues.append("drill %s 缺 covers" % drill.get("id"))
-    return issues
+    return _ops_issues(doc, root)
 
 
 def validate_vendors(doc: Dict[str, Any], root: str = ".") -> List[str]:
-    issues: List[str] = []
-    kinds = doc.get("kind_vocabulary")
-    crits = doc.get("criticality_vocabulary")
-    statuses = doc.get("status_vocabulary")
-    if not isinstance(kinds, list) or not kinds:
-        issues.append("缺 kind_vocabulary")
-    if not isinstance(crits, list) or not crits:
-        issues.append("缺 criticality_vocabulary")
-    vendors = doc.get("vendors") or []
-    ids = [str(v.get("id")) for v in vendors if isinstance(v, dict)]
-    if not vendors:
-        issues.append("vendors 为空（至少登记托管/依赖/TSA/公共日志/模型 provider）")
-    if len(ids) != len(set(ids)):
-        issues.append("vendor id 重复：%s" % ids)
-    for ven in vendors:
-        if not isinstance(ven, dict):
-            issues.append("vendors 含非对象")
-            continue
-        vid = str(ven.get("id"))
-        for field in ("id", "name", "kind", "criticality", "status"):
-            if not str(ven.get(field) or "").strip():
-                issues.append("vendor %s 缺 %s" % (vid, field))
-        if kinds and ven.get("kind") not in kinds:
-            issues.append("vendor %s 的 kind 非法：%s" % (vid, ven.get("kind")))
-        if crits and ven.get("criticality") not in crits:
-            issues.append("vendor %s 的 criticality 非法：%s" % (vid, ven.get("criticality")))
-        if statuses and ven.get("status") not in statuses:
-            issues.append("vendor %s 的 status 非法：%s" % (vid, ven.get("status")))
-        terms = ven.get("data_terms") or {}
-        if terms.get("stores_user_data") is not False:
-            issues.append("vendor %s 不得声明处理用户数据（本仓本地优先；%s）"
-                          % (vid, GUIDE))
-        if not str(terms.get("note") or "").strip():
-            issues.append("vendor %s 的 data_terms 缺 note" % vid)
-        used = ven.get("used_by") or []
-        if not used:
-            issues.append("vendor %s 缺 used_by（能力要落到真实消费点）" % vid)
-        for rel in used:
-            if not _exists(root, str(rel)):
-                issues.append("vendor %s 的 used_by 不在场：%s" % (vid, rel))
-        att = ven.get("attestation") or []
-        for rel in att:
-            if not _exists(root, str(rel)):
-                issues.append("vendor %s 的 attestation 不在场：%s" % (vid, rel))
-        if ven.get("criticality") in ("critical", "high") and not att:
-            issues.append("vendor %s 是 %s，必须有 attestation（SBOM/来源/锚证据）"
-                          % (vid, ven.get("criticality")))
-        plan = ven.get("exit_plan") or {}
-        if not str(plan.get("fallback") or "").strip():
-            issues.append("vendor %s 的 exit_plan 缺 fallback" % vid)
-        steps = plan.get("steps") or []
-        if not isinstance(steps, list) or len(steps) < 2:
-            issues.append("vendor %s 的 exit_plan 至少 2 步" % vid)
-        if not str(plan.get("owner") or "").strip():
-            issues.append("vendor %s 的 exit_plan 缺 owner" % vid)
-    drills = doc.get("replacement_drills") or []
-    if not drills:
-        issues.append("缺 replacement_drills（退出/替换演练要登记）")
-    for drill in drills:
-        covers = drill.get("covers") or []
-        if not covers:
-            issues.append("replacement drill %s 缺 covers" % drill.get("id"))
-        for vid in covers:
-            if vid not in ids:
-                issues.append("replacement drill %s 覆盖了未登记 vendor：%s"
-                              % (drill.get("id"), vid))
-    return issues
+    return _vendor_issues_all(doc, root)
 
 
 def tabletop(doc: Dict[str, Any], severity: str) -> Dict[str, Any]:
@@ -303,6 +147,25 @@ def render(doc: Dict[str, Any]) -> str:
     return json.dumps(doc, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
 
+def _drills(ops: Dict[str, Any], vendors: Dict[str, Any], root: str) -> List[Dict[str, Any]]:
+    """四类演练：桌面（逐严重度）/ 恢复 / 披露（S0·S1）/ 供应商退出。"""
+    drills = [tabletop(ops, sev) for sev in SEVERITIES]
+    drills.append(recovery_drill())
+    drills += [disclosure_drill(ops, sev) for sev in ("S0", "S1")]
+    drills.append(vendor_readiness(vendors, root))
+    return drills
+
+
+def _counts(ops: Dict[str, Any], vendors: Dict[str, Any],
+            drills: List[Dict[str, Any]]) -> Dict[str, int]:
+    """报告计数（严重度/runbook 步/演练数/供应商/SLO）。"""
+    return {"severities": len(SEVERITIES), "runbook_steps": len(
+        (ops.get("incident_runbook") or {}).get("steps") or []),
+        "drills": len(drills),
+        "vendors": len(vendors.get("vendors") or []),
+        "slo": len(ops.get("slo") or [])}
+
+
 def build_report(root: str = ".") -> Dict[str, Any]:
     findings: List[str] = []
     try:
@@ -316,18 +179,11 @@ def build_report(root: str = ".") -> Dict[str, Any]:
         return {"schema": REPORT_SCHEMA, "ok": False, "findings": [str(exc)],
                 "drills": [], "counts": {}}
     findings += validate_ops(ops, root) + validate_vendors(vendors, root)
-    drills = [tabletop(ops, sev) for sev in SEVERITIES]
-    drills.append(recovery_drill())
-    drills += [disclosure_drill(ops, sev) for sev in ("S0", "S1")]
-    drills.append(vendor_readiness(vendors, root))
+    drills = _drills(ops, vendors, root)
     for drill in drills:
         if drill.get("status") != "pass":
             findings.append("演练未过：%s（%s 修登记或演练实现）" % (drill.get("id"), GUIDE))
-    counts = {"severities": len(SEVERITIES), "runbook_steps": len(
-        (ops.get("incident_runbook") or {}).get("steps") or []),
-        "drills": len(drills),
-        "vendors": len(vendors.get("vendors") or []),
-        "slo": len(ops.get("slo") or [])}
+    counts = _counts(ops, vendors, drills)
     return {"schema": REPORT_SCHEMA, "ok": not findings, "findings": findings,
             "drills": drills, "counts": counts}
 

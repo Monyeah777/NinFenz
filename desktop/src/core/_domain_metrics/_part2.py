@@ -79,90 +79,129 @@ def synthesize(family: str, seed: str, n: int = 0) -> List[Dict[str, str]]:
     """按族生成确定性样例夹具（**合成数据**：口径可复算、可核；不代表真实测量结果）。"""
     r = _Rng("%s|%s" % (family, seed))
     rows: List[Dict[str, str]] = []
-    if family == "classification":
-        for i in range(n or 24):
-            gold = r.pick(["pos", "neg"])
-            hit = r.next() < 0.8
-            pred = gold if hit else ("neg" if gold == "pos" else "pos")
-            rows.append({"case_id": "c%02d" % i, "gold": gold, "pred": pred,
-                         "score": "%.4f" % (r.between(0.55, 0.99) if gold == "pos"
-                                            else r.between(0.01, 0.45))})
-        return rows
-    if family == "retrieval":
-        for q in range(n or 3):
-            rel_idx = {int(r.between(0, 6)), int(r.between(0, 6))}
-            for rk in range(6):
-                rows.append({"query_id": "q%d" % q, "rank": str(rk + 1),
-                             "relevant": "1" if rk in rel_idx else "0"})
-        return rows
-    if family == "extraction":
-        fields = ["品牌", "型号", "价格", "日期", "数量", "单位"]
-        for i in range(n or 12):
-            gold = sorted({r.pick(fields), r.pick(fields)})
-            pred = sorted(set(gold) | ({r.pick(fields)} if r.next() < 0.3 else set()))
-            rows.append({"case_id": "e%02d" % i,
-                         "gold_fields": json.dumps(gold, ensure_ascii=False),
-                         "pred_fields": json.dumps(pred, ensure_ascii=False)})
-        return rows
-    if family == "generation":
-        words = ["模型", "口径", "评测", "样本", "结论", "边界"]
-        for i in range(n or 12):
-            ref = "".join(r.pick(words) for _ in range(5))
-            out = ref if r.next() < 0.4 else "".join(r.pick(words) for _ in range(5))
-            rows.append({"case_id": "g%02d" % i, "reference": ref, "output": out})
-        return rows
-    if family == "regression":
-        for i in range(n or 16):
-            gold = r.between(-2.0, 2.0)
-            rows.append({"case_id": "r%02d" % i, "gold": "%.4f" % gold,
-                         "pred": "%.4f" % (gold + r.between(-0.25, 0.25))})
-        return rows
-    if family == "calibration":
-        for i in range(n or 20):
-            p = r.between(0.05, 0.95)
-            rows.append({"case_id": "k%02d" % i, "prob": "%.4f" % p,
-                         "gold": "1" if r.next() < p else "0"})
-        return rows
-    if family == "agreement":
-        for i in range(n or 20):
-            a = r.pick(["T", "F"])
-            rows.append({"case_id": "a%02d" % i, "a": a,
-                         "b": a if r.next() < 0.85 else ("F" if a == "T" else "T")})
-        return rows
-    if family == "preference":
-        for i in range(n or 16):
-            human = r.pick(["a", "b"])
-            rows.append({"case_id": "p%02d" % i, "human": human,
-                         "judge": human if r.next() < 0.7 else r.pick(["a", "b", "tie"])})
-        return rows
-    if family == "exact_judgement":
-        for t in range(n or 4):
-            for i in range(4):
-                rows.append({"task_id": "t%d" % t, "sample": str(i + 1),
-                             "passed": "1" if r.next() < 0.5 else "0"})
-        return rows
-    if family == "latency_cost":
-        for i in range(n or 20):
-            rows.append({"case_id": "l%02d" % i,
-                         "latency_ms": "%.1f" % r.between(120.0, 900.0),
-                         "tokens_in": str(int(r.between(200, 1800))),
-                         "tokens_out": str(int(r.between(50, 600)))})
-        return rows
-    if family == "drift":
-        for i in range(n or 8):
-            e = r.between(0.05, 0.20)
-            rows.append({"bucket": "b%d" % i, "expected": "%.4f" % e,
-                         "actual": "%.4f" % max(0.001, e + r.between(-0.03, 0.03))})
-        return rows
-    if family == "contract_compliance":
-        fields = ["available_ts", "unit", "currency", "version", "owner"]
-        for i in range(n or 20):
-            ok = r.next() < 0.8
-            miss = "" if ok else "|".join(sorted({r.pick(fields), r.pick(fields)}))
-            rows.append({"case_id": "v%02d" % i, "valid": "1" if ok else "0",
-                         "missing_fields": miss})
-        return rows
-    raise ValueError("未登记夹具族：%r" % family)
+    builders = {"classification": _build_classification,
+                "retrieval": _build_retrieval,
+                "extraction": _build_extraction,
+                "generation": _build_generation,
+                "regression": _build_regression,
+                "calibration": _build_calibration,
+                "agreement": _build_agreement,
+                "preference": _build_preference,
+                "exact_judgement": _build_exact_judgement,
+                "latency_cost": _build_latency_cost,
+                "drift": _build_drift,
+                "contract_compliance": _build_contract_compliance}
+    fn = builders.get(family)
+    if fn is None:
+        raise ValueError("未登记夹具族：%r" % family)
+    return fn(r, rows, n)
+
+
+def _build_classification(r, rows, n):
+    for i in range(n or 24):
+        gold = r.pick(["pos", "neg"])
+        hit = r.next() < 0.8
+        pred = gold if hit else ("neg" if gold == "pos" else "pos")
+        rows.append({"case_id": "c%02d" % i, "gold": gold, "pred": pred,
+                     "score": "%.4f" % (r.between(0.55, 0.99) if gold == "pos"
+                                        else r.between(0.01, 0.45))})
+    return rows
+
+
+def _build_retrieval(r, rows, n):
+    for q in range(n or 3):
+        rel_idx = {int(r.between(0, 6)), int(r.between(0, 6))}
+        for rk in range(6):
+            rows.append({"query_id": "q%d" % q, "rank": str(rk + 1),
+                         "relevant": "1" if rk in rel_idx else "0"})
+    return rows
+
+
+def _build_extraction(r, rows, n):
+    fields = ["品牌", "型号", "价格", "日期", "数量", "单位"]
+    for i in range(n or 12):
+        gold = sorted({r.pick(fields), r.pick(fields)})
+        pred = sorted(set(gold) | ({r.pick(fields)} if r.next() < 0.3 else set()))
+        rows.append({"case_id": "e%02d" % i,
+                     "gold_fields": json.dumps(gold, ensure_ascii=False),
+                     "pred_fields": json.dumps(pred, ensure_ascii=False)})
+    return rows
+
+
+def _build_generation(r, rows, n):
+    words = ["模型", "口径", "评测", "样本", "结论", "边界"]
+    for i in range(n or 12):
+        ref = "".join(r.pick(words) for _ in range(5))
+        out = ref if r.next() < 0.4 else "".join(r.pick(words) for _ in range(5))
+        rows.append({"case_id": "g%02d" % i, "reference": ref, "output": out})
+    return rows
+
+
+def _build_regression(r, rows, n):
+    for i in range(n or 16):
+        gold = r.between(-2.0, 2.0)
+        rows.append({"case_id": "r%02d" % i, "gold": "%.4f" % gold,
+                     "pred": "%.4f" % (gold + r.between(-0.25, 0.25))})
+    return rows
+
+
+def _build_calibration(r, rows, n):
+    for i in range(n or 20):
+        p = r.between(0.05, 0.95)
+        rows.append({"case_id": "k%02d" % i, "prob": "%.4f" % p,
+                     "gold": "1" if r.next() < p else "0"})
+    return rows
+
+
+def _build_agreement(r, rows, n):
+    for i in range(n or 20):
+        a = r.pick(["T", "F"])
+        rows.append({"case_id": "a%02d" % i, "a": a,
+                     "b": a if r.next() < 0.85 else ("F" if a == "T" else "T")})
+    return rows
+
+
+def _build_preference(r, rows, n):
+    for i in range(n or 16):
+        human = r.pick(["a", "b"])
+        rows.append({"case_id": "p%02d" % i, "human": human,
+                     "judge": human if r.next() < 0.7 else r.pick(["a", "b", "tie"])})
+    return rows
+
+
+def _build_exact_judgement(r, rows, n):
+    for t in range(n or 4):
+        for i in range(4):
+            rows.append({"task_id": "t%d" % t, "sample": str(i + 1),
+                         "passed": "1" if r.next() < 0.5 else "0"})
+    return rows
+
+
+def _build_latency_cost(r, rows, n):
+    for i in range(n or 20):
+        rows.append({"case_id": "l%02d" % i,
+                     "latency_ms": "%.1f" % r.between(120.0, 900.0),
+                     "tokens_in": str(int(r.between(200, 1800))),
+                     "tokens_out": str(int(r.between(50, 600)))})
+    return rows
+
+
+def _build_drift(r, rows, n):
+    for i in range(n or 8):
+        e = r.between(0.05, 0.20)
+        rows.append({"bucket": "b%d" % i, "expected": "%.4f" % e,
+                     "actual": "%.4f" % max(0.001, e + r.between(-0.03, 0.03))})
+    return rows
+
+
+def _build_contract_compliance(r, rows, n):
+    fields = ["available_ts", "unit", "currency", "version", "owner"]
+    for i in range(n or 20):
+        ok = r.next() < 0.8
+        miss = "" if ok else "|".join(sorted({r.pick(fields), r.pick(fields)}))
+        rows.append({"case_id": "v%02d" % i, "valid": "1" if ok else "0",
+                     "missing_fields": miss})
+    return rows
 
 
 def rows_to_csv(rows: Sequence[Dict[str, str]]) -> str:

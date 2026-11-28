@@ -171,6 +171,41 @@ def _key(root: str, ident: str, snap: Dict[str, Any]) -> str:
     return h.hexdigest()
 
 
+def _detach_collectors(seen: set, listed: set) -> None:
+    for reg, item in ((gf._COLLECTORS, seen), (gf._DIR_COLLECTORS, listed)):  # noqa: SLF001
+        for i, s in enumerate(reg):
+            if s is item:
+                del reg[i]
+                break
+
+
+def _classify_path(raw: Any, base: Path, outside: List[str]) -> Optional[str]:
+    """仓内 → 相对 posix；仓外 → None（并记进 outside，由调用方 fail-closed）。"""
+    try:
+        p = Path(os.fsdecode(raw))
+    except (TypeError, ValueError) as _exc:
+        # 路径解不出（audit 事件参数形状异常）⇒ **按仓外处理**：调用方见 outside 非空即
+        # 判不可缓存（fail-closed）。不外抛、也不当成「仓内已核对」。
+        outside.append("unresolvable:%s:%s" % (type(raw).__name__, _exc))
+        return None
+    ap = p if p.is_absolute() else (Path.cwd() / p)
+    try:
+        rp = ap.resolve()
+    except OSError:
+        outside.append(str(ap))          # 解不出真实路径 ⇒ 保守当仓外
+        return None
+    if _is_runtime_path(rp):
+        return None                       # 解释器自己的地盘：与判据语义无关（见 _RUNTIME_ROOTS）
+    try:
+        rel = rp.relative_to(base)
+    except ValueError:
+        outside.append(str(rp))
+        return None
+    if not rel.parts or rel.parts[0] == ".git":     # .git 内容不参与判据
+        return None
+    return rel.as_posix()
+
+
 def observe(root: str, runner: Callable[[], Any]) -> Tuple[Any, List[str], List[str], List[str]]:
     """跑一次 runner → (返回值, 仓内文件读面, 仓内目录读面, 仓外绝对读面)。
 
@@ -191,46 +226,15 @@ def observe(root: str, runner: Callable[[], Any]) -> Tuple[Any, List[str], List[
     try:
         value = runner()
     finally:
-        for reg, item in ((gf._COLLECTORS, seen), (gf._DIR_COLLECTORS, listed)):  # noqa: SLF001
-            for i, s in enumerate(reg):
-                if s is item:
-                    del reg[i]
-                    break
+        _detach_collectors(seen, listed)
     base = Path(root).resolve()
     files_in, dirs_in, outside = [], [], []
-
-    def _classify(raw: Any) -> Optional[str]:
-        """仓内 → 相对 posix；仓外 → None（并记进 outside，由调用方 fail-closed）。"""
-        try:
-            p = Path(os.fsdecode(raw))
-        except (TypeError, ValueError) as _exc:
-            # 路径解不出（audit 事件参数形状异常）⇒ **按仓外处理**：调用方见 outside 非空即
-            # 判不可缓存（fail-closed）。不外抛、也不当成「仓内已核对」。
-            outside.append("unresolvable:%s:%s" % (type(raw).__name__, _exc))
-            return None
-        ap = p if p.is_absolute() else (Path.cwd() / p)
-        try:
-            rp = ap.resolve()
-        except OSError:
-            outside.append(str(ap))          # 解不出真实路径 ⇒ 保守当仓外
-            return None
-        if _is_runtime_path(rp):
-            return None                       # 解释器自己的地盘：与判据语义无关（见 _RUNTIME_ROOTS）
-        try:
-            rel = rp.relative_to(base)
-        except ValueError:
-            outside.append(str(rp))
-            return None
-        if not rel.parts or rel.parts[0] == ".git":     # .git 内容不参与判据
-            return None
-        return rel.as_posix()
-
     for raw in seen:
-        rel = _classify(raw)
+        rel = _classify_path(raw, base, outside)
         if rel:
             files_in.append(rel)
     for raw in listed:
-        rel = _classify(raw)
+        rel = _classify_path(raw, base, outside)
         if rel:
             dirs_in.append(rel)
     return value, sorted(set(files_in)), sorted(set(dirs_in)), sorted(set(outside))

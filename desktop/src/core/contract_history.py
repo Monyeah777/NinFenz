@@ -117,7 +117,8 @@ def _is_version_pointer(pointer: str) -> bool:
     return tail in {"$id", "$schema", "schema", "version", "schema_version"}
 
 
-def _json_diff(before: dict[str, str], after: dict[str, str]) -> dict[str, Any]:
+def _json_changes(before: dict[str, str], after: dict[str, str]) -> list[dict[str, Any]]:
+    """形状指针级差异（移除 / 新增 / 变更），按指针排序。"""
     changes = []
     for pointer in sorted(set(before) - set(after)):
         changes.append({"pointer": pointer, "from": before[pointer], "to": None, "kind": "移除"})
@@ -129,21 +130,40 @@ def _json_diff(before: dict[str, str], after: dict[str, str]) -> dict[str, Any]:
                 {"pointer": pointer, "from": before[pointer], "to": after[pointer],
                  "kind": "变更"}
             )
-    removed = [change for change in changes if change["kind"] == "移除"]
-    added = [change for change in changes if change["kind"] == "新增"]
-    changed = [change for change in changes if change["kind"] == "变更"]
-    type_changed = any(
+    return changes
+
+
+def _type_changed(changed: list[dict[str, Any]]) -> bool:
+    """变更项里是否有类型前缀变化（string→number 等）。"""
+    return any(
         change["from"].split(":", 1)[0] != change["to"].split(":", 1)[0]
         for change in changed
     )
-    required_added = any(".required[" in change["pointer"] for change in added)
-    version_changed = any(_is_version_pointer(change["pointer"]) for change in changed)
-    if removed or type_changed or required_added or version_changed:
-        impact = "bump"
-    elif added:
-        impact = "additive"
-    else:
-        impact = "editorial"
+
+
+def _breaking(removed: list[dict[str, Any]], added: list[dict[str, Any]],
+              changed: list[dict[str, Any]]) -> bool:
+    """是否破坏性（结构移除、类型/版本变化或必填项增加）。"""
+    if removed or _type_changed(changed):
+        return True
+    if any(".required[" in change["pointer"] for change in added):
+        return True
+    return any(_is_version_pointer(change["pointer"]) for change in changed)
+
+
+def _impact_of(changes: list[dict[str, Any]]) -> str:
+    """影响度三分：bump（破坏）/ additive（字段级新增）/ editorial（编辑性）。"""
+    removed = [change for change in changes if change["kind"] == "移除"]
+    added = [change for change in changes if change["kind"] == "新增"]
+    changed = [change for change in changes if change["kind"] == "变更"]
+    if _breaking(removed, added, changed):
+        return "bump"
+    return "additive" if added else "editorial"
+
+
+def _json_diff(before: dict[str, str], after: dict[str, str]) -> dict[str, Any]:
+    changes = _json_changes(before, after)
+    impact = _impact_of(changes)
     verdict = {
         "bump": "破坏（结构移除、类型/版本变化或必填项增加）",
         "additive": "兼容（字段级新增）",
@@ -229,65 +249,75 @@ def _rel_to_root(root: str, target: str) -> str:
     return Path(os.path.relpath(full, root)).as_posix()
 
 
+def _history_mode(args: Any, root: str) -> int:
+    """--history 模式：单个契约路径的签名时间线。"""
+    if not args.a or args.b is not None:
+        return _run_fail(
+            args,
+            "nf diff --history 只收一个契约路径（修复指引："
+            "`nf diff --history 20 01_核心协议.md`；双文件比较请去掉 --history）",
+            2,
+        )
+    result = history(root, args.a, args.history)
+    if args.json:
+        print(json.dumps({"kind": "contract-history", **result},
+                         ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+    print("== nf diff --history ==")
+    print(f"  契约：{result['path']}")
+    for event in result["revisions"]:
+        print(f"  {event['date']} {event['commit'][:12]} [{event['impact']}] "
+              f"{event['subject']}")
+        if event["changes"]:
+            print(f"    变更 {len(event['changes'])} 项 · {event['verdict']}")
+    summary = result["summary"]
+    print(f"  提交 {summary['count']} · bump {summary['bump']} · "
+          f"additive {summary['additive']} · editorial {summary['editorial']}")
+    return 0
+
+
+def _diff_mode(args: Any, root: str) -> int:
+    """默认模式：两份文件的签名差异。"""
+    if not args.a or not args.b:
+        return _run_fail(
+            args,
+            "nf diff 需要两份文件（修复指引：`nf diff OLD NEW`；"
+            "看单个契约历史用 `nf diff --history 20 <契约路径>`）",
+            2,
+        )
+    rel_a = _rel_to_root(root, args.a)
+    rel_b = _rel_to_root(root, args.b)
+    diff = knowledge_sig.diff_signatures(
+        knowledge_sig.build_signature(rel_a, root),
+        knowledge_sig.build_signature(rel_b, root),
+    )
+    if args.json:
+        print(json.dumps({"kind": "diff", **diff},
+                         ensure_ascii=False, indent=2, sort_keys=True))
+        return 0
+    print("== nf diff ==")
+    print(f"  {diff['from']}  →  {diff['to']}")
+    if not diff["changes"]:
+        print("  无字段差异（两份签名一致）")
+    for change in diff["changes"]:
+        print(f"  [{change['kind']}] {change['field']}  "
+              f"{change['from']!r} → {change['to']!r}")
+    print(f"  判定：{diff['verdict']}")
+    impact = diff.get("impact", "editorial")
+    label = {
+        "bump": "结构性（须 bump + 迁移记录）",
+        "additive": "字段级新增（V1 只增不删）",
+        "editorial": "措辞/编辑（无契约影响）",
+    }.get(impact, impact)
+    print(f"  影响度：{impact}（{label}）")
+    return 0
+
+
 def run(args: Any, root: str = ".") -> int:
     """Run the existing diff face plus its optional contract-history mode."""
     try:
         if args.history is not None:
-            if not args.a or args.b is not None:
-                return _run_fail(
-                    args,
-                    "nf diff --history 只收一个契约路径（修复指引："
-                    "`nf diff --history 20 01_核心协议.md`；双文件比较请去掉 --history）",
-                    2,
-                )
-            result = history(root, args.a, args.history)
-            if args.json:
-                print(json.dumps({"kind": "contract-history", **result},
-                                 ensure_ascii=False, indent=2, sort_keys=True))
-                return 0
-            print("== nf diff --history ==")
-            print(f"  契约：{result['path']}")
-            for event in result["revisions"]:
-                print(f"  {event['date']} {event['commit'][:12]} [{event['impact']}] "
-                      f"{event['subject']}")
-                if event["changes"]:
-                    print(f"    变更 {len(event['changes'])} 项 · {event['verdict']}")
-            summary = result["summary"]
-            print(f"  提交 {summary['count']} · bump {summary['bump']} · "
-                  f"additive {summary['additive']} · editorial {summary['editorial']}")
-            return 0
-        if not args.a or not args.b:
-            return _run_fail(
-                args,
-                "nf diff 需要两份文件（修复指引：`nf diff OLD NEW`；"
-                "看单个契约历史用 `nf diff --history 20 <契约路径>`）",
-                2,
-            )
-        rel_a = _rel_to_root(root, args.a)
-        rel_b = _rel_to_root(root, args.b)
-        diff = knowledge_sig.diff_signatures(
-            knowledge_sig.build_signature(rel_a, root),
-            knowledge_sig.build_signature(rel_b, root),
-        )
-        if args.json:
-            print(json.dumps({"kind": "diff", **diff},
-                             ensure_ascii=False, indent=2, sort_keys=True))
-            return 0
-        print("== nf diff ==")
-        print(f"  {diff['from']}  →  {diff['to']}")
-        if not diff["changes"]:
-            print("  无字段差异（两份签名一致）")
-        for change in diff["changes"]:
-            print(f"  [{change['kind']}] {change['field']}  "
-                  f"{change['from']!r} → {change['to']!r}")
-        print(f"  判定：{diff['verdict']}")
-        impact = diff.get("impact", "editorial")
-        label = {
-            "bump": "结构性（须 bump + 迁移记录）",
-            "additive": "字段级新增（V1 只增不删）",
-            "editorial": "措辞/编辑（无契约影响）",
-        }.get(impact, impact)
-        print(f"  影响度：{impact}（{label}）")
-        return 0
+            return _history_mode(args, root)
+        return _diff_mode(args, root)
     except (OSError, ValueError) as exc:
         return _run_fail(args, str(exc))

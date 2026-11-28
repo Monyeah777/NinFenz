@@ -31,27 +31,45 @@ def problems(graph: Dict[str, Any]) -> List[str]:
            if isinstance(x, dict)}
     declared = set(prereqs) | ext
     legend = {str(k) for k in (graph.get("provenance_legend") or {})}
-    strength = provenance_strength(graph)
+    issues += _strength_issues(provenance_strength(graph), graph)
+    issues += _node_issues(graph, legend)
+    issues += _edge_issues(prereqs, declared)
+    issues += _branch_issues(graph, prereqs)
+    issues += _closure_issues(graph)
+    return issues
+
+
+def _strength_issues(strength, graph: Dict[str, Any]) -> List[str]:
+    """provenance_strength 必填/词表/阶梯自洽。"""
     if not strength:
-        issues.append("图缺 provenance_strength 声明（修复指引：在机读块声明取值 "
-                      "%s——证据强度须显式，不得默认按强证据理解）"
-                      % " / ".join(PROVENANCE_STRENGTHS))
-    elif strength not in PROVENANCE_STRENGTHS:
-        issues.append("provenance_strength 越词表：%s（取值 %s）"
-                      % (strength, " / ".join(PROVENANCE_STRENGTHS)))
-    else:
-        # 四级阶梯须与「节点外部覆盖」自洽（可判定：覆盖 = 有非推断来源键的节点数 / 包内节点数）
-        covered, total = external_coverage(graph)
-        ratio = (float(covered) / total) if total else 0.0
-        if strength == "external" and ratio < 1.0:
-            issues.append("provenance_strength=external 但外部覆盖仅 %d/%d（修复指引：补齐每节点的"
-                          "外部来源锚，或按实况降为 mixed / domain-logic）" % (covered, total))
-        elif strength == "mixed" and not (0.0 < ratio < 1.0):
-            issues.append("provenance_strength=mixed 但外部覆盖 = %d/%d（修复指引：全覆盖用 "
-                          "external；无外部锚用 domain-logic / inferred）" % (covered, total))
-        elif strength in ("domain-logic", "inferred") and ratio > 0.0:
-            issues.append("provenance_strength=%s 但已有 %d/%d 节点挂外部来源键"
-                          "（修复指引：按实况升为 mixed / external）" % (strength, covered, total))
+        return ["图缺 provenance_strength 声明（修复指引：在机读块声明取值 "
+                "%s——证据强度须显式，不得默认按强证据理解）"
+                % " / ".join(PROVENANCE_STRENGTHS)]
+    if strength not in PROVENANCE_STRENGTHS:
+        return ["provenance_strength 越词表：%s（取值 %s）"
+                % (strength, " / ".join(PROVENANCE_STRENGTHS))]
+    return _coverage_issues(strength, graph)
+
+
+def _coverage_issues(strength, graph: Dict[str, Any]) -> List[str]:
+    """四级阶梯与「节点外部覆盖」自洽（覆盖 = 有非推断来源键的节点数 / 包内节点数）。"""
+    covered, total = external_coverage(graph)
+    ratio = (float(covered) / total) if total else 0.0
+    if strength == "external" and ratio < 1.0:
+        return ["provenance_strength=external 但外部覆盖仅 %d/%d（修复指引：补齐每节点的"
+                "外部来源锚，或按实况降为 mixed / domain-logic）" % (covered, total)]
+    if strength == "mixed" and not (0.0 < ratio < 1.0):
+        return ["provenance_strength=mixed 但外部覆盖 = %d/%d（修复指引：全覆盖用 "
+                "external；无外部锚用 domain-logic / inferred）" % (covered, total)]
+    if strength in ("domain-logic", "inferred") and ratio > 0.0:
+        return ["provenance_strength=%s 但已有 %d/%d 节点挂外部来源键"
+                "（修复指引：按实况升为 mixed / external）" % (strength, covered, total)]
+    return []
+
+
+def _node_issues(graph: Dict[str, Any], legend: Set[str]) -> List[str]:
+    """节点 id/名/溯源/层位。"""
+    issues: List[str] = []
     seen_nodes: Set[str] = set()
     for node in graph.get("nodes") or []:
         if not isinstance(node, dict) or not node.get("id"):
@@ -61,24 +79,43 @@ def problems(graph: Dict[str, Any]) -> List[str]:
         if nid in seen_nodes:
             issues.append("节点 id 重复：%s（编号须唯一）" % nid)
         seen_nodes.add(nid)
-        if not str(node.get("name") or "").strip():
-            issues.append("节点 %s 缺 name（修复指引：每个概念须有可读名）" % nid)
-        if not node.get("provenance"):
-            issues.append("节点 %s 缺 provenance（边无溯源即不可复核）" % nid)
-        else:
-            for key in node.get("provenance") or []:
-                if str(key) not in legend:
-                    issues.append("节点 %s 的 provenance 键 %r 不在 provenance_legend 中"
-                                  "（修复指引：补图例键，防图例漂移静默）" % (nid, key))
-        layer = str(node.get("layer") or "")
-        if layer and layer not in LAYERS:
-            issues.append("节点 %s 层位越界：%s（取值 %s）" % (nid, layer, "/".join(LAYERS)))
+        issues += _node_own_issues(node, nid, legend)
+    return issues
+
+
+def _node_own_issues(node: Dict[str, Any], nid: str, legend: Set[str]) -> List[str]:
+    """单节点的 name/provenance/层位口径。"""
+    issues: List[str] = []
+    if not str(node.get("name") or "").strip():
+        issues.append("节点 %s 缺 name（修复指引：每个概念须有可读名）" % nid)
+    if not node.get("provenance"):
+        issues.append("节点 %s 缺 provenance（边无溯源即不可复核）" % nid)
+    else:
+        for key in node.get("provenance") or []:
+            if str(key) not in legend:
+                issues.append("节点 %s 的 provenance 键 %r 不在 provenance_legend 中"
+                              "（修复指引：补图例键，防图例漂移静默）" % (nid, key))
+    layer = str(node.get("layer") or "")
+    if layer and layer not in LAYERS:
+        issues.append("节点 %s 层位越界：%s（取值 %s）" % (nid, layer, "/".join(LAYERS)))
+    return issues
+
+
+def _edge_issues(prereqs: Dict[str, Any], declared: Set[str]) -> List[str]:
+    """前置边：悬空/自环。"""
+    issues: List[str] = []
     for nid, ps in sorted(prereqs.items()):
         for p in ps:
             if p not in declared:
                 issues.append("悬空前置：%s ← %s（前置不在节点表 / 外部前置族中）" % (nid, p))
             if p == nid:
                 issues.append("自环：%s ← %s" % (nid, p))
+    return issues
+
+
+def _branch_issues(graph: Dict[str, Any], prereqs: Dict[str, Any]) -> List[str]:
+    """分支完备性与唯一归属。"""
+    issues: List[str] = []
     bids = node_branch(graph)
     for nid in sorted(set(prereqs) - set(bids)):
         issues.append("概念 %s 未归入任何分支（修复指引：在图 branches 段登记）" % nid)
@@ -87,6 +124,12 @@ def problems(graph: Dict[str, Any]) -> List[str]:
     flat = [n for v in branch_map(graph).values() for n in v]
     if len(flat) != len(set(flat)):
         issues.append("概念被多个分支重复声明（修复指引：一概念只入一个分支）")
+    return issues
+
+
+def _closure_issues(graph: Dict[str, Any]) -> List[str]:
+    """别名唯一与无环（拓扑排序失败即环）。"""
+    issues: List[str] = []
     try:
         alias_map(graph)
     except ClosureError as exc:

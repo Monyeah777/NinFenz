@@ -91,6 +91,46 @@ class Ingress:
 SELFCHECK_TOOL = "nf_selfcheck_probe"
 
 
+def _fresh_gate(base: dict[str, Any], effects: dict[str, str],
+                extra: dict[str, Any] | None = None) -> Ingress:
+    pol = dict(base)
+    allow = list(pol.get("allow") or [])
+    if allow:
+        pol["allow"] = allow + [SELFCHECK_TOOL]
+    if extra:
+        pol.update(extra)
+    return Ingress(pol, side_effects=effects)
+
+
+def _expect_deny(issues: list[str], label: str, gate: Ingress, params: Any, args: Any) -> None:
+    try:
+        gate.check_call(SELFCHECK_TOOL, args, params)
+    except IngressDenied as exc:
+        if "修复指引" not in str(exc):
+            issues.append(label + " 的拒绝消息缺修复指引")
+        return
+    issues.append(label + " 未被拦截（策略声明与执行不一致）")
+
+
+def _auth_meta(tokens: list) -> dict:
+    return {AUTH_META_KEY: tokens[0]} if tokens else {}
+
+
+def _consent_meta(tokens: list) -> dict:
+    return {AUTH_META_KEY: tokens[0], CONSENT_KEY: True} if tokens else {CONSENT_KEY: True}
+
+
+def _deny_gate_issues(gate: Ingress, deny: list) -> list[str]:
+    gate.side_effects[deny[0]] = "filesystem"
+    try:
+        gate.check_call(deny[0], {}, {"_meta": {}})
+    except IngressDenied as exc:
+        if "修复指引" not in str(exc):
+            return ["deny 闸的拒绝消息缺修复指引"]
+        return []
+    return ["deny 闸未拦截已下架工具 " + str(deny[0])]
+
+
 def selfcheck(policy: dict[str, Any] | None = None,
               side_effects: dict[str, str] | None = None) -> list[str]:
     """启动自检：用合成探针验**这份策略**是否真的按声明拒绝 → 失败列表。
@@ -102,47 +142,22 @@ def selfcheck(policy: dict[str, Any] | None = None,
     base = dict(policy or {})
     effects = dict(side_effects or {})
     effects.setdefault(SELFCHECK_TOOL, "filesystem")  # 探针按「有副作用」扱，才能验同意闸
-
-    def fresh(extra: dict[str, Any] | None = None) -> Ingress:
-        pol = dict(base)
-        allow = list(pol.get("allow") or [])
-        if allow:
-            pol["allow"] = allow + [SELFCHECK_TOOL]
-        if extra:
-            pol.update(extra)
-        return Ingress(pol, side_effects=effects)
-
-    def expect_deny(label: str, gate: Ingress, params: Any, args: Any) -> None:
-        try:
-            gate.check_call(SELFCHECK_TOOL, args, params)
-        except IngressDenied as exc:
-            if "修复指引" not in str(exc):
-                issues.append(label + " 的拒绝消息缺修复指引")
-            return
-        issues.append(label + " 未被拦截（策略声明与执行不一致）")
-
     tokens = list(base.get("tokens") or [])
     if tokens:
-        expect_deny("token 闸", fresh(), {"_meta": {}}, {})
-        expect_deny("token 闸（伪造）", fresh(), {"_meta": {AUTH_META_KEY: "forged"}}, {})
+        _expect_deny(issues, "token 闸", _fresh_gate(base, effects), {"_meta": {}}, {})
+        _expect_deny(issues, "token 闸（伪造）", _fresh_gate(base, effects),
+                     {"_meta": {AUTH_META_KEY: "forged"}}, {})
     if base.get("require_consent_for_effects"):
-        meta = {AUTH_META_KEY: tokens[0]} if tokens else {}
-        expect_deny("同意闸", fresh(), {"_meta": dict(meta)}, {})
+        _expect_deny(issues, "同意闸", _fresh_gate(base, effects),
+                     {"_meta": dict(_auth_meta(tokens))}, {})
     max_bytes = int(base.get("max_args_bytes") or 0)
     if max_bytes > 0:
-        meta = {AUTH_META_KEY: tokens[0], CONSENT_KEY: True} if tokens else {CONSENT_KEY: True}
-        expect_deny("字节上限闸", fresh(), {"_meta": dict(meta)}, {"blob": "x" * (max_bytes + 64)})
+        _expect_deny(issues, "字节上限闸", _fresh_gate(base, effects),
+                     {"_meta": dict(_consent_meta(tokens))},
+                     {"blob": "x" * (max_bytes + 64)})
     deny = list(base.get("deny") or [])
     if deny:
-        gate = fresh()
-        gate.side_effects[deny[0]] = "filesystem"
-        try:
-            gate.check_call(deny[0], {}, {"_meta": {}})
-        except IngressDenied as exc:
-            if "修复指引" not in str(exc):
-                issues.append("deny 闸的拒绝消息缺修复指引")
-        else:
-            issues.append("deny 闸未拦截已下架工具 " + str(deny[0]))
+        issues += _deny_gate_issues(_fresh_gate(base, effects), deny)
     return issues
 
 def normalize(policy: Any) -> dict[str, Any]:

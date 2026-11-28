@@ -12,6 +12,7 @@
 """
 from __future__ import annotations
 
+import ast
 import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
@@ -49,9 +50,33 @@ def listing(root: str) -> dict:
     return out
 
 
+def _import_deps(node, deps: set) -> None:
+    for alias in node.names:
+        name = alias.name
+        if name == "core" or name.startswith("core."):
+            if "." in name:
+                deps.add(name.split(".")[1])
+
+
+def _import_from_deps(node, deps: set) -> None:
+    mod = node.module or ""
+    if mod == "core":
+        deps.update(a.name for a in node.names)
+    elif mod.startswith("core."):
+        deps.add(mod.split(".")[1])
+
+
+def _dynamic_import(node) -> bool:
+    fn = node.func
+    if isinstance(fn, ast.Name) and fn.id == "__import__":
+        return True
+    if isinstance(fn, ast.Attribute) and getattr(getattr(fn, "value", None), "id", "") == "importlib":
+        return True
+    return False
+
+
 def parse(text: str) -> Optional[Tuple[frozenset, bool]]:
     """正文 → `(依赖名集合, 是否含动态导入)`；解析不出 → None（调用方退回整块代码面）。"""
-    import ast
     try:
         tree = ast.parse(text)
     except Exception:                                        # noqa: BLE001 - 解析不出即「说不清」
@@ -60,23 +85,11 @@ def parse(text: str) -> Optional[Tuple[frozenset, bool]]:
     dyn = False
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
-            for alias in node.names:
-                if alias.name == "core" or alias.name.startswith("core."):
-                    if "." in alias.name:
-                        deps.add(alias.name.split(".")[1])
+            _import_deps(node, deps)
         elif isinstance(node, ast.ImportFrom):
-            mod = node.module or ""
-            if mod == "core":
-                deps.update(a.name for a in node.names)
-            elif mod.startswith("core."):
-                deps.add(mod.split(".")[1])
-        elif isinstance(node, ast.Call):
-            fn = node.func
-            if isinstance(fn, ast.Name) and fn.id == "__import__":
-                dyn = True
-            elif isinstance(fn, ast.Attribute) \
-                    and getattr(getattr(fn, "value", None), "id", "") == "importlib":
-                dyn = True
+            _import_from_deps(node, deps)
+        elif isinstance(node, ast.Call) and _dynamic_import(node):
+            dyn = True
     return frozenset(d for d in deps if d), dyn
 
 

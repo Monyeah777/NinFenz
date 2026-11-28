@@ -3,6 +3,7 @@
 门面 core.interop_export 按原 API 重新导出；本文件只承载实现，不改变对外面。
 """
 from __future__ import annotations
+from typing import Any, Dict, List
 
 import glob
 import os
@@ -24,6 +25,13 @@ def _pinned_versions(root: str) -> Dict[str, str]:
     （pip-audit / Grype / Dependabot）拿不到可比对的版本号，结论只能是「无版本 SBOM」。
     版本必须来自**已钉**的清单（不猜、不取 latest）。
     """
+    out = _requirement_versions(root)
+    _pyproject_versions(root, out)
+    return out
+
+
+def _requirement_versions(root: str) -> Dict[str, str]:
+    """`.github/requirements-*.txt` 的钉版。"""
     out: Dict[str, str] = {}
     for p in sorted(glob.glob(os.path.join(root, ".github", "requirements-*.txt"))):
         try:
@@ -33,31 +41,47 @@ def _pinned_versions(root: str) -> Dict[str, str]:
             # 尽力而为：依赖清单不可读 ⇒ 跳过该面（缺口由 self_stats / 供应链判据另行报出）。
             continue
         for line in lines:
-            body = line.split("#", 1)[0].strip()
-            if not body or body.startswith("-") or "==" not in body:
-                continue          # 跳过 pip-compile 的 `--hash=` 续行与选项行
-            name, _, ver = body.partition("==")
-            name = name.strip().lower()
-            if "[" in name:
-                name = name.split("[", 1)[0].strip()   # `pkg[extra]==…` 取项目名
-            ver = ver.split(";", 1)[0].strip().rstrip("\\").strip()
-            if name and ver:
-                out.setdefault(name, ver)
-    pp = os.path.join(root, "pyproject.toml")
-    if os.path.isfile(pp):
-        try:
-            import tomllib                      # 3.11+
-            with open(pp, "rb") as fh:
-                doc = tomllib.load(fh)
-            extras = (doc.get("project", {}) or {}).get("optional-dependencies") or {}
-            for specs in extras.values():
-                for spec in (specs if isinstance(specs, list) else []):
-                    if isinstance(spec, str) and "==" in spec:
-                        name, ver = spec.split("==", 1)
-                        out.setdefault(name.strip().lower(), ver.strip())
-        except (OSError, ValueError, TypeError):
-            pass
+            parsed = _parse_req_line(line)
+            if parsed:
+                out.setdefault(parsed[0], parsed[1])
     return out
+
+
+def _parse_req_line(line: str):
+    """一行钉版清单 → (名, 版本) 或 None（跳过选项行/无钉版行）。"""
+    body = line.split("#", 1)[0].strip()
+    if not body or body.startswith("-") or "==" not in body:
+        return None          # 跳过 pip-compile 的 `--hash=` 续行与选项行
+    name, _, ver = body.partition("==")
+    name = name.strip().lower()
+    if "[" in name:
+        name = name.split("[", 1)[0].strip()   # `pkg[extra]==…` 取项目名
+    ver = ver.split(";", 1)[0].strip().rstrip("\\").strip()
+    return (name, ver) if name and ver else None
+
+
+def _pyproject_versions(root: str, out: Dict[str, str]) -> None:
+    """pyproject [project.optional-dependencies] 的钉版补充。"""
+    pp = os.path.join(root, "pyproject.toml")
+    if not os.path.isfile(pp):
+        return
+    try:
+        import tomllib                      # 3.11+
+        with open(pp, "rb") as fh:
+            doc = tomllib.load(fh)
+    except (OSError, ValueError, TypeError):
+        return
+    extras = (doc.get("project", {}) or {}).get("optional-dependencies") or {}
+    for specs in extras.values():
+        _collect_specs(specs, out)
+
+
+def _collect_specs(specs, out: Dict[str, str]) -> None:
+    """可选依赖的 `pkg==ver` 行 → 钉版表。"""
+    for spec in (specs if isinstance(specs, list) else []):
+        if isinstance(spec, str) and "==" in spec:
+            name, ver = spec.split("==", 1)
+            out.setdefault(name.strip().lower(), ver.strip())
 
 
 CONTRACT_REL = "protocol/endpoint_contract.json"

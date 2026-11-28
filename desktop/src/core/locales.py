@@ -57,24 +57,35 @@ def registry(root: str = ".") -> Tuple[Optional[Dict[str, Any]], List[str]]:
     return data, issues
 
 
-def entries(root: str = ".") -> List[Tuple[str, str]]:
-    """在场语言面（注册表优先；缺注册表退回文件扫描，保证空根/临时根仍可判）。"""
-    data, _ = registry(root)
+def _registry_entries(data: Optional[Dict[str, Any]]) -> List[Tuple[str, str]]:
+    """注册表里声明的语言面（id, entry）。"""
     out: List[Tuple[str, str]] = []
     if data and isinstance(data.get("locales"), list):
         for item in data["locales"]:
             if isinstance(item, dict) and item.get("id") and item.get("entry"):
                 out.append((str(item["id"]).lower(), str(item["entry"])))
-    if out:
-        return out
+    return out
+
+
+def _file_entries(root: str) -> List[Tuple[str, str]]:
+    """缺注册表时退回文件扫描（canonical 恒在场，其余按 README.<lang>.md 认）。"""
     r = Path(root)
-    out = [("zh", CANONICAL)]
+    out: List[Tuple[str, str]] = [("zh", CANONICAL)]
     if r.is_dir():
         for p in sorted(r.glob("README.*.md")):
             m = _LOCALE_RE.match(p.name)
             if m:
                 out.append((m.group(1).lower(), p.name))
     return out
+
+
+def entries(root: str = ".") -> List[Tuple[str, str]]:
+    """在场语言面（注册表优先；缺注册表退回文件扫描，保证空根/临时根仍可判）。"""
+    data, _ = registry(root)
+    out = _registry_entries(data)
+    if out:
+        return out
+    return _file_entries(root)
 
 
 def label(lang: str) -> str:
@@ -178,6 +189,178 @@ def stamp(root: str = ".", write: bool = False) -> Dict[str, Any]:
     return {"ok": True, "stamped": stamped, "written": bool(write)}
 
 
+def _locale_item_issues(item: Dict[str, Any], seen: Dict[str, str]) -> List[str]:
+    """单条 locale 登记：id 在场且唯一、label/codeowner/coverage 合规。"""
+    issues: List[str] = []
+    lid = str(item.get("id", "")).lower()
+    if not lid:
+        return ["%s 有 locale 缺 id" % REGISTRY_REL]
+    if lid in seen:
+        issues.append("语言 id 重复：%s" % lid)
+    seen[lid] = str(item.get("entry", ""))
+    if not str(item.get("label", "")).strip():
+        issues.append("%s/%s 缺 label（人读语言名）" % (REGISTRY_REL, lid))
+    if not str(item.get("codeowner", "")).strip():
+        issues.append("%s/%s 缺 codeowner（语言面责任方）" % (REGISTRY_REL, lid))
+    cov = str(item.get("coverage", ""))
+    if cov not in COVERAGES:
+        issues.append("%s/%s coverage 越出词表：%s（词表：%s）" % (REGISTRY_REL, lid, cov, "/".join(COVERAGES)))
+    return issues
+
+
+def _locale_row_issues(data: Dict[str, Any]) -> List[str]:
+    """注册表 locales 逐条体检（非对象条目跳过）。"""
+    issues: List[str] = []
+    seen: Dict[str, str] = {}
+    for item in (data.get("locales") or []):
+        if isinstance(item, dict):
+            issues.extend(_locale_item_issues(item, seen))
+    return issues
+
+
+def _entry_anchor_issues(fn: str, txt: str, want: Tuple[str, ...]) -> List[str]:
+    """入口面：机读锚点齐 + 版本号在场。"""
+    issues: List[str] = []
+    for a in want:
+        if a not in txt:
+            issues.append("%s 缺机读锚点 %s（修复指引：与 %s 同步机读事实）" % (fn, a, CANONICAL))
+    if not re.search(r"v\d+\.\d+", txt):
+        issues.append("%s 缺版本号（vX.Y）" % fn)
+    return issues
+
+
+def _entry_switcher_issues(fn: str, txt: str, locs: List[Tuple[str, str]],
+                           lang: str) -> List[str]:
+    """切换块是**多行 HTML**（marker 行 + <p> + 链接行 + </p>）：逐行比对到 </p> 为止。"""
+    line = switcher(locs, lang)
+    if _switch_block(txt) != line:
+        return ["%s 缺/错语言切换行（期望逐字：%s）" % (fn, line)]
+    return []
+
+
+def _entry_structure_issues(fn: str, txt: str, zh_h2: int,
+                            zh_refs: List[str]) -> List[str]:
+    """非 canonical 入口：H2 数与 canonical 对齐 + canonical 引用的件都在场。"""
+    issues: List[str] = []
+    h2 = len(_H2_RE.findall(txt))
+    if h2 != zh_h2:
+        issues.append("语言面结构不对齐：%s H2=%d ≠ %s H2=%d" % (fn, h2, CANONICAL, zh_h2))
+    miss = [x for x in zh_refs if x not in txt]
+    if miss:
+        issues.append("%s 缺 canonical 引用的件：%s" % (fn, "、".join(miss[:5])))
+    return issues
+
+
+def _entry_face_issues(r: Path, locs: List[Tuple[str, str]], want: Tuple[str, ...],
+                       zh_h2: int, zh_refs: List[str]) -> List[str]:
+    """入口面逐面（锚点 / 版本 / 切换行 / 结构 / 引件）。"""
+    issues: List[str] = []
+    for lang, fn in locs:
+        p = r / fn
+        if not p.is_file():
+            issues.append("语言面缺件 %s（修复指引：补齐该语言入口，或从注册表移除）" % fn)
+            continue
+        txt = p.read_text(encoding="utf-8")
+        issues.extend(_entry_anchor_issues(fn, txt, want))
+        issues.extend(_entry_switcher_issues(fn, txt, locs, lang))
+        if fn != CANONICAL:
+            issues.extend(_entry_structure_issues(fn, txt, zh_h2, zh_refs))
+    return issues
+
+
+def _translation_item_issues(r: Path, src: str, src_digest: str, lang: str,
+                             value: Any) -> List[str]:
+    """单条译件：在场 + 路径镜像 + 源件摘要签名与当前字节一致。"""
+    issues: List[str] = []
+    tp, tsha = _tpath(value)
+    tfile = r / tp
+    if not tp or not tfile.is_file():
+        return ["文档译件不在场：%s（%s ← %s）" % (tp or "（缺 path）", lang, src)]
+    # 路径镜像：译件必须落 docs/<lang>/ 下，且剩余路径与源件一致
+    if not src.startswith("docs/") or not tp.startswith("docs/" + str(lang) + "/"):
+        issues.append("译件路径未镜像：%s（%s 的译文应落 docs/%s/<原文相对路径>）" % (tp, src, lang))
+    elif tp[len("docs/" + str(lang) + "/"):] != src[len("docs/"):]:
+        issues.append("译件路径未镜像：%s ≠ docs/%s/%s" % (tp, lang, src[len("docs/"):]))
+    if not tsha:
+        issues.append("译件未签源件摘要：%s（修复指引：跑 nf locales --write 重签 source_sha256）" % tp)
+    elif tsha != src_digest:
+        issues.append("译件过期：%s 的 source_sha256 与 %s 当前字节不一致（修复指引：更新译文后跑 nf locales --write 重签）" % (tp, src))
+    return issues
+
+
+def _guide_issues(r: Path, g: Dict[str, Any]) -> List[str]:
+    """单份文档面：源件在场 → 逐译件体检。"""
+    issues: List[str] = []
+    src = str(g.get("path", ""))
+    if not src:
+        return ["%s 有 docs 条目缺 path" % REGISTRY_REL]
+    sp = r / src
+    if not sp.is_file():
+        return ["文档原文不在场：%s" % src]
+    src_digest = _sha256_file(sp)
+    for lang, value in (g.get("translations") or {}).items():
+        issues.extend(_translation_item_issues(r, src, src_digest, lang, value))
+    return issues
+
+
+def _translation_issues(r: Path, guides: List[Dict[str, Any]]) -> List[str]:
+    """文档面：声明 ⇄ 在场双向，路径镜像，源件摘要不过期。"""
+    issues: List[str] = []
+    for g in guides:
+        issues.extend(_guide_issues(r, g))
+    return issues
+
+
+def _coverage_issues(data: Dict[str, Any], canon: str, declared: Dict[str, set],
+                     guides: List[Dict[str, Any]]) -> List[str]:
+    """覆盖面诚实声明：entry+guides 须译全；entry 不得有指南译件。"""
+    issues: List[str] = []
+    for item in (data.get("locales") or []):
+        if not isinstance(item, dict):
+            continue
+        lid = str(item.get("id", "")).lower()
+        if lid == str(canon).lower():
+            continue        # canonical 语言的「译件」就是 guide 原文，不参与译件齐备判据
+        cov = str(item.get("coverage", ""))
+        got = declared.get(lid, set())
+        if cov == "entry+guides" and guides and len(got) < len(guides):
+            issues.append("%s 声明 entry+guides 但指南译件不全（缺 %d 件）" % (lid, len(guides) - len(got)))
+        if cov == "entry" and got:
+            issues.append("%s 声明 coverage=entry 却有指南译件 %s（修复指引：升为 entry+guides 或删译件）" % (lid, "、".join(sorted(got))))
+    return issues
+
+
+def _lang_dirs(docs: Path, lang_ids: set) -> list:
+    """只看**注册在册语言**的子目录——docs/examples 这类同形目录不是语言面。"""
+    return sorted(p for p in docs.iterdir() if p.is_dir() and p.name.lower() in lang_ids)
+
+
+def _undeclared_issues(r: Path, data: Dict[str, Any], declared: Dict[str, set]) -> List[str]:
+    """未声明的多语面：docs/<lang>/ 下的 md 必须被注册表声明。"""
+    issues: List[str] = []
+    docs = r / "docs"
+    lang_ids = {str(i.get("id", "")).lower() for i in (data.get("locales") or []) if isinstance(i, dict)}
+    if not docs.is_dir():
+        return issues
+    declared_files: set = set()
+    for s in declared.values():
+        declared_files |= s
+    for d in _lang_dirs(docs, lang_ids):
+        for f in sorted(d.glob("*.md")):
+            rel = "docs/%s/%s" % (d.name, f.name)
+            if rel not in declared_files:
+                issues.append("未声明的多语文档 %s（修复指引：在 %s 的 guides 里登记或删除）" % (rel, REGISTRY_REL))
+    return issues
+
+
+def _locale_stats(locs: List[Tuple[str, str]], canon: str, guides: List[Dict[str, Any]],
+                  declared: Dict[str, set]) -> Dict[str, Any]:
+    """语言面统计（口径同旧实现）。"""
+    return {"locales": [l for l, _ in locs], "files": [f for _, f in locs], "canonical": canon,
+            "guides": len(guides), "translations": sum(len(v) for v in declared.values()),
+            "switcher": switcher(locs, locs[0][0])}
+
+
 def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     """语言面机检（check34 口径）。缺根如实报 issue，不裸崩。"""
     r = Path(root)
@@ -193,123 +376,20 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     canon = data.get("canonical") or "zh"
     if (canon, CANONICAL) not in locs:
         issues.append("注册表的 canonical=%s 未指向 %s" % (canon, CANONICAL))
-    seen: Dict[str, str] = {}
-    for item in (data.get("locales") or []):
-        if not isinstance(item, dict):
-            continue
-        lid = str(item.get("id", "")).lower()
-        if not lid:
-            issues.append("%s 有 locale 缺 id" % REGISTRY_REL)
-            continue
-        if lid in seen:
-            issues.append("语言 id 重复：%s" % lid)
-        seen[lid] = str(item.get("entry", ""))
-        if not str(item.get("label", "")).strip():
-            issues.append("%s/%s 缺 label（人读语言名）" % (REGISTRY_REL, lid))
-        if not str(item.get("codeowner", "")).strip():
-            issues.append("%s/%s 缺 codeowner（语言面责任方）" % (REGISTRY_REL, lid))
-        cov = str(item.get("coverage", ""))
-        if cov not in COVERAGES:
-            issues.append("%s/%s coverage 越出词表：%s（词表：%s）"
-                          % (REGISTRY_REL, lid, cov, "/".join(COVERAGES)))
+    issues.extend(_locale_row_issues(data))
     # 入口面逐面（锚点 / 版本 / 切换行 / 结构 / 引件）
     zh = (r / CANONICAL).read_text(encoding="utf-8") if (r / CANONICAL).is_file() else ""
     zh_h2 = len(_H2_RE.findall(zh))
     zh_refs = sorted(set(_MD_REF_RE.findall(zh)))
     want = anchors()
-    for lang, fn in locs:
-        p = r / fn
-        if not p.is_file():
-            issues.append("语言面缺件 %s（修复指引：补齐该语言入口，或从注册表移除）" % fn)
-            continue
-        txt = p.read_text(encoding="utf-8")
-        for a in want:
-            if a not in txt:
-                issues.append("%s 缺机读锚点 %s（修复指引：与 %s 同步机读事实）" % (fn,
- a,
- CANONICAL))
-        if not re.search(r"v\d+\.\d+", txt):
-            issues.append("%s 缺版本号（vX.Y）" % fn)
-        line = switcher(locs, lang)
-        # 切换块是**多行 HTML**（marker 行 + <p> + 链接行 + </p>）：逐行比对到 </p> 为止。
-        got = _switch_block(txt)
-        if got != line:
-            issues.append("%s 缺/错语言切换行（期望逐字：%s）" % (fn, line))
-        if fn != CANONICAL:
-            h2 = len(_H2_RE.findall(txt))
-            if h2 != zh_h2:
-                issues.append("语言面结构不对齐：%s H2=%d ≠ %s H2=%d" % (fn, h2, CANONICAL, zh_h2))
-            miss = [x for x in zh_refs if x not in txt]
-            if miss:
-                issues.append("%s 缺 canonical 引用的件：%s" % (fn, "、".join(miss[:5])))
-    # 文档面：声明 ⇄ 在场，双向；路径须镜像（docs/<lang>/<rest> ← docs/<rest>）；源件摘要须与当前字
-    # 节一致（防过期）
+    issues.extend(_entry_face_issues(r, locs, want, zh_h2, zh_refs))
+    # 文档面：声明 ⇄ 在场，双向；路径须镜像（docs/<lang>/<rest> ← docs/<rest>）；源件摘要须与当前字节一致（防过期）
     declared = _declared_translations(data)
     guides = _docs(data)
-    for g in guides:
-        src = str(g.get("path", ""))
-        if not src:
-            issues.append("%s 有 docs 条目缺 path" % REGISTRY_REL)
-            continue
-        sp = r / src
-        if not sp.is_file():
-            issues.append("文档原文不在场：%s" % src)
-            continue
-        src_digest = _sha256_file(sp)
-        for lang, value in (g.get("translations") or {}).items():
-            tp, tsha = _tpath(value)
-            tfile = r / tp
-            if not tp or not tfile.is_file():
-                issues.append("文档译件不在场：%s（%s ← %s）" % (tp or "（缺 path）", lang, src))
-                continue
-            # 路径镜像：译件必须落 docs/<lang>/ 下，且剩余路径与源件一致
-            if not src.startswith("docs/") or not tp.startswith("docs/" + str(lang) + "/"):
-                issues.append("译件路径未镜像：%s（%s 的译文应落 docs/%s/<原文相对路径>）" % (tp,
- src,
- lang))
-            elif tp[len("docs/" + str(lang) + "/"):] != src[len("docs/"):]:
-                issues.append("译件路径未镜像：%s ≠ docs/%s/%s" % (tp, lang, src[len("docs/"):]))
-            if not tsha:
-                issues.append("译件未签源件摘要：%s（修复指引：跑 nf locales --write 重签 source_sh"
-                    "a256）" % tp)
-            elif tsha != src_digest:
-                issues.append("译件过期：%s 的 source_sha256 与 %s 当前字节不一致（修复指引：更新译"
-                    "文后跑 nf locales --write 重签）"
-                              % (tp, src))
-    for item in (data.get("locales") or []):
-        if not isinstance(item, dict):
-            continue
-        lid = str(item.get("id", "")).lower()
-        if lid == str(canon).lower():
-            continue        # canonical 语言的「译件」就是 guide 原文，不参与译件齐备判据
-        cov = str(item.get("coverage", ""))
-        got = declared.get(lid, set())
-        if cov == "entry+guides" and guides and len(got) < len(guides):
-            issues.append("%s 声明 entry+guides 但指南译件不全（缺 %d 件）"
-                          % (lid, len(guides) - len(got)))
-        if cov == "entry" and got:
-            issues.append("%s 声明 coverage=entry 却有指南译件 %s（修复指引：升为 entry+guides 或删译件）"
-                          % (lid, "、".join(sorted(got))))
-    # 未声明的多语面：docs/<lang>/ 下的 md 必须被注册表声明
-    docs = r / "docs"
-    lang_ids = {str(i.get("id", "")).lower() for i in (data.get("locales") or [])
-                if isinstance(i, dict)}
-    if docs.is_dir():
-        # 只看**注册在册语言**的子目录——docs/examples 这类同形目录不是语言面。
-        for d in sorted(p for p in docs.iterdir()
-                        if p.is_dir() and p.name.lower() in lang_ids):
-            declared_files = set()
-            for s in declared.values():
-                declared_files |= s
-            for f in sorted(d.glob("*.md")):
-                rel = "docs/%s/%s" % (d.name, f.name)
-                if rel not in declared_files:
-                    issues.append("未声明的多语文档 %s（修复指引：在 %s 的 guides 里登记或删除）"
-                                  % (rel, REGISTRY_REL))
-    stats: Dict[str, Any] = {"locales": [l for l, _ in locs], "files": [f for _, f in locs],
-                             "canonical": canon, "guides": len(guides),
-                             "translations": sum(len(v) for v in declared.values()),
-                             "switcher": switcher(locs, locs[0][0])}
+    issues.extend(_translation_issues(r, guides))
+    issues.extend(_coverage_issues(data, canon, declared, guides))
+    issues.extend(_undeclared_issues(r, data, declared))
+    stats = _locale_stats(locs, canon, guides, declared)
     return issues, stats
 
 

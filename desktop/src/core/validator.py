@@ -11,13 +11,8 @@ from typing import List, Optional
 from .models import Module, Pipeline, LAYER_IDS, fid_key
 
 
-def validate_module(parsed: Module,
-                    installed_ids: Optional[List[str]] = None,
-                    pipeline: Optional[Pipeline] = None,
-                    ) -> List[str]:
-    """校验模块。installed_ids: 已安装模块 full_id 列表；pipeline: 目标管线。"""
+def _required_errors(parsed: Module) -> List[str]:
     errors: List[str] = []
-
     # ---- 必填 ----
     if not parsed.id:
         errors.append("缺少必填字段: id")
@@ -33,34 +28,56 @@ def validate_module(parsed: Module,
     # ---- 层位合法性 ----
     if parsed.layer and parsed.layer not in LAYER_IDS:
         errors.append(f"挂载层 {parsed.layer} 不在九层骨架内（应为 P00-P80）")
+    return errors
 
+
+def _dependency_found(dep: str, installed: set) -> bool:
+    if dep in installed:
+        return True
+    for iid in installed:
+        if iid.endswith(":" + dep) or iid == dep:
+            return True
+    return False
+
+
+def _dependency_errors(parsed: Module, installed_ids: Optional[List[str]]) -> List[str]:
     # ---- 依赖检查 ----
     installed = set(installed_ids or [])
+    errors: List[str] = []
     for dep in parsed.inputs or []:
         # 依赖可能不带类前缀（仓库内 M22 默认同文件上下文）；宽松匹配
-        found = dep in installed
-        if not found:
-            for iid in installed:
-                if iid.endswith(":" + dep) or iid == dep:
-                    found = True
-                    break
-        if not found:
+        if not _dependency_found(dep, installed):
             errors.append(f"依赖模块 {dep} 未安装")
+    return errors
 
+
+def _allowed_errors(parsed: Module, pipeline: Optional[Pipeline]) -> List[str]:
     # ---- 管线层允许集检查 ----
-    if pipeline and parsed.layer:
-        pl = pipeline.layer(parsed.layer)
-        if pl is not None:
-            # 允许集元素与模块标识均做类别去『类』归一（情感类:M22 ↔ 情感:M22）
-            allowed = {fid_key(a) for a in (pl.allowed_modules or [])}
-            if allowed:
-                cands = {fid_key(parsed.id), fid_key(parsed.full_id),
-                         fid_key(f"{parsed.category}:{parsed.id}")}
-                if not (cands & allowed):
-                    errors.append(
-                        f"模块 {parsed.full_id} 不在管线 {pipeline.id} 的 "
-                        f"{parsed.layer} 层允许集内（{sorted(allowed)}）")
+    if not (pipeline and parsed.layer):
+        return []
+    pl = pipeline.layer(parsed.layer)
+    if pl is None:
+        return []
+    # 允许集元素与模块标识均做类别去『类』归一（情感类:M22 ↔ 情感:M22）
+    allowed = {fid_key(a) for a in (pl.allowed_modules or [])}
+    if not allowed:
+        return []
+    cands = {fid_key(parsed.id), fid_key(parsed.full_id),
+             fid_key(f"{parsed.category}:{parsed.id}")}
+    if cands & allowed:
+        return []
+    return [f"模块 {parsed.full_id} 不在管线 {pipeline.id} 的 "
+            f"{parsed.layer} 层允许集内（{sorted(allowed)}）"]
 
+
+def validate_module(parsed: Module,
+                    installed_ids: Optional[List[str]] = None,
+                    pipeline: Optional[Pipeline] = None,
+                    ) -> List[str]:
+    """校验模块。installed_ids: 已安装模块 full_id 列表；pipeline: 目标管线。"""
+    errors: List[str] = _required_errors(parsed)
+    errors += _dependency_errors(parsed, installed_ids)
+    errors += _allowed_errors(parsed, pipeline)
     return errors
 
 

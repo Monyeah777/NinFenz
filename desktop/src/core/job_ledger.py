@@ -134,6 +134,31 @@ def job_digest(ledger: dict[str, Any], job_id: str) -> str:
                       "inputs_digest": job["inputs_digest"]})
 
 
+def _apply_event(fresh: dict[str, Any], item: dict[str, Any]) -> dict[str, Any]:
+    """单事件 → 新账本；未知类型抛 LookupError（调用方如实记 issue 并停止）。"""
+    kind, job_id, body = str(item.get("kind")), str(item.get("job")), item.get("body") or {}
+    if kind == "created":
+        return create(fresh, job_id, str(body.get("kind") or ""),
+                      contract_digest=str(body.get("contract_digest") or ""),
+                      inputs_digest=str(body.get("inputs_digest") or ""))
+    if kind == "transition":
+        return transition(fresh, job_id, str(body.get("to")),
+                          witness=body.get("witness") or {})
+    if kind == "receipt":
+        return attach_receipt(fresh, job_id, {"digest": body.get("receipt")})
+    raise LookupError("未知事件类型：" + kind)
+
+
+def _chain_issue(item: dict[str, Any], prev: str) -> str | None:
+    """事件链连续性 + digest 校验 → 违规说明（None = 通过）。"""
+    if str(item.get("prev") or "") != prev:
+        return "事件链断在第 " + str(item.get("seq")) + " 条"
+    body = {k: v for k, v in item.items() if k != "digest"}
+    if digest_of(body) != item.get("digest"):
+        return "第 " + str(item.get("seq")) + " 条事件 digest 不符"
+    return None
+
+
 def replay(ledger: dict[str, Any]) -> dict[str, Any]:
     """从事件链重放 → {ok, ledger, issues}（校验链、迁移合法性、终态后无追加）。"""
     res: dict[str, Any] = {"ok": False, "ledger": None, "issues": []}
@@ -143,26 +168,15 @@ def replay(ledger: dict[str, Any]) -> dict[str, Any]:
     fresh = new_ledger()
     prev = ""
     for item in ledger.get("chain") or []:
-        if str(item.get("prev") or "") != prev:
-            res["issues"].append("事件链断在第 " + str(item.get("seq")) + " 条")
+        issue = _chain_issue(item, prev)
+        if issue:
+            res["issues"].append(issue)
             return res
-        if digest_of({k: v for k, v in item.items() if k != "digest"}) != item.get("digest"):
-            res["issues"].append("第 " + str(item.get("seq")) + " 条事件 digest 不符")
-            return res
-        kind, job_id, body = str(item.get("kind")), str(item.get("job")), item.get("body") or {}
         try:
-            if kind == "created":
-                fresh = create(fresh, job_id, str(body.get("kind") or ""),
-                               contract_digest=str(body.get("contract_digest") or ""),
-                               inputs_digest=str(body.get("inputs_digest") or ""))
-            elif kind == "transition":
-                fresh = transition(fresh, job_id, str(body.get("to")),
-                                   witness=body.get("witness") or {})
-            elif kind == "receipt":
-                fresh = attach_receipt(fresh, job_id, {"digest": body.get("receipt")})
-            else:
-                res["issues"].append("未知事件类型：" + kind)
-                return res
+            fresh = _apply_event(fresh, item)
+        except LookupError as exc:
+            res["issues"].append(str(exc))
+            return res
         except ValueError as exc:
             res["issues"].append("第 " + str(item.get("seq")) + " 条无法重放：" + str(exc))
             return res

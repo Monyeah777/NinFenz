@@ -47,6 +47,44 @@ def _post_json(url: str, payload: Dict[str, Any], timeout: float) -> Dict[str, A
         return _read_json_response(resp)
 
 
+def _prob_dist(name: str, node: Any) -> List[float]:
+    """服务返回的单问题概率列表（两种键形状）；缺失即抛 ValueError。"""
+    if isinstance(node, dict) and "probs" in node:
+        return [float(p) for p in node["probs"]]
+    if isinstance(node, dict) and isinstance(node.get("probabilities"), dict):
+        return list(node["probabilities"].values())
+    raise ValueError("服务未返回问题 %s 的概率分布" % name)
+
+
+def _answer_entry(name: str, q: dict, probs: List[float],
+                  raw_sums: Dict[str, float]) -> dict:
+    """单问题 → 应答条目（choice/score 先校验长度并按容差归一，原始和记 meta）。"""
+    ptype = q.get("type")
+    if ptype in ("choice", "score"):
+        raw_sums[name] = sum(probs)
+        probs = normalize_probs(probs)      # 舍入容差内的归一（原始和见 meta）
+    if ptype == "choice" and len(probs) != len(q.get("options") or []):
+        raise ValueError("问题 %s 概率长度与候选数不符（%d ≠ %d）"
+                         % (name, len(probs), len(q.get("options") or [])))
+    if ptype == "score" and len(probs) != len(q.get("levels") or []):
+        raise ValueError("问题 %s 概率长度与等级数不符" % name)
+    return _answer_for(q, probs)
+
+
+def _systemone_meta(raw: Any, endpoint: str,
+                    raw_sums: Dict[str, float]) -> Dict[str, Any]:
+    """应答元数据（模型名 / 原始概率和 / 逐项 confidence / 用量）。"""
+    return {"adapter": "systemone-http", "calibrated": True, "non_gate": True,
+            "endpoint": endpoint,
+            "model": str((raw or {}).get("_meta", {}).get("model")
+                         or (raw or {}).get("model") or "unknown"),
+            "raw_prob_sums": raw_sums,
+            "confidence": {k: v.get("confidence")
+                           for k, v in (raw or {}).items()
+                           if isinstance(v, dict) and "confidence" in v},
+            "usage": (raw or {}).get("_meta", {}).get("usage")}
+
+
 def systemone_decide(req: Dict[str, Any], endpoint: str,
                      timeout: float = 30.0) -> Dict[str, Any]:
     """本地 typed-decision 服务适配器（Jev / Laya 系：POST {state, questions}）。
@@ -60,41 +98,9 @@ def systemone_decide(req: Dict[str, Any], endpoint: str,
     raw_sums: Dict[str, float] = {}
     for name, q in (req.get("questions") or {}).items():
         node = raw.get(name) if isinstance(raw, dict) else None
-        if isinstance(node, dict) and "probs" in node:
-            probs = [float(p) for p in node["probs"]]
-        elif isinstance(node, dict) and isinstance(node.get("probabilities"), dict):
-            probs = list(node["probabilities"].values())
-        else:
-            raise ValueError("服务未返回问题 %s 的概率分布" % name)
-        ptype = q.get("type")
-        if ptype in ("choice", "score"):
-            raw_sums[name] = sum(probs)
-            probs = normalize_probs(probs)      # 舍入容差内的归一（原始和见 meta）
-        if ptype == "choice":
-            opts = [str(o) for o in q.get("options") or []]
-            if len(probs) != len(opts):
-                raise ValueError("问题 %s 概率长度与候选数不符（%d ≠ %d）"
-                                 % (name, len(probs), len(opts)))
-            answers[name] = {"type": "choice", "options": opts, "probs": probs,
-                             "argmax": opts[probs.index(max(probs))]}
-        elif ptype == "score":
-            levels = [str(l) for l in q.get("levels") or []]
-            if len(probs) != len(levels):
-                raise ValueError("问题 %s 概率长度与等级数不符" % name)
-            answers[name] = {"type": "score", "levels": levels, "probs": probs,
-                             "value": sum((i + 1) * p for i, p in enumerate(probs))}
-        else:
-            answers[name] = {"type": "noul", "p": float(probs[-1])}
+        answers[name] = _answer_entry(name, q, _prob_dist(name, node), raw_sums)
     return {"schema": RESPONSE_SCHEMA, "status": "ok", "answers": answers,
-            "meta": {"adapter": "systemone-http", "calibrated": True, "non_gate": True,
-                     "endpoint": endpoint,
-                     "model": str((raw or {}).get("_meta", {}).get("model")
-                                  or (raw or {}).get("model") or "unknown"),
-                     "raw_prob_sums": raw_sums,
-                     "confidence": {k: v.get("confidence")
-                                    for k, v in (raw or {}).items()
-                                    if isinstance(v, dict) and "confidence" in v},
-                     "usage": (raw or {}).get("_meta", {}).get("usage")}}
+            "meta": _systemone_meta(raw, endpoint, raw_sums)}
 
 
 def _choice_answer(q: dict, probs: list[float]) -> dict:
@@ -205,88 +211,162 @@ def decide(req: Dict[str, Any], opts: DecideOptions | None = None) -> Dict[str, 
 
 # ---------------------------------------------------------------- 面体检
 
+def _decl_head_issues(decl: Dict[str, Any]) -> List[str]:
+    """声明头判据：schema / 三原语齐全 / 必须有离线 stub 适配器。"""
+    out: List[str] = []
+    if decl.get("schema") != SCHEMA:
+        out.append("%s schema 不匹配（期望 %s）" % (DECL_REL, SCHEMA))
+    prims = decl.get("primitives") or {}
+    for p in PRIMITIVES:
+        if p not in prims:
+            out.append("声明缺原语 %s（三原语齐全才谈得上类型化决策）" % p)
+    adapters = decl.get("adapters") or []
+    if not any(a.get("id") == "stub" for a in adapters):
+        out.append("缺 stub 适配器（门禁必须有一条离线确定性路径）")
+    return out
+
+
+def _adapter_issues(a: Dict[str, Any]) -> List[str]:
+    """单适配器判据（必填字段 / note 自述 / 非 stub 不得 in_gate_path）。"""
+    aid = str(a.get("id") or "")
+    out: List[str] = []
+    for k in ("id", "kind", "in_gate_path", "calibrated"):
+        if k not in a:
+            out.append("适配器 %s 缺字段 %s" % (aid or "?", k))
+    if not str(a.get("note") or "").strip():
+        out.append("适配器 %s 缺 note（能力与边界须自述）" % aid)
+    if a.get("in_gate_path") and aid != "stub":
+        out.append("适配器 %s 声明 in_gate_path 却非 stub"
+                   "（门禁只许离线确定性路径）" % aid)
+    return out
+
+
+def _adapters_issues(adapters: List[Any]) -> List[str]:
+    """逐适配器判据。"""
+    out: List[str] = []
+    for a in adapters:
+        out.extend(_adapter_issues(a))
+    return out
+
+
+def _local_issues(cid: str, local: Dict[str, Any]) -> List[str]:
+    """pulled=true 的本地证据判据（怎么拉/什么运行时/由谁服务）。"""
+    out: List[str] = []
+    for k in ("how", "runtime", "served_by"):
+        if not str(local.get(k) or "").strip():
+            out.append("候选 %s 声明 pulled=true 却缺 local.%s"
+                       "（修复指引：写明怎么拉的、什么运行时、由谁服务）" % (cid, k))
+    return out
+
+
+def _candidate_issues(c: Dict[str, Any]) -> List[str]:
+    """单候选模型判据（必填字段 / pulled 布尔 / 已拉取须带本地证据）。"""
+    cid = str(c.get("id") or "")
+    out: List[str] = []
+    for k in ("id", "source", "license", "evidence", "pulled"):
+        if k not in c:
+            out.append("候选 %s 缺字段 %s（来源/许可/实证/是否已拉取都要写）" % (cid or "?",
+                                                                              k))
+    if not isinstance(c.get("pulled"), bool):
+        out.append("候选 %s 的 pulled 须为布尔（状态不许含糊）" % cid)
+    elif c.get("pulled") is True:
+        # 拉取是**显式动作**：一旦声明已拉取，必须自带可追溯的本地证据
+        out.extend(_local_issues(cid, c.get("local") or {}))
+    return out
+
+
+def _candidates_issues(cands: List[Any]) -> List[str]:
+    """候选清单判据（非空 / 逐条）。"""
+    out: List[str] = []
+    if not cands:
+        out.append("候选模型清单为空（决策层没有可拉取的模型就只是空壳）")
+    for c in cands:
+        out.extend(_candidate_issues(c))
+    return out
+
+
+def _boundary_issues(decl: Dict[str, Any]) -> List[str]:
+    """边界成文判据。"""
+    if not (decl.get("boundaries") or []):
+        return ["声明缺 boundaries（不执行动作/不生成正文/不入门禁 等边界须成文）"]
+    return []
+
+
+def _sample_request() -> Dict[str, Any]:
+    """内部样例请求（stub 确定性/合 schema/fail-closed 三面共用）。"""
+    return {"state": "雨天走廊 与 校园情感 场景；候选：P02 校园情感流 / P03 西幻生存流",
+            "questions": {
+                "pipeline": {"type": "choice",
+                             "options": ["P02 校园情感流", "P03 西幻生存流"]},
+                "multilingual": {"type": "noul", "true_hints": ["中文", "多语"]},
+                "risk": {"type": "score", "levels": ["低", "中", "高"]}}}
+
+
+def _stub_repeat_issues(req: Dict[str, Any],
+                        root: str) -> Tuple[List[str], Dict[str, Any]]:
+    """stub 离线路径判据（确定性 / ok / 合 schema / 自称未校准）→ (issues, 首跑应答)。"""
+    a1 = decide(req, opts=DecideOptions(adapter='stub', root=root))
+    a2 = decide(req, opts=DecideOptions(adapter='stub', root=root))
+    # 比「决策内容视图」而非整份应答：`meta.latency_ms` 是墙钟观测，差值 ≥1 ms 就判死人
+    # （2026-09-29 实测假红，见 decision_view 的说明）。
+    out: List[str] = []
+    if decision_view(a1) != decision_view(a2):
+        out.append("stub 非确定性（同输入两次结果不一致）")
+    if a1.get("status") != "ok":
+        out.append("stub 样例未产出 ok：%s" % a1.get("reason"))
+    issue = response_issue(a1, req)
+    if issue:
+        out.append("stub 应答不合 schema：%s" % issue)
+    if (a1.get("meta") or {}).get("calibrated") is not False:
+        out.append("stub 应答须自称 calibrated=false（排序信号不是概率）")
+    return out, a1
+
+
+def _fail_closed_issues(req: Dict[str, Any], root: str) -> List[str]:
+    """fail-closed 判据（未登记适配器 / 缺 endpoint / 不合规请求 → abstained）。"""
+    out: List[str] = []
+    cases: List[Tuple[str, Dict[str, Any]]] = [("未登记适配器", {"adapter": "ghost"}),
+                                              ("缺 endpoint", {"adapter": "systemone-http"})]
+    for label, kwargs in cases:
+        got = decide(req, opts=DecideOptions(root=root, **kwargs))
+        if got.get("status") != "abstained" or not got.get("reason"):
+            out.append("%s 未 fail-closed（应 abstained + reason）" % label)
+    bad = decide({'questions': {}}, opts=DecideOptions(adapter='stub', root=root))
+    if bad.get("status") != "abstained":
+        out.append("不合规请求未 fail-closed")
+    return out
+
+
+def _probability_guard_issues(req: Dict[str, Any]) -> List[str]:
+    """判据自检：概率和不等于 1 的应答必须被拒。"""
+    if response_issue({"schema": RESPONSE_SCHEMA, "status": "ok",
+                       "answers": {"risk": {"type": "score", "probs": [0.2, 0.2],
+                                            "value": 1.5}},
+                       "meta": {"calibrated": True, "non_gate": True}}, req) == "":
+        return ["概率和不等于 1 的应答竟通过校验（判据失效）"]
+    return []
+
+
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     """决策层面体检（离线）：声明完整 + 适配器诚实标注 + stub 确定性 + fail-closed。"""
     issues: List[str] = []
     decl = load_decl(root)
     if not decl:
         return ["缺决策层声明 %s（修复指引：补声明件再跑门禁）" % DECL_REL], {}
-    if decl.get("schema") != SCHEMA:
-        issues.append("%s schema 不匹配（期望 %s）" % (DECL_REL, SCHEMA))
     prims = decl.get("primitives") or {}
-    for p in PRIMITIVES:
-        if p not in prims:
-            issues.append("声明缺原语 %s（三原语齐全才谈得上类型化决策）" % p)
     adapters = decl.get("adapters") or []
-    if not any(a.get("id") == "stub" for a in adapters):
-        issues.append("缺 stub 适配器（门禁必须有一条离线确定性路径）")
-    for a in adapters:
-        aid = str(a.get("id") or "")
-        for k in ("id", "kind", "in_gate_path", "calibrated"):
-            if k not in a:
-                issues.append("适配器 %s 缺字段 %s" % (aid or "?", k))
-        if not str(a.get("note") or "").strip():
-            issues.append("适配器 %s 缺 note（能力与边界须自述）" % aid)
-        if a.get("in_gate_path") and aid != "stub":
-            issues.append("适配器 %s 声明 in_gate_path 却非 stub"
-                          "（门禁只许离线确定性路径）" % aid)
     cands = decl.get("candidates") or []
-    if not cands:
-        issues.append("候选模型清单为空（决策层没有可拉取的模型就只是空壳）")
-    for c in cands:
-        cid = str(c.get("id") or "")
-        for k in ("id", "source", "license", "evidence", "pulled"):
-            if k not in c:
-                issues.append("候选 %s 缺字段 %s（来源/许可/实证/是否已拉取都要写）" % (cid or "?",
- k))
-        if not isinstance(c.get("pulled"), bool):
-            issues.append("候选 %s 的 pulled 须为布尔（状态不许含糊）" % cid)
-        elif c.get("pulled") is True:
-            # 拉取是**显式动作**：一旦声明已拉取，必须自带可追溯的本地证据
-            local = c.get("local") or {}
-            for k in ("how", "runtime", "served_by"):
-                if not str(local.get(k) or "").strip():
-                    issues.append("候选 %s 声明 pulled=true 却缺 local.%s"
-                                  "（修复指引：写明怎么拉的、什么运行时、由谁服务）" % (cid, k))
-    if not (decl.get("boundaries") or []):
-        issues.append("声明缺 boundaries（不执行动作/不生成正文/不入门禁 等边界须成文）")
-
-    req = {"state": "雨天走廊 与 校园情感 场景；候选：P02 校园情感流 / P03 西幻生存流",
-           "questions": {
-               "pipeline": {"type": "choice",
-                            "options": ["P02 校园情感流", "P03 西幻生存流"]},
-               "multilingual": {"type": "noul", "true_hints": ["中文", "多语"]},
-               "risk": {"type": "score", "levels": ["低", "中", "高"]}}}
+    issues.extend(_decl_head_issues(decl))
+    issues.extend(_adapters_issues(adapters))
+    issues.extend(_candidates_issues(cands))
+    issues.extend(_boundary_issues(decl))
+    req = _sample_request()
     if request_issue(req):
         issues.append("内部样例请求不合规：%s" % request_issue(req))
-    a1 = decide(req, opts=DecideOptions(adapter='stub', root=root))
-    a2 = decide(req, opts=DecideOptions(adapter='stub', root=root))
-    # 比「决策内容视图」而非整份应答：`meta.latency_ms` 是墙钟观测，差值 ≥1 ms 就判死人
-    # （2026-09-29 实测假红，见 decision_view 的说明）。
-    if decision_view(a1) != decision_view(a2):
-        issues.append("stub 非确定性（同输入两次结果不一致）")
-    if a1.get("status") != "ok":
-        issues.append("stub 样例未产出 ok：%s" % a1.get("reason"))
-    issue = response_issue(a1, req)
-    if issue:
-        issues.append("stub 应答不合 schema：%s" % issue)
-    if (a1.get("meta") or {}).get("calibrated") is not False:
-        issues.append("stub 应答须自称 calibrated=false（排序信号不是概率）")
-    # fail-closed：未登记适配器 / 缺 endpoint / 请求不合规 → abstained
-    cases: List[Tuple[str, Dict[str, Any]]] = [("未登记适配器", {"adapter": "ghost"}),
-                                             ("缺 endpoint", {"adapter": "systemone-http"})]
-    for label, kwargs in cases:
-        out = decide(req, opts=DecideOptions(root=root, **kwargs))
-        if out.get("status") != "abstained" or not out.get("reason"):
-            issues.append("%s 未 fail-closed（应 abstained + reason）" % label)
-    bad = decide({'questions': {}}, opts=DecideOptions(adapter='stub', root=root))
-    if bad.get("status") != "abstained":
-        issues.append("不合规请求未 fail-closed")
-    if response_issue({"schema": RESPONSE_SCHEMA, "status": "ok",
-                       "answers": {"risk": {"type": "score", "probs": [0.2, 0.2],
-                                            "value": 1.5}},
-                       "meta": {"calibrated": True, "non_gate": True}}, req) == "":
-        issues.append("概率和不等于 1 的应答竟通过校验（判据失效）")
+    stub_issues, a1 = _stub_repeat_issues(req, root)
+    issues.extend(stub_issues)
+    issues.extend(_fail_closed_issues(req, root))
+    issues.extend(_probability_guard_issues(req))
     stats = {"primitives": len(prims), "adapters": len(adapters),
              "candidates": len(cands), "issueless_stub": a1.get("status") == "ok",
              "issues": len(issues)}

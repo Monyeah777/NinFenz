@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any
+from typing import Any, Dict, List
 
 SCHEMA = "nf-revocation-trust/1"
 SCOPE = "revocations"
@@ -97,6 +97,43 @@ def _shape_issues(manifest: dict[str, Any]) -> list[str]:
     return issues
 
 
+def _delegation_checks(manifest: Dict[str, Any], node: str, now: str,
+                          issues: List[str], seen: set) -> List[str]:
+    """某节点的 issuer 列表（已校验）；失败/已见的委派已按序记 issue 或跳过。"""
+    out: List[str] = []
+    for item in manifest.get("delegations") or []:
+        if not isinstance(item, dict) or str(item.get("subject") or "") != node:
+            continue
+        issuer = str(item.get("issuer") or "")
+        if issuer in seen:
+            continue
+        why = _delegation_issue(item, issuer, node, now)
+        if why:
+            issues.append(why)
+            continue
+        out.append(issuer)
+    return out
+
+
+def _delegation_path(manifest: Dict[str, Any], subject: str, roots: Dict[str, str],
+                     now: str, issues: List[str]):
+    """广度优先找最短委派链（有界深度）→ (root_id, path) 或 None。"""
+    frontier = [(subject, [subject])]
+    seen = {subject}
+    for _depth in range(MAX_DEPTH):
+        nxt = []
+        for node, path in frontier:
+            for issuer in _delegation_checks(manifest, node, now, issues, seen):
+                if issuer in roots:
+                    return roots[issuer], [roots[issuer]] + list(reversed(path))
+                seen.add(issuer)
+                nxt.append((issuer, path + [issuer]))
+        frontier = nxt
+        if not frontier:
+            break
+    return None
+
+
 def anchor(manifest: dict[str, Any], pub: bytes, at: str = "") -> dict[str, Any]:
     """把一把 ed25519 公钥解析到信任根 → {ok, root, path, issues, warnings}。"""
     res: dict[str, Any] = {"ok": False, "root": "", "path": [], "issues": [], "warnings": []}
@@ -113,31 +150,11 @@ def anchor(manifest: dict[str, Any], pub: bytes, at: str = "") -> dict[str, Any]
     if subject in roots:
         res.update({"ok": True, "root": roots[subject], "path": [roots[subject]]})
         return res
-    # 广度优先找最短委派链（有界深度）
-    frontier = [(subject, [subject])]
-    seen = {subject}
-    for _depth in range(MAX_DEPTH):
-        nxt = []
-        for node, path in frontier:
-            for item in manifest.get("delegations") or []:
-                if not isinstance(item, dict) or str(item.get("subject") or "") != node:
-                    continue
-                issuer = str(item.get("issuer") or "")
-                if issuer in seen:
-                    continue
-                why = _delegation_issue(item, issuer, node, now)
-                if why:
-                    res["issues"].append(why)
-                    continue
-                if issuer in roots:
-                    res.update({"ok": True, "root": roots[issuer],
-                                "path": [roots[issuer]] + list(reversed(path))})
-                    return res
-                seen.add(issuer)
-                nxt.append((issuer, path + [issuer]))
-        frontier = nxt
-        if not frontier:
-            break
+    hit = _delegation_path(manifest, subject, roots, now, res["issues"])
+    if hit is not None:
+        root_id, path = hit
+        res.update({"ok": True, "root": root_id, "path": path})
+        return res
     res["issues"].append("公钥没有被信任根覆盖（" + GUIDE
                          + "该公钥不是 root，也没有到 root 的有效委派——"
                          "换把公钥就能冒充，正是这一层要挡的）")

@@ -74,6 +74,116 @@ def _need(req: dict[str, Any], field: str, kind: type, issues: list, where: str)
     return val
 
 
+def _text_issues(req: dict, where: str) -> list[str]:
+    """text 字段：类型 + 非空判据。"""
+    out: list[str] = []
+    val = _need(req, "text", str, out, where)
+    if isinstance(val, str) and not val.strip():
+        out.append(f"{where} 的 text 为空（{GUIDE}请给要出现的提示文字）")
+    return out
+
+
+def _n_issues(req: dict, where: str) -> list[str]:
+    """n 字段：类型 + 非负判据。"""
+    out: list[str] = []
+    val = _need(req, "n", int, out, where)
+    if isinstance(val, int) and val < 0:
+        out.append(f"{where} 的 n 应为非负整数（{GUIDE}给整数下界）")
+    return out
+
+
+def _key_issues(req: dict, where: str) -> list[str]:
+    """key 字段：类型 + 非空判据。"""
+    out: list[str] = []
+    val = _need(req, "key", str, out, where)
+    if isinstance(val, str) and not val.strip():
+        out.append(f"{where} 的 key 为空（{GUIDE}给元数据字段名）")
+    return out
+
+
+def _sha_issues(req: dict, where: str) -> list[str]:
+    """sha256 字段：类型 + 64 位十六进制判据。"""
+    out: list[str] = []
+    val = _need(req, "sha256", str, out, where)
+    if isinstance(val, str) and not re.fullmatch(r"[0-9a-fA-F]{64}", val):
+        out.append(f"{where} 的 sha256 应为 64 位十六进制（{GUIDE}钉完整摘要）")
+    return out
+
+
+def _pattern_issues(req: dict, where: str) -> list[str]:
+    """patterns 字段：列表 + 非空 + 逐条正则编译判据。"""
+    out: list[str] = []
+    pats = _need(req, "patterns", list, out, where)
+    if not isinstance(pats, list):
+        return out
+    if not pats:
+        out.append(f"{where} 的 patterns 为空（{GUIDE}至少给一条）")
+    for pat in pats:
+        if not isinstance(pat, str) or not pat:
+            out.append(f"{where} 的 patterns 里有非字符串项（{GUIDE}每条应是正则字符串）")
+            continue
+        try:
+            re.compile(pat)
+        except re.error as exc:
+            out.append(f"{where} 的 pattern 不是合法正则：{exc}（{GUIDE}请修正后重跑）")
+    return out
+
+
+_NEED_CHECKS = {
+    "text": _text_issues,
+    "patterns": _pattern_issues,
+    "n": _n_issues,
+    "key": _key_issues,
+    "sha256": _sha_issues,
+}
+
+
+def _where_issues(req: dict, spec: dict, where: str) -> list[str]:
+    """where 可选字段的词表判据。"""
+    where_val = req.get("where")
+    if ("where" in spec.get("optional", ()) and where_val is not None
+            and where_val not in PLACES):
+        return [f"{where} 的 where 不在词表（实得 {where_val!r}；"
+                f"可选：{', '.join(PLACES)}）（{GUIDE}改用法内取值）"]
+    return []
+
+
+def _id_issues(req: dict, where: str, seen: set[str]) -> list[str]:
+    """id 唯一性：重复即问题；无论是否重复都记入 seen（保持原判序）。"""
+    rid = str(req.get("id") or "")
+    if not rid:
+        return []
+    dup = [f"{where} 的 id 重复：{rid}（{GUIDE}请改成唯一 id）"] if rid in seen else []
+    seen.add(rid)
+    return dup
+
+
+def _requirement_issues(req: Any, i: int, seen: set[str]) -> list[str]:
+    """单条意图 → 问题清单（id / rule / needs / where）。"""
+    where = f"第 {i} 条意图"
+    if not isinstance(req, dict):
+        return [f"{where} 不是对象（{GUIDE}请写成路由对象）"]
+    out: list[str] = []
+    out.extend(_id_issues(req, where, seen))
+    rule = str(req.get("rule") or "")
+    if not rule:
+        out.append(f"{where} 缺 rule（{GUIDE}请给规则名；可用见 nf check --list-rules）")
+        return out
+    if rule in UNSUPPORTED:
+        return out
+    spec = SUPPORTED.get(rule)
+    if spec is None:
+        out.append(f"{where} 的 rule 未知：{rule!r}（{GUIDE}拼写？可用规则见 "
+                   "nf check --list-rules）")
+        return out
+    for field in spec["needs"]:
+        check = _NEED_CHECKS.get(field)
+        if check is not None:
+            out.extend(check(req, where))
+    out.extend(_where_issues(req, spec, where))
+    return out
+
+
 def validate_intent(intent: Any) -> list[str]:
     """意图形状校验 → 问题列表（空 = 可以编译）。不可表达的规则**不算**问题。"""
     issues: list[str] = []
@@ -92,63 +202,7 @@ def validate_intent(intent: Any) -> list[str]:
         return issues
     seen: set[str] = set()
     for i, req in enumerate(reqs, 1):
-        where = f"第 {i} 条意图"
-        if not isinstance(req, dict):
-            issues.append(f"{where} 不是对象（{GUIDE}请写成路由对象）")
-            continue
-        rid = str(req.get("id") or "")
-        if rid:
-            if rid in seen:
-                issues.append(f"{where} 的 id 重复：{rid}（{GUIDE}请改成唯一 id）")
-            seen.add(rid)
-        rule = str(req.get("rule") or "")
-        if not rule:
-            issues.append(f"{where} 缺 rule（{GUIDE}请给规则名；可用见 nf check --list-rules）")
-            continue
-        if rule in UNSUPPORTED:
-            continue
-        spec = SUPPORTED.get(rule)
-        if spec is None:
-            issues.append(f"{where} 的 rule 未知：{rule!r}（{GUIDE}拼写？可用规则见 "
-                          "nf check --list-rules）")
-            continue
-        for field in spec["needs"]:
-            if field == "text":
-                val = _need(req, "text", str, issues, where)
-                if val is not None and not val.strip():
-                    issues.append(f"{where} 的 text 为空（{GUIDE}请给要出现的提示文字）")
-            elif field == "patterns":
-                pats = _need(req, "patterns", list, issues, where)
-                if isinstance(pats, list):
-                    if not pats:
-                        issues.append(f"{where} 的 patterns 为空（{GUIDE}至少给一条）")
-                    for pat in pats:
-                        if not isinstance(pat, str) or not pat:
-                            issues.append(f"{where} 的 patterns 里有非字符串项"
-                                          f"（{GUIDE}每条应是正则字符串）")
-                            continue
-                        try:
-                            re.compile(pat)
-                        except re.error as exc:
-                            issues.append(f"{where} 的 pattern 不是合法正则：{exc}"
-                                          f"（{GUIDE}请修正后重跑）")
-            elif field == "n":
-                val = _need(req, "n", int, issues, where)
-                if isinstance(val, int) and val < 0:
-                    issues.append(f"{where} 的 n 应为非负整数（{GUIDE}给整数下界）")
-            elif field == "key":
-                val = _need(req, "key", str, issues, where)
-                if isinstance(val, str) and not val.strip():
-                    issues.append(f"{where} 的 key 为空（{GUIDE}给元数据字段名）")
-            elif field == "sha256":
-                val = _need(req, "sha256", str, issues, where)
-                if isinstance(val, str) and not re.fullmatch(r"[0-9a-fA-F]{64}", val):
-                    issues.append(f"{where} 的 sha256 应为 64 位十六进制（{GUIDE}钉完整摘要）")
-        where_val = req.get("where")
-        if ("where" in spec.get("optional", ()) and where_val is not None
-                and where_val not in PLACES):
-            issues.append(f"{where} 的 where 不在词表（实得 {where_val!r}；"
-                          f"可选：{', '.join(PLACES)}）（{GUIDE}改用法内取值）")
+        issues.extend(_requirement_issues(req, i, seen))
     return issues
 
 
@@ -159,6 +213,37 @@ def _rule(rid: str, kind: str, fix: str, **extra: Any) -> dict[str, Any]:
     return rule
 
 
+def _compile_notice(rid: str, req: dict[str, Any]) -> list[dict[str, Any]]:
+    """explicit_notice → 位置化的 regex_present 规则。"""
+    text = str(req["text"])
+    where = str(req.get("where") or "any")
+    escaped = re.escape(text)
+    pattern = {"start": "^" + escaped, "end": escaped + "$", "any": escaped}[where]
+    place = {"start": "开头", "end": "结尾", "any": "任意位置"}[where]
+    return [_rule(rid, "regex_present", f"在对象{place}加上显式提示：{text}",
+                  pattern=pattern)]
+
+
+def _compile_forbidden(rid: str, req: dict[str, Any]) -> list[dict[str, Any]]:
+    """forbidden_tokens → 每条模式一条 regex_absent 规则。"""
+    out = []
+    for j, pat in enumerate(req["patterns"], 1):
+        out.append(_rule(f"{rid}-{j}", "regex_absent",
+                         f"删掉被禁用的内容/词（模式 {pat}）", pattern=pat))
+    return out
+
+
+def _compile_metadata(rid: str, req: dict[str, Any]) -> list[dict[str, Any]]:
+    """require_metadata → regex_present 规则（有 value 则精确匹配）。"""
+    key = re.escape(str(req["key"]))
+    value = req.get("value")
+    pattern = (rf'"?{key}"?\s*[:=]\s*"?{re.escape(str(value))}'
+               if value is not None else rf'"?{key}"?\s*[:=]')
+    return [_rule(rid, "regex_present",
+                  f"补上元数据声明：{req['key']}"
+                  + (f"={value}" if value is not None else "=…"), pattern=pattern)]
+
+
 def _compile_one(req: dict[str, Any], idx: int) -> list[dict[str, Any]]:
     """单条意图 → 策略规则列表（调用前已通过校验）。"""
     rule = str(req["rule"])
@@ -166,31 +251,15 @@ def _compile_one(req: dict[str, Any], idx: int) -> list[dict[str, Any]]:
     if rule == "utf8":
         return [_rule(rid, "utf8", "把对象保存成 UTF-8 文本后重跑")]
     if rule == "explicit_notice":
-        text = str(req["text"])
-        where = str(req.get("where") or "any")
-        escaped = re.escape(text)
-        pattern = {"start": "^" + escaped, "end": escaped + "$", "any": escaped}[where]
-        place = {"start": "开头", "end": "结尾", "any": "任意位置"}[where]
-        return [_rule(rid, "regex_present", f"在对象{place}加上显式提示：{text}",
-                      pattern=pattern)]
+        return _compile_notice(rid, req)
     if rule == "forbidden_tokens":
-        out = []
-        for j, pat in enumerate(req["patterns"], 1):
-            out.append(_rule(f"{rid}-{j}", "regex_absent",
-                             f"删掉被禁用的内容/词（模式 {pat}）", pattern=pat))
-        return out
+        return _compile_forbidden(rid, req)
     if rule == "min_bytes":
         n = int(req["n"])
         return [_rule(rid, "count_at_least", f"补足内容到至少 {n} 字节",
                       field="bytes", n=n)]
     if rule == "require_metadata":
-        key = re.escape(str(req["key"]))
-        value = req.get("value")
-        pattern = (rf'"?{key}"?\s*[:=]\s*"?{re.escape(str(value))}'
-                   if value is not None else rf'"?{key}"?\s*[:=]')
-        return [_rule(rid, "regex_present",
-                      f"补上元数据声明：{req['key']}"
-                      + (f"={value}" if value is not None else "=…"), pattern=pattern)]
+        return _compile_metadata(rid, req)
     if rule == "digest_pinned":
         return [_rule(rid, "digest_pin",
                       "对象摘要不再是钉住的值：确认是期望版本，或更新策略里的 sha256",

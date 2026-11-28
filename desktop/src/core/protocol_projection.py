@@ -38,6 +38,26 @@ def _layer_name(key: Any) -> str:
     return s[1] if len(s) > 1 else ""
 
 
+def _mount_layers(pkg: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    mount_layers: Dict[str, Dict[str, Any]] = {}
+    for raw_key, spec in (pkg.get("mount_layers") or {}).items():
+        key = _layer_key(raw_key)
+        spec = spec if isinstance(spec, dict) else {}
+        mount_layers[key] = {
+            "name": (spec.get("name") or _layer_name(raw_key)),
+            "default": list(spec.get("default") or []),
+            "available": list(spec.get("available") or []),
+        }
+    return mount_layers
+
+
+def _assets(pkg: Dict[str, Any]) -> Dict[str, Any]:
+    assets = dict(pkg.get("assets") or {})
+    assets.setdefault("count", _ASSETS_DEFAULT["count"])
+    assets.setdefault("readme", _ASSETS_DEFAULT["readme"])
+    return assets
+
+
 def project_entry(pkg_dir: str) -> Dict[str, Any]:
     """读 <pkg_dir>/protocol.yaml → registry.json protocols[] 应并入条目 dict。
 
@@ -48,30 +68,14 @@ def project_entry(pkg_dir: str) -> Dict[str, Any]:
         data = yaml.safe_load(f)
     pkg = data["package"]
     proto = data.get("protocol", {})
-    ml_raw = pkg.get("mount_layers") or {}
-
-    mount_layers: Dict[str, Dict[str, Any]] = {}
-    for raw_key, spec in ml_raw.items():
-        key = _layer_key(raw_key)
-        spec = spec if isinstance(spec, dict) else {}
-        mount_layers[key] = {
-            "name": (spec.get("name") or _layer_name(raw_key)),
-            "default": list(spec.get("default") or []),
-            "available": list(spec.get("available") or []),
-        }
-
-    assets = dict(pkg.get("assets") or {})
-    assets.setdefault("count", _ASSETS_DEFAULT["count"])
-    assets.setdefault("readme", _ASSETS_DEFAULT["readme"])
-
     return {
         "id": pkg["id"],
         "name": pkg["name"],
         "pipeline": pkg["pipeline"],
         "categories": list(pkg.get("categories") or []),
         "module_ids": [str(x) for x in (pkg.get("module_id_range") or [])],
-        "assets": assets,
-        "mount_layers": mount_layers,
+        "assets": _assets(pkg),
+        "mount_layers": _mount_layers(pkg),
         "references": list(pkg.get("references") or []),
         "schema_version": proto.get("schema_version", ""),
         # v2.5.0 Wave2 版本槽位（V1 只增不删）：package.version 投影

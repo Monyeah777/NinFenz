@@ -58,96 +58,172 @@ def _interview_evidence(root: str) -> List[str]:
     return out
 
 
-def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
+def _jtbd_row_issues(job: Any) -> List[str]:
+    if not isinstance(job, dict):
+        return ["jtbd 含非对象"]
     issues: List[str] = []
-    problem = doc.get("problem") or {}
-    if not str(problem.get("statement") or "").strip():
-        issues.append("problem 缺 statement")
-    jtbd = problem.get("jtbd") or []
+    for field in ("when", "want", "so"):
+        if not str(job.get(field) or "").strip():
+            issues.append("%s 缺 %s（JTBD 三要素）" % (job.get("id"), field))
+    return issues
+
+
+def _jtbd_issues(jtbd: List[Any]) -> List[str]:
+    issues: List[str] = []
     jids = [str(j.get("id")) for j in jtbd if isinstance(j, dict)]
     if len(jtbd) < 2:
         issues.append("jtbd 至少 2 条（%s）" % GUIDE)
     if len(jids) != len(set(jids)):
         issues.append("jtbd id 重复：%s" % jids)
     for job in jtbd:
-        if not isinstance(job, dict):
-            issues.append("jtbd 含非对象")
-            continue
-        for field in ("when", "want", "so"):
-            if not str(job.get(field) or "").strip():
-                issues.append("%s 缺 %s（JTBD 三要素）" % (job.get("id"), field))
-    metrics = doc.get("metrics") or []
+        issues += _jtbd_row_issues(job)
+    return issues
+
+
+def _problem_issues(doc: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
+    problem = doc.get("problem") or {}
+    if not str(problem.get("statement") or "").strip():
+        issues.append("problem 缺 statement")
+    issues += _jtbd_issues(problem.get("jtbd") or [])
+    return issues
+
+
+def _metric_table_issues(metrics: List[Any]) -> List[str]:
+    issues: List[str] = []
     mids = [str(m.get("id")) for m in metrics if isinstance(m, dict)]
     if len(metrics) < 3:
         issues.append("metrics 至少 3 个（%s）" % GUIDE)
     if len(mids) != len(set(mids)):
         issues.append("metrics id 重复：%s" % mids)
-    counters = {str(c.get("id")) for c in doc.get("countermetrics") or []
-                if isinstance(c, dict)}
-    if len(counters) < 2:
-        issues.append("countermetrics 至少 2 个（防指标伤害价值）")
+    return issues
+
+
+def _metric_row_issues(metric: Any, counters: set) -> List[str]:
+    if not isinstance(metric, dict):
+        return ["metrics 含非对象"]
+    mid = str(metric.get("id"))
+    issues: List[str] = []
+    for field in ("name", "definition", "source"):
+        if not str(metric.get(field) or "").strip():
+            issues.append("%s 缺 %s" % (mid, field))
+    if str(metric.get("countermetric")) not in counters:
+        issues.append("%s 未挂存在的反指标（%s）" % (mid, GUIDE))
+    return issues
+
+
+def _metric_rows_issues(metrics: List[Any], counters: set) -> List[str]:
+    issues: List[str] = []
     for metric in metrics:
-        if not isinstance(metric, dict):
-            issues.append("metrics 含非对象")
+        issues += _metric_row_issues(metric, counters)
+    return issues
+
+
+def _external_evidence_issues(hyp: Dict[str, Any], hid: str, evidence: bool) -> List[str]:
+    refs = hyp.get("evidence") or []
+    if not any(str(x).startswith(INTERVIEW_DIR + "/") for x in refs) or not evidence:
+        return ["%s 标 validated-external 但没有真实访谈证据件（%s 不得伪造结论）"
+                % (hid, GUIDE)]
+    return []
+
+
+def _hyp_evidence_issues(hyp: Dict[str, Any], root: str, hid: str) -> List[str]:
+    issues: List[str] = []
+    for rel in hyp.get("evidence") or []:
+        if str(rel).startswith(INTERVIEW_DIR + "/"):
             continue
-        mid = str(metric.get("id"))
-        for field in ("name", "definition", "source"):
-            if not str(metric.get(field) or "").strip():
-                issues.append("%s 缺 %s" % (mid, field))
-        if str(metric.get("countermetric")) not in counters:
-            issues.append("%s 未挂存在的反指标（%s）" % (mid, GUIDE))
+        if not _exists(root, str(rel)):
+            issues.append("%s 的 evidence 不在场：%s" % (hid, rel))
+    return issues
+
+
+def _hypothesis_row_issues(hyp: Any, root: str, mids: List[str], counters: set,
+                           evidence: bool) -> List[str]:
+    if not isinstance(hyp, dict):
+        return ["value_hypotheses 含非对象"]
+    hid = str(hyp.get("id"))
+    issues: List[str] = []
+    if str(hyp.get("status")) not in STATUSES:
+        issues.append("%s 的 status 非法：%s" % (hid, hyp.get("status")))
+    if str(hyp.get("metric")) not in mids:
+        issues.append("%s 挂了不存在的指标：%s" % (hid, hyp.get("metric")))
+    if str(hyp.get("countermetric")) not in counters:
+        issues.append("%s 挂了不存在的反指标：%s" % (hid, hyp.get("countermetric")))
+    if not str(hyp.get("owner") or "").strip():
+        issues.append("%s 缺 owner" % hid)
+    if str(hyp.get("status")) == "validated-external":
+        issues += _external_evidence_issues(hyp, hid, evidence)
+    issues += _hyp_evidence_issues(hyp, root, hid)
+    return issues
+
+
+def _hypothesis_issues(doc: Dict[str, Any], root: str, mids: List[str],
+                       counters: set) -> List[str]:
     hyps = doc.get("value_hypotheses") or []
     if not hyps:
-        issues.append("缺 value_hypotheses")
+        return ["缺 value_hypotheses"]
     evidence = _interview_evidence(root)
+    issues: List[str] = []
     for hyp in hyps:
-        if not isinstance(hyp, dict):
-            issues.append("value_hypotheses 含非对象")
-            continue
-        hid = str(hyp.get("id"))
-        if str(hyp.get("status")) not in STATUSES:
-            issues.append("%s 的 status 非法：%s" % (hid, hyp.get("status")))
-        if str(hyp.get("metric")) not in mids:
-            issues.append("%s 挂了不存在的指标：%s" % (hid, hyp.get("metric")))
-        if str(hyp.get("countermetric")) not in counters:
-            issues.append("%s 挂了不存在的反指标：%s" % (hid, hyp.get("countermetric")))
-        if not str(hyp.get("owner") or "").strip():
-            issues.append("%s 缺 owner" % hid)
-        if str(hyp.get("status")) == "validated-external":
-            refs = hyp.get("evidence") or []
-            if not any(str(x).startswith(INTERVIEW_DIR + "/") for x in refs) \
-                    or not evidence:
-                issues.append("%s 标 validated-external 但没有真实访谈证据件（%s 不得伪造结论）"
-                              % (hid, GUIDE))
-        for rel in hyp.get("evidence") or []:
-            if str(rel).startswith(INTERVIEW_DIR + "/"):
-                continue
-            if not _exists(root, str(rel)):
-                issues.append("%s 的 evidence 不在场：%s" % (hid, rel))
+        issues += _hypothesis_row_issues(hyp, root, mids, counters, evidence)
+    return issues
+
+
+def _mvp_issues(doc: Dict[str, Any]) -> List[str]:
     mvp = doc.get("mvp") or {}
+    issues: List[str] = []
     for field in ("in_scope", "out_of_scope", "success_criteria"):
         if not mvp.get(field):
             issues.append("mvp 缺 %s" % field)
-    gtm = doc.get("gtm") or {}
-    pricing = gtm.get("pricing_hypothesis") or {}
-    if not str(pricing.get("model") or "").strip():
-        issues.append("gtm.pricing_hypothesis 缺 model")
-    pricing_text = "%s %s" % (pricing.get("model") or "", pricing.get("note") or "")
+    return issues
+
+
+def _pricing_text_issues(pricing_text: str) -> List[str]:
+    issues: List[str] = []
     if "SLA" in pricing_text and not any(m in pricing_text for m in ("不", "非", "无", "未")):
         issues.append("gtm 定价假设不得写 SLA 承诺（%s 改为「不承诺 SLA」）" % GUIDE)
     if re.search(r"\d+(?:\.\d+)?\s*%", pricing_text) and "不" not in pricing_text:
         issues.append("gtm 定价假设不得写百分比承诺（%s）" % GUIDE)
-    tiers = gtm.get("support_tiers") or []
+    return issues
+
+
+def _pricing_issues(gtm: Dict[str, Any]) -> List[str]:
+    pricing = gtm.get("pricing_hypothesis") or {}
+    issues: List[str] = []
+    if not str(pricing.get("model") or "").strip():
+        issues.append("gtm.pricing_hypothesis 缺 model")
+    pricing_text = "%s %s" % (pricing.get("model") or "", pricing.get("note") or "")
+    issues += _pricing_text_issues(pricing_text)
+    return issues
+
+
+def _support_tier_issues(tiers: List[Any]) -> List[str]:
+    issues: List[str] = []
     if len(tiers) < 2:
         issues.append("support_tiers 至少 2 级")
     for tier in tiers:
         if not isinstance(tier, dict) or not str(tier.get("tier") or "").strip():
             issues.append("support_tiers 含无效条目")
-    pilot = gtm.get("pilot") or {}
+    return issues
+
+
+def _pilot_issues(pilot: Dict[str, Any]) -> List[str]:
     if str(pilot.get("status")) not in PILOT_STATUSES:
-        issues.append("gtm.pilot.status 非法：%s（外部试点用 external-open）"
-                      % pilot.get("status"))
+        return ["gtm.pilot.status 非法：%s（外部试点用 external-open）" % pilot.get("status")]
+    return []
+
+
+def _gtm_issues(doc: Dict[str, Any]) -> List[str]:
+    gtm = doc.get("gtm") or {}
+    issues: List[str] = _pricing_issues(gtm)
+    issues += _support_tier_issues(gtm.get("support_tiers") or [])
+    issues += _pilot_issues(gtm.get("pilot") or {})
+    return issues
+
+
+def _interviews_issues(doc: Dict[str, Any], root: str) -> List[str]:
     interviews = doc.get("interviews") or {}
+    issues: List[str] = []
     if str(interviews.get("status")) not in ("planned-external", "done-external", "not-started"):
         issues.append("interviews.status 非法：%s" % interviews.get("status"))
     if int(interviews.get("target_count") or 0) < 3:
@@ -155,13 +231,41 @@ def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
     guide = str(interviews.get("guide") or "")
     if not guide or not _exists(root, guide):
         issues.append("interviews.guide 不在场：%s" % guide)
+    return issues
+
+
+def _open_items_issues(doc: Dict[str, Any]) -> List[str]:
     opens = {str(o.get("id")) for o in doc.get("open_items") or [] if isinstance(o, dict)}
+    issues: List[str] = []
     for need in ("OPEN-PRODUCT",):
         if need not in opens:
             issues.append("open_items 必须含 %s（外部访谈未做不得隐去）" % need)
+    return issues
+
+
+def _claims_boundary_issue(doc: Dict[str, Any]) -> List[str]:
     boundary = " ".join(str(x) for x in doc.get("claims_boundary") or [])
     if "外部背书" not in boundary:
-        issues.append("claims_boundary 必须写明不以外部背书作为质量论据")
+        return ["claims_boundary 必须写明不以外部背书作为质量论据"]
+    return []
+
+
+def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
+    issues: List[str] = _problem_issues(doc)
+    metrics = doc.get("metrics") or []
+    issues += _metric_table_issues(metrics)
+    counters = {str(c.get("id")) for c in doc.get("countermetrics") or []
+                if isinstance(c, dict)}
+    if len(counters) < 2:
+        issues.append("countermetrics 至少 2 个（防指标伤害价值）")
+    issues += _metric_rows_issues(metrics, counters)
+    mids = [str(m.get("id")) for m in metrics if isinstance(m, dict)]
+    issues += _hypothesis_issues(doc, root, mids, counters)
+    issues += _mvp_issues(doc)
+    issues += _gtm_issues(doc)
+    issues += _interviews_issues(doc, root)
+    issues += _open_items_issues(doc)
+    issues += _claims_boundary_issue(doc)
     return issues
 
 

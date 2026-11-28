@@ -28,7 +28,7 @@ import warnings
 import zipfile
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Dict
 
 # 依赖面：实现在 _evidence 子包；本行履约原模块对 core 的 import 边（勿删）。
 from core import atomic_write, attest, json_doc, receipts, timestamp
@@ -273,14 +273,7 @@ def bench() -> dict[str, Any]:
         dup_zip = os.path.join(tmp, "dupym.zip")
         # 造重名 zip 时 zipfile 会发 UserWarning（"Duplicate name"）到 stderr；机器面比对要求
         # 直跑与守护逐字节一致，这条噪声必须在这里消掉（不是屏蔽判据，是屏蔽构造期提示）。
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            with zipfile.ZipFile(dup_zip, "w", zipfile.ZIP_STORED) as zf:
-                for name, raw in sorted(_members(base).items()):
-                    zi = zipfile.ZipInfo(name, date_time=_ZIP_EPOCH)
-                    zf.writestr(zi, raw)
-                zi = zipfile.ZipInfo(PAYLOAD_DIR + "d/a.md", date_time=_ZIP_EPOCH)
-                zf.writestr(zi, b"shadow")
+        _bench_duplicate_zip(dup_zip, _members(base))
         _bench_run(rows, "dup_members", "重名成员（zip 歧义：判定不可复算）", "invalid", dup_zip)
         _bench_run(rows, "revocations_bad", "包内吊销表写坏（坏件不能当「无吊销」）", "invalid",
                    _bench_write(tmp, "revbad.zip", _rebuild(m)))
@@ -343,3 +336,15 @@ def bench() -> dict[str, Any]:
     return {"schema": BENCH_SCHEMA, "cases": rows, "passed": passed,
             "failed": len(rows) - passed, "total": len(rows),
             "ok": passed == len(rows)}
+
+
+def _bench_duplicate_zip(dup_zip: str, members: Dict[str, bytes]) -> None:
+    """造重名成员 zip（构造期 zipfile 的 Duplicate name UserWarning 在此消掉）。"""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        with zipfile.ZipFile(dup_zip, "w", zipfile.ZIP_STORED) as zf:
+            for name, raw in sorted(members.items()):
+                zi = zipfile.ZipInfo(name, date_time=_ZIP_EPOCH)
+                zf.writestr(zi, raw)
+            zi = zipfile.ZipInfo(PAYLOAD_DIR + "d/a.md", date_time=_ZIP_EPOCH)
+            zf.writestr(zi, b"shadow")

@@ -116,43 +116,64 @@ def load_sample(root: str = ".") -> Dict[str, Any]:
             "review": out["human_review"]}
 
 
-def check_ai_evidence(card: Any, lineage: Any, review: Any, root: str = ".") -> List[str]:
-    """三件结构与绑定判据（返回 issues；空=APPROVED 可交付）。"""
-    issues: List[str] = []
-    reg = load_registry(root)
+def _artifact_schema_issues(root: str, reg: Dict[str, Any], docs) -> List[str]:
+    out: List[str] = []
     arts = reg.get("artifacts") or {}
-    for key, doc in (("model_card", card), ("lineage", lineage), ("human_review", review)):
+    for key, doc in docs:
         schema = json.loads((Path(root) / arts[key]["schema_rel"]).read_text(encoding="utf-8"))
         for item in json_schema.json_schema_check(doc, schema)[:3]:
-            issues.append("%s schema：%s" % (key, item))
-    if issues:
-        return issues
-    # 模型卡 ↔ 评测协议
+            out.append("%s schema：%s" % (key, item))
+    return out
+
+
+def _protocol_binding_issues(root: str, card: Any) -> List[str]:
+    out: List[str] = []
     got = str(((card.get("eval_protocol") or {}).get("protocol_digest")))
     if got != _eval_digest(root):
-        issues.append("eval_protocol.protocol_digest 与 %s 实时摘要不一致"
-                      "（修复指引：协议变更后重签模型卡）" % EVAL_REL)
+        out.append("eval_protocol.protocol_digest 与 %s 实时摘要不一致"
+                   "（修复指引：协议变更后重签模型卡）" % EVAL_REL)
     if str((card.get("eval_protocol") or {}).get("protocol_id")) != "eval-validity":
-        issues.append("eval_protocol.protocol_id 必须 eval-validity")
-    card_dig = tmc.card_digest(card)
-    # 血缘（绑定的是模型身份摘要 model_digest+eval_protocol）
+        out.append("eval_protocol.protocol_id 必须 eval-validity")
+    return out
+
+
+def _lineage_issues(lineage: Any, card: Any) -> List[str]:
+    out: List[str] = []
     if str(lineage.get("model_card_digest")) != tmc.identity_digest(card):
-        issues.append("lineage.model_card_digest 与模型身份摘要不一致（修复指引：重建血缘）")
+        out.append("lineage.model_card_digest 与模型身份摘要不一致（修复指引：重建血缘）")
     l_result = tcl.verify_lineage(lineage, card)
     for item in (l_result.get("issues") or [])[:3]:
-        issues.append("血缘：%s" % item.get("message"))
-    # 复核
+        out.append("血缘：%s" % item.get("message"))
+    return out
+
+
+def _review_issues(review: Any, card_dig: str) -> List[str]:
+    out: List[str] = []
     if str(review.get("subject_kind")) != "card":
-        issues.append("复核 subject_kind 必须 card")
+        out.append("复核 subject_kind 必须 card")
     if str(review.get("subject_digest")) != card_dig:
-        issues.append("复核 subject_digest 与模型卡摘要不一致（修复指引：重签复核）")
+        out.append("复核 subject_digest 与模型卡摘要不一致（修复指引：重签复核）")
     if str((review.get("reviewer") or {}).get("kind")) != "human":
-        issues.append("复核 reviewer.kind 必须 human")
+        out.append("复核 reviewer.kind 必须 human")
     decision = str(review.get("decision"))
     if decision != "approve":
-        issues.append("复核 decision=%s（未 approve 的 AI 证据不得交付）" % decision)
+        out.append("复核 decision=%s（未 approve 的 AI 证据不得交付）" % decision)
     if not iso8601.is_iso_instant(str(review.get("reviewed_at"))):
-        issues.append("复核 reviewed_at 必须是 ISO-8601 UTC")
+        out.append("复核 reviewed_at 必须是 ISO-8601 UTC")
+    return out
+
+
+def check_ai_evidence(card: Any, lineage: Any, review: Any, root: str = ".") -> List[str]:
+    """三件结构与绑定判据（返回 issues；空=APPROVED 可交付）。"""
+    reg = load_registry(root)
+    docs = (("model_card", card), ("lineage", lineage), ("human_review", review))
+    issues: List[str] = _artifact_schema_issues(root, reg, docs)
+    if issues:
+        return issues
+    card_dig = tmc.card_digest(card)
+    issues += _protocol_binding_issues(root, card)
+    issues += _lineage_issues(lineage, card)
+    issues += _review_issues(review, card_dig)
     return issues
 
 

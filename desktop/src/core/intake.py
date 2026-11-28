@@ -44,46 +44,56 @@ def load(root: str = ".") -> Dict[str, Any]:
     return data if isinstance(data, dict) else {}
 
 
-def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
-    """声明的三方一致体检 → (issues, stats)。"""
+def _header_issues(doc: Dict[str, Any]) -> List[str]:
     issues: List[str] = []
-    doc = load(root)
-    if not doc:
-        return ["缺投稿闸门声明 %s（修复指引：补声明件，字段见 results/audit 与 library/INDEX.md）"
-                % INTAKE_REL], {"channels": 0, "modes": []}
     if str(doc.get("schema") or "") != SCHEMA:
         issues.append("%s schema 不匹配（期望 %s）" % (INTAKE_REL, SCHEMA))
     if not _DATED.match(str(doc.get("updated") or "")):
         issues.append("%s updated 非 YYYY-MM-DD：%r" % (INTAKE_REL, doc.get("updated")))
     if not str(doc.get("after_action") or "").strip():
         issues.append("%s 缺 after_action（事后处置口径须成文：违规内容怎么下架）" % INTAKE_REL)
-    channels_raw = doc.get("channels")
-    channels: Dict[str, Any] = channels_raw if isinstance(channels_raw, dict) else {}
-    if not channels:
-        issues.append("%s channels 为空（修复指引：至少声明一条接收通道）" % INTAKE_REL)
-    index_text = ""
+    return issues
+
+
+def _mode_issues(name: str, ch: Dict[str, Any]) -> List[str]:
+    mode = str(ch.get("mode") or "")
+    issues: List[str] = []
+    if mode not in MODES:
+        issues.append("通道 %s mode 非法：%r（取值 %s）" % (name, mode, " / ".join(MODES)))
+    if mode == "author_only":
+        allow = [str(x).strip().lower() for x in (ch.get("allowlist") or []) if str(x).strip()]
+        if not allow:
+            issues.append("通道 %s 为 author_only 但 allowlist 为空（修复指引：给白名单，"
+                          "或改为 open / paused）" % name)
+    return issues
+
+
+def _label_issues(name: str, ch: Dict[str, Any], index_text: str) -> List[str]:
+    label = str(ch.get("index_label") or "")
+    if not label:
+        return ["通道 %s 缺 index_label（修复指引：给须在 %s 出现的措辞）"
+                % (name, INDEX_REL)]
+    if index_text and label not in index_text:
+        return ["通道 %s 的 index_label 未出现在 %s：%r（修复指引：同步投稿须知措辞，"
+                "防闸门与须知漂移）" % (name, INDEX_REL, label)]
+    return []
+
+
+def _channel_issues(name: str, ch: Any, index_text: str) -> List[str]:
+    if not isinstance(ch, dict):
+        ch = {}
+    return _mode_issues(name, ch) + _label_issues(name, ch, index_text)
+
+
+def _index_text(root: str) -> Tuple[str, List[str]]:
     idx = Path(root) / INDEX_REL
     if idx.is_file():
-        index_text = idx.read_text(encoding="utf-8")
-    else:
-        issues.append("缺 %s（闸门措辞无处可查）" % INDEX_REL)
-    for name, ch in sorted(channels.items()):
-        ch = ch if isinstance(ch, dict) else {}
-        mode = str(ch.get("mode") or "")
-        if mode not in MODES:
-            issues.append("通道 %s mode 非法：%r（取值 %s）" % (name, mode, " / ".join(MODES)))
-        if mode == "author_only":
-            allow = [str(x).strip().lower() for x in (ch.get("allowlist") or []) if str(x).strip()]
-            if not allow:
-                issues.append("通道 %s 为 author_only 但 allowlist 为空（修复指引：给白名单，"
-                              "或改为 open / paused）" % name)
-        label = str(ch.get("index_label") or "")
-        if not label:
-            issues.append("通道 %s 缺 index_label（修复指引：给须在 %s 出现的措辞）"
-                          % (name, INDEX_REL))
-        elif index_text and label not in index_text:
-            issues.append("通道 %s 的 index_label 未出现在 %s：%r（修复指引：同步投稿须知措辞，"
-                          "防闸门与须知漂移）" % (name, INDEX_REL, label))
+        return idx.read_text(encoding="utf-8"), []
+    return "", ["缺 %s（闸门措辞无处可查）" % INDEX_REL]
+
+
+def _bot_issues(root: str) -> List[str]:
+    issues: List[str] = []
     for rel in BOTS:
         p = Path(root) / rel
         if not p.is_file():
@@ -92,6 +102,29 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         if INTAKE_REL not in p.read_text(encoding="utf-8"):
             issues.append("%s 未引用闸门声明 %s（修复指引：机器人须读声明件，"
                           "否则改闸门不生效 = 声明成摆设）" % (rel, INTAKE_REL))
-    return issues, {"channels": len(channels),
-                    "modes": sorted({str((c or {}).get("mode") or "")
-                                     for c in channels.values()})}
+    return issues
+
+
+def _stats(channels: Dict[str, Any]) -> Dict[str, Any]:
+    return {"channels": len(channels),
+            "modes": sorted({str((c or {}).get("mode") or "")
+                             for c in channels.values()})}
+
+
+def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
+    """声明的三方一致体检 → (issues, stats)。"""
+    doc = load(root)
+    if not doc:
+        return ["缺投稿闸门声明 %s（修复指引：补声明件，字段见 results/audit 与 library/INDEX.md）"
+                % INTAKE_REL], {"channels": 0, "modes": []}
+    issues: List[str] = _header_issues(doc)
+    channels_raw = doc.get("channels")
+    channels: Dict[str, Any] = channels_raw if isinstance(channels_raw, dict) else {}
+    if not channels:
+        issues.append("%s channels 为空（修复指引：至少声明一条接收通道）" % INTAKE_REL)
+    index_text, index_issues = _index_text(root)
+    issues += index_issues
+    for name, ch in sorted(channels.items()):
+        issues += _channel_issues(name, ch, index_text)
+    issues += _bot_issues(root)
+    return issues, _stats(channels)

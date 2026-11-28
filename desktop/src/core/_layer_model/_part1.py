@@ -70,27 +70,36 @@ def _entry_imports(text: str) -> List[Tuple[int, str]]:
     hit = _ENTRY_IMPORT_CACHE.get(key)
     if hit is not None:
         return hit
-    out: List[Tuple[int, str]] = []
-    if _ENTRY_IMPORT_RE.search(text):          # 文本预筛：绝大多数件不含入口 import
-        try:
-            tree = ast.parse(text)
-        except (OSError, SyntaxError):
-            tree = None
-        if tree is not None:
-            for node in ast.walk(tree):
-                if isinstance(node, ast.Import):
-                    names = [a.name.split(".")[0] for a in node.names]
-                elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
-                    names = [node.module.split(".")[0]]
-                else:
-                    names = []
-                for name in names:
-                    if name in ENTRY_MODULE_NAMES:
-                        out.append((getattr(node, "lineno", 0), name))
+    out = _entry_import_facts(text)
     if len(_ENTRY_IMPORT_CACHE) >= _ENTRY_IMPORT_CACHE_MAX:
         _ENTRY_IMPORT_CACHE.clear()
     _ENTRY_IMPORT_CACHE[key] = out
     return out
+
+
+def _entry_import_facts(text: str) -> List[Tuple[int, str]]:
+    """未缓存的入口 import 事实（文本预筛 + AST 遍历）。"""
+    out: List[Tuple[int, str]] = []
+    if not _ENTRY_IMPORT_RE.search(text):      # 文本预筛：绝大多数件不含入口 import
+        return out
+    try:
+        tree = ast.parse(text)
+    except (OSError, SyntaxError):
+        return out
+    for node in ast.walk(tree):
+        for name in _node_entry_names(node):
+            if name in ENTRY_MODULE_NAMES:
+                out.append((getattr(node, "lineno", 0), name))
+    return out
+
+
+def _node_entry_names(node) -> List[str]:
+    """单个 AST 节点的顶层模块名（Import/ImportFrom 两种形态）。"""
+    if isinstance(node, ast.Import):
+        return [a.name.split(".")[0] for a in node.names]
+    if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+        return [node.module.split(".")[0]]
+    return []
 
 
 def _pattern_to_regex(pattern: str):

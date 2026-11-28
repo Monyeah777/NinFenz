@@ -76,6 +76,78 @@ def _env_fingerprint(root: str) -> str:
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()
 
 
+def _raise_findings(fname: str, raises, delta: Dict[str, Any]) -> List[str]:
+    """R4：raise 消息必须带修复指引。"""
+    out: List[str] = []
+    for lineno, msg in raises:
+        delta["raises"] += 1
+        if msg and not _ACTION.search(msg):
+            out.append("%s:%d raise 消息缺修复指引：%s" % (fname, lineno, msg[:60]))
+    return out
+
+
+def _residue_note(msg: str, residue: str) -> str:
+    """残留面的 issue 文案：有残留登记则附上残留值。"""
+    return "%s（%s）" % (msg, residue) if residue else msg
+
+
+def _import_findings(rel: str, modules, guarded, residue, root: str,
+                     delta: Dict[str, Any]) -> List[str]:
+    """R5：第三方 import 必须登记/软导入；端壳残留归 residue 桶。"""
+    out: List[str] = []
+    for mod, lineno in modules:
+        if mod in sys.stdlib_module_names or _is_local(mod, root):
+            continue
+        delta["imports"] += 1
+        if mod in HARD_ALLOW:
+            continue
+        target = delta["residue"] if residue else out
+        if mod in SOFT_IMPORTS:
+            if lineno not in guarded:
+                msg = ("%s:%d 第三方 %s 未软导入（须 try/except ImportError 守卫；登记理由：%s"
+                    "）"
+                       % (rel, lineno, mod, SOFT_IMPORTS[mod]))
+                target.append(_residue_note(msg, residue))
+            continue
+        msg = ("%s:%d 第三方 import 未登记：%s（修复指引：改为软导入并在 purity_scan.SOFT_IMPOR"
+            "TS "
+               "登记理由，或加入 HARD_ALLOW；端壳残留则登记 IMPORT_RESIDUE）" % (rel,
+lineno,
+mod))
+        target.append(_residue_note(msg, residue))
+    return out
+
+
+def _sink_flags(call: str, shell_true) -> list:
+    """单次调用的危险 sink 类目 → [(展示名, 放行键名)]。"""
+    flags = []
+    if call in DANGEROUS_CALLS:
+        flags.append((call, call))
+    method = call.rsplit(".", 1)[-1]
+    if method in METHOD_SINKS:
+        flags.append((method, method))
+    if shell_true:
+        flags.append(("subprocess(shell=True)", "subprocess"))
+    return flags
+
+
+def _sink_findings(fname: str, rel: str, sinks, delta: Dict[str, Any]) -> List[str]:
+    """R6 使用面：危险 sink 未在 SINK_ALLOW 登记即报。"""
+    out: List[str] = []
+    for lineno, call, shell_true in sinks:
+        method = call.rsplit(".", 1)[-1]
+        for name, key_name in _sink_flags(call, shell_true):
+            delta["sinks"] += 1
+            if "%s:%s" % (fname, key_name) in SINK_ALLOW:
+                continue
+            out.append("%s:%d 危险 sink %s（%s）——确需使用须在 purity_scan.SINK_ALLOW "
+                       "登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"
+                       % (rel, lineno, name,
+                          DANGEROUS_CALLS.get(call) or METHOD_SINKS.get(method)
+                          or "shell=True 命令注入面"))
+    return out
+
+
 def _file_findings(rel: str, text: str, env: str, root: str):
     """单份源码的 R4–R6 findings → `(issues, {"raises":n,"imports":n,"sinks":n,"residue":[…]})`。"""
     key = (rel, hashlib.sha256(text.encode("utf-8")).hexdigest(), env)
@@ -90,49 +162,10 @@ def _file_findings(rel: str, text: str, env: str, root: str):
     else:
         raises, guarded, modules, sinks = facts
         fname = os.path.basename(rel)
-        for lineno, msg in raises:
-            delta["raises"] += 1
-            if msg and not _ACTION.search(msg):
-                out.append("%s:%d raise 消息缺修复指引：%s" % (fname, lineno, msg[:60]))
+        out.extend(_raise_findings(fname, raises, delta))
         residue = IMPORT_RESIDUE.get(rel)
-        for mod, lineno in modules:
-            if mod in sys.stdlib_module_names or _is_local(mod, root):
-                continue
-            delta["imports"] += 1
-            if mod in HARD_ALLOW:
-                continue
-            target = delta["residue"] if residue else out
-            if mod in SOFT_IMPORTS:
-                if lineno not in guarded:
-                    msg = ("%s:%d 第三方 %s 未软导入（须 try/except ImportError 守卫；登记理由：%s"
-                        "）"
-                           % (rel, lineno, mod, SOFT_IMPORTS[mod]))
-                    target.append("%s（%s）" % (msg, residue) if residue else msg)
-                continue
-            msg = ("%s:%d 第三方 import 未登记：%s（修复指引：改为软导入并在 purity_scan.SOFT_IMPOR"
-                "TS "
-                   "登记理由，或加入 HARD_ALLOW；端壳残留则登记 IMPORT_RESIDUE）" % (rel,
- lineno,
- mod))
-            target.append("%s（%s）" % (msg, residue) if residue else msg)
-        for lineno, call, shell_true in sinks:
-            flags = []
-            if call in DANGEROUS_CALLS:
-                flags.append((call, call))
-            method = call.rsplit(".", 1)[-1]
-            if method in METHOD_SINKS:
-                flags.append((method, method))
-            if shell_true:
-                flags.append(("subprocess(shell=True)", "subprocess"))
-            for name, key_name in flags:
-                delta["sinks"] += 1
-                if "%s:%s" % (fname, key_name) in SINK_ALLOW:
-                    continue
-                out.append("%s:%d 危险 sink %s（%s）——确需使用须在 purity_scan.SINK_ALLOW "
-                           "登记理由（修复指引：改用安全等价物，或登记后写明为何不可注入）"
-                           % (rel, lineno, name,
-                              DANGEROUS_CALLS.get(call) or METHOD_SINKS.get(method)
-                              or "shell=True 命令注入面"))
+        out.extend(_import_findings(rel, modules, guarded, residue, root, delta))
+        out.extend(_sink_findings(fname, rel, sinks, delta))
         hit = (out, delta)
     if len(_FILE_FINDINGS) >= _FILE_FINDINGS_MAX:
         _FILE_FINDINGS.clear()
@@ -164,11 +197,9 @@ def patterns(root: str = ".") -> tuple:
         return own
 
 
-def _scan_impl(root: str = ".", _layer_fp: Optional[str] = None) -> tuple:
-    """真算（未命中缓存时走这里）；`_layer_fp` 由 `scan()` 传下来，避免走两次阶梯面。"""
+def _doc_issues(root: str, stats: Dict[str, Any]) -> list:
+    """R1/R2/R3：协议层文档的端壳残留/私货/重复标题。"""
     issues = []
-    stats: Dict[str, Any] = {"docs": 0, "raises": 0, "imports": 0, "import_residue": []}
-    # R1/R2/R3：协议层文档
     for name in PROTO_DOCS:
         path = os.path.join(root, name)
         if not os.path.exists(path):
@@ -184,28 +215,39 @@ def _scan_impl(root: str = ".", _layer_fp: Optional[str] = None) -> tuple:
         for title, lines in dup_titles:
             issues.append("%s 重复标题「%s」：行 %s"
                           % (name, title, ",".join(map(str, lines))))
-    # R4：错误信息审计（desktop/src/core/*.py）
+    return issues
+
+
+def _core_issues(root: str, stats: Dict[str, Any]) -> list:
+    """R4：desktop/src/core/*.py 逐件错误信息审计（env 指纹每轮算一次）。"""
+    issues = []
     # R4/R5/R6 共用一份「读 + parse + walk」：同一批 core/*.py 过去被 R4 与 R5 各自 parse
     # 一遍、同一棵树被 walk 四遍（见 `_ast_facts`）；现在更进一步——整段「事实 → 结论」
     # 按 `_file_findings`（键 = 路径 + 正文 + 环境指纹）**逐件**缓存，未变的件连循环体都不再进。
     core_dir = os.path.join(root, "desktop", "src", "core")
     env = _env_fingerprint(root)          # R4–R6 逐件缓存的环境指纹（每轮算一次）
-    if os.path.isdir(core_dir):
-        for fname in sorted(os.listdir(core_dir)):
-            if not fname.endswith(".py"):
-                continue
-            rel = "desktop/src/core/" + fname
-            try:
-                text = csc.read_text_cached(os.path.join(core_dir, fname))
-            except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
-                continue
-            got, delta = _file_findings(rel, text, env, root)
-            issues += got
-            stats["raises"] += delta["raises"]
-            stats["imports"] += delta["imports"]
-            stats["sinks"] = stats.get("sinks", 0) + delta["sinks"]
-            stats["import_residue"] += delta["residue"]
-    # R5：import 面（core + scripts 的第三方依赖须登记；软导入才可免硬依赖）
+    if not os.path.isdir(core_dir):
+        return issues
+    for fname in sorted(os.listdir(core_dir)):
+        if not fname.endswith(".py"):
+            continue
+        rel = "desktop/src/core/" + fname
+        try:
+            text = csc.read_text_cached(os.path.join(core_dir, fname))
+        except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
+            continue
+        got, delta = _file_findings(rel, text, env, root)
+        issues += got
+        stats["raises"] += delta["raises"]
+        stats["imports"] += delta["imports"]
+        stats["sinks"] = stats.get("sinks", 0) + delta["sinks"]
+        stats["import_residue"] += delta["residue"]
+    return issues
+
+
+def _import_scan_issues(root: str, stats: Dict[str, Any], env: str) -> list:
+    """R5：core + scripts 的第三方依赖须登记（软导入才可免硬依赖）。"""
+    issues = []
     import glob as _glob
     for rel_pat in IMPORT_SCAN:
         for f in sorted(_glob.glob(os.path.join(root, rel_pat))):
@@ -221,8 +263,12 @@ def _scan_impl(root: str = ".", _layer_fp: Optional[str] = None) -> tuple:
             stats["imports"] += delta["imports"]           # raises 只在 R4（core/*.py）那一段计
             stats["sinks"] = stats.get("sinks", 0) + delta["sinks"]
             stats["import_residue"] += delta["residue"]
-    # R6 自洽面（登记表自身的判据）：每个 sink 类目须带 CWE 对齐（跨工具对账用缺陷类型编码），
-    # 且 SINK_ALLOW 的每个放行键必须指向一个已登记 sink——放行不能凭空出现。
+    return issues
+
+
+def _registry_consistency_issues() -> list:
+    """R6 自洽面：sink 类目带 CWE 对齐；SINK_ALLOW 放行键必须指向已登记 sink。"""
+    issues = []
     for call, desc in sorted({**DANGEROUS_CALLS, **METHOD_SINKS}.items()):
         if not re.match(r"^CWE-\d+ ", desc):
             issues.append("危险 sink 类目缺 CWE 对齐：%s（修复指引：在 purity_scan.DANGEROUS_CALLS "
@@ -232,33 +278,51 @@ def _scan_impl(root: str = ".", _layer_fp: Optional[str] = None) -> tuple:
         if sink not in DANGEROUS_CALLS and sink not in METHOD_SINKS and sink != "subprocess":
             issues.append("SINK_ALLOW 放行键指向未登记 sink：%s（修复指引：删除放行，"
                           "或先在 DANGEROUS_CALLS 登记该 sink 类目）" % key)
-    # R7：抽象阶梯归属与越界（真源 protocol/LAYERS.json；语义判据在 core/layer_model.py）
+    return issues
+
+
+def _layer_issues(root: str, stats: Dict[str, Any], _layer_fp) -> list:
+    """R7：抽象阶梯归属与越界（真源 protocol/LAYERS.json；语义判据在 core/layer_model.py）。"""
     try:
         from core import layer_model as _lm
-        if os.path.isfile(os.path.join(root, _lm.DECL_REL)):
-            _ladder_issues, _ladder_stats = _lm.scan(root, _fp=_layer_fp)
-            stats["layers"] = _ladder_stats
-            issues += _ladder_issues
-        else:
+        if not os.path.isfile(os.path.join(root, _lm.DECL_REL)):
             # 合成树（单测）通常无阶梯件：缺件不在这里判死——缺席由断言表
             # `layers-declaration-in-place`（json_value 命中"目标件不存在"）+ 规范性名单
             # （modeling.verify_normative 断言 norm 件存在）+ RECEIPTS 覆盖面三处另判，不静默。
             stats["layers"] = {"skipped": "缺 %s（另由断言表与规范性名单判）" % _lm.DECL_REL}
-    except Exception as _exc:
-        issues.append("R7 阶梯体检不可用：%s（修复指引：核对 protocol/LAYERS.json 与 "
-                      "desktop/src/core/layer_model.py 后可读性）" % _exc)
-    # R8：核心文面去叙述（域中立）——实现独立成件（core/domain_neutral.py），守住本件规模上限；
-    # 判定归入 check27 同一个门，不新增 check 序号。
+            return []
+        _ladder_issues, _ladder_stats = _lm.scan(root, _fp=_layer_fp)
+        stats["layers"] = _ladder_stats
+        return list(_ladder_issues)
+    except Exception as _exc:                                    # noqa: BLE001 - 面取不全就报不可用
+        return ["R7 阶梯体检不可用：%s（修复指引：核对 protocol/LAYERS.json 与 "
+                "desktop/src/core/layer_model.py 后可读性）" % _exc]
+
+
+def _domain_neutral_issues(root: str, stats: Dict[str, Any]) -> list:
+    """R8：核心文面去叙述（域中立）——实现独立成件（core/domain_neutral.py）。"""
     try:
         from core import domain_neutral as _dn
         _dn_issues, _dn_stats = _dn.scan(root)
-        issues += _dn_issues
         stats["domain_neutral"] = _dn_stats
-    except Exception as _dexc:
-        issues.append(
+        return list(_dn_issues)
+    except Exception as _dexc:                                   # noqa: BLE001 - 同上
+        return [
             f"R8 去叙述体检不可用：{_dexc}"
             "（修复指引：核对 desktop/src/core/domain_neutral.py 可读性）"
-        )
+        ]
+
+
+def _scan_impl(root: str = ".", _layer_fp: Optional[str] = None) -> tuple:
+    """真算（未命中缓存时走这里）；`_layer_fp` 由 `scan()` 传下来，避免走两次阶梯面。"""
+    issues = []
+    stats: Dict[str, Any] = {"docs": 0, "raises": 0, "imports": 0, "import_residue": []}
+    issues += _doc_issues(root, stats)            # R1/R2/R3：协议层文档
+    issues += _core_issues(root, stats)           # R4：错误信息审计（desktop/src/core/*.py）
+    issues += _import_scan_issues(root, stats, _env_fingerprint(root))   # R5：import 面
+    issues += _registry_consistency_issues()      # R6 自洽面：CWE 对齐 + 放行键可追溯
+    issues += _layer_issues(root, stats, _layer_fp)        # R7：抽象阶梯归属与越界
+    issues += _domain_neutral_issues(root, stats)          # R8：核心文面去叙述
     return issues, stats
 
 

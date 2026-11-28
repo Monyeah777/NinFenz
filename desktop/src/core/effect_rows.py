@@ -51,6 +51,43 @@ def _dotted(node: ast.AST) -> str:
     return ".".join(reversed(parts))
 
 
+def _import_rows(node, line: int) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for a in node.names:
+        k = IMPORT_KINDS.get(a.name.split(".")[0])
+        if k:
+            out.append({"kind": k, "evidence": "import " + a.name, "line": line})
+    return out
+
+
+def _import_from_rows(node, line: int) -> list[dict[str, Any]]:
+    if not node.module:
+        return []
+    k = IMPORT_KINDS.get(node.module.split(".")[0])
+    if k:
+        return [{"kind": k, "evidence": "from " + node.module, "line": line}]
+    return []
+
+
+def _attribute_rows(node, line: int) -> list[dict[str, Any]]:
+    dotted = _dotted(node).lower()
+    k = ATTR_KINDS.get(dotted) or METHOD_KINDS.get(dotted.rsplit(".", 1)[-1])
+    if k:
+        return [{"kind": k, "evidence": dotted, "line": line}]
+    return []
+
+
+def _node_rows(node, line: int) -> list[dict[str, Any]]:
+    """单节点 → 效应行（无效应 = 空）。"""
+    if isinstance(node, ast.Import):
+        return _import_rows(node, line)
+    if isinstance(node, ast.ImportFrom):
+        return _import_from_rows(node, line)
+    if isinstance(node, ast.Attribute):
+        return _attribute_rows(node, line)
+    return []
+
+
 def rows(source: str) -> list[dict[str, Any]]:
     """源码 → 效应行（去重后按 kind/evidence/line 排序）。**解析不出 → 最严一行**（fail-closed）。"""
     try:
@@ -60,23 +97,7 @@ def rows(source: str) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for node in ast.walk(tree):
         line = int(getattr(node, "lineno", 0) or 0)
-        if isinstance(node, ast.Import):
-            for a in node.names:
-                k = IMPORT_KINDS.get(a.name.split(".")[0])
-                if k:
-                    out.append({"kind": k, "evidence": "import " + a.name,
-                                "line": line})
-        elif isinstance(node, ast.ImportFrom):
-            if node.module:
-                k = IMPORT_KINDS.get(node.module.split(".")[0])
-                if k:
-                    out.append({"kind": k, "evidence": "from " + node.module,
-                                "line": line})
-        elif isinstance(node, ast.Attribute):
-            dotted = _dotted(node).lower()
-            k = ATTR_KINDS.get(dotted) or METHOD_KINDS.get(dotted.rsplit(".", 1)[-1])
-            if k:
-                out.append({"kind": k, "evidence": dotted, "line": line})
+        out += _node_rows(node, line)
     best: dict[Any, dict[str, Any]] = {}
     for r in out:
         key = (r["kind"], r["evidence"])

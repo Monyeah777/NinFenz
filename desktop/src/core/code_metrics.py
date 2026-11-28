@@ -92,6 +92,29 @@ def load_baseline(root: str = ".") -> Dict[str, Any]:
     return (doc.get("files") or {}) if isinstance(doc, dict) else {}
 
 
+def _frozen_issues(rel: str, m: Dict[str, Any], rec: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
+    for key, label in (("lines", "模块行数"), ("max_fn_lines", "最长函数行数"),
+                       ("max_fn_cc", "最大圈复杂度")):
+        cap = int((rec or {}).get(key, 0) or 0)
+        if cap and int(m[key]) > cap:
+            issues.append("%s %s %d > 冻结值 %d（修复指引：拆分该模块/函数；确需上调须"
+                          "评审后重冻基线 python scripts/code_metrics.py --write）"
+                          % (rel, label, int(m[key]), cap))
+    return issues
+
+
+def _new_file_issues(rel: str, m: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
+    for key, label in (("lines", "模块行数"), ("max_fn_lines", "最长函数行数"),
+                       ("max_fn_cc", "最大圈复杂度")):
+        if int(m[key]) > LIMITS[key]:
+            issues.append("%s 新文件 %s %d > 限值 %d（修复指引：拆分后再入库；"
+                          "确需放宽须评审后冻结基线）"
+                          % (rel, label, int(m[key]), LIMITS[key]))
+    return issues
+
+
 def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
     """→ (issues, warns, stats)：超冻结值 / 新文件超限 = FAIL；语法坏 = FAIL。"""
     cur = measure(root)
@@ -103,20 +126,9 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
             issues.append("%s %s" % (rel, m["syntax_error"]))
             continue
         if rel in base:
-            for key, label in (("lines", "模块行数"), ("max_fn_lines", "最长函数行数"),
-                               ("max_fn_cc", "最大圈复杂度")):
-                cap = int((base[rel] or {}).get(key, 0) or 0)
-                if cap and int(m[key]) > cap:
-                    issues.append("%s %s %d > 冻结值 %d（修复指引：拆分该模块/函数；确需上调须"
-                                  "评审后重冻基线 python scripts/code_metrics.py --write）"
-                                  % (rel, label, int(m[key]), cap))
+            issues += _frozen_issues(rel, m, base[rel])
         else:
-            for key, label in (("lines", "模块行数"), ("max_fn_lines", "最长函数行数"),
-                               ("max_fn_cc", "最大圈复杂度")):
-                if int(m[key]) > LIMITS[key]:
-                    issues.append("%s 新文件 %s %d > 限值 %d（修复指引：拆分后再入库；"
-                                  "确需放宽须评审后冻结基线）"
-                                  % (rel, label, int(m[key]), LIMITS[key]))
+            issues += _new_file_issues(rel, m)
     stats = {"files": len(cur), "baseline": len(base),
              "max_lines": max((m["lines"] for m in cur.values()), default=0),
              "max_fn_lines": max((m["max_fn_lines"] for m in cur.values()), default=0),

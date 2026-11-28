@@ -21,51 +21,100 @@ from ._part1 import (
 )
 
 
-def validate_pages(pages_doc: Dict[str, Any], index_doc: Dict[str, Any],
-                   graph_doc: Dict[str, Any], mcp_doc: Dict[str, Any],
-                   expected: Dict[str, int], root: str = ".") -> List[str]:
-    """结构/覆盖/关系/复用判据（真源 digest 由 check 另比）。"""
+def _duplicate_id_issues(ids: List[str]) -> List[str]:
+    if len(ids) == len(set(ids)):
+        return []
+    return ["页面 ID 重复：%s" % sorted({i for i in ids if ids.count(i) > 1})[:5]]
+
+
+def _page_issues(page: Dict[str, Any], schema: Dict[str, Any]) -> List[str]:
     from core import json_schema
-    issues: List[str] = []
-    schema = json.loads(_read_bytes(root, PAGE_SCHEMA_REL))
-    pages = pages_doc.get("pages") or []
-    ids = [str(p.get("id")) for p in pages if isinstance(p, dict)]
-    if len(ids) != len(set(ids)):
-        issues.append("页面 ID 重复：%s" % sorted({i for i in ids if ids.count(i) > 1})[:5])
+    pid = str(page.get("id"))
+    out: List[str] = []
+    problems = json_schema.json_schema_check(page, schema)
+    for item in problems[:2]:
+        out.append("%s schema：%s" % (pid, item))
+    if len(str(page.get("summary") or "")) > 240:
+        out.append("%s summary 过长（>240；投影不复制正文）" % pid)
+    for banned in ("body", "content", "text"):
+        if banned in page:
+            out.append("%s 含 %s 字段（投影页禁复制正文）" % (pid, banned))
+    return out
+
+
+def _collect_page_issues(pages: List[Any], schema: Dict[str, Any],
+                         issues: List[str]) -> Dict[str, int]:
     by_type: Dict[str, int] = {}
     for page in pages:
-        pid = str(page.get("id"))
-        problems = json_schema.json_schema_check(page, schema)
-        for item in problems[:2]:
-            issues.append("%s schema：%s" % (pid, item))
-        by_type[str(page.get("type"))] = by_type.get(str(page.get("type")), 0) + 1
-        if len(str(page.get("summary") or "")) > 240:
-            issues.append("%s summary 过长（>240；投影不复制正文）" % pid)
-        for banned in ("body", "content", "text"):
-            if banned in page:
-                issues.append("%s 含 %s 字段（投影页禁复制正文）" % (pid, banned))
+        issues.extend(_page_issues(page, schema))
+        key = str(page.get("type"))
+        by_type[key] = by_type.get(key, 0) + 1
+    return by_type
+
+
+def _coverage_issues(expected: Dict[str, int], by_type: Dict[str, int]) -> List[str]:
+    out: List[str] = []
     for ptype, want in expected.items():
         if by_type.get(ptype, 0) != want:
-            issues.append("%s 覆盖不足（%s/%s；%s 重新 build）"
-                          % (ptype, by_type.get(ptype, 0), want, GUIDE))
-    page_ids = set(ids)
+            out.append("%s 覆盖不足（%s/%s；%s 重新 build）"
+                       % (ptype, by_type.get(ptype, 0), want, GUIDE))
+    return out
+
+
+def _relation_issues(pages: List[Any], page_ids: set) -> List[str]:
+    out: List[str] = []
     for page in pages:
         for rel in page.get("relations") or []:
             target = str((rel or {}).get("target"))
             if target not in page_ids:
-                issues.append("%s 的 relation 目标不可解析：%s" % (page.get("id"), target))
-    idx_ids = [str(p.get("id")) for p in (index_doc.get("pages") or [])]
-    if sorted(idx_ids) != sorted(ids):
-        issues.append("INDEX 与 pages ID 集不一致")
-    if sorted(graph_doc.get("nodes") or []) != sorted(ids):
-        issues.append("GRAPH nodes 与 pages ID 集不一致")
+                out.append("%s 的 relation 目标不可解析：%s" % (page.get("id"), target))
+    return out
+
+
+def _edge_issues(graph_doc: Dict[str, Any], page_ids: set) -> List[str]:
+    out: List[str] = []
     for edge in graph_doc.get("edges") or []:
         if str(edge.get("from")) not in page_ids or str(edge.get("to")) not in page_ids:
-            issues.append("GRAPH 边端点不在 pages：%r" % edge)
+            out.append("GRAPH 边端点不在 pages：%r" % edge)
+    return out
+
+
+def _index_graph_issues(index_doc: Dict[str, Any], graph_doc: Dict[str, Any],
+                        ids: List[str], page_ids: set) -> List[str]:
+    out: List[str] = []
+    idx_ids = [str(p.get("id")) for p in (index_doc.get("pages") or [])]
+    if sorted(idx_ids) != sorted(ids):
+        out.append("INDEX 与 pages ID 集不一致")
+    if sorted(graph_doc.get("nodes") or []) != sorted(ids):
+        out.append("GRAPH nodes 与 pages ID 集不一致")
+    out.extend(_edge_issues(graph_doc, page_ids))
+    return out
+
+
+def _mcp_tool_issues(mcp_doc: Dict[str, Any]) -> List[str]:
+    out: List[str] = []
     tools = [str(t.get("name")) for t in (mcp_doc.get("tools") or [])]
     for need in ("wiki_get", "wiki_search", "wiki_related", "wiki_context", "wiki_check"):
         if need not in tools:
-            issues.append("MCP 工具缺 %s" % need)
+            out.append("MCP 工具缺 %s" % need)
+    return out
+
+
+def validate_pages(pages_doc: Dict[str, Any], index_doc: Dict[str, Any],
+                   graph_doc: Dict[str, Any], mcp_doc: Dict[str, Any],
+                   expected: Dict[str, int], root: str = ".") -> List[str]:
+    """结构/覆盖/关系/复用判据（真源 digest 由 check 另比）。"""
+    issues: List[str] = []
+    schema = json.loads(_read_bytes(root, PAGE_SCHEMA_REL))
+    pages = pages_doc.get("pages") or []
+    ids = [str(p.get("id")) for p in pages if isinstance(p, dict)]
+    issues.extend(_duplicate_id_issues(ids))
+    by_type = _collect_page_issues(pages, schema, issues)
+    issues.extend(_coverage_issues(expected, by_type))
+    page_ids = set(ids)
+    issues.extend(_relation_issues(pages, page_ids))
+    issues.extend(_index_graph_issues(index_doc, graph_doc, ids, page_ids))
+    issues.extend(_mcp_tool_issues(mcp_doc))
     return issues
 
 

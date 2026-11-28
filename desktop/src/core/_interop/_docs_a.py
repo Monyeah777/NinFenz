@@ -3,6 +3,7 @@
 门面 core.interop_export 按原 API 重新导出；本文件只承载实现，不改变对外面。
 """
 from __future__ import annotations
+from typing import Any, Dict, List, Tuple
 
 import os
 import re
@@ -16,64 +17,8 @@ def openapi_doc(root: str = ".") -> Dict[str, Any]:
     contract = _read_json(root, CONTRACT_REL)
     conv = contract.get("conventions") or {}
     # 幂等声明面（RFC 9110 §9.2.2）：默认幂等，例外在契约层登记 → 派生面逐端点标注
-    non_idem = {str(e.get("id")): str(e.get("key") or "")
-                for e in (contract.get("idempotency_exceptions") or [])}
-    paths: Dict[str, Any] = {}
-    for ep in contract.get("endpoints") or []:
-        path = str(ep.get("path") or "")
-        method = str(ep.get("method") or "").lower()
-        if not path or not method:
-            continue
-        req = ep.get("request") or {}
-        resp = ep.get("response") or {}
-        op: Dict[str, Any] = {
-            "operationId": str(ep.get("id") or ""),
-            "summary": "maps_to %s" % str(ep.get("maps_to") or ""),
-            "x-nf-idempotency": ("non-idempotent（幂等键 %s）" % non_idem[str(ep.get("id"))]
-                                 if str(ep.get("id")) in non_idem else "idempotent"),
-            "responses": {
-                "200": {"description": "成功",
-                        "content": {"application/json": {"schema": {
-                            "type": "object",
-                            "properties": {k: _schema_for(v) for k, v in resp.items()},
-                        }}}},
-                "default": {"description": "错误（RFC 9457 Problem Details 映射见 "
-                                           "x-nf-error-mapping）",
-                            "content": {"application/json": {"schema": {
-                                "$ref": "#/components/schemas/NfError"}}}},
-            },
-        }
-        if req or method == "post":
-            op["requestBody"] = {
-                "required": True,
-                "content": {"application/json": {"schema": {
-                    "type": "object",
-                    "properties": {k: _schema_for(v) for k, v in req.items()},
-                }}},
-            }
-        if ep.get("streaming"):
-            op["responses"]["200"]["content"]["text/event-stream"] = {
-                "schema": {"type": "string"},
-                "x-nf-streaming": conv.get("streaming", ""),
-            }
-        # 路径参数派生（2026-09-24 他证实证修复）：OpenAPI 3.1 要求路径模板变量必须在
-        # operation 或 path item 上声明；此前只派生 operation 本体 → 官方校验器
-        # （openapi-spec-validator）对 `/library/{id}` 报 “Path parameter 'id' ... was not resolved”
-        # 。
-        # 口径：模板变量名 → path 参数（type=string），与 endpoint_contract 的 {name} 写法同源。
-        tmpl_vars = re.findall(r"\{([^}]+)\}", path)
-        if tmpl_vars:
-            op["parameters"] = [
-                {"name": name, "in": "path", "required": True,
-                 "schema": {"type": "string"},
-                 "x-nf-derived": "由 protocol/endpoint_contract.json 的路径模板派生"}
-                for name in tmpl_vars
-            ]
-        if ep.get("deprecated"):
-            op["deprecated"] = True
-            op["x-nf-sunset"] = ep.get("sunset")
-            op["x-nf-replacement"] = ep.get("replacement")
-        paths.setdefault(path, {})[method] = op
+    non_idem = _non_idem_map(contract)
+    paths = _build_paths(contract, non_idem, conv)
     return {
         "openapi": "3.1.0",
         "info": {"title": "NinFenz 服务端点契约（派生）",
@@ -107,6 +52,104 @@ def openapi_doc(root: str = ".") -> Dict[str, Any]:
         },
         "x-nf-endpoints": len(contract.get("endpoints") or []),
     }
+
+
+def _non_idem_map(contract: Dict[str, Any]) -> Dict[str, str]:
+    """非幂等例外 → {endpoint id: 幂等键}。"""
+    return {str(e.get("id")): str(e.get("key") or "")
+            for e in (contract.get("idempotency_exceptions") or [])}
+
+
+def _build_paths(contract: Dict[str, Any], non_idem: Dict[str, str],
+                 conv: Dict[str, Any]) -> Dict[str, Any]:
+    """逐端点派生 paths 段。"""
+    paths: Dict[str, Any] = {}
+    for ep in contract.get("endpoints") or []:
+        path = str(ep.get("path") or "")
+        method = str(ep.get("method") or "").lower()
+        if not path or not method:
+            continue
+        paths.setdefault(path, {})[method] = _endpoint_op(ep, non_idem, conv, path)
+    return paths
+
+
+def _endpoint_op(ep: Dict[str, Any], non_idem: Dict[str, str],
+                 conv: Dict[str, Any], path: str) -> Dict[str, Any]:
+    """单端点 operation 对象。"""
+    op = _op_skeleton(ep, non_idem)
+    _op_request_body(op, ep)
+    _op_streaming(op, ep, conv)
+    _op_path_params(op, path)
+    _op_deprecated(op, ep)
+    return op
+
+
+def _op_skeleton(ep: Dict[str, Any], non_idem: Dict[str, str]) -> Dict[str, Any]:
+    """operation 骨架（operationId/summary/幂等标注/响应面）。"""
+    resp = ep.get("response") or {}
+    return {
+        "operationId": str(ep.get("id") or ""),
+        "summary": "maps_to %s" % str(ep.get("maps_to") or ""),
+        "x-nf-idempotency": ("non-idempotent（幂等键 %s）" % non_idem[str(ep.get("id"))]
+                             if str(ep.get("id")) in non_idem else "idempotent"),
+        "responses": {
+            "200": {"description": "成功",
+                    "content": {"application/json": {"schema": {
+                        "type": "object",
+                        "properties": {k: _schema_for(v) for k, v in resp.items()},
+                    }}}},
+            "default": {"description": "错误（RFC 9457 Problem Details 映射见 "
+                                       "x-nf-error-mapping）",
+                        "content": {"application/json": {"schema": {
+                            "$ref": "#/components/schemas/NfError"}}}},
+        },
+    }
+
+
+def _op_request_body(op: Dict[str, Any], ep: Dict[str, Any]) -> None:
+    """requestBody（有请求体或 POST 时）。"""
+    req = ep.get("request") or {}
+    method = str(ep.get("method") or "").lower()
+    if req or method == "post":
+        op["requestBody"] = {
+            "required": True,
+            "content": {"application/json": {"schema": {
+                "type": "object",
+                "properties": {k: _schema_for(v) for k, v in req.items()},
+            }}},
+        }
+
+
+def _op_streaming(op: Dict[str, Any], ep: Dict[str, Any],
+                  conv: Dict[str, Any]) -> None:
+    """streaming 端点补 text/event-stream 响应形态。"""
+    if ep.get("streaming"):
+        op["responses"]["200"]["content"]["text/event-stream"] = {
+            "schema": {"type": "string"},
+            "x-nf-streaming": conv.get("streaming", ""),
+        }
+
+
+def _op_path_params(op: Dict[str, Any], path: str) -> None:
+    """路径参数派生（2026-09-24 他证实证修复）：OpenAPI 3.1 要求路径模板变量必须在
+    operation 或 path item 上声明；口径：模板变量名 → path 参数（type=string），
+    与 endpoint_contract 的 {name} 写法同源。"""
+    tmpl_vars = re.findall(r"\{([^}]+)\}", path)
+    if tmpl_vars:
+        op["parameters"] = [
+            {"name": name, "in": "path", "required": True,
+             "schema": {"type": "string"},
+             "x-nf-derived": "由 protocol/endpoint_contract.json 的路径模板派生"}
+            for name in tmpl_vars
+        ]
+
+
+def _op_deprecated(op: Dict[str, Any], ep: Dict[str, Any]) -> None:
+    """deprecated 端点补 sunset/replacement。"""
+    if ep.get("deprecated"):
+        op["deprecated"] = True
+        op["x-nf-sunset"] = ep.get("sunset")
+        op["x-nf-replacement"] = ep.get("replacement")
 
 
 

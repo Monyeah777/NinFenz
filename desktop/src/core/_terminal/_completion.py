@@ -42,57 +42,90 @@ def complete(partial: str, index, limit: int = 20) -> list:
     text = str(partial or "")
     stripped = _restore_msys_partial(text.strip())
     entries = list(index or [])
-    out = []
-
-    # ① 斜杠命令族
     if stripped.startswith("/"):
-        body = stripped[1:]
-        head, _, tail = body.partition(" ")
-        if head in ("map", "族", "地图") and " " in body:
-            for fam in FAMILIES:
-                key = str(fam["id"])
-                if tail and not (key.startswith(tail) or tail in str(fam["name"])):
-                    continue
-                out.append({"text": "/map %s" % key, "note": str(fam["name"])})
-            return out[:limit]
-        if head in ("zone", "z", "区") and " " in body:
-            for z in ZONES:
-                if tail and not str(z["key"]).startswith(tail):
-                    continue
-                out.append({"text": "/zone %s" % z["key"], "note": str(z["title"])})
-            return out[:limit]
-        for word, note in SLASH_HELP:
-            if word.startswith(head):
-                out.append({"text": "/" + word, "note": note})
-        return out[:limit]
+        return _slash_completions(stripped, limit)
+    return _nf_completions(stripped, entries, limit)
 
-    # ② nf 命令面
+
+def _slash_completions(stripped: str, limit: int) -> list:
+    """斜杠命令族补全。"""
+    body = stripped[1:]
+    head, _, tail = body.partition(" ")
+    if head in ("map", "族", "地图") and " " in body:
+        return _map_completions(tail, limit)
+    if head in ("zone", "z", "区") and " " in body:
+        return _zone_completions(tail, limit)
+    return _slash_word_completions(head, limit)
+
+
+def _map_completions(tail: str, limit: int) -> list:
+    """`/map <族>` 的族名补全。"""
+    out = []
+    for fam in FAMILIES:
+        key = str(fam["id"])
+        if tail and not (key.startswith(tail) or tail in str(fam["name"])):
+            continue
+        out.append({"text": "/map %s" % key, "note": str(fam["name"])})
+    return out[:limit]
+
+
+def _zone_completions(tail: str, limit: int) -> list:
+    """`/zone <键>` 的区键补全。"""
+    out = []
+    for z in ZONES:
+        if tail and not str(z["key"]).startswith(tail):
+            continue
+        out.append({"text": "/zone %s" % z["key"], "note": str(z["title"])})
+    return out[:limit]
+
+
+def _slash_word_completions(head: str, limit: int) -> list:
+    """斜杠帮助词补全。"""
+    out = []
+    for word, note in SLASH_HELP:
+        if word.startswith(head):
+            out.append({"text": "/" + word, "note": note})
+    return out[:limit]
+
+
+def _nf_completions(stripped: str, entries, limit: int) -> list:
+    """`nf` 命令面补全（命令/子命令/旗标）。"""
     has_nf = stripped == "nf" or stripped.startswith("nf ")
     body = stripped[3:].strip() if stripped.startswith("nf ") else stripped
     tokens = body.split()
     base = " ".join(tokens[:-1]) if len(tokens) > 1 else ""
     prefix = tokens[-1] if tokens else ""
+    out = []
     if prefix.startswith("-"):
-        resolved = base
-        for e in entries:
-            if str(e.get("path")) == resolved:
-                for flag in e.get("flags") or []:
-                    if str(flag).startswith(prefix):
-                        out.append({"text": ("nf " if has_nf else "") + resolved + " " + flag,
-                                    "note": "旗标"})
-                break
-        return out[:limit]
+        return _flag_completions(entries, base, prefix, has_nf, limit)
+    return _path_completions(entries, base, prefix, has_nf, limit)
+
+
+def _flag_completions(entries, base: str, prefix: str, has_nf: bool, limit: int) -> list:
+    """已解析命令的旗标补全。"""
+    out = []
+    for e in entries:
+        if str(e.get("path")) == base:
+            for flag in e.get("flags") or []:
+                if str(flag).startswith(prefix):
+                    out.append({"text": ("nf " if has_nf else "") + base + " " + flag,
+                                "note": "旗标"})
+            break
+    return out[:limit]
+
+
+def _path_completions(entries, base: str, prefix: str, has_nf: bool, limit: int) -> list:
+    """命令/子命令路径补全。"""
+    out = []
     for e in entries:
         path = str(e.get("path"))
         if base:
             if not path.startswith(base + " "):
                 continue
-            rest = path[len(base) + 1:]
-            if " " in rest:
+            if " " in path[len(base) + 1:]:
                 continue
-        else:
-            if " " in path:
-                continue
+        elif " " in path:
+            continue
         if prefix and not path.startswith(prefix):
             continue
         out.append({"text": ("nf " + path) if has_nf else path,

@@ -21,6 +21,7 @@ import subprocess
 import sys
 from collections.abc import Callable
 from pathlib import Path
+from typing import Any, Dict, List
 
 from core import attest
 
@@ -41,21 +42,18 @@ sys.exit(0 if ok else 1)
 Verifier = Callable[[dict[str, object]], bool]
 
 
-def receipts_issues(root: Path) -> list[str]:
-    """回执单根自身的形状（机制在场的前提）。"""
-    path = root / RECEIPTS_REL
+def _load_receipts(path: Path):
     if not path.is_file():
-        return ["缺 %s（修复指引：跑 nf receipts --scope protocol --write 生成回执单根）"
-                % RECEIPTS_REL]
+        return None, ["缺 %s（修复指引：跑 nf receipts --scope protocol --write 生成回执单根）"
+                      % RECEIPTS_REL]
     try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8")), []
     except (OSError, ValueError) as exc:
-        return ["%s 不可解析：%s（修复指引：重新生成回执单根）" % (RECEIPTS_REL, exc)]
-    issues: list[str] = []
-    if not isinstance(doc, dict) or doc.get("schema") != RECEIPTS_SCHEMA:
-        issues.append("%s schema 不是 %s（修复指引：重新生成回执单根，别手改）"
-                      % (RECEIPTS_REL, RECEIPTS_SCHEMA))
-        return issues
+        return None, ["%s 不可解析：%s（修复指引：重新生成回执单根）" % (RECEIPTS_REL, exc)]
+
+
+def _receipts_body_issues(doc: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     entries = doc.get("entries") or []
     root_hex = str(doc.get("root") or "")
     if not isinstance(entries, list) or not entries:
@@ -67,6 +65,19 @@ def receipts_issues(root: Path) -> list[str]:
     if isinstance(entries, list) and doc.get("count") != len(entries):
         issues.append("%s 的 count 与 entries 条数不一致（修复指引：重新生成回执单根）"
                       % RECEIPTS_REL)
+    return issues
+
+
+def receipts_issues(root: Path) -> list[str]:
+    """回执单根自身的形状（机制在场的前提）。"""
+    doc, issues = _load_receipts(root / RECEIPTS_REL)
+    if doc is None:
+        return issues
+    if not isinstance(doc, dict) or doc.get("schema") != RECEIPTS_SCHEMA:
+        issues.append("%s schema 不是 %s（修复指引：重新生成回执单根，别手改）"
+                      % (RECEIPTS_REL, RECEIPTS_SCHEMA))
+        return issues
+    issues += _receipts_body_issues(doc)
     return issues
 
 

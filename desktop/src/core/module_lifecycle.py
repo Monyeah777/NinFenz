@@ -11,6 +11,7 @@ from __future__ import annotations
 import glob
 import os
 import re
+from typing import List
 
 STATUSES = ("active", "deprecated", "retired")
 DEFAULT = "active"
@@ -173,23 +174,33 @@ def _collect_infos(root: str) -> tuple:
     return infos, counts, num_ids
 
 
+def _numeric_unique(tnum: str, num_ids: dict) -> bool:
+    return len(num_ids.get(tnum, [])) == 1 if tnum else True
+
+
+def _ref_entries(info: dict, target_id: str, tnum: str, numeric_unique: bool) -> List[str]:
+    out: List[str] = []
+    for r in info["refs"]:
+        if r == target_id:
+            out.append("%s(依赖引用)" % info["file"])
+        elif ":" not in r and ":" not in target_id and r == target_id:
+            out.append("%s(依赖引用)" % info["file"])
+        elif ":" not in r and not numeric_unique and r == ("M" + tnum if tnum else r):
+            # 裸号 + 目标编号与其它模块撞号：不能断定指向本模块，跳过
+            pass
+    return out
+
+
 def _is_referenced(target_id: str, infos: dict, num_ids: dict,
                    protocol_hits: dict) -> list:
     """返回引用方清单（模块文件 + protocol 文本命中）。"""
-    out = []
+    out: list = []
     tnum = _num_of(target_id)
-    numeric_unique = len(num_ids.get(tnum, [])) == 1 if tnum else True
+    numeric_unique = _numeric_unique(tnum, num_ids)
     for key, info in infos.items():
         if key == target_id:
             continue
-        for r in info["refs"]:
-            if r == target_id:
-                out.append("%s(依赖引用)" % info["file"])
-            elif ":" not in r and ":" not in target_id and r == target_id:
-                out.append("%s(依赖引用)" % info["file"])
-            elif ":" not in r and not numeric_unique and r == ("M" + tnum if tnum else r):
-                # 裸号 + 目标编号与其它模块撞号：不能断定指向本模块，跳过
-                pass
+        out += _ref_entries(info, target_id, tnum, numeric_unique)
     if tnum:
         for p in protocol_hits.get(tnum, []):
             out.append("%s(protocol 出现)" % p)

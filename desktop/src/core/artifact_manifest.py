@@ -66,15 +66,15 @@ def build(root: str, paths: Iterable[str], generator: str, coverage: str,
             "root_sha256": _root_digest(files)}
 
 
-def verify(manifest: Dict[str, Any], root: str) -> List[str]:
-    """逐件重算 → 漂移清单。"""
-    issues: List[str] = []
+def _coverage_issues(manifest: Dict[str, Any]) -> List[str]:
     if not str(manifest.get("coverage") or "").strip():
-        issues.append("清单缺「覆盖与局限」段（修复指引：补 coverage）")
-    files = manifest.get("files") or {}
-    if not isinstance(files, dict):
-        return issues + ["清单 files 须为对象（修复指引：重建清单）"]
+        return ["清单缺「覆盖与局限」段（修复指引：补 coverage）"]
+    return []
+
+
+def _file_drift_issues(root: str, files: Dict[str, Any]) -> tuple[Dict[str, str], List[str]]:
     normalized: Dict[str, str] = {}
+    issues: List[str] = []
     for raw_rel, want in files.items():
         try:
             rel = _safe_rel(str(raw_rel))
@@ -91,16 +91,39 @@ def verify(manifest: Dict[str, Any], root: str) -> List[str]:
             continue
         if _sha(full) != want:
             issues.append("产物已漂移：%s（修复指引：重跑生成器重建清单）" % rel)
+    return normalized, issues
+
+
+def _root_issues(manifest: Dict[str, Any], normalized: Dict[str, str]) -> List[str]:
     root_want = str(manifest.get("root_sha256") or "")
+    if not root_want:
+        return ["清单缺 root_sha256（修复指引：重建清单以锚定整面）"]
+    if root_want != _root_digest(normalized):
+        return ["清单整面 Merkle 根不符（修复指引：重跑生成器重建清单）"]
+    return []
+
+
+def _closed_surface_issues(manifest: Dict[str, Any], normalized: Dict[str, str],
+                           root: str) -> List[str]:
+    if manifest.get("closed_surface") is not True:
+        return []
+    untracked = sorted(_surface_files(root) - set(normalized))
+    if untracked:
+        return ["封闭产物面出现未登记文件：%s（修复指引：纳入清单或移出产物目录）"
+                % ", ".join(untracked[:5])]
+    return []
+
+
+def verify(manifest: Dict[str, Any], root: str) -> List[str]:
+    """逐件重算 → 漂移清单。"""
+    issues: List[str] = _coverage_issues(manifest)
+    files = manifest.get("files") or {}
+    if not isinstance(files, dict):
+        return issues + ["清单 files 须为对象（修复指引：重建清单）"]
+    normalized, drift = _file_drift_issues(root, files)
+    issues += drift
     if not files:
         return issues
-    if not root_want:
-        issues.append("清单缺 root_sha256（修复指引：重建清单以锚定整面）")
-    elif root_want != _root_digest(normalized):
-        issues.append("清单整面 Merkle 根不符（修复指引：重跑生成器重建清单）")
-    if manifest.get("closed_surface") is True:
-        untracked = sorted(_surface_files(root) - set(normalized))
-        if untracked:
-            issues.append("封闭产物面出现未登记文件：%s（修复指引：纳入清单或移出产物目录）"
-                          % ", ".join(untracked[:5]))
+    issues += _root_issues(manifest, normalized)
+    issues += _closed_surface_issues(manifest, normalized, root)
     return issues

@@ -104,6 +104,23 @@ def write(root: str = ".") -> Path:
     return path
 
 
+def _metric_issues(metric: Dict[str, Any]) -> tuple[List[str], int]:
+    mid = str(metric.get("id"))
+    status = str(metric.get("status"))
+    issues: List[str] = []
+    if status not in ("measured", "no-data"):
+        issues.append("%s 的 status 非法：%s" % (mid, status))
+    if status == "measured":
+        if not str(metric.get("source")):
+            issues.append("%s measured 但缺 source（修复指引：指标必须可复算）" % mid)
+        return issues, 1
+    if not str(metric.get("owner")):
+        issues.append("%s no-data 但缺 owner（修复指引：未采集必须有责任人）" % mid)
+    if str(metric.get("value")) not in ("None", "null"):
+        issues.append("%s no-data 但填了 value（修复指引：不得冒充 measured）" % mid)
+    return issues, 0
+
+
 def check(root: str = ".") -> List[str]:
     """口径判据：committed == 实时重算 + no-data 有 owner + measured 有 source。"""
     issues: List[str] = []
@@ -114,26 +131,15 @@ def check(root: str = ".") -> List[str]:
         committed = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         return ["%s 不可解析：%s（修复指引：重写基线）" % (METRICS_REL, exc)]
-    live = build(root)
-    if render(committed) != render(live):
+    if render(committed) != render(build(root)):
         issues.append("指标件与实时重算不一致（修复指引：重跑生成器写回）")
     if str(committed.get("schema")) != SCHEMA:
         issues.append("schema 必须 %s" % SCHEMA)
     seen_measured = 0
     for metric in committed.get("metrics") or []:
-        mid = str(metric.get("id"))
-        status = str(metric.get("status"))
-        if status not in ("measured", "no-data"):
-            issues.append("%s 的 status 非法：%s" % (mid, status))
-        if status == "measured":
-            seen_measured += 1
-            if not str(metric.get("source")):
-                issues.append("%s measured 但缺 source（修复指引：指标必须可复算）" % mid)
-        else:
-            if not str(metric.get("owner")):
-                issues.append("%s no-data 但缺 owner（修复指引：未采集必须有责任人）" % mid)
-            if str(metric.get("value")) not in ("None", "null"):
-                issues.append("%s no-data 但填了 value（修复指引：不得冒充 measured）" % mid)
+        metric_issues, measured = _metric_issues(metric)
+        issues += metric_issues
+        seen_measured += measured
     if seen_measured < 4:
         issues.append("measured 指标少于 4（首次成功/返工/成本/复用）")
     return issues

@@ -252,13 +252,26 @@ def verify(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
     """工厂自检：生成物是否与计划逐字节一致 + 登记是否到位 + 产出面机检。"""
     issues: List[str] = []
     _, files = plan(root, spec)
+    missing, drift = _plan_drift_issues(root, files)
+    issues += ["缺件：%s" % r for r in sorted(missing)]
+    issues += ["与生成器漂移：%s" % r for r in sorted(drift)]
+    _plan_doc_issues(root, spec, issues)
+    _plan_verify_sh_issues(root, spec, issues)
+    _plan_registry_issues(root, spec, issues)
+    stats = {"files": len(files), "missing": len(missing), "drift": len(drift)}
+    return issues, stats
+
+
+def _plan_drift_issues(root, files):
     missing = [r for r, c in files.items()
                if not (Path(root) / r).is_file()]
     drift = [r for r, c in files.items()
              if (Path(root) / r).is_file()
              and (Path(root) / r).read_bytes() != c.encode("utf-8")]
-    issues += ["缺件：%s" % r for r in sorted(missing)]
-    issues += ["与生成器漂移：%s" % r for r in sorted(drift)]
+    return missing, drift
+
+
+def _plan_doc_issues(root, spec, issues):
     doc02 = csc.read_text_cached(Path(root) / DOC02_REL)
     if spec["pack_name"] + "（community/" not in doc02:
         issues.append("02 §8 未登记本包")
@@ -267,17 +280,27 @@ def verify(root: str, spec: Dict[str, Any]) -> Tuple[List[str], Dict[str, Any]]:
                          % re.escape(spec["pack_name"]), doc02)
         if not segm or "模块（2）" not in segm.group(0):
             issues.append("02 §8 段缺 `模块（2）` 在册行")
+
+
+def _plan_verify_sh_issues(root, spec, issues):
     vs = csc.read_text_cached(Path(root) / VERIFY_REL)
     if "'community/%s'" % spec["pack_name"] not in vs:
         issues.append("verify.sh DOMAIN 列表未登记本包")
+
+
+def _plan_registry_issues(root, spec, issues):
     reg = _read_json(Path(root) / REGISTRY_REL) or {}
-    pids = [p.get("id") for p in reg.get("protocols") or []]
+    pids, cats = _plan_registry_lists(reg, spec)
     if spec["pack_name"] not in pids:
         issues.append("registry protocols[] 未登记本包（修复指引：nf register --apply）")
-    cats = [c for p in reg.get("protocols") or []
-            if p.get("id") != spec["pack_name"] for c in (p.get("categories") or [])]
     if spec["category"] in cats:
         issues.append("R2 类别冲突：%s 已被他包占用" % spec["category"])
-    stats = {"files": len(files), "missing": len(missing), "drift": len(drift)}
-    return issues, stats
+
+
+def _plan_registry_lists(reg, spec):
+    """registry → (protocols id 列表, 他包已占类别列表)。"""
+    pids = [p.get("id") for p in reg.get("protocols") or []]
+    cats = [c for p in reg.get("protocols") or []
+            if p.get("id") != spec["pack_name"] for c in (p.get("categories") or [])]
+    return pids, cats
 # ruff: noqa: UP035 — 拆分产物按需重复 typing 注解 import（债未新增）

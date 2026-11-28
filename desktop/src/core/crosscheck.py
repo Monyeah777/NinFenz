@@ -123,17 +123,22 @@ def _offline_probe(root: str) -> Dict[str, Any]:
             "error": "" if proc.returncode == 0 else (proc.stderr or "")[-300:]}
 
 
-def _deletion_cases(root: str) -> List[Dict[str, Any]]:
-    from core import assembly_runtime as ar
-    from core import delivery as dv
-    from core.trust import context_lineage as tcl
+def _truncated_unparseable(path: Path, cut: int | None) -> bool:
+    """把 JSON 文本截到前 cut 字节（None=对半）后是否不可解析（即截断可检出）。"""
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(tmp) / "record.json"
+        raw = path.read_text(encoding="utf-8")
+        size = len(raw) // 2 if cut is None else cut
+        target.write_text(raw[:size], encoding="utf-8", newline="\n")
+        try:
+            json.loads(target.read_text(encoding="utf-8"))
+            return False
+        except ValueError:
+            return True
 
-    root_p = Path(root)
-    out: List[Dict[str, Any]] = []
 
-    def record(case_id: str, detected: bool, detail: str) -> None:
-        out.append({"id": case_id, "detected": detected, "detail": detail})
-
+def _deletion_pack_cases(root_p: Path, root: str, dv: Any, record) -> None:
+    """D-01..D-04：交付包删件/坏 JSON 必须被 verify 检出。"""
     def _mutated_pack(mutate) -> Dict[str, Any]:
         with tempfile.TemporaryDirectory() as tmp:
             dst = Path(tmp) / "pack"
@@ -149,6 +154,9 @@ def _deletion_cases(root: str) -> List[Dict[str, Any]]:
                                                    encoding="utf-8", newline="\n")))
     record("D-04", **_mutated_pack(lambda d: (d / "evidence/sidecar.json").unlink()))
 
+
+def _deletion_assembly_case(root_p: Path, root: str, ar: Any, record) -> None:
+    """D-05：删计划步骤后装配记录校验必须报问题。"""
     assembly = json.loads((root_p / "results/assembly/sample-document.assembly.json").read_text(encoding="utf-8"))
     broken = copy.deepcopy(assembly)
     plan_steps = (broken.get("assembly") or {}).get("steps")
@@ -157,17 +165,9 @@ def _deletion_cases(root: str) -> List[Dict[str, Any]]:
     issues = ar.validate_record(broken, str(root))
     record("D-05", bool(issues), "; ".join(str(i) for i in issues[:2]) or "未检出")
 
-    with tempfile.TemporaryDirectory() as tmp:
-        path = Path(tmp) / "record.json"
-        raw = (root_p / "results/assembly/sample-document.assembly.json").read_text(encoding="utf-8")
-        path.write_text(raw[: len(raw) // 2], encoding="utf-8", newline="\n")
-        try:
-            json.loads(path.read_text(encoding="utf-8"))
-            detected = False
-        except ValueError:
-            detected = True
-        record("D-06", detected, "截断后不可解析" if detected else "截断未被检出")
 
+def _deletion_lineage_cases(root_p: Path, tcl: Any, record) -> None:
+    """D-07..D-09：血缘删段/重排/篡改摘要都必须被检出。"""
     card = json.loads((root_p / "results/ai/model-card.json").read_text(encoding="utf-8"))
     lineage = json.loads((root_p / "results/ai/lineage.json").read_text(encoding="utf-8"))
     deleted = copy.deepcopy(lineage)
@@ -182,16 +182,26 @@ def _deletion_cases(root: str) -> List[Dict[str, Any]]:
     tampered["lineage_digest"] = hashlib.sha256(b"tampered").hexdigest()
     record("D-09", bool(tcl.verify_lineage(tampered, card).get("issues")), "篡改 lineage_digest 可检出")
 
-    with tempfile.TemporaryDirectory() as tmp:
-        path = Path(tmp) / "claims.json"
-        raw = (root_p / "results/docs_claims_report.json").read_text(encoding="utf-8")
-        path.write_text(raw[:40], encoding="utf-8", newline="\n")
-        try:
-            json.loads(path.read_text(encoding="utf-8"))
-            detected = False
-        except ValueError:
-            detected = True
-        record("D-10", detected, "截断后不可解析" if detected else "截断未被检出")
+
+def _deletion_cases(root: str) -> List[Dict[str, Any]]:
+    from core import assembly_runtime as ar
+    from core import delivery as dv
+    from core.trust import context_lineage as tcl
+
+    root_p = Path(root)
+    out: List[Dict[str, Any]] = []
+
+    def record(case_id: str, detected: bool, detail: str) -> None:
+        out.append({"id": case_id, "detected": detected, "detail": detail})
+
+    _deletion_pack_cases(root_p, root, dv, record)
+    _deletion_assembly_case(root_p, root, ar, record)
+    detected = _truncated_unparseable(
+        root_p / "results/assembly/sample-document.assembly.json", None)
+    record("D-06", detected, "截断后不可解析" if detected else "截断未被检出")
+    _deletion_lineage_cases(root_p, tcl, record)
+    detected = _truncated_unparseable(root_p / "results/docs_claims_report.json", 40)
+    record("D-10", detected, "截断后不可解析" if detected else "截断未被检出")
     return out
 
 
@@ -216,26 +226,47 @@ render = report_module.render
 write = report_module.writer(REPORT_REL, build)
 
 
-def check(root: str = ".") -> List[str]:
-    issues, committed, live = report_module.start(root, REPORT_REL, build, "跨实现/断网/删除矩阵报告与实时重算不一致（修复指引：重跑 write）")
+def _parity_issues(committed: Dict[str, Any]) -> List[str]:
+    """parity 面：go 不可用时 runtime 必须显式 open，status 必须在词表内。"""
+    issues: List[str] = []
     parity = committed.get("parity") or {}
     go_available = _tool_present("go")
     if not go_available and str(parity.get("runtime")) != "open":
         issues.append("go 不可用时 parity.runtime 必须显式 open（不得冒充跑通）")
     if str(parity.get("status")) not in ("static-only", "pass", "gap", "open"):
         issues.append("parity.status 非法")
+    return issues
+
+
+def _offline_issues(committed: Dict[str, Any]) -> List[str]:
+    """断网探针：总开关 ok + 逐管线 checks 全绿。"""
+    issues: List[str] = []
     offline = committed.get("offline") or {}
     if not offline.get("ok"):
         issues.append("断网探针失败：%s" % (offline.get("error") or "见 checks"))
     for name, ok in (offline.get("checks") or {}).items():
         if not ok:
             issues.append("断网下管线失败：%s" % name)
+    return issues
+
+
+def _deletion_issues(committed: Dict[str, Any]) -> List[str]:
+    """删除矩阵：case 数下限 + 逐 case 漏检。"""
+    issues: List[str] = []
     cases = committed.get("deletion_matrix") or []
     if len(cases) < 10:
         issues.append("删除矩阵 case 少于 10")
     for case in cases:
         if not case.get("detected"):
             issues.append("%s 漏检（%s）" % (case.get("id"), case.get("detail")))
+    return issues
+
+
+def check(root: str = ".") -> List[str]:
+    issues, committed, live = report_module.start(root, REPORT_REL, build, "跨实现/断网/删除矩阵报告与实时重算不一致（修复指引：重跑 write）")
+    issues.extend(_parity_issues(committed))
+    issues.extend(_offline_issues(committed))
+    issues.extend(_deletion_issues(committed))
     boundary = " ".join(str(x) for x in committed.get("claims_boundary") or [])
     if "OPEN" not in boundary:
         issues.append("claims_boundary 必须写明 Go 运行时 parity 属 OPEN")

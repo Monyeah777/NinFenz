@@ -187,55 +187,52 @@ def _changes_issues(r: Path, changes_dir: str) -> Tuple[List[str], List[str]]:
     return issues, names
 
 
-def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
-    """可机检发布前置（check38 子扫描口径）。缺根如实报 issue，不裸崩。"""
-    r = Path(root)
-    if not (r / "verify.sh").is_file():
-        return (["读不到仓库根（缺 verify.sh）——发布编排须在 NF 仓库根运行"], {})
-    issues: List[str] = []
-    stats: Dict[str, Any] = {}
-
-    # 1 机读策略件：在场 + 过 schema
-    pol, p_issues = policy(root)
-    issues += p_issues
-    pol = pol or {}
-
-    # 2 人读策略件：三段锚点齐
+def _policy_doc_issues(r: Path) -> List[str]:
     doc = r / POLICY_DOC
     if not doc.is_file():
-        issues.append("缺人读发布策略 %s（修复指引：写明冻结链/版本面/变更条目三段；"
-                      "锚点见 core/release_gate.py::POLICY_ANCHORS）" % POLICY_DOC)
-    else:
-        ptxt = doc.read_text(encoding="utf-8")
-        miss = [a for a in POLICY_ANCHORS if a not in ptxt]
-        if miss:
-            issues.append("%s 缺声明锚点：%s" % (POLICY_DOC, "、".join(miss)))
+        return ["缺人读发布策略 %s（修复指引：写明冻结链/版本面/变更条目三段；"
+                "锚点见 core/release_gate.py::POLICY_ANCHORS）" % POLICY_DOC]
+    ptxt = doc.read_text(encoding="utf-8")
+    miss = [a for a in POLICY_ANCHORS if a not in ptxt]
+    if miss:
+        return ["%s 缺声明锚点：%s" % (POLICY_DOC, "、".join(miss))]
+    return []
 
-    # 3 必需产物在场（策略声明）
+
+def _artifact_issues(r: Path, pol: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     for rel in pol.get("required_artifacts") or []:
         if not (r / rel).exists():
             issues.append("发布必需产物不在场：%s（修复指引：按冻结链重生成）" % rel)
-
-    # 4 版本面 + 计划可编译 + 冻结链按序
     for rel in pol.get("version_faces") or []:
         if not (r / rel).is_file():
             issues.append("版本面不在场：%s" % rel)
-    steps = plan(root)
-    bad = [s["id"] for s in steps if not (s.get("cmd") and s.get("out") and s.get("judge"))]
-    if bad:
-        issues.append("发布计划步骤缺栏：%s" % "、".join(bad))
+    return issues
+
+
+def _chain_issues(steps: List[Dict[str, Any]], pol: Dict[str, Any]):
     chain = list(pol.get("freeze_chain") or DEFAULT_FREEZE_CHAIN)
     cmds = [s["cmd"] for s in steps]
     pos = [next((i for i, c in enumerate(cmds) if c.startswith(x)), -1) for x in chain]
     if any(p < 0 for p in pos) or pos != sorted(pos):
-        issues.append("冻结链未按序进计划（%s）（修复指引：conformance → approve → receipts 顺序不"
-            "可颠倒）"
-                      % "、".join(str(p) for p in pos))
+        return ["冻结链未按序进计划（%s）（修复指引：conformance → approve → receipts 顺序不"
+                "可颠倒）" % "、".join(str(p) for p in pos)], chain
+    return [], chain
 
-    # 5 变更条目可归档 + 变更日志生成可溯源（release-please 的最后一环）
-    ch_dir = str(pol.get("changes_dir") or "changes/unreleased")
-    ch_issues, ch_names = _changes_issues(r, ch_dir)
-    issues += ch_issues
+
+def _plan_section(root: str, pol: Dict[str, Any]):
+    steps = plan(root)
+    issues: List[str] = []
+    bad = [s["id"] for s in steps if not (s.get("cmd") and s.get("out") and s.get("judge"))]
+    if bad:
+        issues.append("发布计划步骤缺栏：%s" % "、".join(bad))
+    chain_issues, chain = _chain_issues(steps, pol)
+    issues += chain_issues
+    return issues, steps, chain
+
+
+def _changelog_issues(root: str, steps: List[Dict[str, Any]], ch_dir: str) -> List[str]:
+    issues: List[str] = []
     try:
         from core import changelog_gen as _cg
         for i in _cg.check(root, changes_dir=ch_dir)[0]:
@@ -244,26 +241,53 @@ def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         issues.append("变更日志生成检查不可用：%s" % exc)
     if not any("changelog --version" in s["cmd"] for s in steps):
         issues.append("发布计划缺变更日志生成步（修复指引：changes-1 步须调 nf changelog）")
+    return issues
 
+
+def _release_line_issues(r: Path, rel: str) -> List[str]:
+    issues: List[str] = []
+    if not rel:
+        issues.append("CHANGELOG 无版本节（修复指引：加 \"## [X.Y.Z] - 未发布\" 节）")
+        return issues
+    matrix = r / "docs/meta/VERSION-MATRIX.md"
+    mtxt = matrix.read_text(encoding="utf-8") if matrix.is_file() else ""
+    if rel not in mtxt:
+        issues.append("发布线 v%s 未登记 VERSION-MATRIX（修复指引：补一行 v%s）" % (rel, rel))
+    return issues
+
+
+def check(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
+    """可机检发布前置（check38 子扫描口径）。缺根如实报 issue，不裸崩。"""
+    r = Path(root)
+    if not (r / "verify.sh").is_file():
+        return (["读不到仓库根（缺 verify.sh）——发布编排须在 NF 仓库根运行"], {})
+    # 1 机读策略件：在场 + 过 schema
+    pol, issues = policy(root)
+    pol = pol or {}
+    # 2 人读策略件：三段锚点齐
+    issues += _policy_doc_issues(r)
+    # 3 必需产物在场（策略声明）
+    issues += _artifact_issues(r, pol)
+    # 4 版本面 + 计划可编译 + 冻结链按序
+    plan_issues, steps, chain = _plan_section(root, pol)
+    issues += plan_issues
+    # 5 变更条目可归档 + 变更日志生成可溯源（release-please 的最后一环）
+    ch_dir = str(pol.get("changes_dir") or "changes/unreleased")
+    ch_issues, ch_names = _changes_issues(r, ch_dir)
+    issues += ch_issues
+    issues += _changelog_issues(root, steps, ch_dir)
     # 6 版本面登记不悬空（发布线可达 CHANGELOG ↔ VERSION-MATRIX）
     if not (r / "README.md").is_file():
         issues.append("缺版本面入口 README.md（修复指引：版本块须在场）")
     rel = release_line(root)
-    if not rel:
-        issues.append("CHANGELOG 无版本节（修复指引：加 \"## [X.Y.Z] - 未发布\" 节）")
-    else:
-        matrix = r / "docs/meta/VERSION-MATRIX.md"
-        mtxt = matrix.read_text(encoding="utf-8") if matrix.is_file() else ""
-        if rel not in mtxt:
-            issues.append("发布线 v%s 未登记 VERSION-MATRIX（修复指引：补一行 v%s）" % (rel, rel))
-
+    issues += _release_line_issues(r, rel)
     ver, checks, expected_pass = _version(r)
-    stats.update({
+    stats: Dict[str, Any] = {
         "policy": POLICY_JSON, "policy_doc": POLICY_DOC, "release_line": rel,
         "gate_version": ver, "checks": checks, "expected_pass": expected_pass,
         "plan_steps": len(steps),
         "freeze_chain": chain, "changes": ch_names,
-    })
+    }
     return issues, stats
 
 

@@ -89,12 +89,8 @@ def load_sample(root: str = ".") -> Dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def check_label(label: Any, root: str = ".") -> List[str]:
-    """单张标识的闭合判据（schema/词表/绑定/引用/复核）。"""
+def _label_header_issues(reg: Dict[str, Any], label: Dict[str, Any]) -> List[str]:
     issues: List[str] = []
-    reg = load_registry(root)
-    if not isinstance(label, dict):
-        return ["标识不是对象"]
     if str(label.get("schema")) != LABEL_SCHEMA:
         issues.append("schema 必须 %s" % LABEL_SCHEMA)
     kind = str(label.get("subject_kind"))
@@ -106,7 +102,11 @@ def check_label(label: Any, root: str = ".") -> List[str]:
     for key in (reg.get("label_artifact") or {}).get("required") or []:
         if not label.get(key):
             issues.append("缺必填字段：%s" % key)
-    # 生成器绑定
+    return issues
+
+
+def _generator_issues(root: str, label: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     card_path = Path(root) / CARD_REL
     if not card_path.is_file():
         issues.append("缺模型卡（修复指引：先跑 WP-40 write_sample）")
@@ -116,12 +116,20 @@ def check_label(label: Any, root: str = ".") -> List[str]:
             issues.append("generator.model_digest 与模型卡不一致（修复指引：重签标识）")
         if str((label.get("generator") or {}).get("model_id")) != str(card.get("model_id")):
             issues.append("generator.model_id 与模型卡不一致")
-    # 对象绑定（样例固定到交付产物）
+    return issues
+
+
+def _subject_issues(root: str, label: Dict[str, Any]) -> List[str]:
     subject = Path(root) / SUBJECT
-    if subject.is_file():
-        if str(label.get("subject_digest")) != _sha_file(subject):
-            issues.append("subject_digest 与被标注产物摘要不一致（修复指引：重算并重签）")
-    # 引用闭合
+    if not subject.is_file():
+        return []
+    if str(label.get("subject_digest")) != _sha_file(subject):
+        return ["subject_digest 与被标注产物摘要不一致（修复指引：重算并重签）"]
+    return []
+
+
+def _ref_issues(root: str, label: Dict[str, Any]) -> List[str]:
+    issues: List[str] = []
     refs = label.get("provenance_refs") or []
     if not refs:
         issues.append("provenance_refs 不能为空")
@@ -131,19 +139,47 @@ def check_label(label: Any, root: str = ".") -> List[str]:
             issues.append("provenance_ref 越界（只允许 results/ai/* 或 protocol/ai_evidence.json）：%s" % ref)
         if not (Path(root) / ref).is_file():
             issues.append("provenance_ref 不在场：%s" % ref)
-    if tag == "human":
-        review_path = Path(root) / REVIEW_REL
-        if not review_path.is_file():
-            issues.append("label=human 但缺复核记录")
-        else:
-            review = json.loads(review_path.read_text(encoding="utf-8"))
-            if str(review.get("decision")) != "approve":
-                issues.append("label=human 但复核未 approve")
+    return issues
+
+
+def _human_label_issues(root: str, tag: str) -> List[str]:
+    if tag != "human":
+        return []
+    review_path = Path(root) / REVIEW_REL
+    if not review_path.is_file():
+        return ["label=human 但缺复核记录"]
+    review = json.loads(review_path.read_text(encoding="utf-8"))
+    if str(review.get("decision")) != "approve":
+        return ["label=human 但复核未 approve"]
+    return []
+
+
+def _labeled_at_issues(label: Dict[str, Any]) -> List[str]:
     if not str(label.get("labeled_at") or "").endswith("Z"):
-        issues.append("labeled_at 必须是 UTC（ISO-8601 Z）")
+        return ["labeled_at 必须是 UTC（ISO-8601 Z）"]
+    return []
+
+
+def _claims_boundary_issues(reg: Dict[str, Any]) -> List[str]:
     boundary = " ".join(str(x) for x in reg.get("claims_boundary") or [])
     if "不声称" not in boundary:
-        issues.append("claims_boundary 必须写明不声称外部法规兼容")
+        return ["claims_boundary 必须写明不声称外部法规兼容"]
+    return []
+
+
+def check_label(label: Any, root: str = ".") -> List[str]:
+    """单张标识的闭合判据（schema/词表/绑定/引用/复核）。"""
+    reg = load_registry(root)
+    if not isinstance(label, dict):
+        return ["标识不是对象"]
+    tag = str(label.get("label"))
+    issues: List[str] = _label_header_issues(reg, label)
+    issues += _generator_issues(root, label)
+    issues += _subject_issues(root, label)
+    issues += _ref_issues(root, label)
+    issues += _human_label_issues(root, tag)
+    issues += _labeled_at_issues(label)
+    issues += _claims_boundary_issues(reg)
     return issues
 
 

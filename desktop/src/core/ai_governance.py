@@ -48,74 +48,115 @@ def _evidence_issues(root: str, refs: Any, where: str) -> List[str]:
     return issues
 
 
-def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
-    issues: List[str] = []
-    scope = doc.get("scope") or {}
+def _scope_issues(scope: Dict[str, Any]) -> List[str]:
+    out: List[str] = []
     for field in ("system_purpose", "affected_parties", "out_of_scope", "claims_boundary"):
         if not scope.get(field):
-            issues.append("scope 缺 %s" % field)
+            out.append("scope 缺 %s" % field)
     if not isinstance(scope.get("affected_parties"), list) or len(scope["affected_parties"]) < 2:
-        issues.append("scope.affected_parties 至少登记两类受影响方")
+        out.append("scope.affected_parties 至少登记两类受影响方")
     boundary = " ".join(str(x) for x in scope.get("claims_boundary") or [])
     if "不声称" not in boundary:
-        issues.append("scope.claims_boundary 必须显式写「不声称合规/认证」")
-    impact = doc.get("impact_assessment") or {}
-    criteria = impact.get("criteria") or []
+        out.append("scope.claims_boundary 必须显式写「不声称合规/认证」")
+    return out
+
+
+def _missing_fields(record: Dict[str, Any], fields) -> List[str]:
+    return [f for f in fields if not str(record.get(f) or "").strip()]
+
+
+def _criteria_issues(root: str, criteria: List[Any]) -> List[str]:
+    out: List[str] = []
     ids = [str(c.get("id")) for c in criteria if isinstance(c, dict)]
     if len(ids) < 4 or len(ids) != len(set(ids)):
-        issues.append("impact_assessment.criteria 至少 4 项且 id 唯一（%s）" % GUIDE)
+        out.append("impact_assessment.criteria 至少 4 项且 id 唯一（%s）" % GUIDE)
     for item in criteria:
         if not isinstance(item, dict):
-            issues.append("criteria 含非对象")
+            out.append("criteria 含非对象")
             continue
-        for field in ("id", "question", "answer"):
-            if not str(item.get(field) or "").strip():
-                issues.append("criteria %s 缺 %s" % (item.get("id"), field))
-        issues += _evidence_issues(root, item.get("evidence"), "criteria " + str(item.get("id")))
+        for field in _missing_fields(item, ("id", "question", "answer")):
+            out.append("criteria %s 缺 %s" % (item.get("id"), field))
+        out += _evidence_issues(root, item.get("evidence"), "criteria " + str(item.get("id")))
+    return out
+
+
+def _impact_block_issues(root: str, impact: Dict[str, Any]) -> List[str]:
+    out: List[str] = []
     for key in ("human_oversight", "transparency", "recourse"):
         block = impact.get(key) or {}
         if not str(block.get("mechanism") or "").strip():
-            issues.append("impact_assessment.%s 缺 mechanism" % key)
-        issues += _evidence_issues(root, block.get("evidence"), "impact_assessment." + key)
-    risks = doc.get("model_risk_register") or []
+            out.append("impact_assessment.%s 缺 mechanism" % key)
+        out += _evidence_issues(root, block.get("evidence"), "impact_assessment." + key)
+    return out
+
+
+def _risk_row_issues(root: str, risk: Dict[str, Any], rid: str) -> List[str]:
+    out: List[str] = []
+    for field in _missing_fields(risk, ("risk", "category", "likelihood", "impact",
+                                       "mitigation", "owner")):
+        out.append("风险 %s 缺 %s" % (rid, field))
+    for field in ("likelihood", "impact"):
+        if str(risk.get(field)) not in RISK_LEVELS:
+            out.append("风险 %s 的 %s 非法：%s" % (rid, field, risk.get(field)))
+    status = str(risk.get("status"))
+    if status not in STATUSES:
+        out.append("风险 %s 的 status 非法：%s" % (rid, status))
+    if status in ("partial", "planned") and str(risk.get("planned_gate")) not in GATES:
+        out.append("风险 %s 标 %s 但缺 planned_gate" % (rid, status))
+    out += _evidence_issues(root, risk.get("evidence"), "风险 " + rid)
+    return out
+
+
+def _risk_issues(root: str, risks: List[Any]) -> List[str]:
+    out: List[str] = []
     rids = [str(r.get("id")) for r in risks if isinstance(r, dict)]
     if len(rids) < 4:
-        issues.append("model_risk_register 至少 4 条（%s 覆盖 GOVERN/MAP/MEASURE/MANAGE）" % GUIDE)
+        out.append("model_risk_register 至少 4 条（%s 覆盖 GOVERN/MAP/MEASURE/MANAGE）" % GUIDE)
     if len(rids) != len(set(rids)):
-        issues.append("model_risk_register id 重复：%s" % rids)
+        out.append("model_risk_register id 重复：%s" % rids)
     for risk in risks:
         if not isinstance(risk, dict):
-            issues.append("model_risk_register 含非对象")
+            out.append("model_risk_register 含非对象")
             continue
-        rid = str(risk.get("id"))
-        for field in ("risk", "category", "likelihood", "impact", "mitigation", "owner"):
-            if not str(risk.get(field) or "").strip():
-                issues.append("风险 %s 缺 %s" % (rid, field))
-        for field in ("likelihood", "impact"):
-            if str(risk.get(field)) not in RISK_LEVELS:
-                issues.append("风险 %s 的 %s 非法：%s" % (rid, field, risk.get(field)))
-        status = str(risk.get("status"))
-        if status not in STATUSES:
-            issues.append("风险 %s 的 status 非法：%s" % (rid, status))
-        if status in ("partial", "planned") and str(risk.get("planned_gate")) not in GATES:
-            issues.append("风险 %s 标 %s 但缺 planned_gate" % (rid, status))
-        issues += _evidence_issues(root, risk.get("evidence"), "风险 " + rid)
-    mapping = doc.get("regulatory_mapping") or []
+        out += _risk_row_issues(root, risk, str(risk.get("id")))
+    return out
+
+
+def _framework_issues(mapping: List[Any]) -> List[str]:
     frameworks = " ".join(str(m.get("framework")) for m in mapping if isinstance(m, dict))
+    out: List[str] = []
     for need in EXPECTED_FRAMEWORKS:
         if need not in frameworks:
-            issues.append("监管映射缺框架：%s（%s 补一行机制对照）" % (need, GUIDE))
+            out.append("监管映射缺框架：%s（%s 补一行机制对照）" % (need, GUIDE))
+    return out
+
+
+def _mapping_issues(root: str, mapping: List[Any]) -> List[str]:
+    out: List[str] = []
     for row in mapping:
         if not isinstance(row, dict):
-            issues.append("regulatory_mapping 含非对象")
+            out.append("regulatory_mapping 含非对象")
             continue
         fid = str(row.get("framework"))
         if str(row.get("claim")) not in CLAIMS:
-            issues.append("映射 %s 的 claim 非法：%s（只允许 %s；不声称合规）"
-                          % (fid, row.get("claim"), list(CLAIMS)))
+            out.append("映射 %s 的 claim 非法：%s（只允许 %s；不声称合规）"
+                       % (fid, row.get("claim"), list(CLAIMS)))
         if not isinstance(row.get("clauses"), list) or not row.get("clauses"):
-            issues.append("映射 %s 缺 clauses" % fid)
-        issues += _evidence_issues(root, row.get("evidence"), "映射 " + fid)
+            out.append("映射 %s 缺 clauses" % fid)
+        out += _evidence_issues(root, row.get("evidence"), "映射 " + fid)
+    return out
+
+
+def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
+    issues: List[str] = []
+    issues += _scope_issues(doc.get("scope") or {})
+    impact = doc.get("impact_assessment") or {}
+    issues += _criteria_issues(root, impact.get("criteria") or [])
+    issues += _impact_block_issues(root, impact)
+    issues += _risk_issues(root, doc.get("model_risk_register") or [])
+    mapping = doc.get("regulatory_mapping") or []
+    issues += _framework_issues(mapping)
+    issues += _mapping_issues(root, mapping)
     return issues
 
 

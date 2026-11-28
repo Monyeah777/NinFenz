@@ -16,6 +16,7 @@ from __future__ import annotations
 import re
 
 from core import module_lifecycle as ml
+from typing import Any, Dict, List
 
 _YAML_FENCE = re.compile(r"^```[ \t]*[Yy][Aa][Mm][Ll]?[ \t]*$", re.M)
 _EVENT_LIST = re.compile(r"^\s*(publish|subscribe):\s*\[(.*?)\]\s*$", re.M)
@@ -79,37 +80,66 @@ def _module_info(root: str, rel: str) -> dict:
     }
 
 
-def scan(root: str = ".") -> tuple:
-    """check26 语义：语义级矛盾扫描 → (issues, stats)。"""
+def _module_infos(root: str) -> List[Dict[str, Any]]:
     infos = []
     for rel in ml.iter_module_files(root):
         info = _module_info(root, rel)
         if info["id"]:
             infos.append(info)
-    publishers: dict[str, list[str]] = {}
+    return infos
+
+
+def _publishers(infos: List[Dict[str, Any]]) -> Dict[str, List[str]]:
+    publishers: Dict[str, List[str]] = {}
     for info in infos:
         for e in info["publish"]:
             publishers.setdefault(e, []).append(info["id"])
+    return publishers
+
+
+def _chain_issues(info: Dict[str, Any], publishers: Dict[str, List[str]]) -> List[str]:
+    if info["id"] not in TECHDOC_IDS:
+        return []
+    issues: List[str] = []
+    for e in info["subscribe"]:
+        if e not in publishers:
+            issues.append("%s 订阅事件 %s 无任何模块 machine_contract 发布（事件契约断链）"
+                          % (info["file"], e))
+    return issues
+
+
+def _mount_issue(info: Dict[str, Any]) -> List[str]:
+    mount = _MOUNT_P.search(info["meta"].get("挂载点", ""))
+    mp = mount.group(1) if mount else ""
+    if mp and info["layer"] and mp != info["layer"]:
+        return ["%s 头挂载点 %s ≠ machine_contract.layer %s（挂载点漂移）"
+                % (info["file"], mp, info["layer"])]
+    return []
+
+
+def _category_issue(info: Dict[str, Any]) -> List[str]:
+    cat_meta = re.split(r"[｜|]", info["meta"].get("类别", ""), maxsplit=1)[0].strip()
+    if cat_meta and info["category"] and cat_meta != info["category"]:
+        return ["%s 头类别 %s ≠ machine_contract.category %s（类别漂移）"
+                % (info["file"], cat_meta, info["category"])]
+    return []
+
+
+def _module_issues(info: Dict[str, Any], publishers: Dict[str, List[str]]) -> List[str]:
+    issues: List[str] = []
+    issues += _chain_issues(info, publishers)
+    issues += _mount_issue(info)
+    issues += _category_issue(info)
+    return issues
+
+
+def scan(root: str = ".") -> tuple:
+    """check26 语义：语义级矛盾扫描 → (issues, stats)。"""
+    infos = _module_infos(root)
+    publishers = _publishers(infos)
     issues = []
     for info in infos:
-        mid = info["id"]
-        # R1：techdoc 链订阅事件必须存在 machine_contract 发布方
-        if mid in TECHDOC_IDS:
-            for e in info["subscribe"]:
-                if e not in publishers:
-                    issues.append("%s 订阅事件 %s 无任何模块 machine_contract 发布（事件契约断链）"
-                                  % (info["file"], e))
-        # R2：挂载点 vs contract layer 漂移
-        mount = _MOUNT_P.search(info["meta"].get("挂载点", ""))
-        mp = mount.group(1) if mount else ""
-        if mp and info["layer"] and mp != info["layer"]:
-            issues.append("%s 头挂载点 %s ≠ machine_contract.layer %s（挂载点漂移）"
-                          % (info["file"], mp, info["layer"]))
-        # R3：类别 meta vs contract category 漂移
-        cat_meta = re.split(r"[｜|]", info["meta"].get("类别", ""), maxsplit=1)[0].strip()
-        if cat_meta and info["category"] and cat_meta != info["category"]:
-            issues.append("%s 头类别 %s ≠ machine_contract.category %s（类别漂移）"
-                          % (info["file"], cat_meta, info["category"]))
+        issues += _module_issues(info, publishers)
     stats = {
         "modules": len(infos),
         "publishers": len(publishers),

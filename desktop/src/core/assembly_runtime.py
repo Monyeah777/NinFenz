@@ -66,6 +66,58 @@ def _plan(task: Dict[str, Any], task_slot: str) -> Dict[str, Any]:
             "fallback": {"on_failure": "abort"}}
 
 
+def _spec_and_task(bundle: Dict[str, Any]) -> tuple:
+    """spec 与首个 task 的完整性前置校验（不完整即拒，含修复指引）。"""
+    spec = bundle.get("spec") or {}
+    if not spec.get("ref") or not spec.get("digest"):
+        raise AssemblyError("spec bundle 不完整（修复指引：重跑 nf spec compile）",
+                            code="SPEC-INVALID")
+    task = (bundle.get("tasks") or [{}])[0]
+    if not task.get("slot"):
+        raise AssemblyError("bundle 缺 task（修复指引：重跑 nf spec compile）",
+                            code="SPEC-INVALID")
+    return spec, task
+
+
+def _adapter_run(adapter: str, task: Dict[str, Any], pack: Dict[str, Any], root: str,
+                 checks: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """跑生成式适配器；OUTPUT-INVALID 时补记 K-002 红项再抛。"""
+    try:
+        return aa.run(adapter, task, pack, root)
+    except aa.AdapterError as exc:
+        if getattr(exc, "code", "") == "OUTPUT-INVALID":
+            checks.append({"id": "K-002", "ok": False,
+                           "detail": str(exc.message)[:240]})
+        raise
+
+
+def _commit_output(out: Dict[str, Any], task: Dict[str, Any], run_doc: Dict[str, Any],
+                   trace: List[Dict[str, Any]], checks: List[Dict[str, Any]]) -> None:
+    """把产物摘要写进 run 信封 + K-003/K-004 判定。"""
+    content = str(out["output"]["content"])
+    run_doc["output"] = {"kind": out["output"]["kind"], "path": out["output"]["path"],
+                         "digest": _sha(content), "chars": len(content),
+                         "tokens": int(out["usage"]["tokens"])}
+    trace.append({"id": "output", "ok": True, "detail": "kind=%s chars=%d digest=%s…"
+                  % (out["output"]["kind"], len(content), _sha(content)[:12])})
+    max_chars = task["budget"]["max_tokens"] * 4
+    checks.append({"id": "K-003", "ok": len(content) <= max_chars,
+                   "detail": "chars=%d max=%d" % (len(content), max_chars)})
+    checks.append({"id": "K-004", "ok": True,
+                   "detail": "输出只在 slot %s 内，引用均来自上下文" % task["slot"]["id"]})
+
+
+def _record_error(run_doc: Dict[str, Any], trace: List[Dict[str, Any]], exc: Exception) -> None:
+    """失败时补 error 步骤并落 blocked 信封（轨迹已在错处则不再重复）。"""
+    if not trace or trace[-1]["ok"]:
+        trace.append({"id": "error", "ok": False,
+                      "detail": "%s：%s" % (getattr(exc, "code", "ERROR"),
+                                            getattr(exc, "message", str(exc)))[:240]})
+    run_doc["status"] = "blocked"
+    run_doc["error"] = {"code": getattr(exc, "code", "ASSEMBLY-INVALID"),
+                        "message": str(getattr(exc, "message", str(exc)))[:240]}
+
+
 def run(intent_rel: str, adapter: str = "mock", root: str = ".",
         budget_chars: int = 2000, role: str = "author") -> Dict[str, Any]:
     """跑 P00 黄金路径 → (assembly 计划 + run 信封)；失败时 run.status=blocked。"""
@@ -79,14 +131,7 @@ def run(intent_rel: str, adapter: str = "mock", root: str = ".",
     try:
         intent = sc._load_intent_file(root, intent_rel)
         bundle = sc.compile_intent(intent, root, intent_rel)
-        spec = bundle.get("spec") or {}
-        if not spec.get("ref") or not spec.get("digest"):
-            raise AssemblyError("spec bundle 不完整（修复指引：重跑 nf spec compile）",
-                                code="SPEC-INVALID")
-        task = (bundle.get("tasks") or [{}])[0]
-        if not task.get("slot"):
-            raise AssemblyError("bundle 缺 task（修复指引：重跑 nf spec compile）",
-                                code="SPEC-INVALID")
+        spec, task = _spec_and_task(bundle)
         assembly = _plan(task, task["slot"]["id"])
         trace.append({"id": "spec", "ok": True, "detail": "spec=%s digest=%s…"
                       % (bundle["spec"]["ref"], bundle["spec"]["digest"][:12])})
@@ -97,13 +142,7 @@ def run(intent_rel: str, adapter: str = "mock", root: str = ".",
                        "detail": "citation_rate=%s" % pack["report"]["citation_rate"]})
         trace.append({"id": "context", "ok": True, "detail": "entries=%d chars=%d"
                       % (len(pack["entries"]), pack["budget"]["used_chars"])})
-        try:
-            out = aa.run(adapter, task, pack, root)
-        except aa.AdapterError as exc:
-            if getattr(exc, "code", "") == "OUTPUT-INVALID":
-                checks.append({"id": "K-002", "ok": False,
-                               "detail": str(exc.message)[:240]})
-            raise
+        out = _adapter_run(adapter, task, pack, root, checks)
         trace.append({"id": "adapter", "ok": True, "detail": "citations=%s"
                       % ",".join(out["citations"])})
         report = ov.validate(out, task, pack, root)
@@ -118,17 +157,7 @@ def run(intent_rel: str, adapter: str = "mock", root: str = ".",
             raise AssemblyError("输出被拒收：%s（%s；%s）"
                                 % (first["code"], first["message"], first["fix"]),
                                 code="OUTPUT-INVALID")
-        content = str(out["output"]["content"])
-        run_doc["output"] = {"kind": out["output"]["kind"], "path": out["output"]["path"],
-                             "digest": _sha(content), "chars": len(content),
-                             "tokens": int(out["usage"]["tokens"])}
-        trace.append({"id": "output", "ok": True, "detail": "kind=%s chars=%d digest=%s…"
-                      % (out["output"]["kind"], len(content), _sha(content)[:12])})
-        max_chars = task["budget"]["max_tokens"] * 4
-        checks.append({"id": "K-003", "ok": len(content) <= max_chars,
-                       "detail": "chars=%d max=%d" % (len(content), max_chars)})
-        checks.append({"id": "K-004", "ok": True,
-                       "detail": "输出只在 slot %s 内，引用均来自上下文" % task["slot"]["id"]})
+        _commit_output(out, task, run_doc, trace, checks)
         gate_ok = all(c["ok"] for c in checks)
         trace.append({"id": "gate", "ok": gate_ok, "detail": "checks=%d ok=%d"
                       % (len(checks), sum(1 for c in checks if c["ok"]))})
@@ -139,16 +168,60 @@ def run(intent_rel: str, adapter: str = "mock", root: str = ".",
         run_doc["status"] = "delivered"
     except (sc.SpecError, cp.PackError, aa.AdapterError, AssemblyError,
             KeyError, TypeError, IndexError) as exc:
-        if not trace or trace[-1]["ok"]:
-            trace.append({"id": "error", "ok": False,
-                          "detail": "%s：%s" % (getattr(exc, "code", "ERROR"),
-                                                getattr(exc, "message", str(exc)))[:240]})
-        run_doc["status"] = "blocked"
-        run_doc["error"] = {"code": getattr(exc, "code", "ASSEMBLY-INVALID"),
-                            "message": str(getattr(exc, "message", str(exc)))[:240]}
+        _record_error(run_doc, trace, exc)
     run_doc["steps"] = trace
     run_doc["checks"] = checks
     return {"schema": RUN_SCHEMA, "assembly": assembly, "run": run_doc}
+
+
+def _assembly_schema_issues(record: Dict[str, Any], root: str) -> List[str]:
+    """assembly 过 nf-assembly/1 schema + pipeline 必须是 P00。"""
+    from core import json_schema
+    issues: List[str] = []
+    schema = json.loads((Path(root) / ASSEMBLY_SCHEMA_REL).read_text(encoding="utf-8"))
+    for item in json_schema.json_schema_check(record["assembly"], schema)[:3]:
+        issues.append("assembly schema：%s" % item)
+    if str(record["assembly"].get("pipeline")) != PIPELINE:
+        issues.append("pipeline 必须 %s" % PIPELINE)
+    return issues
+
+
+def _plan_step_ids(record: Dict[str, Any]) -> List[str]:
+    """assembly 计划的步骤 id 序列。"""
+    return [str(s.get("id")) for s in (record.get("assembly") or {}).get("steps") or []]
+
+
+def _missing_trace_issues(trace_ids: List[str]) -> List[str]:
+    """delivered 记录缺哪些必备步骤。"""
+    issues: List[str] = []
+    for need in ("spec", "task", "context", "adapter", "output", "gate", "export"):
+        if need not in trace_ids:
+            issues.append("delivered 记录缺步骤：%s" % need)
+    return issues
+
+
+def _trace_alignment_issues(record: Dict[str, Any],
+                            run_doc: Dict[str, Any]) -> List[str]:
+    """计划步骤序列必须与执行轨迹对齐（S01…S0N 连续、不重排/不删段）。"""
+    issues: List[str] = []
+    trace_ids = [str(s.get("id")) for s in run_doc.get("steps") or []]
+    plan_ids = _plan_step_ids(record)
+    expected = ["S%02d" % (i + 1) for i in range(len(trace_ids))]
+    if plan_ids != expected:
+        issues.append("assembly.steps 与执行轨迹不对齐（期望 %s，实际 %s）"
+                      % (expected, plan_ids))
+    issues.extend(_missing_trace_issues(trace_ids))
+    if not all(c.get("ok") for c in run_doc.get("checks") or []):
+        issues.append("delivered 但 checks 有红项")
+    return issues
+
+
+def _delivered_output_issues(run_doc: Dict[str, Any]) -> List[str]:
+    """delivered 记录里 output.digest 必须是 64 位 sha256。"""
+    out = run_doc.get("output") or {}
+    if len(str(out.get("digest") or "")) != 64:
+        return ["output.digest 必须是 64 位 sha256"]
+    return []
 
 
 def validate_record(record: Dict[str, Any], root: str = ".") -> List[str]:
@@ -160,31 +233,13 @@ def validate_record(record: Dict[str, Any], root: str = ".") -> List[str]:
     if not str(record.get("assembly")):
         issues.append("缺 assembly 计划")
         return issues
-    schema = json.loads((Path(root) / ASSEMBLY_SCHEMA_REL).read_text(encoding="utf-8"))
-    for item in json_schema.json_schema_check(record["assembly"], schema)[:3]:
-        issues.append("assembly schema：%s" % item)
-    if str(record["assembly"].get("pipeline")) != PIPELINE:
-        issues.append("pipeline 必须 %s" % PIPELINE)
+    issues.extend(_assembly_schema_issues(record, root))
     run_doc = record.get("run") or {}
     if str(run_doc.get("status")) not in ("delivered", "blocked"):
         issues.append("run.status 非法")
     if run_doc.get("status") == "delivered":
-        trace_ids = [str(s.get("id")) for s in run_doc.get("steps") or []]
-        # 计划的步骤序列必须与执行轨迹对齐（S01…S0N 连续、不重排/不删段）：
-        # 删除/重排计划步骤会让「计划 vs 执行」不一致，必须可检出（WP-51 删除矩阵）。
-        plan_ids = [str(s.get("id")) for s in (record.get("assembly") or {}).get("steps") or []]
-        expected = ["S%02d" % (i + 1) for i in range(len(trace_ids))]
-        if plan_ids != expected:
-            issues.append("assembly.steps 与执行轨迹不对齐（期望 %s，实际 %s）"
-                          % (expected, plan_ids))
-        for need in ("spec", "task", "context", "adapter", "output", "gate", "export"):
-            if need not in trace_ids:
-                issues.append("delivered 记录缺步骤：%s" % need)
-        if not all(c.get("ok") for c in run_doc.get("checks") or []):
-            issues.append("delivered 但 checks 有红项")
-        out = run_doc.get("output") or {}
-        if len(str(out.get("digest") or "")) != 64:
-            issues.append("output.digest 必须是 64 位 sha256")
+        issues.extend(_trace_alignment_issues(record, run_doc))
+        issues.extend(_delivered_output_issues(run_doc))
     if run_doc.get("status") == "blocked" and "error" not in run_doc:
         issues.append("blocked 必须写 error")
     return issues

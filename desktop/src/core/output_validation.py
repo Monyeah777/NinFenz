@@ -66,16 +66,28 @@ def _form_issues(form: str, content: str) -> List[Dict[str, str]]:
                            "message": "JSON 不可解析：%s" % exc,
                            "fix": GUIDE + "输出 kind=json 必须是合法 JSON"})
     else:
-        if form == "md" and not any(line.startswith("#") for line in content.splitlines()):
-            issues.append({"code": "FORM-MD-NO-HEADING",
-                           "message": "Markdown 缺标题（#）",
-                           "fix": GUIDE + "md 输出必须有标题结构"})
-        for line_no, line in enumerate(content.splitlines(), 1):
-            if len(line) > 400:
-                issues.append({"code": "FORM-LINE-TOO-LONG",
-                               "message": "第 %d 行 >400 字符" % line_no,
-                               "fix": GUIDE + "拆行（行宽影响可 diff）"})
-                break
+        issues += _text_form_issues(form, content)
+    issues += _content_form_issues(content)
+    return issues
+
+
+def _text_form_issues(form: str, content: str) -> List[Dict[str, str]]:
+    issues: List[Dict[str, str]] = []
+    if form == "md" and not any(line.startswith("#") for line in content.splitlines()):
+        issues.append({"code": "FORM-MD-NO-HEADING",
+                       "message": "Markdown 缺标题（#）",
+                       "fix": GUIDE + "md 输出必须有标题结构"})
+    for line_no, line in enumerate(content.splitlines(), 1):
+        if len(line) > 400:
+            issues.append({"code": "FORM-LINE-TOO-LONG",
+                           "message": "第 %d 行 >400 字符" % line_no,
+                           "fix": GUIDE + "拆行（行宽影响可 diff）"})
+            break
+    return issues
+
+
+def _content_form_issues(content: str) -> List[Dict[str, str]]:
+    issues: List[Dict[str, str]] = []
     for word in PLACEHOLDERS:
         if word in content:
             issues.append({"code": "FORM-PLACEHOLDER",
@@ -109,39 +121,63 @@ def _contract(task: Dict[str, Any], out: Dict[str, Any], content: str) -> Dict[s
 def validate(out: Dict[str, Any], task: Dict[str, Any],
              pack: Optional[Dict[str, Any]] = None, root: str = ".") -> Dict[str, Any]:
     """独立校验产物 → `nf-output-report/1`（不抛；accept() 才拒收）。"""
-    from core import json_schema
     issues: List[Dict[str, str]] = []
     content = str(((out.get("output") or {}).get("content")) or "")
     kind = str((out.get("output") or {}).get("kind") or "md")
     form = _form_of(kind)
     # 1) adapter 契约（citations/budget/kind/slot/tokens）
-    for item in aa.validate_output(out, task, pack):
-        issues.append({"code": "ADAPTER-CONTRACT", "message": item,
-                       "fix": GUIDE + "按 nf-adapter-output/1 修"})
+    issues += _adapter_issues(out, task, pack)
     # 2) contract（nf-contract/1 schema）
     contract = _contract(task, out, content)
-    schema = json.loads((Path(root) / CONTRACT_SCHEMA_REL).read_text(encoding="utf-8"))
-    for item in json_schema.json_schema_check(contract, schema)[:3]:
-        issues.append({"code": "CONTRACT-INVALID", "message": "contract schema：%s" % item,
-                       "fix": GUIDE + "修 nf-contract/1 字段"})
+    issues += _contract_issues(contract, root)
     # 3) output form
     issues += _form_issues(form, content)
     # 4) metrics
-    citations = [str(c) for c in out.get("citations") or []]
-    allowed = {str((c or {}).get("id")) for c in task.get("context_refs") or []}
-    if pack:
-        allowed = {str(e.get("id")) for e in pack.get("entries") or []}
-    cited_ok = sum(1 for c in citations if c in allowed)
-    rate = (cited_ok / len(citations)) if citations else 0.0
-    metrics = {"form": form, "tier": _tier(form), "chars": len(content),
-               "tokens": int((out.get("usage") or {}).get("tokens") or 0),
-               "citations": len(citations), "citation_rate": round(rate, 4),
-               "control_chars": len(_control_chars(content)),
-               "violations": len(issues)}
+    metrics = _metrics(out, task, pack, form, content, issues)
     report = {"schema": REPORT_SCHEMA, "ok": not issues, "form": form, "tier": _tier(form),
               "digest": _sha(content), "contract": contract, "issues": issues,
               "metrics": metrics}
     return report
+
+
+def _adapter_issues(out: Dict[str, Any], task: Dict[str, Any],
+                    pack: Optional[Dict[str, Any]]) -> List[Dict[str, str]]:
+    """adapter 契约问题（citations/budget/kind/slot/tokens）。"""
+    return [{"code": "ADAPTER-CONTRACT", "message": item,
+             "fix": GUIDE + "按 nf-adapter-output/1 修"}
+            for item in aa.validate_output(out, task, pack)]
+
+
+def _contract_issues(contract: Dict[str, Any], root: str) -> List[Dict[str, str]]:
+    """nf-contract/1 schema 校验问题（最多 3 条，与逐条口径一致）。"""
+    from core import json_schema
+    schema = json.loads((Path(root) / CONTRACT_SCHEMA_REL).read_text(encoding="utf-8"))
+    return [{"code": "CONTRACT-INVALID", "message": "contract schema：%s" % item,
+             "fix": GUIDE + "修 nf-contract/1 字段"}
+            for item in json_schema.json_schema_check(contract, schema)[:3]]
+
+
+def _allowed_ids(task: Dict[str, Any],
+                 pack: Optional[Dict[str, Any]]) -> set:
+    """可引用 id 集合：pack 在场时以 pack 为准（原口径）。"""
+    allowed = {str((c or {}).get("id")) for c in task.get("context_refs") or []}
+    if pack:
+        allowed = {str(e.get("id")) for e in pack.get("entries") or []}
+    return allowed
+
+
+def _metrics(out: Dict[str, Any], task: Dict[str, Any], pack: Optional[Dict[str, Any]],
+             form: str, content: str, issues: List[Dict[str, str]]) -> Dict[str, Any]:
+    """指标段（引用率/长度/控制字符/违规数）。"""
+    citations = [str(c) for c in out.get("citations") or []]
+    allowed = _allowed_ids(task, pack)
+    cited_ok = sum(1 for c in citations if c in allowed)
+    rate = (cited_ok / len(citations)) if citations else 0.0
+    return {"form": form, "tier": _tier(form), "chars": len(content),
+            "tokens": int((out.get("usage") or {}).get("tokens") or 0),
+            "citations": len(citations), "citation_rate": round(rate, 4),
+            "control_chars": len(_control_chars(content)),
+            "violations": len(issues)}
 
 
 def accept(out: Dict[str, Any], task: Dict[str, Any],

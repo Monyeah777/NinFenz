@@ -91,6 +91,34 @@ def load_methods(root: str) -> dict[str, Any]:
     return doc
 
 
+def _method_field_issues(m: dict, label: Any) -> list[str]:
+    """方法必填字段（title/when/output/falsifier）逐项非空。"""
+    issues: list[str] = []
+    for field in ("title", "when", "output", "falsifier"):
+        if not str(m.get(field) or "").strip():
+            issues.append(f"方法 {label} 缺 {field}（" + GUIDE + "补齐，缺了就不可证）")
+    return issues
+
+
+def _method_issues(m: Any, i: int, seen: set[str]) -> list[str]:
+    """单条方法：id 唯一 / steps≥2 / title·when·output·falsifier 必填。"""
+    issues: list[str] = []
+    if not isinstance(m, dict):
+        return [f"第 {i} 条方法不是对象（" + GUIDE + "改写成对象）"]
+    mid = str(m.get("id") or "").strip()
+    if not mid:
+        issues.append(f"第 {i} 条方法缺 id（" + GUIDE + "给唯一 id（M1…））")
+    elif mid in seen:
+        issues.append(f"方法 id 重复：{mid}（" + GUIDE + "改成唯一 id）")
+    else:
+        seen.add(mid)
+    steps = m.get("steps")
+    if not isinstance(steps, list) or len(steps) < 2:
+        issues.append(f"方法 {mid or i} 的 steps 至少两步（" + GUIDE + "写清怎么走）")
+    issues.extend(_method_field_issues(m, mid or i))
+    return issues
+
+
 def validate_methods(doc: Any) -> list[str]:
     """方法论库形状校验（判据面：id 唯一 / steps 非空 / output 与 falsifier 必填）。"""
     issues: list[str] = []
@@ -101,22 +129,7 @@ def validate_methods(doc: Any) -> list[str]:
         return ["方法论库缺 methods（" + GUIDE + "至少一条方法）"]
     seen: set[str] = set()
     for i, m in enumerate(methods, 1):
-        if not isinstance(m, dict):
-            issues.append(f"第 {i} 条方法不是对象（" + GUIDE + "改写成对象）")
-            continue
-        mid = str(m.get("id") or "").strip()
-        if not mid:
-            issues.append(f"第 {i} 条方法缺 id（" + GUIDE + "给唯一 id（M1…））")
-        elif mid in seen:
-            issues.append(f"方法 id 重复：{mid}（" + GUIDE + "改成唯一 id）")
-        else:
-            seen.add(mid)
-        steps = m.get("steps")
-        if not isinstance(steps, list) or len(steps) < 2:
-            issues.append(f"方法 {mid or i} 的 steps 至少两步（" + GUIDE + "写清怎么走）")
-        for field in ("title", "when", "output", "falsifier"):
-            if not str(m.get(field) or "").strip():
-                issues.append(f"方法 {mid or i} 缺 {field}（" + GUIDE + "补齐，缺了就不可证）")
+        issues.extend(_method_issues(m, i, seen))
     return issues
 
 
@@ -141,6 +154,66 @@ def _expand(template: str, topic: str, topic_en: str, key: str) -> str:
                     .replace("{topic}", topic))
 
 
+def _picked_methods(methods: list[str] | None, known: dict[str, Any]) -> list[str]:
+    """本次要用的方法 id 序列；出现未知 id 即拒（消息含可用 id）。"""
+    picked = methods if methods is not None else list(_METHOD_ORDER)
+    unknown = [m for m in picked if m not in known]
+    if unknown:
+        raise ValueError("未知方法 id：" + ", ".join(unknown) + "（" + GUIDE +
+                         "可用 " + ", ".join(sorted(known)) + "）")
+    return picked
+
+
+def _build_slices(topic: str, topic_en: str, key: str, picked: list[str],
+                  depth: int) -> list[dict[str, Any]]:
+    """按 depth 取切片面，逐片展开检索词/方法论/证据与证伪条件。"""
+    # 纯 CJK 主题没有可靠英文译法：英文检索词标记为「需人补」，不编造译名
+    en_is_derived = any(ord(ch) < 128 and ch.isalnum() for ch in topic)
+    slices: list[dict[str, Any]] = []
+    for sl in SLICES[:_DEPTH_N[depth]]:
+        use = [m for m in sl["methods"] if m in picked]
+        if not use:
+            continue
+        slices.append({
+            "id": sl["id"], "title": sl["title"],
+            "question": _expand(sl["q"], topic, topic_en, key),
+            "terms": {"zh": [_expand(t, topic, topic_en, key) for t in sl["terms_zh"]],
+                      "en": [_expand(t, topic, topic_en, key) for t in sl["terms_en"]],
+                      "ops": [_expand(t, topic, topic_en, key) for t in sl["ops"]],
+                      "en_needs_human": not en_is_derived},
+            "methods": use,
+            "evidence_owed": list(sl["evidence"]),
+            "falsifier": _expand(sl["falsifier"], topic, topic_en, key),
+        })
+    return slices
+
+
+def _build_paths(picked: list[str], slices: list[dict[str, Any]],
+                 known: dict[str, Any]) -> list[dict[str, Any]]:
+    """方法论路径：按固定顺序取「本次选中且在切片里出现」的方法，逐条展开。"""
+    paths: list[dict[str, Any]] = []
+    for order, mid in enumerate([m for m in _METHOD_ORDER if m in picked
+                                 and any(m in s["methods"] for s in slices)], 1):
+        m = known[mid]
+        paths.append({"order": order, "method": mid, "title": str(m["title"]),
+                      "when": str(m["when"]),
+                      "steps": list(m["steps"]), "output": str(m["output"]),
+                      "falsifier": str(m["falsifier"])})
+    return paths
+
+
+def _domain_block(root: str, pack_ids: list[str] | None) -> dict[str, Any] | None:
+    """域包组合面的只读投影（未给 pack_ids → None）。"""
+    if not pack_ids:
+        return None
+    from core import method_pack as mp
+    composed = mp.compose([mp.load_pack(root, pid) for pid in pack_ids])
+    return {"packs": composed["packs"],
+            "expert_moves": composed["expert_moves"],
+            "evidence_standards": composed["evidence_standards"],
+            "common_failures": composed["common_failures"]}
+
+
 def plan(topic: str, depth: int = 2, methods: list[str] | None = None,
          root: str = ".", pack_ids: list[str] | None = None) -> dict[str, Any]:
     """主题 → 研究计划（切片 + 检索词 + 方法论路径 + 证据台账）。纯函数、确定性。"""
@@ -151,50 +224,14 @@ def plan(topic: str, depth: int = 2, methods: list[str] | None = None,
         raise ValueError(f"depth 只接受 {DEPTHS}（" + GUIDE + "1=快扫3片 / 2=标准5片 / 3=全7片）")
     lib = load_methods(root)
     known = {str(m["id"]): m for m in lib["methods"]}
-    picked_methods = methods if methods is not None else list(_METHOD_ORDER)
-    unknown = [m for m in picked_methods if m not in known]
-    if unknown:
-        raise ValueError("未知方法 id：" + ", ".join(unknown) + "（" + GUIDE +
-                         "可用 " + ", ".join(sorted(known)) + "）")
+    picked_methods = _picked_methods(methods, known)
     topic_en = _topic_en(text)
-    # 纯 CJK 主题没有可靠英文译法：英文检索词标记为「需人补」，不编造译名
-    en_is_derived = any(ord(ch) < 128 and ch.isalnum() for ch in text)
     key = _topic_key(text)
-    chosen = SLICES[:_DEPTH_N[depth]]
-    slices: list[dict[str, Any]] = []
-    for sl in chosen:
-        use = [m for m in sl["methods"] if m in picked_methods]
-        if not use:
-            continue
-        slices.append({
-            "id": sl["id"], "title": sl["title"],
-            "question": _expand(sl["q"], text, topic_en, key),
-            "terms": {"zh": [_expand(t, text, topic_en, key) for t in sl["terms_zh"]],
-                      "en": [_expand(t, text, topic_en, key) for t in sl["terms_en"]],
-                      "ops": [_expand(t, text, topic_en, key) for t in sl["ops"]],
-                      "en_needs_human": not en_is_derived},
-            "methods": use,
-            "evidence_owed": list(sl["evidence"]),
-            "falsifier": _expand(sl["falsifier"], text, topic_en, key),
-        })
+    slices = _build_slices(text, topic_en, key, picked_methods, depth)
     if not slices:
         raise ValueError("方法过滤后没有可执行的切片（" + GUIDE + "至少保留一个切片所需的方法）")
-    paths = []
-    for order, mid in enumerate([m for m in _METHOD_ORDER if m in picked_methods
-                                 and any(m in s["methods"] for s in slices)], 1):
-        m = known[mid]
-        paths.append({"order": order, "method": mid, "title": str(m["title"]),
-                      "when": str(m["when"]),
-                      "steps": list(m["steps"]), "output": str(m["output"]),
-                      "falsifier": str(m["falsifier"])})
-    domain = None
-    if pack_ids:
-        from core import method_pack as mp
-        composed = mp.compose([mp.load_pack(root, pid) for pid in pack_ids])
-        domain = {"packs": composed["packs"],
-                  "expert_moves": composed["expert_moves"],
-                  "evidence_standards": composed["evidence_standards"],
-                  "common_failures": composed["common_failures"]}
+    paths = _build_paths(picked_methods, slices, known)
+    domain = _domain_block(root, pack_ids)
     return {"schema": SCHEMA, "topic": text, "depth": depth,
             "topic_en": topic_en, "topic_key": key,
             "domain": domain,

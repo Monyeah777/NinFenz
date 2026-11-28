@@ -84,32 +84,27 @@ def _perm_issues(rel: str, text: str) -> List[str]:
     return out
 
 
-def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """→ (issues, warns, stats)：未钉 SHA / 缺显式 permissions = FAIL；缺版本注释 = WARN。"""
-    issues: List[str] = []
-    warns: List[str] = []
-    files = workflows(root)
+def _workflow_file_issues(root: str, rel: str):
+    text = (Path(root) / rel).read_text(encoding="utf-8", errors="replace")
+    issues = _pin_issues(rel, text)
+    issues += _perm_issues(rel, text)
+    issues += _timeout_issues(rel, text)
     pinned = 0
-    for rel in files:
-        text = (Path(root) / rel).read_text(encoding="utf-8", errors="replace")
-        issues += _pin_issues(rel, text)
-        issues += _perm_issues(rel, text)
-        issues += _timeout_issues(rel, text)
-        for line in text.splitlines():
-            m = USES_RE.match(line)
-            if m and SHA_RE.match(m.group(1).rpartition("@")[2].rstrip(",")):
-                pinned += 1
-                if "#" not in m.group(2):
-                    warns.append("%s 钉了 SHA 但没写版本注释（修复指引：行尾补 `# v4` 一类注释，"
-                                 "便于依赖更新）" % rel)
-    stats = {"workflows": len(files), "pinned_uses": pinned,
-             "with_explicit_permissions": sum(
-                 1 for rel in files
-                 if re.search(r"^permissions:\s*|^\s+permissions:\s*",
-                              (Path(root) / rel).read_text(encoding="utf-8", errors="replace"),
-                              re.M))}
-    reqs = sorted((Path(root) / ".github").glob("requirements-*.txt")) \
-        if (Path(root) / ".github").is_dir() else []
+    warns: List[str] = []
+    for line in text.splitlines():
+        m = USES_RE.match(line)
+        if m and SHA_RE.match(m.group(1).rpartition("@")[2].rstrip(",")):
+            pinned += 1
+            if "#" not in m.group(2):
+                warns.append("%s 钉了 SHA 但没写版本注释（修复指引：行尾补 `# v4` 一类注释，"
+                             "便于依赖更新）" % rel)
+    return issues, pinned, warns
+
+
+def _requirements_issues(root: str):
+    issues: List[str] = []
+    github = Path(root) / ".github"
+    reqs = sorted(github.glob("requirements-*.txt")) if github.is_dir() else []
     for p in reqs:
         for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
             t = line.strip()
@@ -119,5 +114,27 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
                 issues.append("%s:%d 依赖未钉版本：%s（修复指引：改 `包==版本`——FAIR4RS R 面"
                               "要求依赖可重建，见 DOI 10.5281/zenodo.6374314 / Scorecard "
                               "§Pinned-Dependencies）" % (p.name, i, t[:60]))
+    return issues, reqs
+
+
+def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
+    """→ (issues, warns, stats)：未钉 SHA / 缺显式 permissions = FAIL；缺版本注释 = WARN。"""
+    issues: List[str] = []
+    warns: List[str] = []
+    files = workflows(root)
+    pinned = 0
+    for rel in files:
+        file_issues, file_pinned, file_warns = _workflow_file_issues(root, rel)
+        issues += file_issues
+        pinned += file_pinned
+        warns += file_warns
+    stats = {"workflows": len(files), "pinned_uses": pinned,
+             "with_explicit_permissions": sum(
+                 1 for rel in files
+                 if re.search(r"^permissions:\s*|^\s+permissions:\s*",
+                              (Path(root) / rel).read_text(encoding="utf-8", errors="replace"),
+                              re.M))}
+    req_issues, reqs = _requirements_issues(root)
+    issues += req_issues
     stats["requirements_files"] = len(reqs)
     return issues, warns, stats

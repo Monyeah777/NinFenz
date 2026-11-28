@@ -74,48 +74,73 @@ def render(doc: Dict[str, Any]) -> bytes:
             + "\n").encode("utf-8")
 
 
+def _link_issues(link: Dict[str, Any], i: int, prev: str, entry: Any) -> List[str]:
+    issues: List[str] = []
+    if link["index"] != i:
+        issues.append("链节序号断裂：期望 %d 实得 %s" % (i, link["index"]))
+    if link["prev"] != prev:
+        issues.append("链节 %d 的 prev 与上一节 chain 不一致（修复指引：链被改过——"
+                      "append-only 顺序不成立）" % i)
+    want = _h(NODE_PREFIX, prev.encode("ascii"), link["leaf"].encode("ascii"))
+    if link["chain"] != want:
+        issues.append("链节 %d 哈希不匹配（修复指引：链节内容与推导式不符）" % i)
+    if link["path"] != str(entry.get("path")):
+        issues.append("链节 %d 与回执第 %d 条路径不一致" % (i, i))
+    if link["digest"] != str(entry.get("digest")):
+        issues.append("链节 %d 与回执第 %d 条摘要不一致（修复指引：回执改了就重写链）"
+                      % (i, i))
+    return issues
+
+
+def _chain_issues(doc: Dict[str, Any], entries: List[Any]) -> List[str]:
+    issues: List[str] = []
+    prev = "0" * 64
+    for i, link in enumerate(doc["links"], 1):
+        issues += _link_issues(link, i, prev, entries[i - 1])
+        prev = link["chain"]
+    if doc["head"] != prev:
+        issues.append("链头与末节不一致（修复指引：head 须等于末节 chain）")
+    return issues
+
+
+def _boundary_issues(doc: Dict[str, Any]) -> List[str]:
+    boundary = str(doc.get("boundary") or "")
+    if "不可抵赖" not in boundary or "不提供" not in boundary:
+        return ["缺「不可抵赖不提供」的边界声明（修复指引：链条可证顺序与防删改，"
+                "不可抵赖需第三方见证——不得夸大）"]
+    return []
+
+
+def _disk_issues(root: str, doc: Dict[str, Any]) -> List[str]:
+    disk = os.path.join(root, GENERATED_REL)
+    if not os.path.isfile(disk):
+        return []
+    with open(disk, "rb") as fh:
+        if fh.read() != render(doc):
+            return ["%s 过期：与实时重算不一致"
+                    "（修复指引：nf transparency --write）" % GENERATED_REL]
+    return []
+
+
 def verify(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     """门禁：链自洽 + 与回执一致 + 边界声明在场 + 在盘生成物 == 实时重算。"""
-    issues: List[str] = []
     if not os.path.isfile(os.path.join(root, RECEIPTS_REL)):
         return ["缺 %s（修复指引：先跑 nf receipts --scope protocol --write）"
                 % RECEIPTS_REL], {}
     doc = build(root)
-    rec: Dict[str, Any] = {}
-    rec = json_doc.load(os.path.join(root, RECEIPTS_REL), dict, what=RECEIPTS_REL)
+    rec: Dict[str, Any] = json_doc.load(os.path.join(root, RECEIPTS_REL), dict,
+                                        what=RECEIPTS_REL)
     entries = rec.get("entries") or []
+    issues: List[str] = []
     if doc["count"] != len(entries):
         issues.append("链节数 %d ≠ 回执条目数 %d（修复指引：链须逐条对应回执）"
                       % (doc["count"], len(entries)))
-    prev = "0" * 64
-    for i, link in enumerate(doc["links"], 1):
-        if link["index"] != i:
-            issues.append("链节序号断裂：期望 %d 实得 %s" % (i, link["index"]))
-        if link["prev"] != prev:
-            issues.append("链节 %d 的 prev 与上一节 chain 不一致（修复指引：链被改过——"
-                          "append-only 顺序不成立）" % i)
-        want = _h(NODE_PREFIX, prev.encode("ascii"), link["leaf"].encode("ascii"))
-        if link["chain"] != want:
-            issues.append("链节 %d 哈希不匹配（修复指引：链节内容与推导式不符）" % i)
-        if link["path"] != str(entries[i - 1].get("path")):
-            issues.append("链节 %d 与回执第 %d 条路径不一致" % (i, i))
-        if link["digest"] != str(entries[i - 1].get("digest")):
-            issues.append("链节 %d 与回执第 %d 条摘要不一致（修复指引：回执改了就重写链）"
-                          % (i, i))
-        prev = link["chain"]
-    if doc["head"] != prev:
-        issues.append("链头与末节不一致（修复指引：head 须等于末节 chain）")
-    if "不可抵赖" not in str(doc.get("boundary") or "") or "不提供" not in str(doc.get("boundary")):
-        issues.append("缺「不可抵赖不提供」的边界声明（修复指引：链条可证顺序与防删改，"
-                      "不可抵赖需第三方见证——不得夸大）")
-    disk = os.path.join(root, GENERATED_REL)
-    if os.path.isfile(disk):
-        with open(disk, "rb") as fh:
-            if fh.read() != render(doc):
-                issues.append("%s 过期：与实时重算不一致"
-                              "（修复指引：nf transparency --write）" % GENERATED_REL)
+    issues += _chain_issues(doc, entries)
+    issues += _boundary_issues(doc)
+    issues += _disk_issues(root, doc)
     stats = {"links": doc["count"], "head": doc["head"][:16],
-             "on_disk": os.path.isfile(disk), "issues": len(issues)}
+             "on_disk": os.path.isfile(os.path.join(root, GENERATED_REL)),
+             "issues": len(issues)}
     return issues, stats
 
 

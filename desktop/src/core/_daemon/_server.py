@@ -11,7 +11,7 @@ import socket
 import sys
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from ._cache import reset_response_cache, set_watcher
 from ._const import BIND_HOST, HANDSHAKE_TIMEOUT, PROTO
@@ -81,17 +81,7 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
     # 但有些命令的人读面默认带墙钟耗时，而两条路径的耗时必然不同 ⇒ 值必然分叉。
     # 故守护侧统一声明「不要不确定性面」，各命令按此关闭耗时字段（当前是 nf verify）。
     os.environ["NF_VERIFY_QUIET_TIME"] = "1"
-    watcher = None
-    if watch:
-        from core import watch as _watch
-        watcher = _watch.DirWatcher(root)
-        if watcher.start():
-            set_watcher(watcher)
-        else:
-            set_watcher(None)
-            watcher = None
-            print("目录监听不可用（平台未实现或打开失败）→ 不启用响应缓存，"
-                  "行为与常规守护一致", file=sys.stderr)
+    watcher = _setup_watch(root, watch)
     token = secrets.token_hex(32)
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     _configure_server_socket(srv)
@@ -103,6 +93,25 @@ def serve_forever(root: Path, idle_timeout: float = 0.0, ready: Optional[Any] = 
     if ready is not None:
         ready(port)
     srv.settimeout(1.0)
+    return _serve_loop(srv, token, root, idle_timeout, watcher)
+
+
+def _setup_watch(root, watch):
+    watcher = None
+    if watch:
+        from core import watch as _watch
+        watcher = _watch.DirWatcher(root)
+        if watcher.start():
+            set_watcher(watcher)
+        else:
+            set_watcher(None)
+            watcher = None
+            print("目录监听不可用（平台未实现或打开失败）→ 不启用响应缓存，"
+                  "行为与常规守护一致", file=sys.stderr)
+    return watcher
+
+
+def _serve_loop(srv, token, root, idle_timeout, watcher):
     last = time.time()
     try:
         while True:

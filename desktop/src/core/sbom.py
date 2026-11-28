@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List
 
 SCHEMA = "nf-sbom/1"
 GUIDE = "修复指引："
@@ -65,29 +65,38 @@ def collect(root: str | Path = ".") -> dict[str, Any]:
             "note": "只覆盖显式范围；不是全仓清单"}
 
 
+def _material_issues(base: Path, row: Any) -> List[str]:
+    rel = str(row.get("path") or "")
+    if not rel:
+        return ["有条目缺 path"]
+    path = base / rel
+    if not path.is_file():
+        return ["材料不在场：" + rel + "（" + GUIDE + "删掉该条或恢复文件）"]
+    actual = hashlib.sha256(path.read_bytes()).hexdigest()
+    if actual != str(row.get("sha256") or ""):
+        return ["材料摘要不符：" + rel + "（" + GUIDE + "重新生成清单）"]
+    return []
+
+
+def _manifest_tail_issues(manifest: Dict[str, Any], rows: List[Any]) -> List[str]:
+    issues: List[str] = []
+    if int(manifest.get("count") or -1) != len(rows):
+        issues.append("count 与条目数不符（" + GUIDE + "手改过清单）")
+    if str(manifest.get("digest") or "") != _digest(rows):
+        issues.append("折叠摘要不可复算（" + GUIDE + "手改过清单）")
+    return issues
+
+
 def verify(manifest: Any, root: str | Path = ".") -> list[str]:
     """核对材料清单：结构、逐条文件与摘要、总数与折叠摘要。"""
-    issues: list[str] = []
     if not isinstance(manifest, dict) or str(manifest.get("schema")) != SCHEMA:
         return ["材料清单 schema 不符（" + GUIDE + "需要 " + SCHEMA + "）"]
     rows = manifest.get("materials")
     if not isinstance(rows, list) or not rows:
         return ["材料清单为空（" + GUIDE + "用 collect 重新生成）"]
     base = Path(root)
+    issues: list[str] = []
     for row in rows:
-        rel = str(row.get("path") or "")
-        if not rel:
-            issues.append("有条目缺 path")
-            continue
-        path = base / rel
-        if not path.is_file():
-            issues.append("材料不在场：" + rel + "（" + GUIDE + "删掉该条或恢复文件）")
-            continue
-        actual = hashlib.sha256(path.read_bytes()).hexdigest()
-        if actual != str(row.get("sha256") or ""):
-            issues.append("材料摘要不符：" + rel + "（" + GUIDE + "重新生成清单）")
-    if int(manifest.get("count") or -1) != len(rows):
-        issues.append("count 与条目数不符（" + GUIDE + "手改过清单）")
-    if str(manifest.get("digest") or "") != _digest(rows):
-        issues.append("折叠摘要不可复算（" + GUIDE + "手改过清单）")
+        issues += _material_issues(base, row)
+    issues += _manifest_tail_issues(manifest, rows)
     return issues

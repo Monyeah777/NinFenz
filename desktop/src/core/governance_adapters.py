@@ -67,6 +67,23 @@ def detect(root: str = ".") -> Dict[str, Dict[str, Any]]:
     return out
 
 
+def _needs(reg: Dict[str, Any], level: str) -> List[str]:
+    """某等级声明的适配器需求表（缺 → 空表）。"""
+    return (reg.get("level_requirements") or {}).get(str(level)) or []
+
+
+def _achievable_level(reg: Dict[str, Any], live: Dict[str, Dict[str, Any]]) -> str:
+    """现测可达的最高等级（逐级须全 available，遇缺即停）。"""
+    achievable = "T0"
+    for level in LEVELS:
+        level_needs = _needs(reg, level)
+        if all(live.get(aid, {}).get("live") == "available" for aid in level_needs):
+            achievable = level
+        else:
+            break
+    return achievable
+
+
 def verify_plan(required_level: str, root: str = ".") -> Dict[str, Any]:
     """给定 required 等级 → 需要哪些适配器、缺什么、可达最高等级。
 
@@ -76,22 +93,54 @@ def verify_plan(required_level: str, root: str = ".") -> Dict[str, Any]:
     if str(required_level) not in LEVELS:
         raise AdapterError("未知 required_level：%r（修复指引：T0…T4）" % required_level,
                            code="LEVEL-UNKNOWN")
-    needs = (reg.get("level_requirements") or {}).get(str(required_level)) or []
+    needs = _needs(reg, required_level)
     live = detect(root)
     missing = [aid for aid in needs if live.get(aid, {}).get("live") != "available"]
-    achievable = "T0"
-    for level in LEVELS:
-        level_needs = (reg.get("level_requirements") or {}).get(level) or []
-        if all(live.get(aid, {}).get("live") == "available" for aid in level_needs):
-            achievable = level
-        else:
-            break
+    achievable = _achievable_level(reg, live)
     ok = not missing
     return {"schema": "nf-gov-plan/1", "required_level": str(required_level),
             "needs": list(needs), "missing": missing,
             "achievable": achievable, "ok": ok, "degraded": not ok,
             "exit_code": 0 if ok else 2,
             "note": "缺适配器=不可判定（exit 2），不降级冒充更高等级" if not ok else "所需适配器在场"}
+
+
+def _blocked_issues(adapter: Dict[str, Any], aid: str) -> List[str]:
+    """blocked 适配器必须写理由与降级策略。"""
+    issues: List[str] = []
+    if not str(adapter.get("blocked_reason") or "").strip():
+        issues.append("%s blocked 但缺理由（修复指引：写清缺什么工具/为何不可用）" % aid)
+    if not str(adapter.get("degrade") or "").strip():
+        issues.append("%s blocked 但缺降级策略（修复指引：写清最高可报等级）" % aid)
+    return issues
+
+
+def _adapter_row_issues(root: str, adapter: Dict[str, Any]) -> List[str]:
+    """单适配器：kind/availability 词表 + local_impl 在场 + blocked 义务。"""
+    aid = str(adapter.get("id"))
+    issues: List[str] = []
+    if str(adapter.get("kind")) not in KINDS:
+        issues.append("%s kind 非法：%s" % (aid, adapter.get("kind")))
+    if str(adapter.get("availability")) not in AVAILABILITY:
+        issues.append("%s availability 非法" % aid)
+    impl = str(adapter.get("local_impl") or "")
+    if impl and not (Path(root) / impl).is_file():
+        issues.append("%s local_impl 不在场：%s" % (aid, impl))
+    if str(adapter.get("availability")) == "blocked":
+        issues.extend(_blocked_issues(adapter, aid))
+    return issues
+
+
+def _level_issues(levels: Dict[str, Any], ids: List[str]) -> List[str]:
+    """等级映射：四等级齐备且只引用已登记适配器。"""
+    issues: List[str] = []
+    for level in LEVELS:
+        if level not in levels:
+            issues.append("level_requirements 缺 %s" % level)
+        for aid in levels.get(level) or []:
+            if aid not in ids:
+                issues.append("level_requirements[%s] 引用未登记适配器：%s" % (level, aid))
+    return issues
 
 
 def check(root: str = ".") -> List[str]:
@@ -105,26 +154,8 @@ def check(root: str = ".") -> List[str]:
     if len(ids) != len(set(ids)):
         issues.append("适配器 id 重复")
     for adapter in adapters:
-        aid = str(adapter.get("id"))
-        if str(adapter.get("kind")) not in KINDS:
-            issues.append("%s kind 非法：%s" % (aid, adapter.get("kind")))
-        if str(adapter.get("availability")) not in AVAILABILITY:
-            issues.append("%s availability 非法" % aid)
-        impl = str(adapter.get("local_impl") or "")
-        if impl and not (Path(root) / impl).is_file():
-            issues.append("%s local_impl 不在场：%s" % (aid, impl))
-        if str(adapter.get("availability")) == "blocked":
-            if not str(adapter.get("blocked_reason") or "").strip():
-                issues.append("%s blocked 但缺理由（修复指引：写清缺什么工具/为何不可用）" % aid)
-            if not str(adapter.get("degrade") or "").strip():
-                issues.append("%s blocked 但缺降级策略（修复指引：写清最高可报等级）" % aid)
-    levels = reg.get("level_requirements") or {}
-    for level in LEVELS:
-        if level not in levels:
-            issues.append("level_requirements 缺 %s" % level)
-        for aid in levels.get(level) or []:
-            if aid not in ids:
-                issues.append("level_requirements[%s] 引用未登记适配器：%s" % (level, aid))
+        issues.extend(_adapter_row_issues(root, adapter))
+    issues.extend(_level_issues(reg.get("level_requirements") or {}, ids))
     boundary = " ".join(str(x) for x in reg.get("claims_boundary") or [])
     if "不作质量背书" not in boundary:
         issues.append("claims_boundary 必须写明外部标准不作质量背书")

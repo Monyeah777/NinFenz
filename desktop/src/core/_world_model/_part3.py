@@ -278,6 +278,57 @@ def phase_sequence(wm: Dict[str, Any], limit: int = 100) -> Tuple[List[str], str
     return sequence, "limit", current
 
 
+def _as_dict(value: Any) -> Dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def _as_list(value: Any) -> List[Any]:
+    return value if isinstance(value, list) else []
+
+
+def _slot_count(var_list: Any) -> int:
+    return sum(1 for v in var_list if isinstance(v, dict) and v.get("slot"))
+
+
+def _model_entry(wm: Any, mc: Dict[str, Any], rel: str):
+    """world_model 块 → (models 条目, 计数增量)；非对象按空块处理（与旧行为一致）。"""
+    if not isinstance(wm, dict):
+        wm = {}
+    abstract = _as_dict(wm.get("abstract_state"))
+    transition = _as_dict(wm.get("transition"))
+    var_list = abstract.get("variables") or []
+    invs = wm.get("invariants")
+    check_list = wm.get("checks")
+    inv_list = invs if isinstance(invs, list) else []
+    checks = check_list if isinstance(check_list, list) else []
+    phases = transition.get("phases") or []
+    slots = _slot_count(var_list)
+    counts = {"variables": len(var_list), "phases": len(phases),
+              "invariants": len(inv_list), "checks": len(checks), "slots": slots}
+    model = {"module": (mc.get("id") or rel), "source": rel,
+             "initial_phase": transition.get("initial_phase"),
+             "phases": len(phases), "invariants": len(inv_list),
+             "checks": len(checks), "slots": slots}
+    return model, counts
+
+
+def _scan_doc(r: Path, doc: str, slot_registry: Dict[str, Any], csc):
+    """单模块文档 → (issues, model|None, 计数增量|None)。"""
+    rel = os.path.relpath(doc, str(r)).replace(os.sep, "/")
+    try:
+        text = csc.read_text_cached(doc)
+    except Exception as exc:
+        return [f"{rel}: 读取失败 {exc}"], None, None
+    parsed = csc._fence_yaml(text, "machine_contract")
+    mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
+    if not isinstance(mc, dict) or "world_model" not in mc:
+        return [], None, None
+    wm = mc["world_model"]
+    issues = list(validate_contract(wm, f"{rel}.world_model", slot_registry=slot_registry))
+    model, counts = _model_entry(wm, mc, rel)
+    return issues, model, counts
+
+
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     """扫描全部模块文档中的 world_model 契约。"""
     r = Path(root)
@@ -287,67 +338,18 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     slot_registry = load_slots(str(r))
     if not slot_registry:
         issues.append("protocol/world_slots.json 缺失或 slots 为空")
-    modules = 0
-    variables = 0
-    phases = 0
-    invariants = 0
-    checks = 0
-    slots = 0
+    stats: Dict[str, Any] = {"modules": 0, "variables": 0, "phases": 0, "invariants": 0,
+                             "checks": 0, "slots": 0}
     models: List[Dict[str, Any]] = []
-
     for doc in csc._module_docs(str(r)):
-        rel = os.path.relpath(doc, str(r)).replace(os.sep, "/")
-        try:
-            text = csc.read_text_cached(doc)
-        except Exception as exc:
-            issues.append(f"{rel}: 读取失败 {exc}")
+        doc_issues, model, counts = _scan_doc(r, doc, slot_registry, csc)
+        issues.extend(doc_issues)
+        if model is None:
             continue
-        parsed = csc._fence_yaml(text, "machine_contract")
-        mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
-        if not isinstance(mc, dict) or "world_model" not in mc:
-            continue
-        wm = mc["world_model"]
-        for issue in validate_contract(wm, f"{rel}.world_model",
-                                       slot_registry=slot_registry):
-            issues.append(issue)
-        modules += 1
-        abstract = wm.get("abstract_state") if isinstance(wm, dict) else {}
-        transition = wm.get("transition") if isinstance(wm, dict) else {}
-        invs = wm.get("invariants") if isinstance(wm, dict) else []
-        check_list = wm.get("checks") if isinstance(wm, dict) else []
-        if isinstance(abstract, dict):
-            var_list = abstract.get("variables") or []
-            variables += len(var_list)
-            slots += sum(1 for v in var_list if isinstance(v, dict) and v.get("slot"))
-        if isinstance(transition, dict):
-            phases += len(transition.get("phases") or [])
-        if isinstance(invs, list):
-            invariants += len(invs)
-        if isinstance(check_list, list):
-            checks += len(check_list)
-        models.append({
-            "module": (mc.get("id") or rel),
-            "source": rel,
-            "initial_phase": (
-                transition.get("initial_phase") if isinstance(transition, dict) else None
-            ),
-            "phases": len(transition.get("phases") or [])
-            if isinstance(transition, dict) else 0,
-            "invariants": len(invs) if isinstance(invs, list) else 0,
-            "checks": len(check_list) if isinstance(check_list, list) else 0,
-            "slots": sum(1 for v in (abstract.get("variables") or [])
-                         if isinstance(v, dict) and v.get("slot"))
-            if isinstance(abstract, dict) else 0,
-        })
-
-    stats = {
-        "modules": modules,
-        "variables": variables,
-        "phases": phases,
-        "invariants": invariants,
-        "checks": checks,
-        "slots": slots,
-        "slot_registry": len(slot_registry),
-        "models": models,
-    }
+        models.append(model)
+        for key, value in counts.items():
+            stats[key] += value
+    stats["modules"] = len(models)
+    stats["slot_registry"] = len(slot_registry)
+    stats["models"] = models
     return issues, stats

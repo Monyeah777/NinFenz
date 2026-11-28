@@ -57,6 +57,18 @@ def build(root: str = ".") -> Dict[str, Any]:
 
 def artifact_issues(tc: Dict[str, Any], scan: Dict[str, Any]) -> List[str]:
     """扫描件结构判据（供测试/变异自证复用；不重跑扫描）。"""
+    issues = _toolchain_issues(tc)
+    issues += _scan_head_issues(scan)
+    issues += _dimension_issues(scan.get("dimensions") or {})
+    findings = scan.get("findings") or []
+    issues += _finding_issues(findings)
+    issues += _count_issues(findings, scan.get("findings_counts") or {})
+    issues += _hotspot_issues(scan.get("hotspots") or [])
+    return issues
+
+
+def _toolchain_issues(tc: Dict[str, Any]) -> List[str]:
+    """toolchain 头与工具条目面。"""
     issues: List[str] = []
     if str(tc.get("schema")) != TOOLCHAIN_SCHEMA:
         issues.append("toolchain schema 不匹配")
@@ -64,28 +76,51 @@ def artifact_issues(tc: Dict[str, Any], scan: Dict[str, Any]) -> List[str]:
     if len(tools) < len(TOOLS):
         issues.append("toolchain 工具数少于登记矩阵（%d < %d）" % (len(tools), len(TOOLS)))
     for entry in tools:
-        if not isinstance(entry, dict) or not str(entry.get("id")):
-            issues.append("toolchain 含无效条目")
-            continue
-        if str(entry.get("status")) not in ("ok", "blocked"):
-            issues.append("%s 的 status 非法：%s" % (entry.get("id"), entry.get("status")))
-        if entry.get("status") == "blocked" and not str(entry.get("blocked_reason") or "").strip():
-            issues.append("%s blocked 但缺理由" % entry.get("id"))
-        if entry.get("status") == "ok" and not str(entry.get("version") or "").strip():
-            issues.append("%s ok 但缺版本（工具版本必须固定记录）" % entry.get("id"))
+        issues += _tool_entry_issues(entry)
     blocked = tc.get("blocked") or []
     if blocked != [e["id"] for e in tools if e.get("status") != "ok"]:
         issues.append("blocked 列表与工具状态不一致（缺失=BLOCKED，不冒充通过）")
+    return issues
+
+
+def _tool_entry_issues(entry) -> List[str]:
+    """单条工具条目的 status/理由/版本口径。"""
+    issues: List[str] = []
+    if not isinstance(entry, dict) or not str(entry.get("id")):
+        issues.append("toolchain 含无效条目")
+        return issues
+    if str(entry.get("status")) not in ("ok", "blocked"):
+        issues.append("%s 的 status 非法：%s" % (entry.get("id"), entry.get("status")))
+    if entry.get("status") == "blocked" and not str(entry.get("blocked_reason") or "").strip():
+        issues.append("%s blocked 但缺理由" % entry.get("id"))
+    if entry.get("status") == "ok" and not str(entry.get("version") or "").strip():
+        issues.append("%s ok 但缺版本（工具版本必须固定记录）" % entry.get("id"))
+    return issues
+
+
+def _scan_head_issues(scan: Dict[str, Any]) -> List[str]:
+    """scan 头（schema / fingerprint）。"""
+    issues: List[str] = []
     if str(scan.get("schema")) != SCAN_SCHEMA:
         issues.append("scan schema 不匹配")
     fp = str(scan.get("fingerprint") or "")
     if len(fp) != 64:
         issues.append("scan.fingerprint 必须是 64 位 sha256")
-    dims = scan.get("dimensions") or {}
+    return issues
+
+
+def _dimension_issues(dims: Dict[str, Any]) -> List[str]:
+    """扫描维度齐备。"""
+    issues: List[str] = []
     for dim in DIMS:
         if dim not in dims:
             issues.append("缺扫描维度：%s" % dim)
-    findings = scan.get("findings") or []
+    return issues
+
+
+def _finding_issues(findings: List[Any]) -> List[str]:
+    """findings 的 severity 词表与必填字段（首个违规即止）。"""
+    issues: List[str] = []
     for item in findings:
         if str(item.get("severity")) not in SEVERITIES:
             issues.append("findings 含非法 severity：%s" % item.get("severity"))
@@ -93,12 +128,22 @@ def artifact_issues(tc: Dict[str, Any], scan: Dict[str, Any]) -> List[str]:
         if not str(item.get("dim")) or not str(item.get("owner")) or not str(item.get("status")):
             issues.append("finding %s 缺 dim/owner/status" % item.get("id"))
             break
-    counts = scan.get("findings_counts") or {}
+    return issues
+
+
+def _count_issues(findings: List[Any], counts: Dict[str, Any]) -> List[str]:
+    """findings_counts 与实况一致。"""
+    issues: List[str] = []
     for sev in SEVERITIES:
         want = sum(1 for f in findings if f.get("severity") == sev)
         if counts.get(sev) != want:
             issues.append("%s 计数不一致（记录 %s / 实际 %s）" % (sev, counts.get(sev), want))
-    hotspots = scan.get("hotspots") or []
+    return issues
+
+
+def _hotspot_issues(hotspots: List[Any]) -> List[str]:
+    """hotspots 按复杂度降序。"""
+    issues: List[str] = []
     if any(int(h.get("complexity") or 0) < int(hotspots[i + 1].get("complexity") or 0)
            for i, h in enumerate(hotspots[:-1])):
         issues.append("hotspots 未按复杂度降序")

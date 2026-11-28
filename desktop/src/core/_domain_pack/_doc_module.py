@@ -15,26 +15,9 @@ def module_md(spec: Dict[str, Any], which: int, alloc: Dict[str, Any]) -> str:  
     code, cat, name = spec["code"], spec["category"], spec["name"]
     mid = "%s:M%02d" % (cat, which)
     title = spec["module_titles"][which - 1]
-    layer = "P40" if which == 1 else "P60"
-    layer_name = "行为决策" if which == 1 else "长期演变"
+    layer, layer_name = _layer_meta(which)
     ready_ev, conflict_ev = _event_names(spec, which)
-    if which == 1:
-        duty = ("逐条登记本域 %d 个细分口径（定义 / 可机验判据 / 失效模式），校验齐备性与词表边界；"
-                "越界或缺项即发布口径冲突事件" % len(spec["subdivisions"]))
-        outs = ["domain_spec", "spec_conflict_list"]
-        pub = [ready_ev, conflict_ev]
-        # 事件面闭合（2026-09-23 实测修）：本模块发布的 spec_* 必须有人订阅，否则 check16 ③
-        # 判「发布面 ⊄ 邻居订阅面」；收口层订阅 spec_ready/spec_conflict = 口径 ↔ 收口反馈对。
-        sub_ev = _event_names(spec, 2)[:]      # [report_ready, report_conflict]
-        assets = "CONCEPT_GRAPH, DOMAIN_SPEC, STANDARDS_ANCHORS"
-    else:
-        duty = ("把口径面收口为**可复算产出**：由样例与度量族重算域报告（T4），并从概念图派生图形态"
-            "；"
-                "报告与图与口径表三段同源，任一漂移即发布收口冲突事件")
-        outs = ["domain_report", "closure_conflict_list"]
-        pub = [ready_ev, conflict_ev]
-        sub_ev = (_event_names(spec, 1)[0], _event_names(spec, 1)[1])
-        assets = "DOMAIN_SPEC, CONCEPT_GRAPH"
+    duty, outs, pub, sub_ev, assets = _module_meta(spec, which, ready_ev, conflict_ev)
     lines = [
         "# 模块 %s · %s" % (mid, title),
         "",
@@ -162,6 +145,33 @@ def module_md(spec: Dict[str, Any], which: int, alloc: Dict[str, Any]) -> str:  
         "- 域包不承担该域的教学职能：包外前置族（%s-00）须装载方自备。" % code,
     ]
     return "\n".join(lines) + "\n"
+
+
+def _layer_meta(which):
+    layer = "P40" if which == 1 else "P60"
+    layer_name = "行为决策" if which == 1 else "长期演变"
+    return layer, layer_name
+
+
+def _module_meta(spec, which, ready_ev, conflict_ev):
+    if which == 1:
+        duty = ("逐条登记本域 %d 个细分口径（定义 / 可机验判据 / 失效模式），校验齐备性与词表边界；"
+                "越界或缺项即发布口径冲突事件" % len(spec["subdivisions"]))
+        outs = ["domain_spec", "spec_conflict_list"]
+        pub = [ready_ev, conflict_ev]
+        # 事件面闭合（2026-09-23 实测修）：本模块发布的 spec_* 必须有人订阅，否则 check16 ③
+        # 判「发布面 ⊄ 邻居订阅面」；收口层订阅 spec_ready/spec_conflict = 口径 ↔ 收口反馈对。
+        sub_ev = _event_names(spec, 2)[:]      # [report_ready, report_conflict]
+        assets = "CONCEPT_GRAPH, DOMAIN_SPEC, STANDARDS_ANCHORS"
+    else:
+        duty = ("把口径面收口为**可复算产出**：由样例与度量族重算域报告（T4），并从概念图派生图形态"
+            "；"
+                "报告与图与口径表三段同源，任一漂移即发布收口冲突事件")
+        outs = ["domain_report", "closure_conflict_list"]
+        pub = [ready_ev, conflict_ev]
+        sub_ev = (_event_names(spec, 1)[0], _event_names(spec, 1)[1])
+        assets = "DOMAIN_SPEC, CONCEPT_GRAPH"
+    return duty, outs, pub, sub_ev, assets
 
 
 

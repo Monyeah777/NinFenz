@@ -42,6 +42,35 @@ class ParseError(Exception):
         self.pos = pos
 
 
+def _skip_comment(src: str, i: int, n: int) -> int:
+    while i < n and src[i] != "\n":
+        i += 1
+    return i
+
+
+def _number_token(src: str, i: int):
+    m = _NUM.match(src, i)
+    if not m:
+        return None
+    raw = m.group(0)
+    kind = "float" if "." in raw else "int"
+    return ({"k": kind, "v": float(raw) if kind == "float" else int(raw), "pos": i}, m.end())
+
+
+def _ident_token(src: str, i: int):
+    m = _IDENT.match(src, i)
+    if not m:
+        return None
+    return ({"k": "ident", "v": m.group(0), "pos": i}, m.end())
+
+
+def _punct_token(src: str, i: int):
+    for p in _PUNCT:
+        if src.startswith(p, i):
+            return ({"k": "punct", "v": p, "pos": i}, i + len(p))
+    return None
+
+
 def tokenize(src: str) -> List[Dict[str, Any]]:
     """源码 → token 列表（末项恒为 eof）；非法字符/未闭合字符串抛 LexError。"""
     out: List[Dict[str, Any]] = []
@@ -52,32 +81,17 @@ def tokenize(src: str) -> List[Dict[str, Any]]:
             i += 1
             continue
         if ch == "#":                              # 行注释（借 YAML/JSON5 习惯）
-            while i < n and src[i] != "\n":
-                i += 1
+            i = _skip_comment(src, i, n)
             continue
         if ch == '"':
             tok, i = _scan_string(src, i)
             out.append(tok)
             continue
-        m = _NUM.match(src, i)
-        if m:
-            raw = m.group(0)
-            kind = "float" if "." in raw else "int"
-            out.append({"k": kind, "v": float(raw) if kind == "float" else int(raw), "pos": i})
-            i = m.end()
-            continue
-        m = _IDENT.match(src, i)
-        if m:
-            out.append({"k": "ident", "v": m.group(0), "pos": i})
-            i = m.end()
-            continue
-        for p in _PUNCT:
-            if src.startswith(p, i):
-                out.append({"k": "punct", "v": p, "pos": i})
-                i += len(p)
-                break
-        else:
+        found = _number_token(src, i) or _ident_token(src, i) or _punct_token(src, i)
+        if found is None:
             raise LexError("非法字符 %r" % ch + _GUIDE, i)
+        out.append(found[0])
+        i = found[1]
     out.append({"k": "eof", "v": None, "pos": n})
     return out
 

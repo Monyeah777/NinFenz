@@ -143,11 +143,9 @@ def _asset_entries(root: str) -> List[str]:
     return out
 
 
-def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
-    """编译 → (pages_doc, expected)；expected = 每类真源计数（覆盖判据用）。"""
+def _protocol_pages(root: str) -> List[Dict[str, Any]]:
+    """protocol schema 页（IDL 9 + 生产 5）。"""
     pages: List[Dict[str, Any]] = []
-    expected: Dict[str, int] = {}
-    # protocol schema 页（IDL 9 + 生产 5）
     for sub, rel in _schema_files(root):
         data = _read_bytes(root, rel)
         schema = json.loads(data)
@@ -164,11 +162,15 @@ def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 machine_contract={'required': schema.get('required') or []},
             ),
         ))
-    expected["protocol"] = len(pages)
-    # module 页
+    return pages
+
+
+def _module_pages(root: str) -> Tuple[List[Dict[str, Any]], int]:
+    """module 页 + 真源模块数（expected 用真源计数，非页面数）。"""
     modules = _registry_modules(root)
     registry_bytes = _read_bytes(root, REGISTRY_REL)
     module_proto = "wiki:protocol:schema/module"
+    pages: List[Dict[str, Any]] = []
     for mod in modules:
         mid = str(mod.get("id"))
         if not mid or any(ch.isspace() for ch in mid):
@@ -185,10 +187,13 @@ def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 machine_contract={'mounts': mod.get('mounts') or []},
             ),
         ))
-    expected["module"] = len(modules)
-    # pipeline 页
+    return pages, len(modules)
+
+
+def _pipeline_pages(root: str, pipes: List[str]) -> List[Dict[str, Any]]:
+    """pipeline 页。"""
     assembly_proto = "wiki:protocol:production/assembly"
-    pipes = _pipeline_files(root)
+    pages: List[Dict[str, Any]] = []
     for rel in pipes:
         data = _read_bytes(root, rel)
         pid = "wiki:pipeline:" + Path(rel).stem
@@ -203,10 +208,14 @@ def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 relations=[{'kind': 'implements', 'target': assembly_proto}],
             ),
         ))
-    expected["pipeline"] = len(pipes)
-    # domain 页
+    return pages
+
+
+def _domain_pages(root: str, rels: List[str]) -> List[Dict[str, Any]]:
+    """domain 页。"""
     contract_proto = "wiki:protocol:production/contract"
-    for rel in _domain_specs(root):
+    pages: List[Dict[str, Any]] = []
+    for rel in rels:
         data = _read_bytes(root, rel)
         spec = json.loads(data)
         code = str(spec.get("code") or Path(rel).parent.parent.name)
@@ -223,9 +232,12 @@ def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 machine_contract={'subdivisions': len(spec.get('subdivisions') or [])},
             ),
         ))
-    expected["domain"] = len(_domain_specs(root))
-    # asset 页
-    assets = _asset_entries(root)
+    return pages
+
+
+def _asset_pages(root: str, assets: List[str]) -> List[Dict[str, Any]]:
+    """asset 页。"""
+    pages: List[Dict[str, Any]] = []
     for rel in assets:
         path = Path(root) / rel
         digest = _sha(path.read_bytes()) if path.is_file() else _dir_digest(root, rel)
@@ -241,17 +253,45 @@ def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
                 relations=[{'kind': 'references', 'target': 'wiki:protocol:schema/asset_contracts'}],
             ),
         ))
-    expected["asset"] = len(assets)
-    pages.sort(key=lambda p: p["id"])
-    index = {"schema": SCHEMA_INDEX,
-             "pages": [{"id": p["id"], "type": p["type"], "summary": p["summary"],
-                        "source": p["provenance"]["source"],
-                        "digest": p["provenance"]["digest"]} for p in pages]}
+    return pages
+
+
+def _index_doc(pages: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """INDEX 文档。"""
+    return {"schema": SCHEMA_INDEX,
+            "pages": [{"id": p["id"], "type": p["type"], "summary": p["summary"],
+                       "source": p["provenance"]["source"],
+                       "digest": p["provenance"]["digest"]} for p in pages]}
+
+
+def _graph_doc(pages: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """GRAPH 文档。"""
     edges = [{"from": p["id"], "kind": r["kind"], "to": r["target"]}
              for p in pages for r in p.get("relations") or []]
-    graph = {"schema": SCHEMA_GRAPH,
-             "nodes": [p["id"] for p in pages],
-             "edges": sorted(edges, key=lambda e: (e["from"], e["kind"], e["to"]))}
+    return {"schema": SCHEMA_GRAPH,
+            "nodes": [p["id"] for p in pages],
+            "edges": sorted(edges, key=lambda e: (e["from"], e["kind"], e["to"]))}
+
+
+def build(root: str = ".") -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """编译 → (pages_doc, expected)；expected = 每类真源计数（覆盖判据用）。"""
+    pages: List[Dict[str, Any]] = _protocol_pages(root)
+    expected: Dict[str, int] = {"protocol": len(pages)}
+    module_pages, module_count = _module_pages(root)
+    pages.extend(module_pages)
+    expected["module"] = module_count
+    pipes = _pipeline_files(root)
+    pages.extend(_pipeline_pages(root, pipes))
+    expected["pipeline"] = len(pipes)
+    domain_specs = _domain_specs(root)
+    pages.extend(_domain_pages(root, domain_specs))
+    expected["domain"] = len(domain_specs)
+    assets = _asset_entries(root)
+    pages.extend(_asset_pages(root, assets))
+    expected["asset"] = len(assets)
+    pages.sort(key=lambda p: p["id"])
+    index = _index_doc(pages)
+    graph = _graph_doc(pages)
     pages_doc = {"schema": SCHEMA_PAGES, "pages": pages}
     return pages_doc, {"index": index, "graph": graph, "expected": expected}
 

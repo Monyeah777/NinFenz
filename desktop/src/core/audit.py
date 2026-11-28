@@ -90,22 +90,21 @@ def check_doc(root: str, rel: str) -> Tuple[List[str], Dict[str, Any]]:
     return issues, {"legacy": False, "subjects": ok_subs}
 
 
-def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """声明 + 全部审计件 → (issues, warns, stats)。"""
+def _decl_issues(d: Dict[str, Any]) -> List[str]:
     issues: List[str] = []
-    warns: List[str] = []
-    d = decl(root)
-    if not d:
-        return ["缺审计协议声明 %s" % DECL_REL], warns, {}
     if str(d.get("schema") or "") != SCHEMA:
         issues.append("审计协议 schema 不匹配（期望 %s）" % SCHEMA)
     if tuple(d.get("verdict_vocabulary") or ()) != ("pass", "fail", "warn"):
         issues.append("verdict 词表与判据不一致（期望 pass/fail/warn）")
     if not (d.get("rules") or []):
         issues.append("rules 不得为空（审计纪律必须成文）")
-    issues.extend(audit_legacy.validation_issues(root, d))
-    rows = entries(root)
-    legacy, subs = [], 0
+    return issues
+
+
+def _entry_scan(root: str, rows: List[Dict[str, Any]]):
+    issues: List[str] = []
+    legacy: List[str] = []
+    subs = 0
     for e in rows:
         i, st = check_doc(root, e["path"])
         if st.get("legacy"):
@@ -113,6 +112,20 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
             continue
         issues += ["%s：%s" % (e["fm"].get("id") or e["file"], x) for x in i]
         subs += st.get("subjects", 0)
+    return issues, legacy, subs
+
+
+def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
+    """声明 + 全部审计件 → (issues, warns, stats)。"""
+    warns: List[str] = []
+    d = decl(root)
+    if not d:
+        return ["缺审计协议声明 %s" % DECL_REL], warns, {}
+    issues: List[str] = _decl_issues(d)
+    issues.extend(audit_legacy.validation_issues(root, d))
+    rows = entries(root)
+    doc_issues, legacy, subs = _entry_scan(root, rows)
+    issues += doc_issues
     if legacy:
         warns.append("显式登记的 legacy 历史审计件（不补造摘要）：%d 件 —— %s"
                      % (len(legacy), "、".join(legacy[:3])))

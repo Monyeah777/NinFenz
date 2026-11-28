@@ -49,45 +49,53 @@ def parse_head(text: str) -> Dict[str, str]:
     return out
 
 
-def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """→ (issues, warns, stats)。"""
+def _head_issues(item: Dict[str, Any], head: Dict[str, Any], rel: str, rfc: str,
+                 vocab: Tuple[str, ...]) -> List[str]:
     issues: List[str] = []
-    warns: List[str] = []
-    idx = index(root)
-    if not idx:
-        return ["缺 RFC 索引 %s（修复指引：见 protocol/rfc_index.json）" % INDEX_REL], [], {}
-    vocab = tuple(idx.get("status_vocabulary") or ("Active",))
-    seen: Dict[str, str] = {}
-    supby: Dict[str, str] = {}
-    for item in idx.get("docs") or []:
-        rel, rfc = str(item.get("path") or ""), str(item.get("rfc") or "")
-        p = Path(root) / rel
-        if not p.is_file():
-            issues.append("RFC 索引指向不存在的文档：%s" % rel)
-            continue
-        if rfc in seen:
-            issues.append("RFC 编号重复：%s（%s 与 %s）" % (rfc, seen[rfc], rel))
-        seen[rfc] = rel
-        head = parse_head(p.read_text(encoding="utf-8"))
-        if not head:
-            issues.append("%s 缺 RFC 头（修复指引：见 docs 或 core/rfc.py 头格式）" % rel)
-            continue
-        if head["rfc"] != rfc:
-            issues.append("%s 头部 RFC 与索引不一致：头=%s 索引=%s" % (rel, head["rfc"], rfc))
-        if head["cat"] not in CATEGORIES:
-            issues.append("%s Category 越词表：%s（%s）" % (rel, head["cat"], "/".join(CATEGORIES)))
-        if head["status"] not in vocab:
-            issues.append("%s Status 越词表：%s（%s）" % (rel, head["status"], "/".join(vocab)))
-        if head["last_updated"] and head["date"] != head["last_updated"]:
-            issues.append("%s Date 与「最后更新」不一致：RFC=%s 最后更新=%s"
-                          % (rel, head["date"], head["last_updated"]))
-        if str(item.get("category") or "") and str(item["category"]) != head["cat"]:
-            issues.append("%s Category 索引与头部不一致：索引=%s 头=%s"
-                          % (rel, item["category"], head["cat"]))
-        if head["status"] == "Superseded" and head["supby"] in ("—", "-", ""):
-            issues.append("%s 标记 Superseded 但缺 Superseded by" % rel)
-        if head["supby"] not in ("—", "-", ""):
-            supby[rfc] = head["supby"]
+    if head["rfc"] != rfc:
+        issues.append("%s 头部 RFC 与索引不一致：头=%s 索引=%s" % (rel, head["rfc"], rfc))
+    if head["cat"] not in CATEGORIES:
+        issues.append("%s Category 越词表：%s（%s）" % (rel, head["cat"], "/".join(CATEGORIES)))
+    if head["status"] not in vocab:
+        issues.append("%s Status 越词表：%s（%s）" % (rel, head["status"], "/".join(vocab)))
+    if head["last_updated"] and head["date"] != head["last_updated"]:
+        issues.append("%s Date 与「最后更新」不一致：RFC=%s 最后更新=%s"
+                      % (rel, head["date"], head["last_updated"]))
+    if str(item.get("category") or "") and str(item["category"]) != head["cat"]:
+        issues.append("%s Category 索引与头部不一致：索引=%s 头=%s"
+                      % (rel, item["category"], head["cat"]))
+    issues += _superseded_issue(head, rel)
+    return issues
+
+
+def _superseded_issue(head: Dict[str, Any], rel: str) -> List[str]:
+    if head["status"] == "Superseded" and head["supby"] in ("—", "-", ""):
+        return ["%s 标记 Superseded 但缺 Superseded by" % rel]
+    return []
+
+
+def _rfc_doc_issues(root: str, item: Dict[str, Any], seen: Dict[str, str],
+                    vocab: Tuple[str, ...], supby: Dict[str, str]) -> List[str]:
+    rel, rfc = str(item.get("path") or ""), str(item.get("rfc") or "")
+    p = Path(root) / rel
+    if not p.is_file():
+        return ["RFC 索引指向不存在的文档：%s" % rel]
+    issues: List[str] = []
+    if rfc in seen:
+        issues.append("RFC 编号重复：%s（%s 与 %s）" % (rfc, seen[rfc], rel))
+    seen[rfc] = rel
+    head = parse_head(p.read_text(encoding="utf-8"))
+    if not head:
+        issues.append("%s 缺 RFC 头（修复指引：见 docs 或 core/rfc.py 头格式）" % rel)
+        return issues
+    issues += _head_issues(item, head, rel, rfc, vocab)
+    if head["supby"] not in ("—", "-", ""):
+        supby[rfc] = head["supby"]
+    return issues
+
+
+def _supersede_issues(supby: Dict[str, str], seen: Dict[str, str]) -> List[str]:
+    issues: List[str] = []
     for rfc, target in supby.items():
         if target not in seen:
             issues.append("%s 的 Superseded by 指向不在册的编号：%s" % (rfc, target))
@@ -100,8 +108,27 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
             if cur == rfc:
                 issues.append("supersede 链成环：%s → … → %s" % (rfc, rfc))
                 break
-    stats = {"docs": len(seen), "chains": len(supby),
-             "statuses": sorted({parse_head((Path(root) / r).read_text(encoding="utf-8")).get("stat"
-                 "us", "")
-                                 for r in seen.values()})}
+    return issues
+
+
+def _status_stats(root: str, seen: Dict[str, str], supby: Dict[str, str]) -> Dict[str, Any]:
+    statuses = sorted({parse_head((Path(root) / r).read_text(encoding="utf-8")).get("status", "")
+                       for r in seen.values()})
+    return {"docs": len(seen), "chains": len(supby), "statuses": statuses}
+
+
+def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
+    """→ (issues, warns, stats)。"""
+    issues: List[str] = []
+    warns: List[str] = []
+    idx = index(root)
+    if not idx:
+        return ["缺 RFC 索引 %s（修复指引：见 protocol/rfc_index.json）" % INDEX_REL], [], {}
+    vocab = tuple(idx.get("status_vocabulary") or ("Active",))
+    seen: Dict[str, str] = {}
+    supby: Dict[str, str] = {}
+    for item in idx.get("docs") or []:
+        issues += _rfc_doc_issues(root, item, seen, vocab, supby)
+    issues += _supersede_issues(supby, seen)
+    stats = _status_stats(root, seen, supby)
     return issues, warns, stats

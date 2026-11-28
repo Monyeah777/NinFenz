@@ -120,8 +120,8 @@ def _structure_issues(chunks: list[tuple[str, bytes]]) -> list[str]:
     return issues
 
 
-def _embed_png(png: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
-    """把 IR 写进 PNG 的 AIGC iTXt 块 → (新字节, 摘要信息)。已存在则**替换**（幂等）。"""
+def _embed_inputs(png: bytes, ir: dict[str, Any]) -> tuple[str, list[tuple[str, bytes]]]:
+    """写载体前置校验（IR 合法/摘要基准/尺寸/结构）→ (IR 文本, PNG 块列表)。"""
     issues = label_ir.validate(ir)["issues"]
     if issues:
         raise CarrierError("标注 IR 不合法：" + "；".join(issues[:3])
@@ -141,26 +141,38 @@ def _embed_png(png: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
     if want != got:
         raise CarrierError("IR 的 object.digest 与输入对象不符（" + GUIDE + "IR 必须针对**这份**"
                            "对象生成（nf label ir <对象>）；声明的是写入前内容，不是任意对象）")
-    before = pixel_digest(png)
-    payload = json.dumps(ir, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    text = json.dumps(ir, ensure_ascii=False, sort_keys=True)
+    payload = text.encode("utf-8")
     if len(payload) > 8000:
         raise CarrierError(f"IR 太大（{len(payload)} 字节，上限 8000）（{GUIDE}减小声明项或改用 "
                            "sidecar 回退）")
+    return text, chunks
+
+
+def _embed_kept(chunks: list[tuple[str, bytes]],
+                text: str) -> tuple[list[tuple[str, bytes]], bool]:
+    """替换/插入 AIGC iTXt 块 → (新块列表, 是否替换了既有块)。"""
     kept: list[tuple[str, bytes]] = []
     replaced = False
     for ctype, body in chunks:
         if ctype == "iTXt" and _itxt_text(body) is not None:
             if not replaced:
-                kept.append(("iTXt", _itxt_body(json.dumps(ir, ensure_ascii=False,
-                                                           sort_keys=True))))
+                kept.append(("iTXt", _itxt_body(text)))
                 replaced = True
             continue
         kept.append((ctype, body))
     if not replaced:
         # 插在 IHDR 之后：所有解码器都会读到，且不打断 IDAT/IEND 的相对顺序
         insert_at = 1 if kept and kept[0][0] == "IHDR" else 0
-        kept.insert(insert_at, ("iTXt", _itxt_body(json.dumps(ir, ensure_ascii=False,
-                                                              sort_keys=True))))
+        kept.insert(insert_at, ("iTXt", _itxt_body(text)))
+    return kept, replaced
+
+
+def _embed_png(png: bytes, ir: dict[str, Any]) -> tuple[bytes, dict[str, Any]]:
+    """把 IR 写进 PNG 的 AIGC iTXt 块 → (新字节, 摘要信息)。已存在则**替换**（幂等）。"""
+    text, chunks = _embed_inputs(png, ir)
+    before = pixel_digest(png)
+    kept, replaced = _embed_kept(chunks, text)
     out = PNG_SIG + b"".join(_chunk(t, b) for t, b in kept)
     after = pixel_digest(out)
     if after != before:
@@ -216,6 +228,26 @@ JPEG_PREFIX = b"AIGC\x00"
 _JPEG_STANDALONE = frozenset({0x01, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7})
 
 
+def _jpeg_sos_check(data: bytes, pos: int, n: int) -> None:
+    """SOS 段头/长度在场校验（不通过即抛 CarrierError）。"""
+    if pos + 2 > n:
+        raise CarrierError("JPEG SOS 段头截断（" + GUIDE + "文件不完整）")
+    seg_len = struct.unpack(">H", data[pos:pos + 2])[0]
+    if pos + seg_len > n:
+        raise CarrierError("JPEG SOS 段数据截断（" + GUIDE + "文件不完整）")
+
+
+def _jpeg_segment(data: bytes, pos: int, n: int, marker: int) -> tuple[bytes, int]:
+    """普通段 → (payload, 段结束偏移)。"""
+    if pos + 2 > n:
+        raise CarrierError("JPEG 段长度截断（" + GUIDE + "文件不完整）")
+    seg_len = struct.unpack(">H", data[pos:pos + 2])[0]
+    if seg_len < 2 or pos + seg_len > n:
+        raise CarrierError(f"JPEG 段长度非法（marker=0x{marker:02X}）("
+                           + GUIDE + "文件损坏，重新导出原图再写）")
+    return data[pos + 2:pos + seg_len], pos + seg_len
+
+
 def _jpeg_split(data: bytes) -> tuple[list[tuple[int, bytes, bytes]], bytes]:
     """JPEG → (SOS 之前的段列表 [(marker, payload, raw_bytes)], 从 SOS 到 EOF 的原始字节)。
 
@@ -240,23 +272,14 @@ def _jpeg_split(data: bytes) -> tuple[list[tuple[int, bytes, bytes]], bytes]:
         marker = data[pos]
         pos += 1
         if marker == 0xDA:                        # SOS：后面全是熵数据
-            if pos + 2 > n:
-                raise CarrierError("JPEG SOS 段头截断（" + GUIDE + "文件不完整）")
-            seg_len = struct.unpack(">H", data[pos:pos + 2])[0]
-            if pos + seg_len > n:
-                raise CarrierError("JPEG SOS 段数据截断（" + GUIDE + "文件不完整）")
+            _jpeg_sos_check(data, pos, n)
             return segs, data[seg_start:]         # 从 SOS 标记起原样返回（含 FFDA 与长度）
         if marker in _JPEG_STANDALONE:
             segs.append((marker, b"", data[seg_start:pos]))
             continue
-        if pos + 2 > n:
-            raise CarrierError("JPEG 段长度截断（" + GUIDE + "文件不完整）")
-        seg_len = struct.unpack(">H", data[pos:pos + 2])[0]
-        if seg_len < 2 or pos + seg_len > n:
-            raise CarrierError(f"JPEG 段长度非法（marker=0x{marker:02X}）("
-                               + GUIDE + "文件损坏，重新导出原图再写）")
-        segs.append((marker, data[pos + 2:pos + seg_len], data[seg_start:pos + seg_len]))
-        pos += seg_len
+        payload, end = _jpeg_segment(data, pos, n, marker)
+        segs.append((marker, payload, data[seg_start:end]))
+        pos = end
     raise CarrierError("JPEG 缺 SOS（" + GUIDE + "文件不完整，重新导出原图再写）")
 
 

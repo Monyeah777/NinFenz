@@ -50,30 +50,39 @@ def resolve(root: str = ".", workflow: str = "") -> Dict[str, Any]:
 # 一个不依赖 mcp_runtime 的编译入口，再按「调用方注入」重加（见 patterns/dependency-direction）。
 
 
-def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
-    """机检 driver 声明 → (issues, warns, stats)。"""
-    issues: List[str] = []
-    warns: List[str] = []
-    doc = load(root)
-    if not doc:
-        return ["缺 driver 声明 %s（修复指引：见 protocol/driver.json）" % DRIVER_REL], [], {}
-    if str(doc.get("schema") or "") != "nf-driver/1":
-        issues.append("driver schema 不匹配（期望 nf-driver/1）")
+def _runtime_defs():
     try:
         from core.mcp_runtime import PROMPT_DEFS, TOOL_DEFS
-        live_tools = {t["name"] for t in TOOL_DEFS}
-        live_prompts = {p["name"] for p in PROMPT_DEFS}
-        tool_map = {t["name"]: t for t in TOOL_DEFS}
+        return ({t["name"] for t in TOOL_DEFS}, {p["name"] for p in PROMPT_DEFS},
+                {t["name"]: t for t in TOOL_DEFS})
     except Exception:
-        live_tools, live_prompts, tool_map = set(), set(), {}
-    bind = doc.get("bindings") or {}
+        return set(), set(), {}
+
+
+def _binding_issues(bind: Dict[str, Any], live_tools: set, live_prompts: set) -> List[str]:
+    issues: List[str] = []
     for t in (bind.get("mcp.tools") or []):
         if t not in live_tools:
             issues.append("bindings.mcp.tools 引用了运行时不存在工具：%s" % t)
     for p in (bind.get("mcp.prompts") or []):
         if p not in live_prompts:
             issues.append("bindings.mcp.prompts 引用了运行时不存在提示：%s" % p)
-    for name, wf in sorted((doc.get("workflows") or {}).items()):
+    return issues
+
+
+def _fallback_issues(root: str, name: str, wf: Dict[str, Any]) -> List[str]:
+    fb = str(wf.get("fallback") or "")
+    if not fb:
+        return ["workflow %s 缺 fallback 文件（无机器面时的文本路径必须显式）" % name]
+    if not (Path(root) / fb).is_file():
+        return ["workflow %s 的 fallback 不存在：%s" % (name, fb)]
+    return []
+
+
+def _workflow_issues(root: str, workflows: Dict[str, Any], live_tools: set,
+                     live_prompts: set) -> List[str]:
+    issues: List[str] = []
+    for name, wf in sorted(workflows.items()):
         for t in (wf.get("mcp_tools") or []):
             if t not in live_tools:
                 issues.append("workflow %s 引用不存在的 MCP 工具：%s（修复指引：改正或实现该工具）"
@@ -81,14 +90,23 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
         pr = str(wf.get("mcp_prompt") or "")
         if pr and pr not in live_prompts:
             issues.append("workflow %s 引用不存在的 MCP 提示：%s" % (name, pr))
-        fb = str(wf.get("fallback") or "")
-        if not fb:
-            issues.append("workflow %s 缺 fallback 文件（无机器面时的文本路径必须显式）" % name)
-        elif not (Path(root) / fb).is_file():
-            issues.append("workflow %s 的 fallback 不存在：%s" % (name, fb))
-    kws = (doc.get("fail_closed") or {}).get("marker_keywords") or []
-    wfs = set(doc.get("workflows") or {})
-    for d in (doc.get("documents") or []):
+        issues += _fallback_issues(root, name, wf)
+    return issues
+
+
+def _keyword_issues(rel: str, head: str, kws: List[Any]) -> List[str]:
+    issues: List[str] = []
+    for kw in kws:
+        if kw not in head:
+            issues.append("%s 的 override 块缺 fail-closed 关键词「%s」" % (rel, kw))
+    return issues
+
+
+def _document_issues(root: str, documents: List[Any], wfs: set,
+                     kws: List[Any]) -> Tuple[List[str], List[str]]:
+    issues: List[str] = []
+    warns: List[str] = []
+    for d in documents:
         rel, wf = str(d.get("path") or ""), str(d.get("workflow") or "")
         p = Path(root) / rel
         if not p.is_file():
@@ -103,14 +121,41 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
             continue
         if wf and wf not in head:
             warns.append("%s 的 override 块未写出工作流名 %s" % (rel, wf))
-        for kw in kws:
-            if kw not in head:
-                issues.append("%s 的 override 块缺 fail-closed 关键词「%s」" % (rel, kw))
-    stats = {"workflows": len(wfs), "documents": len(doc.get("documents") or []),
-             "tools_bound": len(bind.get("mcp.tools") or []),
-             "fallback_files": sum(1 for w in (doc.get("workflows") or {}).values()
-                                   if w.get("fallback"))}
-    # 编排可达性并入本门（不新增 check 序号）：工作流映射的工具必须能组成一步可编译计划。
+        issues += _keyword_issues(rel, head, kws)
+    return issues, warns
+
+
+def _driver_sections(doc: Dict[str, Any]):
+    """声明文档 → (bindings, workflows, marker_keywords, documents)。"""
+    return (doc.get("bindings") or {}, doc.get("workflows") or {},
+            (doc.get("fail_closed") or {}).get("marker_keywords") or [],
+            doc.get("documents") or [])
+
+
+def _driver_stats(doc: Dict[str, Any], bind: Dict[str, Any],
+                  workflows: Dict[str, Any]) -> Dict[str, Any]:
+    return {"workflows": len(workflows), "documents": len(doc.get("documents") or []),
+            "tools_bound": len(bind.get("mcp.tools") or []),
+            "fallback_files": sum(1 for w in workflows.values() if w.get("fallback"))}
+
+
+def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, Any]]:
+    """机检 driver 声明 → (issues, warns, stats)。"""
+    doc = load(root)
+    if not doc:
+        return ["缺 driver 声明 %s（修复指引：见 protocol/driver.json）" % DRIVER_REL], [], {}
+    issues: List[str] = []
+    warns: List[str] = []
+    if str(doc.get("schema") or "") != "nf-driver/1":
+        issues.append("driver schema 不匹配（期望 nf-driver/1）")
+    live_tools, live_prompts, tool_map = _runtime_defs()
+    bind, workflows, kws, documents = _driver_sections(doc)
+    issues += _binding_issues(bind, live_tools, live_prompts)
+    issues += _workflow_issues(root, workflows, live_tools, live_prompts)
+    doc_issues, doc_warns = _document_issues(root, documents, set(workflows), kws)
+    issues += doc_issues
+    warns += doc_warns
+    stats = _driver_stats(doc, bind, workflows)
     from core import orchestration as _orch
     o_issues, o_stats = _orch.scan(root, tool_map)
     issues += ["编排：%s" % i for i in o_issues]

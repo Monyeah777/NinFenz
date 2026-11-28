@@ -25,30 +25,40 @@ _PROGRESS = ("推进", "进入", "写回", "快照", "存档", "状态", "回合
 _MODULE = re.compile(r"(?:[\u4e00-\u9fff]+:)?M\d{2,3}")
 
 
-def scan(transcript: str, allowed: List[str]) -> Tuple[List[str], Dict[str, Any]]:
-    issues: List[str] = []
+def _turn_spans(transcript: str) -> List[Tuple[int, str]]:
     matches = list(_TURN.finditer(transcript))
-    turns = []
+    turns: List[Tuple[int, str]] = []
     for idx, m in enumerate(matches):
         start = m.end()
         end = matches[idx + 1].start() if idx + 1 < len(matches) else len(transcript)
         num = int(m.group(1) or m.group(2))
-        body = transcript[start:end]
-        turns.append((num, body))
+        turns.append((num, transcript[start:end]))
+    return turns
+
+
+def _turn_issues(num: int, body: str, allowed_set: set, allowed_bare: set) -> List[str]:
+    issues: List[str] = []
+    if not _CITE.search(body):
+        issues.append("第 %d 回合缺引用（R-R1）" % num)
+    if not any(k in body for k in _PROGRESS):
+        issues.append("第 %d 回合无推进/状态留痕（R-R2）" % num)
+    for tok in _MODULE.findall(body):
+        if tok not in allowed_set and tok.split(":", 1)[-1] not in allowed_bare:
+            issues.append("第 %d 回合出现允许集外编号 %s（R-R3）" % (num, tok))
+    return issues
+
+
+def scan(transcript: str, allowed: List[str]) -> Tuple[List[str], Dict[str, Any]]:
+    issues: List[str] = []
+    turns = _turn_spans(transcript)
     if not turns:
         issues.append("未检测到回合标记（转录需含 回合 N： / 第 N 回合）")
         return issues, {"turns": 0, "warn_gaps": []}
     allowed_set = set(allowed)
+    allowed_bare = {a.split(":", 1)[-1] for a in allowed_set}
     gaps = []
     for i, (num, body) in enumerate(turns):
-        if not _CITE.search(body):
-            issues.append("第 %d 回合缺引用（R-R1）" % num)
-        if not any(k in body for k in _PROGRESS):
-            issues.append("第 %d 回合无推进/状态留痕（R-R2）" % num)
-        for tok in _MODULE.findall(body):
-            if tok not in allowed_set and tok.split(":", 1)[-1] not in {
-                    a.split(":", 1)[-1] for a in allowed_set}:
-                issues.append("第 %d 回合出现允许集外编号 %s（R-R3）" % (num, tok))
+        issues += _turn_issues(num, body, allowed_set, allowed_bare)
         if i > 0 and num != turns[i - 1][0] + 1:
             gaps.append((turns[i - 1][0], num))
     return issues, {"turns": len(turns), "warn_gaps": gaps}

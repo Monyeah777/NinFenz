@@ -55,9 +55,19 @@ def identifier_issue(text: str) -> str:
         return "标识为空"
     if unicodedata.normalize("NFC", text) != text:
         return "非 NFC 规范化形态（UAX #15：同形异码会让机器侧不等）"
+    return _invisible_issue(text) or _bounds_issue(text)
+
+
+def _invisible_issue(text: str) -> str:
+    """隐形/同形字符（空串=无）。"""
     for ch, name in INVISIBLE.items():
         if ch in text:
             return "含隐形/同形字符 %s（U+%04X）" % (name, ord(ch))
+    return ""
+
+
+def _bounds_issue(text: str) -> str:
+    """字符集越界与控制/格式/未分配码位（空串=无）。"""
     bad = [c for c in text if c not in _ASCII_OK and not _is_cjk(c)]
     if bad:
         names = "、".join("U+%04X" % ord(c) for c in bad[:4])
@@ -180,76 +190,113 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     issues: List[str] = []
     # EOL 纪律的**可执行落点**：.gitattributes 须声明全仓 LF（属性优先于 core.autocrlf，
     # 因此这是跨平台字节一致的前提；缺失则 CRLF 会在 Windows 检出时反复回流）。
-    ga_path = os.path.join(root, ".gitattributes")
-    if not os.path.isfile(ga_path):
-        issues.append("缺 .gitattributes（修复指引：声明 `* text=auto eol=lf`——"
-                      "EOL 纪律须有落点，否则 Windows 检出反复回流 CRLF）")
-    else:
-        with open(ga_path, encoding="utf-8") as fh:
-            ga = fh.read()
-        if not re.search(r"(?m)^\*\s+text(?:=\w+)?\s+eol=lf", ga):
-            issues.append(".gitattributes 未声明 `* text=auto eol=lf`"
-                          "（修复指引：全仓行尾纪律须显式声明，见仓库根 .gitattributes）")
+    issues += _gitattributes_issues(root)
     files = _walk(root)
-    n_text = n_json = n_crlf = n_bom = 0
-    keys_checked = values_checked = 0
+    counters = {"text": 0, "json": 0, "crlf": 0, "bom": 0,
+                "keys_checked": 0, "values_checked": 0}
     for path in files:
-        rel = os.path.relpath(path, root).replace(os.sep, "/")
-        try:
-            with open(path, "rb") as fh:
-                raw = fh.read()
-        except OSError:            # 尽力而为：读不到的文件跳过（缺件由 check35 回执门/门禁件清单报出）
-            continue
-        if b"\x00" in raw[:4096]:  # 二进制哨兵
-            continue
-        n_text += 1
-        if raw.startswith(b"\xef\xbb\xbf"):
-            n_bom += 1
-            issues.append("%s 以 UTF-8 BOM 开头（修复指引：去掉 BOM——BOM 会让 json/yaml "
-                          "首键解析失败，也让摘要随编辑器变化）" % rel)
-            raw = raw[3:]
-        if b"\r\n" in raw:
-            n_crlf += 1
-            issues.append("%s 含 CRLF 行尾（修复指引：仓库 EOL 纪律 = LF"
-                          "（.gitattributes `* text=auto eol=lf`）；本地去 CR 后存回，勿改内容）"
-                          % rel)
-        try:
-            text = raw.decode("utf-8")
-        except UnicodeDecodeError as exc:
-            issues.append("%s 不是合法 UTF-8：%s（修复指引：RFC 3629 只许 UTF-8——"
-                          "重存为 UTF-8 无 BOM）" % (rel, exc))
-            continue
-        if path.endswith(".json"):
-            n_json += 1
-            doc, ok = _dup_check(text, rel, issues)
-            if ok:
-                ks: List[str] = []
-                _keys(doc, ks)
-                for k in ks:
-                    keys_checked += 1
-                    msg = identifier_issue(k)
-                    if msg:
-                        issues.append("%s JSON 键 %r 违规：%s（修复指引：键须 NFC + 字符集内；"
-                                      "同形/隐形字符会让机器侧当成另一个键）" % (rel, k, msg))
-                # 标识**值**面：登记册里作为值出现的 id/类别/键同样要过词法
-                for src_rel, paths in VALUE_SOURCES:
-                    if rel != src_rel:
-                        continue
-                    for jp in paths:
-                        for val in _resolve(doc, jp):
-                            if not isinstance(val, str):
-                                continue
-                            values_checked += 1
-                            msg = identifier_issue(val)
-                            if msg:
-                                issues.append("%s 的 %s = %r 违规：%s（修复指引：标识值须 NFC + "
-                                              "字符集内——键有判据而值没有，等于给同形留后门）"
-                                              % (rel, jp, val, msg))
-    stats = {"files": len(files), "text": n_text, "json": n_json, "bom": n_bom,
-             "crlf": n_crlf, "keys_checked": keys_checked,
-             "values_checked": values_checked, "issues": len(issues)}
+        _scan_file(path, root, issues, counters)
+    stats = {"files": len(files), "text": counters["text"], "json": counters["json"],
+             "bom": counters["bom"], "crlf": counters["crlf"],
+             "keys_checked": counters["keys_checked"],
+             "values_checked": counters["values_checked"], "issues": len(issues)}
     # 版本面：声明件里的 version 值须过 SemVer 2.0.0 词法（schema 只挡到三段数字，
     # 挡不住前导零/空预发布段这类「看起来像版本、实际不是」的值）
+    stats["versions_checked"] = _version_issues(root, issues)
+    stats["issues"] = len(issues)
+    return issues, stats
+
+
+def _gitattributes_issues(root: str) -> List[str]:
+    """全仓 LF 的落点：.gitattributes 必须显式声明。"""
+    ga_path = os.path.join(root, ".gitattributes")
+    if not os.path.isfile(ga_path):
+        return ["缺 .gitattributes（修复指引：声明 `* text=auto eol=lf`——"
+                "EOL 纪律须有落点，否则 Windows 检出反复回流 CRLF）"]
+    with open(ga_path, encoding="utf-8") as fh:
+        ga = fh.read()
+    if not re.search(r"(?m)^\*\s+text(?:=\w+)?\s+eol=lf", ga):
+        return [".gitattributes 未声明 `* text=auto eol=lf`"
+                "（修复指引：全仓行尾纪律须显式声明，见仓库根 .gitattributes）"]
+    return []
+
+
+def _scan_file(path: str, root: str, issues: List[str],
+               counters: Dict[str, int]) -> None:
+    """单文件的 BOM/CRLF/UTF-8/JSON 键值面。"""
+    rel = os.path.relpath(path, root).replace(os.sep, "/")
+    try:
+        with open(path, "rb") as fh:
+            raw = fh.read()
+    except OSError:            # 尽力而为：读不到的文件跳过（缺件由 check35 回执门/门禁件清单报出）
+        return
+    if b"\x00" in raw[:4096]:  # 二进制哨兵
+        return
+    counters["text"] += 1
+    raw = _bom_issue(rel, raw, issues, counters)
+    if b"\r\n" in raw:
+        counters["crlf"] += 1
+        issues.append("%s 含 CRLF 行尾（修复指引：仓库 EOL 纪律 = LF"
+                      "（.gitattributes `* text=auto eol=lf`）；本地去 CR 后存回，勿改内容）"
+                      % rel)
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        issues.append("%s 不是合法 UTF-8：%s（修复指引：RFC 3629 只许 UTF-8——"
+                      "重存为 UTF-8 无 BOM）" % (rel, exc))
+        return
+    if path.endswith(".json"):
+        counters["json"] += 1
+        _json_issues(rel, text, issues, counters)
+
+
+def _bom_issue(rel: str, raw: bytes, issues: List[str],
+               counters: Dict[str, int]) -> bytes:
+    """BOM 哨兵：命中则记 issue 并返回去 BOM 后的字节。"""
+    if not raw.startswith(b"\xef\xbb\xbf"):
+        return raw
+    counters["bom"] += 1
+    issues.append("%s 以 UTF-8 BOM 开头（修复指引：去掉 BOM——BOM 会让 json/yaml "
+                  "首键解析失败，也让摘要随编辑器变化）" % rel)
+    return raw[3:]
+
+
+def _json_issues(rel: str, text: str, issues: List[str],
+                 counters: Dict[str, int]) -> None:
+    """JSON 键面 + 登记册标识值面。"""
+    doc, ok = _dup_check(text, rel, issues)
+    if not ok:
+        return
+    ks: List[str] = []
+    _keys(doc, ks)
+    for k in ks:
+        counters["keys_checked"] += 1
+        msg = identifier_issue(k)
+        if msg:
+            issues.append("%s JSON 键 %r 违规：%s（修复指引：键须 NFC + 字符集内；"
+                          "同形/隐形字符会让机器侧当成另一个键）" % (rel, k, msg))
+    _value_issues(rel, doc, issues, counters)
+
+
+def _value_issues(rel: str, doc, issues: List[str], counters: Dict[str, int]) -> None:
+    """登记册里作为值出现的 id/类别/键同样要过词法。"""
+    for src_rel, paths in VALUE_SOURCES:
+        if rel != src_rel:
+            continue
+        for jp in paths:
+            for val in _resolve(doc, jp):
+                if not isinstance(val, str):
+                    continue
+                counters["values_checked"] += 1
+                msg = identifier_issue(val)
+                if msg:
+                    issues.append("%s 的 %s = %r 违规：%s（修复指引：标识值须 NFC + "
+                                  "字符集内——键有判据而值没有，等于给同形留后门）"
+                                  % (rel, jp, val, msg))
+
+
+def _version_issues(root: str, issues: List[str]) -> int:
+    """声明件里的 version 值过 SemVer 2.0.0 词法 → 检查数。"""
     import glob as _glob
     n_versions = 0
     for pattern, regex in VERSION_SOURCES:
@@ -264,9 +311,7 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                 if bad:
                     issues.append("%s 的版本值 %r 违规：%s（修复指引：按 SemVer 2.0.0 改写，"
                                   "破坏性变更须 bump 主版本并留迁移记录）" % (rel, value, bad))
-    stats["versions_checked"] = n_versions
-    stats["issues"] = len(issues)
-    return issues, stats
+    return n_versions
 
 
 def summary(stats: Dict[str, Any]) -> str:

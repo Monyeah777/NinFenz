@@ -7,7 +7,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List, Sequence, Tuple
 
 from core import atomic_write
 
@@ -96,7 +96,23 @@ def certify(root: str = ".", packs: Sequence[str] = (), label: str = "", note: s
     if not write:
         return cert
     path = Path(root) / CERT_REL
-    doc = _read_json(path) or {
+    doc = _read_json(path) or _empty_cert_doc()
+    # 去重键 = 组合输入本身（packs + extra_modules），**不是** digest：
+    # 引擎升级后同一组合的摘要会变，按 digest 去重会留下历史快照（实测 26 条里 13 条过期）。
+    certs = [c for c in doc["certificates"] if _cert_key(c) != _cert_key(cert)]
+    certs.append(cert)
+    doc["certificates"] = sorted(certs, key=_cert_sort_key)
+    doc["count"] = len(doc["certificates"])
+    doc["max_packs"] = _cert_max_packs(doc)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # 原子写（2026-09-30 收口）：组合证书是在仓产物（`protocol/` 侧），并发读者可能读到半截。
+    atomic_write.write_text(path, json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
+    return cert
+
+
+def _empty_cert_doc() -> Dict[str, Any]:
+    """空证书册的骨架。"""
+    return {
         "schema": "nf-combo-certificates/1",
         "note": "声明组合证书（公开结果面）。每条 = 一次 n 元组合的可机验凭证：包清单 / 模块集 / "
                 "层位堆叠 / 依赖闭包 / 事件闭包 / 资产借阅 / 合法性 / 规范摘要。"
@@ -104,21 +120,21 @@ def certify(root: str = ".", packs: Sequence[str] = (), label: str = "", note: s
                 "逐字段一致（T4）；③ 广度证明（全部两两 + 定种子三元/四元）不变量全成立。",
         "certificates": [],
     }
-    # 去重键 = 组合输入本身（packs + extra_modules），**不是** digest：
-    # 引擎升级后同一组合的摘要会变，按 digest 去重会留下历史快照（实测 26 条里 13 条过期）。
-    def _key(c: Dict[str, Any]) -> Tuple[Any, ...]:
-        return (tuple(c.get("packs") or ()), tuple(sorted(c.get("extra_modules") or ())))
 
-    certs = [c for c in doc["certificates"] if _key(c) != _key(cert)]
-    certs.append(cert)
-    doc["certificates"] = sorted(certs, key=lambda c: (len(c.get("packs") or []),
-                                                      c.get("label") or "", c["digest"]))
-    doc["count"] = len(doc["certificates"])
-    doc["max_packs"] = max((len(c.get("packs") or []) for c in doc["certificates"]), default=0)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    # 原子写（2026-09-30 收口）：组合证书是在仓产物（`protocol/` 侧），并发读者可能读到半截。
-    atomic_write.write_text(path, json.dumps(doc, ensure_ascii=False, indent=2) + "\n")
-    return cert
+
+def _cert_key(c: Dict[str, Any]) -> Tuple[Any, ...]:
+    """证书去重键（组合输入本身）。"""
+    return (tuple(c.get("packs") or ()), tuple(sorted(c.get("extra_modules") or ())))
+
+
+def _cert_sort_key(c: Dict[str, Any]) -> Tuple[Any, ...]:
+    """证书册排序键（包数 / label / digest）。"""
+    return (len(c.get("packs") or []), c.get("label") or "", c["digest"])
+
+
+def _cert_max_packs(doc: Dict[str, Any]) -> int:
+    """证书册里最大包数。"""
+    return max((len(c.get("packs") or []) for c in doc["certificates"]), default=0)
 
 
 

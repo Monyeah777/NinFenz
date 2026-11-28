@@ -83,6 +83,24 @@ def probe(pattern: str, n: int = 65536, budget_ms: float = 1500.0) -> Tuple[floa
     return worst_ms, worst_desc
 
 
+def _file_patterns(p: Path, root: Path) -> List[Tuple[str, int, str]]:
+    try:
+        tree = ast.parse(p.read_text(encoding="utf-8", errors="replace"))
+    except (OSError, SyntaxError):
+        # 不可读/不可解析的件不构成正则命中面（其语法问题由 ruff / py_compile 判据报出）。
+        return []
+    out: List[Tuple[str, int, str]] = []
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "compile" and node.args):
+            continue
+        a = node.args[0]
+        if isinstance(a, ast.Constant) and isinstance(a.value, str):
+            out.append((p.relative_to(root).as_posix(), node.lineno, a.value))
+    return out
+
+
 def literal_patterns(root: str = ".", dirs: Tuple[str, ...] = SCAN_DIRS
                      ) -> List[Tuple[str, int, str]]:
     """AST 提取字面量 `re.compile("…")` → [(仓库相对路径, 行号, pattern)]。"""
@@ -93,19 +111,7 @@ def literal_patterns(root: str = ".", dirs: Tuple[str, ...] = SCAN_DIRS
         if not base.is_dir():
             continue
         for p in sorted(p for p in base.rglob("*.py") if not p.is_symlink()):
-            try:
-                tree = ast.parse(p.read_text(encoding="utf-8", errors="replace"))
-            except (OSError, SyntaxError):
-                # 不可读/不可解析的件不构成正则命中面（其语法问题由 ruff / py_compile 判据报出）。
-                continue
-            for node in ast.walk(tree):
-                if not (isinstance(node, ast.Call)
-                        and isinstance(node.func, ast.Attribute)
-                        and node.func.attr == "compile" and node.args):
-                    continue
-                a = node.args[0]
-                if isinstance(a, ast.Constant) and isinstance(a.value, str):
-                    out.append((p.relative_to(r).as_posix(), node.lineno, a.value))
+            out += _file_patterns(p, r)
     return out
 
 

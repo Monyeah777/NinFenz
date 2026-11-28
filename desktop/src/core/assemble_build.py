@@ -144,6 +144,7 @@ def _load_pipe(root: Path, files: List[str]):
         from core.pipeline_loader import load_pipeline_file
         return load_pipeline_file(root / files[0])
     except Exception:
+        # best-effort：管线文件不可读/解析失败时按「无预设」继续（上层走默认路径并另行提示）
         return None
 
 

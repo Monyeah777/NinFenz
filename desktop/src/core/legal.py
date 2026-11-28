@@ -96,107 +96,219 @@ def _reuse_annotations(root: str) -> List[Dict[str, Any]]:
     return list(doc.get("annotations") or [])
 
 
-def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
-    issues: List[str] = []
-    lic = doc.get("license") or {}
-    spdx = str(lic.get("spdx") or "")
+def _license_issues(lic: Dict[str, Any], root: str, spdx: str) -> List[str]:
+    """license 判据（spdx 合法 / 文件在场 / MIT 文本一致）。"""
+    out: List[str] = []
     if not spdx or not _license_expression_ok(spdx):
-        issues.append("license.spdx 非法：%s" % spdx)
+        out.append("license.spdx 非法：%s" % spdx)
     for field in ("file", "text"):
         if not _exists(root, str(lic.get(field) or "")):
-            issues.append("license.%s 不在场：%s" % (field, lic.get(field)))
+            out.append("license.%s 不在场：%s" % (field, lic.get(field)))
     if spdx == "MIT":  # 与本仓实际文本对齐（换许可须同时换文本与登记）
         try:
             head = (Path(root) / "LICENSE").read_text(encoding="utf-8")
             if "MIT License" not in head:
-                issues.append("LICENSE 文本与 spdx=MIT 不一致（%s 换许可须同步文本/REUSE/登记）" % GUIDE)
+                out.append("LICENSE 文本与 spdx=MIT 不一致（%s 换许可须同步文本/REUSE/登记）" % GUIDE)
         except OSError:
             pass
-    community = lic.get("community_license") or {}
+    return out
+
+
+def _community_issues(community: Dict[str, Any], root: str) -> List[str]:
+    """community_license 判据（LicenseRef 前缀 / 文本在场 / scope 非空）。"""
+    out: List[str] = []
     if not str(community.get("spdx") or "").startswith("LicenseRef-"):
-        issues.append("community_license 必须用 LicenseRef-<自定义> 显式自造许可")
+        out.append("community_license 必须用 LicenseRef-<自定义> 显式自造许可")
     if not _exists(root, str(community.get("text") or "")):
-        issues.append("community_license.text 不在场：%s" % community.get("text"))
+        out.append("community_license.text 不在场：%s" % community.get("text"))
     if not isinstance(community.get("scope"), list) or not community.get("scope"):
-        issues.append("community_license 缺 scope（覆盖哪些投稿面）")
-    reuse = doc.get("reuse") or {}
+        out.append("community_license 缺 scope（覆盖哪些投稿面）")
+    return out
+
+
+def _reuse_toml_issues(reuse: Dict[str, Any], root: str) -> List[str]:
+    """reuse.toml 在场判据。"""
     if not _exists(root, str(reuse.get("toml") or "")):
-        issues.append("reuse.toml 不在场：%s" % reuse.get("toml"))
-    annotations = _reuse_annotations(root)
+        return ["reuse.toml 不在场：%s" % reuse.get("toml")]
+    return []
+
+
+def _reuse_agg_issues(reuse: Dict[str, Any], annotations: List[Any],
+                      spdx: str) -> List[str]:
+    """REUSE annotations 非空 + 聚合许可对账判据。"""
+    out: List[str] = []
     if not annotations:
-        issues.append("REUSE.toml 解析不出 annotations（%s 修 TOML）" % GUIDE)
+        out.append("REUSE.toml 解析不出 annotations（%s 修 TOML）" % GUIDE)
     aggregate = [a for a in annotations if str(a.get("precedence")) == "aggregate"]
     if aggregate and str(aggregate[0].get("SPDX-License-Identifier")) != str(reuse.get("aggregate_license")):
-        issues.append("REUSE 聚合许可 %r ≠ 登记 %r"
-                      % (aggregate[0].get("SPDX-License-Identifier"), reuse.get("aggregate_license")))
+        out.append("REUSE 聚合许可 %r ≠ 登记 %r"
+                   % (aggregate[0].get("SPDX-License-Identifier"), reuse.get("aggregate_license")))
     if str(reuse.get("aggregate_license")) != spdx:
-        issues.append("reuse 聚合许可 %r ≠ license.spdx %r（换许可须同步 LICENSE/REUSE/登记，%s）"
-                      % (reuse.get("aggregate_license"), spdx, GUIDE))
+        out.append("reuse 聚合许可 %r ≠ license.spdx %r（换许可须同步 LICENSE/REUSE/登记，%s）"
+                   % (reuse.get("aggregate_license"), spdx, GUIDE))
+    return out
+
+
+def _override_issues(community: Dict[str, Any], annotations: List[Any]) -> List[str]:
+    """REUSE override 对投稿面的覆盖判据。"""
     overrides = [a for a in annotations if str(a.get("precedence")) == "override"]
+    out: List[str] = []
     for scope in community.get("scope") or []:
         if not any(scope in [str(p) for p in (a.get("path") or [])] for a in overrides):
-            issues.append("REUSE override 缺投稿面覆盖：%s" % scope)
-    third = doc.get("third_party") or {}
+            out.append("REUSE override 缺投稿面覆盖：%s" % scope)
+    return out
+
+
+def _third_party_issues(third: Dict[str, Any], root: str) -> List[str]:
+    """third_party 判据（三件在场 / requirements 逐条在场）。"""
+    out: List[str] = []
     for field in ("notice", "generator", "sbom"):
         if not _exists(root, str(third.get(field) or "")):
-            issues.append("third_party.%s 不在场：%s" % (field, third.get(field)))
+            out.append("third_party.%s 不在场：%s" % (field, third.get(field)))
     for rel in third.get("requirements") or []:
         if not _exists(root, str(rel)):
-            issues.append("third_party.requirements 不在场：%s" % rel)
+            out.append("third_party.requirements 不在场：%s" % rel)
+    return out
+
+
+def _dep_issues(root: str) -> List[str]:
+    """运行时零第三方依赖判据（pyproject / npm）。"""
     deps = _pyproject_deps(root)
-    if deps != []:
-        issues.append("pyproject [project].dependencies 必须为空（运行时零第三方；实际 %r）" % (deps,))
     npm = _package_json_deps(root)
+    out: List[str] = []
+    if deps != []:
+        out.append("pyproject [project].dependencies 必须为空（运行时零第三方；实际 %r）" % (deps,))
     if npm not in (None, {}):
-        issues.append("npm package.json 不得有 dependencies（实际 %r）" % (npm,))
-    trade = doc.get("trademark") or {}
+        out.append("npm package.json 不得有 dependencies（实际 %r）" % (npm,))
+    return out
+
+
+def _trademark_issues(trade: Dict[str, Any]) -> List[str]:
+    """trademark 判据（name / rules / 非背书 / attribution）。"""
+    out: List[str] = []
     if not str(trade.get("name") or "").strip():
-        issues.append("trademark 缺 name")
+        out.append("trademark 缺 name")
     if len(trade.get("rules") or []) < 2:
-        issues.append("trademark.rules 至少 2 条（使用/分发边界）")
+        out.append("trademark.rules 至少 2 条（使用/分发边界）")
     if "不得" not in str(trade.get("no_endorsement") or ""):
-        issues.append("trademark 缺非背书条款（不得暗示官方认证/背书）")
+        out.append("trademark 缺非背书条款（不得暗示官方认证/背书）")
     if not str(trade.get("attribution") or "").strip():
-        issues.append("trademark 缺 attribution（署名口径）")
-    contracts = doc.get("contracts") or []
+        out.append("trademark 缺 attribution（署名口径）")
+    return out
+
+
+def _contract_issues(item: Dict[str, Any], root: str) -> List[str]:
+    """单个合同模板判据（path 在场 / status 词表）。"""
+    out: List[str] = []
+    if not _exists(root, str(item.get("path") or "")):
+        out.append("合同模板 %s 的 path 不在场：%s" % (item.get("id"), item.get("path")))
+    if str(item.get("status")) not in ("template-in-doc", "signed-external", "none"):
+        out.append("合同 %s 的 status 非法：%s" % (item.get("id"), item.get("status")))
+    return out
+
+
+def _contracts_issues(contracts: List[Any], root: str) -> List[str]:
+    """contracts 类型覆盖 + 逐件判据。"""
     types = [str(c.get("type")) for c in contracts if isinstance(c, dict)]
+    out: List[str] = []
     if sorted(types) != sorted(CONTRACT_TYPES):
-        issues.append("contracts 必须恰覆盖 %s（实际 %s）" % (list(CONTRACT_TYPES), types))
+        out.append("contracts 必须恰覆盖 %s（实际 %s）" % (list(CONTRACT_TYPES), types))
     for item in contracts:
         if not isinstance(item, dict):
-            issues.append("contracts 含非对象")
+            out.append("contracts 含非对象")
             continue
-        if not _exists(root, str(item.get("path") or "")):
-            issues.append("合同模板 %s 的 path 不在场：%s" % (item.get("id"), item.get("path")))
-        if str(item.get("status")) not in ("template-in-doc", "signed-external", "none"):
-            issues.append("合同 %s 的 status 非法：%s" % (item.get("id"), item.get("status")))
-    exp = doc.get("export") or {}
+        out.extend(_contract_issues(item, root))
+    return out
+
+
+def _export_issues(exp: Dict[str, Any], root: str) -> List[str]:
+    """export 判据（加密组件登记/在场 / review_trigger / 非法律意见）。"""
+    out: List[str] = []
     comps = exp.get("crypto_components") or []
     if not comps:
-        issues.append("export.crypto_components 为空（加密组件必须显式登记）")
+        out.append("export.crypto_components 为空（加密组件必须显式登记）")
     for rel in comps:
         if not _exists(root, str(rel)):
-            issues.append("加密组件不在场：%s" % rel)
+            out.append("加密组件不在场：%s" % rel)
     if not exp.get("review_trigger"):
-        issues.append("export 缺 review_trigger（何时须做出口/制裁评审）")
+        out.append("export 缺 review_trigger（何时须做出口/制裁评审）")
     if not str(exp.get("not_legal_advice") or "").strip():
-        issues.append("export 缺 not_legal_advice（不构成法律意见）")
-    oss = doc.get("oss_governance") or {}
+        out.append("export 缺 not_legal_advice（不构成法律意见）")
+    return out
+
+
+def _oss_files_issues(oss: Dict[str, Any], root: str) -> List[str]:
+    """oss_governance.files 逐件在场判据。"""
     files = oss.get("files") or {}
+    out: List[str] = []
     for key in ("contributing", "code_of_conduct", "maintainers", "security",
                 "support", "governance", "changelog"):
         if not _exists(root, str(files.get(key) or "")):
-            issues.append("oss_governance.files.%s 不在场：%s" % (key, files.get(key)))
+            out.append("oss_governance.files.%s 不在场：%s" % (key, files.get(key)))
+    return out
+
+
+def _oss_policy_issues(oss: Dict[str, Any], root: str) -> List[str]:
+    """oss_governance 策略文本 + scorecard workflow 判据。"""
+    out: List[str] = []
     for key in ("release_policy", "deprecation_policy"):
         if not str(oss.get(key) or "").strip():
-            issues.append("oss_governance 缺 %s" % key)
+            out.append("oss_governance 缺 %s" % key)
     if not _exists(root, str((oss.get("scorecard") or {}).get("workflow") or "")):
-        issues.append("scorecard workflow 不在场：%s" % (oss.get("scorecard") or {}).get("workflow"))
+        out.append("scorecard workflow 不在场：%s" % (oss.get("scorecard") or {}).get("workflow"))
+    return out
+
+
+def _boundary_issues(doc: Dict[str, Any]) -> List[str]:
+    """claims_boundary 必写词判据。"""
     boundary = " ".join(str(x) for x in doc.get("claims_boundary") or [])
+    out: List[str] = []
     for word in ("不提供法律意见", "不声称合规"):
         if word not in boundary:
-            issues.append("claims_boundary 必须显式写「%s」" % word)
+            out.append("claims_boundary 必须显式写「%s」" % word)
+    return out
+
+
+def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
+    lic = doc.get("license") or {}
+    spdx = str(lic.get("spdx") or "")
+    issues: List[str] = []
+    issues.extend(_license_issues(lic, root, spdx))
+    community = lic.get("community_license") or {}
+    issues.extend(_community_issues(community, root))
+    reuse = doc.get("reuse") or {}
+    issues.extend(_reuse_toml_issues(reuse, root))
+    annotations = _reuse_annotations(root)
+    issues.extend(_reuse_agg_issues(reuse, annotations, spdx))
+    issues.extend(_override_issues(community, annotations))
+    third = doc.get("third_party") or {}
+    issues.extend(_third_party_issues(third, root))
+    issues.extend(_dep_issues(root))
+    trade = doc.get("trademark") or {}
+    issues.extend(_trademark_issues(trade))
+    contracts = doc.get("contracts") or []
+    issues.extend(_contracts_issues(contracts, root))
+    exp = doc.get("export") or {}
+    issues.extend(_export_issues(exp, root))
+    oss = doc.get("oss_governance") or {}
+    issues.extend(_oss_files_issues(oss, root))
+    issues.extend(_oss_policy_issues(oss, root))
+    issues.extend(_boundary_issues(doc))
     return issues
+
+
+def _audit_facts(root: str, doc: Dict[str, Any], rows: int) -> Dict[str, Any]:
+    """许可/治理事实（供人读报告与测试断言）。"""
+    return {
+        "license": (doc.get("license") or {}).get("spdx"),
+        "reuse_annotations": len(_reuse_annotations(root)),
+        "third_party_rows": rows,
+        "contracts": len(doc.get("contracts") or []),
+        "crypto_components": len((doc.get("export") or {}).get("crypto_components") or []),
+        "governance_files": len(((doc.get("oss_governance") or {}).get("files") or {})),
+        "runtime_deps": _pyproject_deps(root),
+        "npm_deps": _package_json_deps(root),
+    }
 
 
 def audit(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
@@ -211,14 +323,4 @@ def audit(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     if notice.is_file():
         rows = sum(1 for line in notice.read_text(encoding="utf-8").splitlines()
                    if line.strip().startswith("| `"))
-    facts = {
-        "license": (doc.get("license") or {}).get("spdx"),
-        "reuse_annotations": len(_reuse_annotations(root)),
-        "third_party_rows": rows,
-        "contracts": len(doc.get("contracts") or []),
-        "crypto_components": len((doc.get("export") or {}).get("crypto_components") or []),
-        "governance_files": len(((doc.get("oss_governance") or {}).get("files") or {})),
-        "runtime_deps": _pyproject_deps(root),
-        "npm_deps": _package_json_deps(root),
-    }
-    return issues, facts
+    return issues, _audit_facts(root, doc, rows)

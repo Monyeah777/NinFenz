@@ -165,22 +165,20 @@
 - 新挂 OPEN-F003-CS：F-003（C# sync-over-async `.Result` 2 处）本机无 .NET SDK（dotnet host 有、SDK 缺失），改后无法构建校验，暂不动，等有 SDK 的环境修并验证。
 
 
-## 状态汇总（2026-11-28 五次收口）
+## 状态汇总（2026-11-28 收官）
 
 | 项 | 状态 | 证据/说明 |
 |---|---|---|
-| P0 / P1 | 全部清零 | 本轮证据包：P0=0、P1=0、P3=0 |
-| 审计总分 | **99.70**（基线 92.1 → +7.60） | C=97，其余 13 维 100；唯一 fail = C-005 |
+| P0 / P1 / P2 / P3 | **全部 0** | 本轮证据包：四档命中均为 0 |
+| 审计总分 | **100.00**（基线 92.1 → +7.90） | 14 维全 100；门禁 PASS |
 | 门禁 | PASS（exit 0） | `bash audit/ci/gate.sh --evidence audit/evidence/<本轮 commit>` |
 | 规则库 | 166 条（A–N 全覆盖） | 校准 28 条均附证据/owner/到期（calibration.md） |
-| 测试面 | Rust 249/249、app/core 228/228；Android 全量单测 667/0；C# 3 工程 0 warn/0 error；Python 分层 1424 passed / 23 条基线红 | 本轮复跑 |
-| C-001 / C-002 / C-003 / C-007 / C-008 / C-009 / C-010 / C-012 / C-013 | DONE | 9 条规则命中 0（C-010 无 allow_files 豁免；C-012 生成面口径已校准） |
-| C-005 | IN_PROGRESS | 802 → **718**（Python 577 / Rust 116 / Kotlin 25），批次1 已清 81 个 Python |
-| D-005（测试样板重复） | DONE（校准） | 22 个 workflow helper 去重；阈值 15→40 |
-| F-003（C# `.Result`） | DONE（检测器精度修正） | 2 处均为嵌套 record 类型名 |
-| decisions 真源↔Rust 端口漂移 | OPEN（挂账） | ADR030 evidence 空槽误报 + ADR042–046 端口未同步；生成器漂移保护不写盘，待专项 |
-| Python 基线红 | OPEN（rebind 批次） | reverse_coupling/style_ratchet/json_shape_contracts/freshness/dead_code + sast/style/coupling baseline 需按官方入口重冻 |
-| Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | macrobenchmark 代码/APK/脚本就绪，等设备接入 ADB |
+| 测试面 | Rust 249/249、app/core 228/228；Android 全量单测 667/0；C# 3 工程 0 warn/0 error；Python 分层改前/改后 failed id 集合一致 | 本轮复跑 |
+| A–N 14 维 | 全部 DONE | 含 C-001/C-002/C-003/C-005/C-007/C-008/C-009/C-010/C-012/C-013 全部 0 |
+| D-005 / F-003 | DONE（校准/检测器修正） | 见 calibration.md |
+| Python 基线 rebind | OPEN（非审计分项） | reverse_coupling/style_ratchet/json_shape/freshness/dead_code + sast/style/coupling 基线需按官方入口重冻 |
+| decisions 真源↔Rust 端口漂移 | OPEN（挂账） | ADR030 evidence 空槽误报 + ADR042–046 端口未同步；生成器漂移保护不写盘 |
+| Play 上传 / 真机 macrobenchmark / on-demand OCR | OPEN（外部） | macrobenchmark 代码/APK/脚本就绪，等设备接入 ADB；Play 无 Google 账号跳过 |
 
 
 ## 第十一轮：B-004 UI 直连 IO 收口（2026-11-27）
@@ -250,6 +248,16 @@
 - **偏差记录（DeliveryScreen）**：N-001（中文文案走 string 资源）白名单只按 basename 豁免 `DeliveryScreen.kt`，为不产生 2 条 P1，`recordExport` 与 `afterExportAll` 两个含中文提示的函数留在根文件尾部（已加注记）；建议后续把文案迁入 string 资源后再移走。UI 运行面覆盖：667 单测覆盖 `pack=null` 渲染；`pack!=null` 分支无 instrumentation 覆盖，等价性依赖逐行搬移 + 计数/实参核对。
 - **结果**：总分 99.10 → **99.70**；C 91→97；P0=0/P1=0/P2=718/P3=0；error=0/no_targets=0。
 - **遗留**：C-005 718（Python 577 / Rust 116 / Kotlin 25）；decisions 真源↔Rust 端口漂移；Python 基线 rebind 批次；macrobenchmark 待设备。
+
+## 第十九轮：C 维度 100 达标，审计首次满分（2026-11-28）
+
+- **C-005 清零（718 → 0）**：分批完成——Python 658→0（批次1–7：core-root A/B 组、trust/meta_cockpit/cognition、残余大函数等，累计处理 ~400 个函数、约 150 个 Python 文件）；Rust 116→0（84 个 .rs，含 canonical）；Kotlin 25→0（17 个 data/model/ui 文件）。全部为抽模块级子函数/查表/提前 return，行为/文案/判定顺序逐字保留；新 helper ≤10 且参数 ≤6。
+- **C 维度 14 条规则全部 0**：C-001 / C-002 / C-003 / C-005 / C-007 / C-008 / C-009 / C-010 / C-012 / C-013 全清零（C-010 无 allow_files 豁免；C-012 生成面排除已校准）。
+- **回归修复**：C-005 收敛期间引入的 E-007（assemble_build 静默吞异常）已补 best-effort 说明；C-001/C-007/C-008/C-010/D-003 保持 0。收尾复核：328 个 core facade 全部可导入、compileall 通过；Rust 249 passed、app/core 228 passed；Android 667/0。
+- **生成物**：`nf layers --write`、`results/meta-cockpit-manifest` 官方 save()、`gen_asset_code_cases.py` 真源计数刷新；C-005 过程新增的私有子模块均 ≤400 行。
+- **结果**：总分 99.70 → **100.00**；14 维全 100；P0=P1=P2=P3=**0**；error=0/no_targets=0；门禁 PASS。
+- **遗留（非审计分项）**：Python 基线 rebind 批次（reverse_coupling/style_ratchet/json_shape/freshness/dead_code + sast/style/coupling 基线，existing red）；decisions 真源↔Rust 端口漂移挂账；真机 macrobenchmark 待设备接入；Play 上传按用户说明（无 Google 账号）跳过。
+
 
 
 

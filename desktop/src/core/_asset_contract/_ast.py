@@ -3,6 +3,7 @@
 门面 core.asset_contract 按原 API 重新导出；本文件只承载实现，不改变对外面。
 """
 from __future__ import annotations
+from typing import Any, Iterable, List, Optional, Tuple
 
 import ast
 
@@ -141,37 +142,58 @@ def _scan_block(stmts: List[ast.stmt], cur: set, rel: str,
     for st in stmts:
         for lineno in _derefs(st, cur):
             out.append((rel, lineno, ",".join(sorted(cur))))
-        if isinstance(st, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
-            for name in _assigned_names(st):
-                (cur.add if _assigns_none(st, name) else cur.discard)(name)
-        elif isinstance(st, ast.Assert):
-            g = _guard(st)
-            if g and g[1] == "is-not-none":
-                cur.discard(g[0])
-        elif isinstance(st, ast.If):
-            g = _guard(st)
-            if g and g[1] == "is-not-none":
-                _scan_block(st.body, cur - {g[0]}, rel, out)
-                _scan_block(st.orelse, cur, rel, out)
-            elif g and g[1] == "is-none":
-                _scan_block(st.body, cur, rel, out)
-                _scan_block(st.orelse, cur - {g[0]}, rel, out)
-            else:
-                _scan_block(st.body, cur, rel, out)
-                _scan_block(st.orelse, cur, rel, out)
-            if g and g[1] == "is-none" and _always_exits(st.body):
-                cur.discard(g[0])
-            cur -= _assigned_names(st)
-        elif isinstance(st, (ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith)):
-            _scan_block(st.body, cur, rel, out)
-            cur -= _assigned_names(st)
-        elif isinstance(st, ast.Try):
-            _scan_block(st.body, cur, rel, out)
-            for handler in st.handlers:
-                _scan_block(handler.body, cur, rel, out)
-            _scan_block(st.orelse, cur, rel, out)
-            _scan_block(st.finalbody, cur, rel, out)
-            cur -= _assigned_names(st)
+        cur = _scan_stmt(st, cur, rel, out)
+    return cur
+
+
+def _scan_stmt(st: ast.stmt, cur: set, rel: str,
+               out: List[Tuple[str, int, str]]) -> set:
+    """单语句扫描 → 更新后的 None 集合。"""
+    if isinstance(st, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+        for name in _assigned_names(st):
+            (cur.add if _assigns_none(st, name) else cur.discard)(name)
+    elif isinstance(st, ast.Assert):
+        g = _guard(st)
+        if g and g[1] == "is-not-none":
+            cur.discard(g[0])
+    elif isinstance(st, ast.If):
+        cur = _scan_if(st, cur, rel, out)
+    elif isinstance(st, (ast.For, ast.AsyncFor, ast.While, ast.With, ast.AsyncWith)):
+        _scan_block(st.body, cur, rel, out)
+        cur -= _assigned_names(st)
+    elif isinstance(st, ast.Try):
+        cur = _scan_try(st, cur, rel, out)
+    return cur
+
+
+def _scan_if(st: ast.If, cur: set, rel: str,
+             out: List[Tuple[str, int, str]]) -> set:
+    """if 分支扫描（守卫只在本分支内生效，不并回外层）。"""
+    g = _guard(st)
+    if g and g[1] == "is-not-none":
+        _scan_block(st.body, cur - {g[0]}, rel, out)
+        _scan_block(st.orelse, cur, rel, out)
+    elif g and g[1] == "is-none":
+        _scan_block(st.body, cur, rel, out)
+        _scan_block(st.orelse, cur - {g[0]}, rel, out)
+    else:
+        _scan_block(st.body, cur, rel, out)
+        _scan_block(st.orelse, cur, rel, out)
+    if g and g[1] == "is-none" and _always_exits(st.body):
+        cur.discard(g[0])
+    cur -= _assigned_names(st)
+    return cur
+
+
+def _scan_try(st: ast.Try, cur: set, rel: str,
+              out: List[Tuple[str, int, str]]) -> set:
+    """try 各子块扫描（body/handlers/orelse/finalbody）。"""
+    _scan_block(st.body, cur, rel, out)
+    for handler in st.handlers:
+        _scan_block(handler.body, cur, rel, out)
+    _scan_block(st.orelse, cur, rel, out)
+    _scan_block(st.finalbody, cur, rel, out)
+    cur -= _assigned_names(st)
     return cur
 
 

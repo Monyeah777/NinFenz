@@ -22,16 +22,18 @@ from core import gate_select as gs
 from core import gate_verdict as gv
 
 
-def plan(changed, root: str = ".", faces=None, tests_dir=None, quick_only: bool = True,
-         use_cache: bool = True) -> dict:
-    """计划期：定键 + 查缓存（**此刻不应有任何测试在跑**）。"""
+def _plan_inputs(changed, root: str, faces, tests_dir, quick_only: bool):
     tdir = Path(tests_dir) if tests_dir is not None else None
     got = gs.select(changed, doc=faces, tests_dir=tdir, root=root)
-    faces = faces if faces is not None else gs.load_faces(root)
+    faces_doc = faces if faces is not None else gs.load_faces(root)
     picked = got["quick"] if quick_only else got["run"]
+    return faces_doc, picked, got, tdir
+
+
+def _split_cached(picked, faces_doc: dict, root: str, tdir, use_cache: bool):
     cached, to_run, uncacheable = [], [], []
     for mod, _why in picked:
-        rec = faces.get(mod) or {}
+        rec = faces_doc.get(mod) or {}
         reads = rec.get("reads") or []
         code = [f"desktop/tests/{mod}.py"]
         if not use_cache or not reads or not gs.cacheable(mod, rec, tdir):
@@ -43,8 +45,20 @@ def plan(changed, root: str = ".", faces=None, tests_dir=None, quick_only: bool 
             cached.append((mod, value))
         else:
             to_run.append((mod, (tag, ckey, entry)))
+    return cached, to_run, uncacheable
+
+
+def _deferred(got: dict, quick_only: bool) -> list:
+    return [m for m, _w in got["slow"]] if quick_only else []
+
+
+def plan(changed, root: str = ".", faces=None, tests_dir=None, quick_only: bool = True,
+         use_cache: bool = True) -> dict:
+    """计划期：定键 + 查缓存（**此刻不应有任何测试在跑**）。"""
+    faces_doc, picked, got, tdir = _plan_inputs(changed, root, faces, tests_dir, quick_only)
+    cached, to_run, uncacheable = _split_cached(picked, faces_doc, root, tdir, use_cache)
     return {"cached": cached, "to_run": to_run, "uncacheable": uncacheable,
-            "deferred": [m for m, _w in got["slow"]] if quick_only else [],
+            "deferred": _deferred(got, quick_only),
             "skipped": got["skip"], "run": got["run"], "quick": got["quick"]}
 
 

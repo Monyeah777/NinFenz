@@ -92,40 +92,82 @@ def lint_text(text: str, extra_terms: Optional[List[str]] = None,
     terms = list(CLICHES) + list(extra_terms or [])
 
     for no, s in lines:
-        masked = _mask_code(s)          # 代码内容不参与正文规则（降噪，见 _mask_code）
-        hit = next((w for w in terms if w in masked), None)
-        if hit:
-            out.append({"rule": "cliche_open", "line": no,
-                        "message": "陈词滥调/套话：「%s」" % hit, "snippet": s[:40]})
-        tail = next((w for w in SUMMARY_TAILS if w in masked), None)
-        if tail:
-            out.append({"rule": "summary_tail", "line": no,
-                        "message": "总结腔：「%s」" % tail, "snippet": s[:40]})
-        lec = next((w for w in LECTURE if w in masked), None)
-        if lec:
-            out.append({"rule": "lecture_tone", "line": no,
-                        "message": "说教腔：「%s」" % lec, "snippet": s[:40]})
-        m = _BINARY.search(masked)
-        if m:
-            out.append({"rule": "binary_parallel", "line": no,
-                        "message": "对称句式（AI 腔高发）：%s" % m.group(0)[:20],
-                        "snippet": s[:40]})
-        q = _QUAD.search(masked)
-        if q and q.group(0).count("、") + 1 >= TRIPLE_ADJ_MIN:
-            out.append({"rule": "triple_adj", "line": no,
-                        "message": "四字词堆砌（≥%d 连）：%s"
-                                   % (TRIPLE_ADJ_MIN, q.group(0)[:24]),
-                        "snippet": s[:40]})
-        # `punct_mix`：CJK 后紧跟 ASCII 标点。**豁免 ID 语法**——`通用:M10` / `事件:M22`
-        # 是仓内既有模块 id 形态（ASCII 冒号 + 标识符），不是中英标点混用（实测假阳性来源）。
-        for p in _PUNCT.finditer(masked):
-            ch, nxt = p.group(0)[-1], masked[p.end():p.end() + 1]
-            if ch == ":" and nxt and (nxt.isascii() and (nxt.isalnum() or nxt == "_")):
-                continue
-            out.append({"rule": "punct_mix", "line": no,
-                        "message": "中英标点混用：%s" % p.group(0), "snippet": s[:40]})
-            break
+        out += _line_issues(no, s, terms)
 
+    out += _connector_issues(lines)
+
+    if body:
+        out += _hedge_issues(body, hedge_per_1000)
+    out.sort(key=lambda f: (f["line"], f["rule"]))
+    return out
+
+
+def _first(terms: List[str], masked: str) -> Optional[str]:
+    """首个命中的词（无命中= None）。"""
+    return next((w for w in terms if w in masked), None)
+
+
+def _line_issues(no: int, s: str, terms: List[str]) -> List[Dict[str, object]]:
+    """单行正文规则（陈词/总结腔/说教腔/对称句式/四字堆砌/标点混用）。"""
+    masked = _mask_code(s)          # 代码内容不参与正文规则（降噪，见 _mask_code）
+    out: List[Dict[str, object]] = []
+    hit = _first(terms, masked)
+    if hit:
+        out.append({"rule": "cliche_open", "line": no,
+                    "message": "陈词滥调/套话：「%s」" % hit, "snippet": s[:40]})
+    tail = _first(SUMMARY_TAILS, masked)
+    if tail:
+        out.append({"rule": "summary_tail", "line": no,
+                    "message": "总结腔：「%s」" % tail, "snippet": s[:40]})
+    lec = _first(LECTURE, masked)
+    if lec:
+        out.append({"rule": "lecture_tone", "line": no,
+                    "message": "说教腔：「%s」" % lec, "snippet": s[:40]})
+    out += _pattern_issues(no, s, masked)
+    return out
+
+
+def _pattern_issues(no: int, s: str,
+                    masked: str) -> List[Dict[str, object]]:
+    """行内正则型规则（对称句式/四字堆砌/标点混用）。"""
+    out: List[Dict[str, object]] = []
+    m = _BINARY.search(masked)
+    if m:
+        out.append({"rule": "binary_parallel", "line": no,
+                    "message": "对称句式（AI 腔高发）：%s" % m.group(0)[:20],
+                    "snippet": s[:40]})
+    q = _QUAD.search(masked)
+    if q and q.group(0).count("、") + 1 >= TRIPLE_ADJ_MIN:
+        out.append({"rule": "triple_adj", "line": no,
+                    "message": "四字词堆砌（≥%d 连）：%s"
+                               % (TRIPLE_ADJ_MIN, q.group(0)[:24]),
+                    "snippet": s[:40]})
+    out += _punct_issues(no, s, masked)
+    return out
+
+
+def _is_id_colon(ch: str, nxt: str) -> bool:
+    """CJK 后是「ASCII 冒号 + 标识符」→ 仓内模块 id 形态，不判混用。"""
+    return (ch == ":" and bool(nxt) and nxt.isascii()
+            and (nxt.isalnum() or nxt == "_"))
+
+
+def _punct_issues(no: int, s: str, masked: str) -> List[Dict[str, object]]:
+    """中英标点混用（首个命中即止）。"""
+    out: List[Dict[str, object]] = []
+    for p in _PUNCT.finditer(masked):
+        ch, nxt = p.group(0)[-1], masked[p.end():p.end() + 1]
+        if _is_id_colon(ch, nxt):
+            continue
+        out.append({"rule": "punct_mix", "line": no,
+                    "message": "中英标点混用：%s" % p.group(0), "snippet": s[:40]})
+        break
+    return out
+
+
+def _connector_issues(lines) -> List[Dict[str, object]]:
+    """段首连接词复用（≥2 次）。"""
+    out: List[Dict[str, object]] = []
     starts = [s[:4] for _no, s in lines]
     for c in CONNECTORS:
         hits = [i for i, st in enumerate(starts) if st.startswith(c)]
@@ -133,16 +175,18 @@ def lint_text(text: str, extra_terms: Optional[List[str]] = None,
             out.append({"rule": "repeat_connector", "line": lines[hits[1]][0],
                         "message": "段首连接词复用 %d 次：「%s」" % (len(hits), c),
                         "snippet": c})
-
-    if body:
-        n_hedge = sum(body.count(w) for w in HEDGES)
-        per_1k = n_hedge * 1000.0 / max(1, len(body))
-        if per_1k > hedge_per_1000:
-            out.append({"rule": "hedge_overuse", "line": 0,
-                        "message": "模糊限定词过密：%.1f 次/千字（阈值 %.1f）"
-                                   % (per_1k, hedge_per_1000), "snippet": ""})
-    out.sort(key=lambda f: (f["line"], f["rule"]))
     return out
+
+
+def _hedge_issues(body: str, hedge_per_1000: float) -> List[Dict[str, object]]:
+    """模糊限定词密度超阈值。"""
+    n_hedge = sum(body.count(w) for w in HEDGES)
+    per_1k = n_hedge * 1000.0 / max(1, len(body))
+    if per_1k > hedge_per_1000:
+        return [{"rule": "hedge_overuse", "line": 0,
+                 "message": "模糊限定词过密：%.1f 次/千字（阈值 %.1f）"
+                            % (per_1k, hedge_per_1000), "snippet": ""}]
+    return []
 
 
 def summarize(findings: List[Dict[str, object]]) -> Dict[str, int]:
@@ -194,41 +238,74 @@ def cli_commands(root: str = ".") -> set:
 def command_face(root: str = ".") -> tuple:
     """文档命令面 ↔ CLI 注册表 / MCP 工具表一致性（外部标准净吸收：文档即接口面）。
 
-    内部差距：`protocol/driver.json` 只锚定**指令档**（组装指令包 / AI_ROUTING / ai-menu）
-    的机器面路由；README、ROUTES、07 导航、docs/** 里写的 `nf <子命令>` 与 MCP 工具名
+    内部差距：protocol/driver.json 只锚定**指令档**（组装指令包 / AI_ROUTING / ai-menu）
+    的机器面路由；README、ROUTES、07 导航、docs/** 里写的 nf <子命令> 与 MCP 工具名
     **无判据**——写错一个子命令（改名的残留）读者按文档执行即失败，门禁一条都不会红。
     判据只看「当作命令呈现的片段」（行内代码 / 围栏块），不判散文里的自然语言词。
     """
-    import glob
     cmds = cli_commands(root)
-    try:
-        import sys
-        sys.path.insert(0, os.path.join(root, "desktop", "src"))
-        from core.mcp_runtime import TOOL_DEFS  # noqa: PLC0415
-        tools = {t["name"] for t in TOOL_DEFS}
-    except Exception:  # pragma: no cover - 工具表不可读即跳过工具面
-        tools = set()
-    docs = [d for d in FACE_DOCS if os.path.exists(os.path.join(root, d))]
-    docs += sorted(os.path.relpath(p, root).replace(os.sep, "/")
-                   for p in glob.glob(os.path.join(root, "docs", "*.md")))
+    tools = _tool_names(root)
+    docs = _face_docs(root)
     issues: List[str] = []
     checked = 0
     for rel in docs:
         with open(os.path.join(root, rel), encoding="utf-8") as fh:
             text = fh.read()
-        for snip in _command_snippets(text):
-            for m in _NF_CALL.finditer(snip):
-                checked += 1
-                name = m.group(1)
-                if name not in cmds:
-                    issues.append("%s 命令面：`%s` 不是 CLI 子命令"
-                                  "（修复指引：核对 scripts/nf.py 注册表改文档，或先实现该命令）"
-                                  % (rel, ("nf " + name).strip()))
-            for m in _MCP_TOOL_MENTION.finditer(snip):
-                checked += 1
-                if tools and m.group(1) not in tools:
-                    issues.append("%s 命令面：%s 不是已登记 MCP 工具"
-                                  "（修复指引：核对 core/mcp_runtime.TOOL_DEFS，"
-                                  "工具名与实现须逐名一致）" % (rel, m.group(1)))
+        doc_issues, doc_checked = _doc_face_issues(rel, text, cmds, tools)
+        issues += doc_issues
+        checked += doc_checked
     return issues, {"docs": len(docs), "commands_checked": checked,
                     "cli_commands": len(cmds), "mcp_tools": len(tools)}
+
+
+def _tool_names(root: str) -> set:
+    """MCP 工具名集合（工具表不可读 → 空集，跳过工具面）。"""
+    try:
+        import sys
+        sys.path.insert(0, os.path.join(root, "desktop", "src"))
+        from core.mcp_runtime import TOOL_DEFS  # noqa: PLC0415
+        return {t["name"] for t in TOOL_DEFS}
+    except Exception:  # pragma: no cover - 工具表不可读即跳过工具面
+        return set()
+
+
+def _face_docs(root: str) -> List[str]:
+    """命令面文档清单（固定面 + docs/*.md）。"""
+    import glob
+    docs = [d for d in FACE_DOCS if os.path.exists(os.path.join(root, d))]
+    docs += sorted(os.path.relpath(p, root).replace(os.sep, "/")
+                   for p in glob.glob(os.path.join(root, "docs", "*.md")))
+    return docs
+
+
+def _doc_face_issues(rel: str, text: str, cmds: set,
+                     tools: set) -> tuple:
+    """单件文档的命令面问题与检查计数。"""
+    issues: List[str] = []
+    checked = 0
+    for snip in _command_snippets(text):
+        snip_issues, snip_checked = _snippet_issues(rel, snip, cmds, tools)
+        issues += snip_issues
+        checked += snip_checked
+    return issues, checked
+
+
+def _snippet_issues(rel: str, snip: str, cmds: set,
+                    tools: set) -> tuple:
+    """单个「命令片段」里的 nf 子命令与 MCP 工具名核对。"""
+    issues: List[str] = []
+    checked = 0
+    for m in _NF_CALL.finditer(snip):
+        checked += 1
+        name = m.group(1)
+        if name not in cmds:
+            issues.append("%s 命令面：`%s` 不是 CLI 子命令"
+                          "（修复指引：核对 scripts/nf.py 注册表改文档，或先实现该命令）"
+                          % (rel, ("nf " + name).strip()))
+    for m in _MCP_TOOL_MENTION.finditer(snip):
+        checked += 1
+        if tools and m.group(1) not in tools:
+            issues.append("%s 命令面：%s 不是已登记 MCP 工具"
+                          "（修复指引：核对 core/mcp_runtime.TOOL_DEFS，"
+                          "工具名与实现须逐名一致）" % (rel, m.group(1)))
+    return issues, checked

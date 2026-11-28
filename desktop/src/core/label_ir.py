@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterable
-from typing import Any
+from typing import Any, List
 
 SCHEMA = "nf-label/1"
 #: 标准真源（v0 只认这一份；换标准要显式改这里并补判据）
@@ -143,6 +143,43 @@ def _covered(item: dict[str, Any], rule: dict[str, Any]) -> bool:
     return True
 
 
+def _header_issues(doc: dict[str, Any]) -> List[str]:
+    issues: List[str] = []
+    if doc.get("schema") != SCHEMA:
+        issues.append(f"schema 不匹配：{doc.get('schema')!r}（" + GUIDE +
+                      f"期望 {SCHEMA}）")
+    if doc.get("standard") != STANDARD:
+        issues.append(f"standard 不匹配：{doc.get('standard')!r}（" + GUIDE +
+                      f"v0 只认 {STANDARD}）")
+    level = doc.get("level")
+    if level not in LEVELS:
+        issues.append(f"level 非法：{level!r}（" + GUIDE +
+                      f"可用：{', '.join(LEVELS)}）")
+    return issues
+
+
+def _level_pool(doc: dict[str, Any], face: str) -> list:
+    key = "explicit" if face == "explicit" else "implicit"
+    return [i for i in (doc.get(key) or []) if isinstance(i, dict)]
+
+
+def _missing_rule_issues(res: dict[str, Any], rule: dict[str, Any]) -> None:
+    res["missing"].append(rule["id"])
+    res["issues"].append(f"缺 {rule['id']}：{rule['desc']}（" + GUIDE +
+                         "补对应声明项，或把档位降到 minimal）")
+
+
+def _apply_level(doc: dict[str, Any], level: str, res: dict[str, Any]) -> None:
+    res["level"] = level
+    for rule in rules(level):
+        pool = _level_pool(doc, rule["face"])
+        hit = next((i for i in pool if _covered(i, rule)), None)
+        if hit is None:
+            _missing_rule_issues(res, rule)
+            continue
+        res["applied"].append({"rule": rule["id"], "kind": hit.get("kind")})
+
+
 def validate(doc: dict[str, Any]) -> dict[str, Any]:
     """校验 IR → {ok, verdict, level, applied, issues, warnings, missing}。"""
     res: dict[str, Any] = {"ok": False, "verdict": "invalid", "level": "none",
@@ -150,31 +187,12 @@ def validate(doc: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(doc, dict):
         res["issues"].append("IR 顶层应为对象（" + GUIDE + "不是数组/标量）")
         return res
-    if doc.get("schema") != SCHEMA:
-        res["issues"].append(f"schema 不匹配：{doc.get('schema')!r}（" + GUIDE +
-                             f"期望 {SCHEMA}）")
-    if doc.get("standard") != STANDARD:
-        res["issues"].append(f"standard 不匹配：{doc.get('standard')!r}（" + GUIDE +
-                             f"v0 只认 {STANDARD}）")
-    level = doc.get("level")
-    if level not in LEVELS:
-        res["issues"].append(f"level 非法：{level!r}（" + GUIDE +
-                             f"可用：{', '.join(LEVELS)}）")
+    res["issues"] += _header_issues(doc)
     _check_object(doc, res["issues"])
     _check_items(doc, res["issues"], res["warnings"])
+    level = doc.get("level")
     if isinstance(level, str) and level in LEVELS:
-        res["level"] = level
-        explicit = [i for i in (doc.get("explicit") or []) if isinstance(i, dict)]
-        implicit = [i for i in (doc.get("implicit") or []) if isinstance(i, dict)]
-        for rule in rules(level):
-            pool = explicit if rule["face"] == "explicit" else implicit
-            hit = next((i for i in pool if _covered(i, rule)), None)
-            if hit is None:
-                res["missing"].append(rule["id"])
-                res["issues"].append(f"缺 {rule['id']}：{rule['desc']}（" + GUIDE +
-                                     "补对应声明项，或把档位降到 minimal）")
-                continue
-            res["applied"].append({"rule": rule["id"], "kind": hit.get("kind")})
+        _apply_level(doc, level, res)
     res["ok"] = not res["issues"]
     res["verdict"] = "ok" if res["ok"] else "invalid"
     return res

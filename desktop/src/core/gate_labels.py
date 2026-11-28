@@ -172,6 +172,40 @@ def _shell_tokens(lines: list[str], in_heredoc: set) -> list[str]:
     return tokens
 
 
+def _oks_token(tok: str, active: list[bool]) -> str | None:
+    """token → 该 token 贡献的 ok 文案（非 ok / 非成功路径 = None）。"""
+    if "||" in tok:
+        return None
+    if not tok.startswith(("ok ", "ok'", 'ok"')):
+        return None
+    if not all(active):
+        return None
+    m = _OK_RE.search(tok)
+    if m:
+        return m.group(1) or m.group(2) or ""
+    return None
+
+
+def _consume_flow_token(tok: str, active: list[bool], pending_if: bool) -> tuple[bool, bool]:
+    """if/then/elif/else/fi → (pending_if, 是否已消费该 token)。"""
+    if tok == "if":
+        return True, True
+    if tok == "then":
+        if pending_if:
+            active.append(True)
+            return False, True
+        return pending_if, True
+    if tok in ("elif", "else"):
+        if active:
+            active[-1] = False      # elif / else 分支都不是成功路径
+        return pending_if, True
+    if tok == "fi":
+        if active:
+            active.pop()
+        return pending_if, True
+    return pending_if, False
+
+
 def _oks_on_success_path(tokens: list[str]) -> list[str]:
     """`if/then/elif/else/fi` 状态机：只收集**成功（then）路径**上的 `ok` 文案。
 
@@ -184,28 +218,12 @@ def _oks_on_success_path(tokens: list[str]) -> list[str]:
     active: list[bool] = []          # 每层 if：当前是否位于 then（成功）分支
     pending_if = False
     for tok in tokens:
-        if tok == "if":
-            pending_if = True
+        pending_if, consumed = _consume_flow_token(tok, active, pending_if)
+        if consumed:
             continue
-        if tok == "then":
-            if pending_if:
-                active.append(True)
-                pending_if = False
-            continue
-        if tok in ("elif", "else"):
-            if active:
-                active[-1] = False      # elif / else 分支都不是成功路径
-            continue
-        if tok == "fi":
-            if active:
-                active.pop()
-            continue
-        if "||" in tok:
-            continue
-        if tok.startswith(("ok ", "ok'", 'ok"')) and all(active):
-            m = _OK_RE.search(tok)
-            if m:
-                out.append(m.group(1) or m.group(2) or "")
+        text = _oks_token(tok, active)
+        if text is not None:
+            out.append(text)
     return out
 
 

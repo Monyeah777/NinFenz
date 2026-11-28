@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Any
 from core import json_doc
 
 STATE_HEAD = "## 状态块（条件先行摘要）"
@@ -93,6 +93,53 @@ def ab_manifest(text: str) -> Dict[str, Dict[str, object]]:
     return out
 
 
+def _family_issues(root: str, rules: List[Dict[str, Any]]):
+    from pathlib import Path as _Path
+    issues: List[str] = []
+    hits: List[str] = []
+    for r in rules:
+        g = str(r.get("glob") or "")
+        if not g:
+            issues.append("族规则缺 glob")
+            continue
+        matched = [p for p in sorted(_Path(root).glob(g)) if p.is_file()]
+        low = int(r.get("min_members") or 1)
+        if len(matched) < low:
+            issues.append("族 %s 成员不足：%d < %d（修复指引：按 sources 重新生成）"
+                          % (g, len(matched), low))
+        for p in matched:
+            hits.append(p.relative_to(_Path(root)).as_posix())
+    return issues, hits
+
+
+def _hits_issues(root: str, hits: List[str]) -> List[str]:
+    from pathlib import Path as _Path
+    issues: List[str] = []
+    for rel_ in hits:
+        bad = check_order((_Path(root) / rel_).read_text(encoding="utf-8"))
+        if bad:
+            issues.append("族内件未通过 condition-first：%s（%s）" % (rel_, bad[0]))
+    return issues
+
+
+def _declared_issues(root: str, rows: List[Dict[str, Any]]) -> List[str]:
+    from pathlib import Path as _Path
+    issues: List[str] = []
+    for r in rows:
+        rp = str(r.get("path") or "")
+        f = _Path(root) / rp
+        if not rp:
+            issues.append("声明条目缺 path")
+            continue
+        if not f.is_file():
+            issues.append("登记件不存在：%s" % rp)
+            continue
+        bad = check_order(f.read_text(encoding="utf-8"))
+        if bad:
+            issues.append("登记为 condition-first 但未通过：%s（%s）" % (rp, bad[0]))
+    return issues
+
+
 def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, object]]:
     """门禁：凡登记为 condition-first 的产物件，必须真的通过 `check_order`。"""
     from pathlib import Path as _Path
@@ -110,35 +157,10 @@ def scan(root: str = ".") -> Tuple[List[str], List[str], Dict[str, object]]:
     rules = doc.get("family_rules") or []
     if not rows and not rules:
         warns.append("条件先行声明为空——门禁空转")
-    hits: List[str] = []
-    for r in rules:
-        g = str(r.get("glob") or "")
-        if not g:
-            issues.append("族规则缺 glob")
-            continue
-        matched = [p for p in sorted(_Path(root).glob(g)) if p.is_file()]
-        low = int(r.get("min_members") or 1)
-        if len(matched) < low:
-            issues.append("族 %s 成员不足：%d < %d（修复指引：按 sources 重新生成）"
-                          % (g, len(matched), low))
-        for p in matched:
-            hits.append(p.relative_to(_Path(root)).as_posix())
-    for rel_ in hits:
-        bad = check_order((_Path(root) / rel_).read_text(encoding="utf-8"))
-        if bad:
-            issues.append("族内件未通过 condition-first：%s（%s）" % (rel_, bad[0]))
-    for r in rows:
-        rp = str(r.get("path") or "")
-        f = _Path(root) / rp
-        if not rp:
-            issues.append("声明条目缺 path")
-            continue
-        if not f.is_file():
-            issues.append("登记件不存在：%s" % rp)
-            continue
-        bad = check_order(f.read_text(encoding="utf-8"))
-        if bad:
-            issues.append("登记为 condition-first 但未通过：%s（%s）" % (rp, bad[0]))
+    family_issues, hits = _family_issues(root, rules)
+    issues += family_issues
+    issues += _hits_issues(root, hits)
+    issues += _declared_issues(root, rows)
     return issues, warns, {"declared": len(rows), "family_rules": len(rules),
                            "family_members": len(hits)}
 

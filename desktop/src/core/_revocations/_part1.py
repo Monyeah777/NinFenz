@@ -199,16 +199,23 @@ def sign(table: dict[str, Any], key: bytes, opts: SignOptions | None = None) -> 
     （不写 null，免得无谓改变 digest）。签名体仍是「除 signature 外全部字段」，故它们
     自动进签名、改一个字节即破签名；本模块**不**根据 status_uri 联网取任何东西。
     """
-
     opts = opts if opts is not None else SignOptions()
-    issuer = opts.issuer
-    seq = opts.seq
-    prev = opts.prev
-    issued_at = opts.issued_at
-    expires_at = opts.expires_at
-    ttl = opts.ttl
-    status_uri = opts.status_uri
     scheme = opts.scheme
+    _validate_sign_inputs(key, scheme, opts.seq)
+    stamp = opts.issued_at or attest.issue_stamp()
+    _validate_feed_opts(opts.expires_at, opts.ttl, opts.status_uri, stamp)
+    base: dict[str, Any] = {"schema": FEED_SCHEMA, "issuer": opts.issuer or "",
+                            "seq": int(opts.seq),
+                            "issued_at": stamp,
+                            "prev_digest": digest(opts.prev) if isinstance(opts.prev, dict) else ZERO,
+                            "table": table}
+    _optional_fields(base, opts.expires_at, opts.ttl, opts.status_uri)
+    _attach_signature(base, canonical_bytes(base), key, scheme)
+    return base
+
+
+def _validate_sign_inputs(key: bytes, scheme: str, seq: int) -> None:
+    """密钥/方案/序号的前置校验（不符 → ValueError）。"""
     if not isinstance(key, bytes) or not key:
         raise ValueError("签名需要密钥（" + GUIDE + "请用 --key-file 指一个非空密钥文件）")
     if scheme not in (ALG, ALG_ED25519):
@@ -220,7 +227,10 @@ def sign(table: dict[str, Any], key: bytes, opts: SignOptions | None = None) -> 
                          "revocations pubkey 导出）")
     if int(seq) < 0:
         raise ValueError("seq 必须是非负整数（" + GUIDE + "首份用 0 或 1，之后逐份 +1）")
-    stamp = issued_at or attest.issue_stamp()
+
+
+def _validate_feed_opts(expires_at, ttl, status_uri, stamp: str) -> None:
+    """可选新鲜度字段的形状校验（不符 → ValueError）。"""
     if expires_at:
         if not STAMP_RE.match(str(expires_at)):
             raise ValueError("--expires-at 必须是 UTC 秒级 YYYY-MM-DDTHH:MM:SSZ（" + GUIDE +
@@ -234,18 +244,21 @@ def sign(table: dict[str, Any], key: bytes, opts: SignOptions | None = None) -> 
     if status_uri and not (isinstance(status_uri, str) and status_uri.strip()):
         raise ValueError("feed 的 status_uri 必须是非空字符串（" + GUIDE +
                          "填 URI 形式；本仓不会去取它）")
-    base: dict[str, Any] = {"schema": FEED_SCHEMA, "issuer": issuer or "",
-                            "seq": int(seq),
-                            "issued_at": stamp,
-                            "prev_digest": digest(prev) if isinstance(prev, dict) else ZERO,
-                            "table": table}
+
+
+def _optional_fields(base: dict[str, Any], expires_at, ttl, status_uri) -> None:
+    """可选字段只在给出时写入（不写 null）。"""
     if expires_at:
         base["expires_at"] = str(expires_at)
     if ttl is not None:
         base["ttl"] = int(ttl)
     if status_uri:
         base["status_uri"] = str(status_uri)
-    payload = canonical_bytes(base)
+
+
+def _attach_signature(base: dict[str, Any], payload: bytes, key: bytes,
+                      scheme: str) -> None:
+    """按方案附 signature（ed25519 或 hmac-sha256）。"""
     if scheme == ALG_ED25519:
         from core import ed25519 as _ed
         base["signature"] = {"alg": ALG_ED25519, "pub": _ed.public_key(key).hex(),
@@ -253,4 +266,3 @@ def sign(table: dict[str, Any], key: bytes, opts: SignOptions | None = None) -> 
     else:
         mac = hmac.new(key, payload, hashlib.sha256).hexdigest()
         base["signature"] = {"alg": ALG, "mac": mac}
-    return base

@@ -59,11 +59,9 @@ def _pages(root: str) -> Dict[str, Dict[str, Any]]:
     return {str(p.get("id")): p for p in doc.get("pages") or [] if isinstance(p, dict)}
 
 
-def parse_intent(doc: Dict[str, Any]) -> List[str]:
-    """intent 结构判据（返回问题清单；不抛）。"""
+def _intent_head_issues(doc: Dict[str, Any]) -> List[str]:
+    """intent 头部四字段：schema / kind / goal / wiki_ids。"""
     issues: List[str] = []
-    if not isinstance(doc, dict):
-        return ["intent 必须是 JSON 对象"]
     if str(doc.get("schema")) != INTENT_SCHEMA:
         issues.append("intent.schema 必须为 %s" % INTENT_SCHEMA)
     if str(doc.get("kind")) not in KINDS:
@@ -73,6 +71,30 @@ def parse_intent(doc: Dict[str, Any]) -> List[str]:
     ids = doc.get("wiki_ids")
     if not isinstance(ids, list) or not ids:
         issues.append("intent.wiki_ids 必填（非空数组，指向 Wiki 页 id）")
+    return issues
+
+
+def _intent_budget_issues(doc: Dict[str, Any]) -> List[str]:
+    """intent.budget：对象 + max_tokens ≥1 + max_steps（如有）≥1。"""
+    issues: List[str] = []
+    budget = doc.get("budget") or {}
+    if not isinstance(budget, dict):
+        issues.append("intent.budget 必须是对象")
+        return issues
+    if not isinstance(budget.get("max_tokens"), int) or budget.get("max_tokens", 0) < 1:
+        issues.append("intent.budget.max_tokens 必须是 ≥1 的整数")
+    if "max_steps" in budget and (not isinstance(budget["max_steps"], int)
+                                  or budget["max_steps"] < 1):
+        issues.append("intent.budget.max_steps 必须是 ≥1 的整数")
+    return issues
+
+
+def parse_intent(doc: Dict[str, Any]) -> List[str]:
+    """intent 结构判据（返回问题清单；不抛）。"""
+    issues: List[str] = []
+    if not isinstance(doc, dict):
+        return ["intent 必须是 JSON 对象"]
+    issues.extend(_intent_head_issues(doc))
     allowed = {"schema", "kind", "goal", "wiki_ids", "constraints", "budget", "output"}
     extra = sorted(set(doc) - allowed)
     if extra:
@@ -81,15 +103,7 @@ def parse_intent(doc: Dict[str, Any]) -> List[str]:
     if not isinstance(cons, list) or not cons or not all(
             isinstance(x, str) and x.strip() for x in cons):
         issues.append("intent.constraints 必须是非空字符串数组（硬约束）")
-    budget = doc.get("budget") or {}
-    if not isinstance(budget, dict):
-        issues.append("intent.budget 必须是对象")
-    else:
-        if not isinstance(budget.get("max_tokens"), int) or budget.get("max_tokens", 0) < 1:
-            issues.append("intent.budget.max_tokens 必须是 ≥1 的整数")
-        if "max_steps" in budget and (not isinstance(budget["max_steps"], int)
-                                      or budget["max_steps"] < 1):
-            issues.append("intent.budget.max_steps 必须是 ≥1 的整数")
+    issues.extend(_intent_budget_issues(doc))
     return issues
 
 
@@ -107,48 +121,50 @@ def _load_intent_file(root: str, rel: str) -> Dict[str, Any]:
             fix=GUIDE + "修 JSON（UTF-8、无注释）后重试") from exc
 
 
-def task_graph_issues(pages: Dict[str, Dict[str, Any]], ids: List[str]) -> List[str]:
-    """上下文页 relations 图：端点必须在选中集内，且无环（拓扑检查）。"""
-    issues: List[str] = []
-    selected = [pid for pid in ids if pid in pages]
+def _graph_edges(pages: Dict[str, Dict[str, Any]],
+                 selected: List[str]) -> List[Tuple[str, str]]:
+    """选中页之间 relations 的边（端点必须都在选中集内）。"""
     edges = []
     for pid in selected:
         for rel in pages[pid].get("relations") or []:
             target = str((rel or {}).get("target"))
             if target in selected:
                 edges.append((pid, target))
+    return edges
+
+
+def _graph_visit(node: str, stack: List[str], state: Dict[str, int],
+                 nodes: Dict[str, set], issues: List[str]) -> None:
+    """拓扑 DFS：回边即记环（路径从栈里原位取）。"""
+    if state.get(node) == 1:
+        cyc = stack[stack.index(node):] + [node] if node in stack else [node, node]
+        issues.append("任务图有环：%s（%s 拆掉循环引用）" % ("→".join(cyc), GUIDE))
+        return
+    if state.get(node) == 2:
+        return
+    state[node] = 1
+    stack.append(node)
+    for nxt in sorted(nodes.get(node, ())):
+        _graph_visit(nxt, stack, state, nodes, issues)
+    stack.pop()
+    state[node] = 2
+
+
+def task_graph_issues(pages: Dict[str, Dict[str, Any]], ids: List[str]) -> List[str]:
+    """上下文页 relations 图：端点必须在选中集内，且无环（拓扑检查）。"""
+    issues: List[str] = []
+    selected = [pid for pid in ids if pid in pages]
     nodes = {pid: set() for pid in selected}
-    for src, dst in edges:
+    for src, dst in _graph_edges(pages, selected):
         nodes[src].add(dst)
     state: Dict[str, int] = {}
-
-    def visit(node: str, stack: List[str]) -> None:
-        if state.get(node) == 1:
-            cyc = stack[stack.index(node):] + [node] if node in stack else [node, node]
-            issues.append("任务图有环：%s（%s 拆掉循环引用）" % ("→".join(cyc), GUIDE))
-            return
-        if state.get(node) == 2:
-            return
-        state[node] = 1
-        stack.append(node)
-        for nxt in sorted(nodes.get(node, ())):
-            visit(nxt, stack)
-        stack.pop()
-        state[node] = 2
-
     for pid in sorted(selected):
-        visit(pid, [])
+        _graph_visit(pid, [], state, nodes, issues)
     return issues
 
 
-def compile_intent(intent: Dict[str, Any], root: str = ".",
-                   intent_rel: Optional[str] = None) -> Dict[str, Any]:
-    """编译 intent → bundle（确定性）；不合法任一项抛 SpecError（exit 2）。"""
-    issues = parse_intent(intent)
-    if issues:
-        raise SpecError(
-            "；".join(issues[:3])
-            + "（修复指引：按 nf-intent/1 改 kind/goal/wiki_ids/constraints/budget）")
+def _resolve_pages(intent: Dict[str, Any], root: str) -> Tuple[Dict[str, Dict[str, Any]], List[str]]:
+    """取 Wiki 页表 + 选中 id；缺页/有环即抛 SpecError（含修复指引）。"""
     pages = _pages(root)
     ids = [str(x) for x in intent["wiki_ids"]]
     missing = [pid for pid in ids if pid not in pages]
@@ -162,6 +178,42 @@ def compile_intent(intent: Dict[str, Any], root: str = ".",
         raise SpecError(
             graph_issues[0] + "（修复指引：拆掉选中页之间的循环引用）",
             code="TASK-GRAPH-CYCLE")
+    return pages, ids
+
+
+def _intent_tasks(pages: Dict[str, Dict[str, Any]], ids: List[str], ref: str,
+                  spec_digest: str, constraint: List[str],
+                  budget: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """逐个选中页生成有界任务（slot/spec_refs/context_refs/acceptance/budget）。"""
+    tasks: List[Dict[str, Any]] = []
+    for idx, pid in enumerate(ids):
+        page = pages[pid]
+        slug = pid.replace("wiki:", "").replace("/", "-").replace(":", "-")
+        tasks.append({
+            "schema": TASK_SCHEMA,
+            "slot": {"id": "slot:" + slug, "kind": "section", "max_items": 1},
+            "spec_refs": [{"ref": ref, "digest": spec_digest}],
+            "context_refs": [{"id": pid,
+                              "digest": str((page.get("provenance") or {}).get("digest"))}],
+            "output_schema": {"kind": "md", "path": "out/%s.md" % slug},
+            "acceptance": [{"id": "A-001",
+                            "rule": "输出必须引用 Wiki 页 %s 的 spec_ref；不得超出 slot 范围" % pid},
+                           {"id": "A-002",
+                            "rule": "硬约束逐条可查：%s" % "；".join(constraint[:3])}],
+            "budget": dict(budget),
+        })
+    return tasks
+
+
+def compile_intent(intent: Dict[str, Any], root: str = ".",
+                   intent_rel: Optional[str] = None) -> Dict[str, Any]:
+    """编译 intent → bundle（确定性）；不合法任一项抛 SpecError（exit 2）。"""
+    issues = parse_intent(intent)
+    if issues:
+        raise SpecError(
+            "；".join(issues[:3])
+            + "（修复指引：按 nf-intent/1 改 kind/goal/wiki_ids/constraints/budget）")
+    pages, ids = _resolve_pages(intent, root)
     kind = str(intent["kind"])
     anchor = pages[ids[0]]
     ref = "%s:%s" % (kind, ids[0])
@@ -173,23 +225,7 @@ def compile_intent(intent: Dict[str, Any], root: str = ".",
     budget = {"max_tokens": int(intent["budget"]["max_tokens"])}
     if isinstance(intent["budget"].get("max_steps"), int):
         budget["max_steps"] = int(intent["budget"]["max_steps"])
-    tasks: List[Dict[str, Any]] = []
-    for idx, pid in enumerate(ids):
-        page = pages[pid]
-        slug = pid.replace("wiki:", "").replace("/", "-").replace(":", "-")
-        tasks.append({
-            "schema": TASK_SCHEMA,
-            "slot": {"id": "slot:" + slug, "kind": "section", "max_items": 1},
-            "spec_refs": [{"ref": ref, "digest": spec["digest"]}],
-            "context_refs": [{"id": pid,
-                              "digest": str((page.get("provenance") or {}).get("digest"))}],
-            "output_schema": {"kind": "md", "path": "out/%s.md" % slug},
-            "acceptance": [{"id": "A-001",
-                            "rule": "输出必须引用 Wiki 页 %s 的 spec_ref；不得超出 slot 范围" % pid},
-                           {"id": "A-002",
-                            "rule": "硬约束逐条可查：%s" % "；".join(constraint[:3])}],
-            "budget": dict(budget),
-        })
+    tasks = _intent_tasks(pages, ids, ref, spec["digest"], constraint, budget)
     bundle = {"schema": BUNDLE_SCHEMA, "spec": spec, "tasks": tasks,
               "graph": {"nodes": ids,
                         "edges": [{"from": str(r.get("target")),
@@ -206,6 +242,40 @@ def render(bundle: Dict[str, Any]) -> str:
     return json.dumps(bundle, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
 
 
+def _bundle_context_issues(task: Dict[str, Any],
+                           pages: Dict[str, Dict[str, Any]]) -> List[str]:
+    """task context_refs：页必须在场且 digest 与 Wiki 页一致。"""
+    issues: List[str] = []
+    for ctx in task.get("context_refs") or []:
+        pid = str(ctx.get("id"))
+        if pid not in pages:
+            issues.append("task context_ref 不在场：%s" % pid)
+        elif str(ctx.get("digest")) != str((pages[pid].get("provenance") or {}).get("digest")):
+            issues.append("task context_ref digest 与 Wiki 页不一致：%s" % pid)
+    return issues
+
+
+def _bundle_ref_issues(task: Dict[str, Any], spec: Dict[str, Any]) -> List[str]:
+    """task spec_refs 必须与 bundle 的 spec.ref 一致。"""
+    issues: List[str] = []
+    for sref in task.get("spec_refs") or []:
+        if str(sref.get("ref")) != str(spec.get("ref")):
+            issues.append("task spec_ref 与 spec.ref 不一致")
+    return issues
+
+
+def _bundle_task_issues(task: Dict[str, Any], pages: Dict[str, Dict[str, Any]],
+                        spec: Dict[str, Any], task_schema: Dict[str, Any]) -> List[str]:
+    """单个 task：schema + context_refs + spec_refs 三面。"""
+    from core import json_schema
+    issues: List[str] = []
+    for item in json_schema.json_schema_check(task, task_schema)[:2]:
+        issues.append("task schema：%s" % item)
+    issues.extend(_bundle_context_issues(task, pages))
+    issues.extend(_bundle_ref_issues(task, spec))
+    return issues
+
+
 def validate_bundle(bundle: Dict[str, Any], root: str = ".") -> List[str]:
     """用生产 schema 校验 spec/task，并检查引用可解析。"""
     from core import json_schema
@@ -217,15 +287,5 @@ def validate_bundle(bundle: Dict[str, Any], root: str = ".") -> List[str]:
         issues.append("spec schema：%s" % item)
     pages = _pages(root)
     for task in bundle.get("tasks") or []:
-        for item in json_schema.json_schema_check(task, task_schema)[:2]:
-            issues.append("task schema：%s" % item)
-        for ctx in task.get("context_refs") or []:
-            pid = str(ctx.get("id"))
-            if pid not in pages:
-                issues.append("task context_ref 不在场：%s" % pid)
-            elif str(ctx.get("digest")) != str((pages[pid].get("provenance") or {}).get("digest")):
-                issues.append("task context_ref digest 与 Wiki 页不一致：%s" % pid)
-        for sref in task.get("spec_refs") or []:
-            if str(sref.get("ref")) != str(spec.get("ref")):
-                issues.append("task spec_ref 与 spec.ref 不一致")
+        issues.extend(_bundle_task_issues(task, pages, spec, task_schema))
     return issues

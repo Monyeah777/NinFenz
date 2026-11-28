@@ -57,6 +57,11 @@ def _revocation_source(rev: dict[str, Any] | None,
 
 
 
+def _revoke_reason(hit: dict[str, Any]) -> str:
+    """吊销理由：reason > path > digest > 兜底文案（逐字保留原取值顺序）。"""
+    return hit.get("reason") or hit.get("path") or hit.get("digest") or "未给理由"
+
+
 def _apply_revocation(rd: _Reader, entries: Sequence[dict[str, Any]],
                       revocations: dict[str, Any] | None,
                       res: dict[str, Any], fresh: dict[str, Any],
@@ -87,7 +92,7 @@ def _apply_revocation(rd: _Reader, entries: Sequence[dict[str, Any]],
         return False
     res["verdict"] = "revoked"
     res["revoked_by"] = hit
-    why = hit.get("reason") or hit.get("path") or hit.get("digest") or "未给理由"
+    why = _revoke_reason(hit)
     res["issues"].append(f"证据已被吊销：{why}（{GUIDE}吊销是不可逆判定——请向签发方确认是否"
                          "曾发生错签或内容下架，不要把它当临时失败重试）")
     return True
@@ -118,6 +123,23 @@ def _embedded_revocations(rd: _Reader) -> tuple[dict[str, Any] | None, str]:
 
 
 
+def _revocation_index(entries: Sequence[dict[str, Any]]
+                       ) -> tuple[set[str], set[str]]:
+    """证据条目的摘要/路径索引（供吊销命中判定）。"""
+    digests = {str(e.get("digest") or "") for e in entries}
+    paths = {_norm(str(e.get("path") or "")) for e in entries}
+    return digests, paths
+
+
+def _revoked_item(item: Any, digests: set[str], paths: set[str]) -> bool:
+    """单条吊销条目是否命中（按摘要或仓相对路径；坏条目跳过）。"""
+    if not isinstance(item, dict):
+        return False
+    dig = str(item.get("digest") or "")
+    pat = _norm(str(item.get("path") or ""))
+    return bool((dig and dig in digests) or (pat and pat in paths))
+
+
 def _revocation_hit(rev: dict[str, Any] | None,
                     entries: Sequence[dict[str, Any]]) -> dict[str, Any] | None:
     """吊销表命中判定（按摘要或仓相对路径）；表形状不对一律不认（宁可 invalid 也不放过）。"""
@@ -126,14 +148,9 @@ def _revocation_hit(rev: dict[str, Any] | None,
     revoked = rev.get("revoked") or []
     if not isinstance(revoked, list):
         return None
-    digests = {str(e.get("digest") or "") for e in entries}
-    paths = {_norm(str(e.get("path") or "")) for e in entries}
+    digests, paths = _revocation_index(entries)
     for item in revoked:
-        if not isinstance(item, dict):
-            continue
-        dig = str(item.get("digest") or "")
-        pat = _norm(str(item.get("path") or ""))
-        if (dig and dig in digests) or (pat and pat in paths):
+        if _revoked_item(item, digests, paths):
             return item
     return None
 
@@ -159,7 +176,7 @@ def _apply_revocation_doc(revocations: dict[str, Any] | None,
     hit = _revocation_hit(table, entries)
     if hit is None:
         return False
-    why = hit.get("reason") or hit.get("path") or hit.get("digest") or "未给理由"
+    why = _revoke_reason(hit)
     res["verdict"] = "revoked"
     res["revoked_by"] = hit
     res["issues"].append(f"证据已被吊销：{why}（{GUIDE}吊销是不可逆判定——请向签发方确认"

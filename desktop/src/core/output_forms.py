@@ -53,7 +53,7 @@ from core import concept_graph as cg
 from core import pack_combo as pc
 
 import copy
-from typing import Any, Dict
+from typing import Any, Dict, List, Tuple
 from core import conformance_scan as _csc
 from core import import_graph as _ig
 
@@ -205,6 +205,93 @@ INDEX_INPUTS = ("community/*/outputs/**/*",
 _INDEX_CACHE: Dict[str, Any] = {}
 
 
+def _index_issues(idx: Dict[str, Any], rel: str, pkg: str) -> List[str]:
+    issues: List[str] = []
+    if idx.get("schema") != "nf-output-index/1":
+        issues.append("%s: schema 应为 nf-output-index/1" % rel)
+    if idx.get("package") != pkg:
+        issues.append("%s: package 字段 %r ≠ 包目录名 %r" % (rel, idx.get("package"), pkg))
+    return issues
+
+
+def _entry_declared_issues(root: str, pkg: str, rel: str, entry: Dict[str, Any]):
+    """条目声明面前置校验 → (issues, out_rel)；out_rel 为 None = 该条已判负终止。"""
+    path = entry.get("path") or ""
+    tier = entry.get("tier") or ""
+    if not path:
+        return ["%s: outputs 条目缺 path" % rel], None
+    if tier not in TIERS:
+        return ["%s: %s 档位非法 %r" % (rel, path, tier)], None
+    try:
+        out_rel = _declared_out_rel(root, pkg, path)
+    except ValueError as exc:                     # 外来清单里的越界写法 → 问题，不读盘
+        return ["%s: %s" % (rel, exc)], None
+    if not _rel(root, out_rel).is_file():
+        return ["%s: 声明产出面不存在 %s" % (rel, path)], None
+    return [], out_rel
+
+
+def _entry_form_issues(root: str, rel: str, entry: Dict[str, Any], out_rel: str):
+    path = entry.get("path") or ""
+    form = entry.get("form") or ""
+    tier = entry.get("tier") or ""
+    got_form, got_tier = detect(root, out_rel)
+    issues: List[str] = []
+    if form and form != got_form:
+        issues.append("%s: %s 声明形态 %s，实测 %s" % (rel, path, form, got_form))
+    if TIERS.index(tier) > TIERS.index(got_tier):
+        issues.append("%s: %s 声明档位 %s 超出本仓可判上限 %s"
+                      % (rel, path, tier, got_tier))
+    checker = _FORM_CHECK.get(form or got_form)
+    sub = checker(root, out_rel) if checker else []
+    issues += ["%s: %s %s" % (rel, path, s) for s in sub]
+    return issues, got_form
+
+
+def _entry_schema_issues(root: str, pkg: str, rel: str, entry: Dict[str, Any],
+                         out_rel: str) -> List[str]:
+    path = entry.get("path") or ""
+    sch_rel = entry.get("schema") or ""
+    if not sch_rel:
+        return []
+    issues: List[str] = []
+    try:
+        full = _declared_out_rel(root, pkg, sch_rel)
+    except ValueError as exc:
+        issues.append("%s: %s %s" % (rel, path, exc))
+        full = ""
+    schema, serr = _read_json(_rel(root, full)) if full else (None, "schema 路径越界")
+    if serr:
+        issues.append("%s: %s schema %s" % (rel, path, serr))
+        return issues
+    inst, ierr = _read_json(_rel(root, out_rel))
+    if ierr:
+        issues.append("%s: %s %s" % (rel, path, ierr))
+        return issues
+    unsup: List[str] = []
+    errs = json_schema_check(inst, schema, unsupported=unsup)
+    issues += ["%s: %s schema 不符 %s" % (rel, path, e) for e in errs[:8]]
+    return issues
+
+
+def _entry_extra_issues(root: str, pkg: str, rel: str, entry: Dict[str, Any],
+                        out_rel: str) -> List[str]:
+    path = entry.get("path") or ""
+    tier = entry.get("tier") or ""
+    issues: List[str] = []
+    ds = entry.get("dual_source")
+    if isinstance(ds, dict):
+        issues += ["%s: %s %s" % (rel, path, m)
+                   for m in _dual_source_check(root, pkg, out_rel, ds)]
+    rc = entry.get("recompute")
+    if isinstance(rc, dict):
+        sub_issues, _st = _recompute_entry(root, {**entry, "_pkg": pkg})
+        issues += ["%s: %s" % (rel, s) for s in sub_issues]
+    elif tier == "T4":
+        issues.append("%s: %s 声明 T4（可复算）却无 recompute 声明" % (rel, path))
+    return issues
+
+
 def _verify_pack(root: str, pkg: str) -> Tuple[List[str], List[Dict[str, Any]]]:
     """**单个包**的产出面校验（原体；被 `_index_verify_impl` 按包内容键缓存）。"""
     issues: List[str] = []
@@ -214,67 +301,19 @@ def _verify_pack(root: str, pkg: str) -> Tuple[List[str], List[Dict[str, Any]]]:
     if err:
         issues.append("%s: %s" % (rel, err))
         return issues, rows
-    if idx.get("schema") != "nf-output-index/1":
-        issues.append("%s: schema 应为 nf-output-index/1" % rel)
-    if idx.get("package") != pkg:
-        issues.append("%s: package 字段 %r ≠ 包目录名 %r" % (rel, idx.get("package"), pkg))
+    issues += _index_issues(idx, rel, pkg)
     for entry in idx.get("outputs") or []:
-        path = entry.get("path") or ""
-        form = entry.get("form") or ""
-        tier = entry.get("tier") or ""
-        if not path:
-            issues.append("%s: outputs 条目缺 path" % rel)
+        entry_issues, out_rel = _entry_declared_issues(root, pkg, rel, entry)
+        issues += entry_issues
+        if out_rel is None:
             continue
-        if tier not in TIERS:
-            issues.append("%s: %s 档位非法 %r" % (rel, path, tier))
-            continue
-        try:
-            out_rel = _declared_out_rel(root, pkg, path)
-        except ValueError as exc:                     # 外来清单里的越界写法 → 问题，不读盘
-            issues.append("%s: %s" % (rel, exc))
-            continue
-        if not _rel(root, out_rel).is_file():
-            issues.append("%s: 声明产出面不存在 %s" % (rel, path))
-            continue
-        got_form, got_tier = detect(root, out_rel)
-        if form and form != got_form:
-            issues.append("%s: %s 声明形态 %s，实测 %s" % (rel, path, form, got_form))
-        if TIERS.index(tier) > TIERS.index(got_tier):
-            issues.append("%s: %s 声明档位 %s 超出本仓可判上限 %s"
-                          % (rel, path, tier, got_tier))
-        checker = _FORM_CHECK.get(form or got_form)
-        sub = checker(root, out_rel) if checker else []
-        issues += ["%s: %s %s" % (rel, path, s) for s in sub]
-        sch_rel = entry.get("schema") or ""
-        if sch_rel:
-            try:
-                full = _declared_out_rel(root, pkg, sch_rel)
-            except ValueError as exc:
-                issues.append("%s: %s %s" % (rel, path, exc))
-                full = ""
-            schema, serr = _read_json(_rel(root, full)) if full else (None, "schema 路径越界")
-            if serr:
-                issues.append("%s: %s schema %s" % (rel, path, serr))
-            else:
-                inst, ierr = _read_json(_rel(root, out_rel))
-                if ierr:
-                    issues.append("%s: %s %s" % (rel, path, ierr))
-                else:
-                    unsup: List[str] = []
-                    errs = json_schema_check(inst, schema, unsupported=unsup)
-                    issues += ["%s: %s schema 不符 %s" % (rel, path, e) for e in errs[:8]]
-        ds = entry.get("dual_source")
-        if isinstance(ds, dict):
-            issues += ["%s: %s %s" % (rel, path, m)
-                       for m in _dual_source_check(root, pkg, out_rel, ds)]
-        rc = entry.get("recompute")
-        if isinstance(rc, dict):
-            sub_issues, _st = _recompute_entry(root, {**entry, "_pkg": pkg})
-            issues += ["%s: %s" % (rel, s) for s in sub_issues]
-        elif tier == "T4":
-            issues.append("%s: %s 声明 T4（可复算）却无 recompute 声明" % (rel, path))
-        rows.append({"package": pkg, "path": path, "form": form or got_form,
-                     "tier": tier, "role": entry.get("role") or ""})
+        form_issues, got_form = _entry_form_issues(root, rel, entry, out_rel)
+        issues += form_issues
+        issues += _entry_schema_issues(root, pkg, rel, entry, out_rel)
+        issues += _entry_extra_issues(root, pkg, rel, entry, out_rel)
+        rows.append({"package": pkg, "path": entry.get("path") or "",
+                     "form": (entry.get("form") or "") or got_form,
+                     "tier": entry.get("tier") or "", "role": entry.get("role") or ""})
     return issues, rows
 
 

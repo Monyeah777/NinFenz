@@ -79,6 +79,125 @@ def subset_key_violations(schema: Any, path: str = "schema", _depth: int = 0) ->
 
 
 # ---------------------------------------------------------------- 子集校验器
+def _enum_issues(instance: Any, schema: Dict[str, Any], path: str) -> List[str]:
+    """enum 违例（类型无关，先判一次；各类型分支的 return 都带上它）。"""
+    if "enum" not in schema:
+        return []
+    _enum = schema["enum"] if isinstance(schema["enum"], list) else []
+    if not any(_js.json_equal(instance, v) for v in _enum):
+        return [f"{path}: 值 {instance!r} 不在枚举 {schema['enum']}"]
+    return []
+
+
+def _object_required_issues(instance: Dict[str, Any], schema: Dict[str, Any],
+                            path: str) -> List[str]:
+    """required 判据。"""
+    out: List[str] = []
+    for req in schema.get("required", []) or []:
+        if req not in instance:
+            out.append(f"{path}: 缺必填字段 {req}")
+    return out
+
+
+def _object_named_issues(instance: Dict[str, Any], schema: Dict[str, Any],
+                         path: str, depth: int, out: List[str]) -> None:
+    """propertyNames + properties 递归判据（追加进 out）。"""
+    props = schema.get("properties", {})
+    # propertyNames：键名逐个过子 schema（01 §1.1 扩展键命名纪律）
+    pnames = schema.get("propertyNames")
+    if isinstance(pnames, dict):
+        for key in instance:
+            out += subset_validate(key, pnames, f"{path}/{key}（键名）", depth + 1)
+    for key in props:
+        if key in instance:
+            out += subset_validate(instance[key], props[key], f"{path}/{key}", depth + 1)
+
+
+def _object_extra_issues(instance: Dict[str, Any], schema: Dict[str, Any],
+                         path: str, depth: int, out: List[str]) -> None:
+    """additionalProperties 判据（追加进 out）。"""
+    props = schema.get("properties", {})
+    extra = schema.get("additionalProperties")
+    for key in instance:
+        if key in props:
+            continue
+        if extra is False:
+            out.append(f"{path}: 未知字段 {key}（不在该 schema 词表内）")
+        elif isinstance(extra, dict):
+            out += subset_validate(instance[key], extra, f"{path}/{key}", depth + 1)
+
+
+def _object_issues(instance: Any, schema: Dict[str, Any], path: str, depth: int,
+                   out: List[str]) -> List[str]:
+    if not isinstance(instance, dict):
+        return [f"{path}: 应为 object，实为 {type(instance).__name__}"]
+    out += _object_required_issues(instance, schema, path)
+    _object_named_issues(instance, schema, path, depth, out)
+    _object_extra_issues(instance, schema, path, depth, out)
+    return out
+
+
+def _array_issues(instance: Any, schema: Dict[str, Any], path: str, depth: int,
+                  out: List[str]) -> List[str]:
+    if not isinstance(instance, list):
+        return [f"{path}: 应为 array，实为 {type(instance).__name__}"]
+    if "minItems" in schema and len(instance) < schema["minItems"]:
+        out.append(f"{path}: 数组长度 {len(instance)} < minItems {schema['minItems']}")
+    if "maxItems" in schema and len(instance) > schema["maxItems"]:
+        out.append(f"{path}: 数组长度 {len(instance)} > maxItems {schema['maxItems']}")
+    items = schema.get("items")
+    for i, item in enumerate(instance):
+        out += subset_validate(item, items, f"{path}[{i}]", depth + 1)
+    return out
+
+
+def _string_issues(instance: Any, schema: Dict[str, Any], path: str, depth: int,
+                   out: List[str]) -> List[str]:
+    if not isinstance(instance, str):
+        return [f"{path}: 应为 string，实为 {type(instance).__name__}"]
+    if "minLength" in schema and len(instance) < schema["minLength"]:
+        out.append(f"{path}: 字符串过短 {len(instance)} < minLength {schema['minLength']}")
+    if "pattern" in schema:
+        if not re.search(schema["pattern"], instance):
+            out.append(f"{path}: 值 {instance!r} 不匹配 pattern {schema['pattern']}")
+    return out
+
+
+def _integer_issues(instance: Any, schema: Dict[str, Any], path: str, depth: int,
+                    out: List[str]) -> List[str]:
+    if isinstance(instance, bool) or not isinstance(instance, int):
+        return [f"{path}: 应为 integer，实为 {type(instance).__name__}"]
+    if "minimum" in schema and instance < schema["minimum"]:
+        out.append(f"{path}: 值 {instance} < minimum {schema['minimum']}")
+    return out
+
+
+def _number_issues(instance: Any, schema: Dict[str, Any], path: str, depth: int,
+                   out: List[str]) -> List[str]:
+    if isinstance(instance, bool) or not isinstance(instance, (int, float)):
+        return [f"{path}: 应为 number，实为 {type(instance).__name__}"]
+    if "minimum" in schema and instance < schema["minimum"]:
+        out.append(f"{path}: 值 {instance} < minimum {schema['minimum']}")
+    return out
+
+
+def _boolean_issues(instance: Any, schema: Dict[str, Any], path: str, depth: int,
+                    out: List[str]) -> List[str]:
+    if not isinstance(instance, bool):
+        return [f"{path}: 应为 boolean，实为 {type(instance).__name__}"]
+    return out
+
+
+_TYPE_HANDLERS: Dict[str, Any] = {
+    "object": _object_issues,
+    "array": _array_issues,
+    "string": _string_issues,
+    "integer": _integer_issues,
+    "number": _number_issues,
+    "boolean": _boolean_issues,
+}
+
+
 def subset_validate(
     instance: Any, schema: Any, path: str = "instance", _depth: int = 0
 ) -> List[str]:
@@ -90,83 +209,13 @@ def subset_validate(
         return []
     if not isinstance(schema, dict):
         return [f"{path}: schema 段非对象"]
-    out: List[str] = []
-
     # enum 是**类型无关**的约束：先判一次，后面各类型分支的 return 都会带上它。
     # （2026-10-10 审计 Y4：此前它只在 string 分支里 ⇒ boolean/number 的 enum 被静默放行。）
-    if "enum" in schema:
-        _enum = schema["enum"] if isinstance(schema["enum"], list) else []
-        if not any(_js.json_equal(instance, v) for v in _enum):
-            out.append(f"{path}: 值 {instance!r} 不在枚举 {schema['enum']}")
-
+    out = _enum_issues(instance, schema, path)
     stype = schema.get("type")
-    if stype == "object":
-        if not isinstance(instance, dict):
-            return [f"{path}: 应为 object，实为 {type(instance).__name__}"]
-        props = schema.get("properties", {})
-        for req in schema.get("required", []) or []:
-            if req not in instance:
-                out.append(f"{path}: 缺必填字段 {req}")
-        # propertyNames：键名逐个过子 schema（01 §1.1 扩展键命名纪律）
-        pnames = schema.get("propertyNames")
-        if isinstance(pnames, dict):
-            for key in instance:
-                out += subset_validate(key, pnames, f"{path}/{key}（键名）", _depth + 1)
-        for key in props:
-            if key in instance:
-                out += subset_validate(instance[key], props[key], f"{path}/{key}",
-                                       _depth + 1)
-        extra = schema.get("additionalProperties")
-        for key in instance:
-            if key in props:
-                continue
-            if extra is False:
-                out.append(f"{path}: 未知字段 {key}（不在该 schema 词表内）")
-            elif isinstance(extra, dict):
-                out += subset_validate(instance[key], extra, f"{path}/{key}", _depth + 1)
-        return out
-
-    if stype == "array":
-        if not isinstance(instance, list):
-            return [f"{path}: 应为 array，实为 {type(instance).__name__}"]
-        if "minItems" in schema and len(instance) < schema["minItems"]:
-            out.append(f"{path}: 数组长度 {len(instance)} < minItems {schema['minItems']}")
-        if "maxItems" in schema and len(instance) > schema["maxItems"]:
-            out.append(f"{path}: 数组长度 {len(instance)} > maxItems {schema['maxItems']}")
-        items = schema.get("items")
-        for i, item in enumerate(instance):
-            out += subset_validate(item, items, f"{path}[{i}]", _depth + 1)
-        return out
-
-    if stype == "string":
-        if not isinstance(instance, str):
-            return [f"{path}: 应为 string，实为 {type(instance).__name__}"]
-        if "minLength" in schema and len(instance) < schema["minLength"]:
-            out.append(f"{path}: 字符串过短 {len(instance)} < minLength {schema['minLength']}")
-        if "pattern" in schema:
-            if not re.search(schema["pattern"], instance):
-                out.append(f"{path}: 值 {instance!r} 不匹配 pattern {schema['pattern']}")
-        return out
-
-    if stype == "integer":
-        if isinstance(instance, bool) or not isinstance(instance, int):
-            return [f"{path}: 应为 integer，实为 {type(instance).__name__}"]
-        if "minimum" in schema and instance < schema["minimum"]:
-            out.append(f"{path}: 值 {instance} < minimum {schema['minimum']}")
-        return out
-
-    if stype == "number":
-        if isinstance(instance, bool) or not isinstance(instance, (int, float)):
-            return [f"{path}: 应为 number，实为 {type(instance).__name__}"]
-        if "minimum" in schema and instance < schema["minimum"]:
-            out.append(f"{path}: 值 {instance} < minimum {schema['minimum']}")
-        return out
-
-    if stype == "boolean":
-        if not isinstance(instance, bool):
-            return [f"{path}: 应为 boolean，实为 {type(instance).__name__}"]
-        return out
-
+    handler = _TYPE_HANDLERS.get(stype)
+    if handler is not None:
+        return handler(instance, schema, path, _depth, out)
     if stype is None:
         # 无 type 也**不许吞掉**已判出的 enum 违例（2026-10-10 审计 Y4）：out 里可能有它。
         return out
@@ -174,6 +223,47 @@ def subset_validate(
 
 
 # ---------------------------------------------------------------- schema 元检
+def _schema_decl_issues(data: Dict[str, Any], name: str) -> List[str]:
+    """单份 schema 的声明面：方言 / $id / type / properties / required。"""
+    issues: List[str] = []
+    if data.get("$schema") != DIALECT:
+        issues.append(
+            f"{name}: $schema={data.get('$schema')!r} 与校验器实现的方言不一致"
+            f"（预期 {DIALECT}；修复指引：改声明或先扩展校验器再改声明）"
+        )
+    if data.get("$id") != f"https://ninfenz.dev/schema/{name}":
+        issues.append(
+            f"{name}: $id={data.get('$id')!r} 必须是稳定绝对 URI "
+            f"https://ninfenz.dev/schema/{name}（修复指引：只改标识，不改业务字段）"
+        )
+    if data.get("type") != "object":
+        issues.append(f"{name}: schema.type 应为 object")
+    if not isinstance(data.get("properties"), dict):
+        issues.append(f"{name}: schema.properties 缺失/非对象")
+    if "required" in data and not isinstance(data.get("required"), list):
+        issues.append(f"{name}: schema.required 非数组")
+    return issues
+
+
+def _schema_file_issues(f: str) -> Tuple[List[str], Optional[Dict[str, Any]]]:
+    """单份 schema 文件 → (issues, 合法对象或 None)。"""
+    name = os.path.basename(f)
+    try:
+        with open(f, encoding="utf-8") as fh:
+            data = json.load(fh)
+    except Exception as exc:
+        return [f"{name}: JSON 解析失败 {exc}"], None
+    if not isinstance(data, dict):
+        return [f"{name}: schema 顶层非对象"], None
+    issues: List[str] = []
+    for key in ("$id", "title", "type"):
+        if key not in data:
+            issues.append(f"{name}: schema 缺 {key}")
+    issues.extend(_schema_decl_issues(data, name))
+    issues += subset_key_violations(data, name)
+    return issues, data
+
+
 def check_schema_files(root: str) -> Tuple[List[str], List[Dict[str, Any]]]:
     """校验 protocol/schema/*.json 在场且元结构合法；返回 (issues, schemas)。"""
     issues: List[str] = []
@@ -183,37 +273,10 @@ def check_schema_files(root: str) -> Tuple[List[str], List[Dict[str, Any]]]:
         return [f"{SCHEMA_DIR}/ 缺失（协议层 IDL 未落盘）"], []
     files = sorted(glob.glob(os.path.join(sdir, "*.json")))
     for f in files:
-        name = os.path.basename(f)
-        try:
-            with open(f, encoding="utf-8") as fh:
-                data = json.load(fh)
-        except Exception as exc:
-            issues.append(f"{name}: JSON 解析失败 {exc}")
-            continue
-        if not isinstance(data, dict):
-            issues.append(f"{name}: schema 顶层非对象")
-            continue
-        for key in ("$id", "title", "type"):
-            if key not in data:
-                issues.append(f"{name}: schema 缺 {key}")
-        if data.get("$schema") != DIALECT:
-            issues.append(
-                f"{name}: $schema={data.get('$schema')!r} 与校验器实现的方言不一致"
-                f"（预期 {DIALECT}；修复指引：改声明或先扩展校验器再改声明）"
-            )
-        if data.get("$id") != f"https://ninfenz.dev/schema/{name}":
-            issues.append(
-                f"{name}: $id={data.get('$id')!r} 必须是稳定绝对 URI "
-                f"https://ninfenz.dev/schema/{name}（修复指引：只改标识，不改业务字段）"
-            )
-        if data.get("type") != "object":
-            issues.append(f"{name}: schema.type 应为 object")
-        if not isinstance(data.get("properties"), dict):
-            issues.append(f"{name}: schema.properties 缺失/非对象")
-        if "required" in data and not isinstance(data.get("required"), list):
-            issues.append(f"{name}: schema.required 非数组")
-        issues += subset_key_violations(data, name)
-        schemas.append(data)
+        file_issues, data = _schema_file_issues(f)
+        issues.extend(file_issues)
+        if data is not None:
+            schemas.append(data)
     return issues, schemas
 
 

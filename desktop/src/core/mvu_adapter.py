@@ -64,6 +64,34 @@ def _canonical_digest(obj: Any) -> str:
     return hashlib.sha256(blob).hexdigest()
 
 
+def _attrs(obj: Any, name: str) -> List[Any]:
+    """取对象某属性的列表形态（属性缺席/为 None → 空表，形状宽容）。"""
+    return getattr(obj, name, None) or []
+
+
+def _add_id(ids: List[str], x: Any) -> None:
+    """把模块对象/id 归一成去重 id 列表项。"""
+    s = x if isinstance(x, str) else str(
+        getattr(x, "full_id", None) or getattr(x, "id", "") or "")
+    s = s.strip()
+    if s and s not in ids:
+        ids.append(s)
+
+
+def _ir_text(ir: IRDocument) -> str:
+    """IR 的全文形态（to_markdown/to_md 优先，取不到则 str(ir)）——兜底扫描用。"""
+    text = ""
+    for attr in ("to_markdown", "to_md"):
+        fn = getattr(ir, attr, None)
+        if callable(fn):
+            try:
+                text = fn() or ""
+                break
+            except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
+                pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
+    return text or str(ir)
+
+
 def _ir_module_ids(ir: IRDocument) -> List[str]:
     """从 IR 里尽力收集模块 id（形状宽容）：层内模块 / 层 module_ids / extra_modules /
     `ir.modules`；全部取不到时退化为对 `to_markdown()` / `str(ir)` 扫 `M\\d+`。
@@ -72,36 +100,53 @@ def _ir_module_ids(ir: IRDocument) -> List[str]:
     否则取件只看 IR 会永远空转（见 postmortems/PO-0001 的教训：根因要指向机制）。
     """
     ids: List[str] = []
-
-    def _add(x: Any) -> None:
-        s = x if isinstance(x, str) else str(
-            getattr(x, "full_id", None) or getattr(x, "id", "") or "")
-        s = s.strip()
-        if s and s not in ids:
-            ids.append(s)
-
-    for layer in (getattr(ir, "layers", None) or []):
-        for m in (getattr(layer, "modules", None) or []):
-            _add(m)
-        for mid in (getattr(layer, "module_ids", None) or []):
-            _add(mid)
-    for m in (getattr(ir, "extra_modules", None) or []):
-        _add(m)
-    for m in (getattr(ir, "modules", None) or []):
-        _add(m)
+    for layer in _attrs(ir, "layers"):
+        for m in _attrs(layer, "modules"):
+            _add_id(ids, m)
+        for mid in _attrs(layer, "module_ids"):
+            _add_id(ids, mid)
+    for m in _attrs(ir, "extra_modules"):
+        _add_id(ids, m)
+    for m in _attrs(ir, "modules"):
+        _add_id(ids, m)
     if not ids:
-        text = ""
-        for attr in ("to_markdown", "to_md"):
-            fn = getattr(ir, attr, None)
-            if callable(fn):
-                try:
-                    text = fn() or ""
-                    break
-                except Exception:  # nosec B110/B112 —— 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁与 AUD-0016 静默跳过清单另行报出
-                    pass  # best-effort 显式忽略（清理/探测失败不影响主流程）
-        text = text or str(ir)
-        ids = list(dict.fromkeys(re.findall(r"M\d{2,3}", text)))
+        ids = list(dict.fromkeys(re.findall(r"M\d{2,3}", _ir_text(ir))))
     return ids
+
+
+def _module_index() -> Dict[str, str]:
+    """模块 id → 模块源文本（从 conformance_scan 的模块文档面建，一次建好复用）。"""
+    from . import conformance_scan as csc
+    by_id: Dict[str, str] = {}
+    root = Path(__file__).resolve().parents[3]
+    for doc in csc._module_docs(str(root)):
+        txt = Path(doc).read_text(encoding="utf-8")
+        parsed = csc._fence_yaml(txt, "machine_contract") or {}
+        mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
+        if isinstance(mc, dict) and mc.get("id"):
+            by_id[str(mc["id"])] = txt
+    return by_id
+
+
+def _module_texts(obj: Any, idx: Dict[str, str], bare: str, mid: str) -> List[str]:
+    """单模块取件三级 fallback 的候选文本序列（content / source_md / 源文件）。"""
+    return [getattr(obj, "content", "") or "" if obj is not None else "",
+            getattr(obj, "source_md", "") or "" if obj is not None else "",
+            idx.get(bare, ""), idx.get(mid, "")]
+
+
+def _world_model_from(texts: List[str]) -> Any:
+    """按 ①content ②source_md ③源文件 三级 fallback 取 world_model（首个命中即用）。"""
+    from . import conformance_scan as csc
+    for t in texts:
+        if not t:
+            continue
+        parsed = csc._fence_yaml(t, "machine_contract") or {}
+        mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
+        cand = (mc or {}).get("world_model") if isinstance(mc, dict) else None
+        if isinstance(cand, dict):
+            return cand
+    return None
 
 
 def _collect_world_models(ir: IRDocument) -> List[Dict[str, Any]]:
@@ -112,42 +157,14 @@ def _collect_world_models(ir: IRDocument) -> List[Dict[str, Any]]:
     → ③ 模块源文件（按 id 在 `conformance_scan._module_docs` 里匹配）。
     真跑实测：装配路径下 `content` 已不含 fence，故必须有 ②③ 兜底。
     """
-    from . import conformance_scan as csc
-
-    rows: List[Dict[str, Any]] = []
-    by_id: Dict[str, str] = {}
-
-    def _index() -> Dict[str, str]:
-        if by_id:
-            return by_id
-        root = Path(__file__).resolve().parents[3]
-        for doc in csc._module_docs(str(root)):
-            txt = Path(doc).read_text(encoding="utf-8")
-            parsed = csc._fence_yaml(txt, "machine_contract") or {}
-            mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
-            if isinstance(mc, dict) and mc.get("id"):
-                by_id[str(mc["id"])] = txt
-        return by_id
-
-    idx = _index()
+    idx = _module_index()
     objs = {str(getattr(m, "full_id", None) or getattr(m, "id", "") or ""): m
             for m in _modules(ir)}
+    rows: List[Dict[str, Any]] = []
     for mid in _ir_module_ids(ir):
         bare = mid.split(":")[-1]
         obj = objs.get(mid) or objs.get(bare)
-        texts = [getattr(obj, "content", "") or "" if obj is not None else "",
-                 getattr(obj, "source_md", "") or "" if obj is not None else "",
-                 idx.get(bare, ""), idx.get(mid, "")]
-        wm = None
-        for t in texts:
-            if not t:
-                continue
-            parsed = csc._fence_yaml(t, "machine_contract") or {}
-            mc = parsed.get("machine_contract") if isinstance(parsed, dict) else None
-            cand = (mc or {}).get("world_model") if isinstance(mc, dict) else None
-            if isinstance(cand, dict):
-                wm = cand
-                break
+        wm = _world_model_from(_module_texts(obj, idx, bare, mid))
         if not isinstance(wm, dict):
             continue
         rows.append({"module": mid, "contract": wm, "digest": _canonical_digest(wm)})
@@ -194,6 +211,46 @@ def _iter_checks(c: Dict[str, Any]) -> List[Any]:
     return out
 
 
+def _variable_entries(module: str, c: Dict[str, Any], seen: Dict[str, str],
+                      warnings: List[str]) -> List[Dict[str, Any]]:
+    """契约变量声明 → payload.variables 条目（跨模块同名冲突记 warning，先到者保留）。"""
+    out: List[Dict[str, Any]] = []
+    for decl in _iter_variables(c):
+        name = str(decl.get("name") or "")
+        if not name:
+            continue
+        if name in seen and seen[name] != module:
+            warnings.append("变量名冲突：%s 同时来自 %s 与 %s——按先到者保留，"
+                            "冲突已记录（不静默）" % (name, seen[name], module))
+            continue
+        seen[name] = module
+        kind = str(decl.get("kind") or "untyped")
+        out.append({"name": name, "kind": kind,
+                    "mvu_type": TYPE_MAP.get(kind, "union"),
+                    "slot": decl.get("slot") or "",
+                    "note": decl.get("note") or "",
+                    "source": module})
+    return out
+
+
+def _check_entries(c: Dict[str, Any]) -> Dict[str, Any]:
+    """契约检查声明 → payload.checks 表。"""
+    out: Dict[str, Any] = {}
+    for k, v in _iter_checks(c):
+        vals = v.get("values") if isinstance(v, dict) else None
+        if vals is None and isinstance(v, dict):
+            vals = v.get("allowed") or v.get("enum")
+        out[k] = {"values": vals} if vals else {"rule": v}
+    return out
+
+
+def _contract_state(c: Dict[str, Any]) -> Tuple[Dict[str, Any], List[Any], List[Any]]:
+    """契约的 abstract_state.initial / transition.phases / invariants。"""
+    st = c.get("abstract_state") if isinstance(c.get("abstract_state"), dict) else {}
+    tr = c.get("transition") if isinstance(c.get("transition"), dict) else {}
+    return st.get("initial") or {}, tr.get("phases") or [], c.get("invariants") or []
+
+
 def build_mvu_payload(ir: IRDocument) -> Dict[str, Any]:
     """纯函数：契约 → NF 侧 MVU 中间模型（可单测，不写盘）。"""
     rows = _collect_world_models(ir)
@@ -206,32 +263,12 @@ def build_mvu_payload(ir: IRDocument) -> Dict[str, Any]:
     seen: Dict[str, str] = {}
     for r in rows:
         c = r["contract"]
-        for decl in _iter_variables(c):
-            name = str(decl.get("name") or "")
-            if not name:
-                continue
-            if name in seen and seen[name] != r["module"]:
-                warnings.append("变量名冲突：%s 同时来自 %s 与 %s——按先到者保留，"
-                                "冲突已记录（不静默）" % (name, seen[name], r["module"]))
-                continue
-            seen[name] = r["module"]
-            kind = str(decl.get("kind") or "untyped")
-            variables.append({"name": name, "kind": kind,
-                              "mvu_type": TYPE_MAP.get(kind, "union"),
-                              "slot": decl.get("slot") or "",
-                              "note": decl.get("note") or "",
-                              "source": r["module"]})
-        st = c.get("abstract_state") if isinstance(c.get("abstract_state"), dict) else {}
-        if st.get("initial"):
-            initial.update(st["initial"])
-        for k, v in _iter_checks(c):
-            vals = v.get("values") if isinstance(v, dict) else None
-            if vals is None and isinstance(v, dict):
-                vals = v.get("allowed") or v.get("enum")
-            checks[k] = {"values": vals} if vals else {"rule": v}
-        tr = c.get("transition") if isinstance(c.get("transition"), dict) else {}
-        phases.extend(tr.get("phases") or [])
-        invariants.extend(c.get("invariants") or [])
+        variables.extend(_variable_entries(r["module"], c, seen, warnings))
+        st_initial, st_phases, st_invariants = _contract_state(c)
+        initial.update(st_initial)
+        phases.extend(st_phases)
+        invariants.extend(st_invariants)
+        checks.update(_check_entries(c))
     return {
         "schema": "nf-mvu-payload/1",
         "generator": ADAPTER_VERSION,

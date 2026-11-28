@@ -47,6 +47,67 @@ from ._verify_core import (
     _check_proofs,
     _check_root,
 )
+from ._verify_forms_parts import (
+    _attest_entries,
+    _attest_payload,
+    _attest_tail,
+    _attest_verdicts,
+    _payload_find,
+    _receipt_entry_issues,
+    _receipt_leaves,
+    _receipts_tail,
+)
+
+
+def _verify_structure(rd: _Reader, res: dict[str, Any]) -> tuple:
+    """结构 → 成员摘要 → 根（先失败先返回）→ (meta, entries) 或 (None, [])。"""
+    try:
+        meta = _load_meta(rd)
+    except ValueError as exc:
+        res["issues"].append(str(exc))
+        return None, []
+    entries = meta.get("entries") or []
+    res["count"] = len(entries)
+    _fill_header(res, meta)
+    res["issues"].extend(rd.issues)
+    if not entries:
+        res["issues"].append("证据包为空（" + GUIDE + "pack 时请至少给一个目标文件；"
+                             "空包不给 ok）")
+        return None, []
+    leaves = _check_members(rd, entries, res["issues"])
+    if res["issues"]:
+        return None, []
+    _check_root(leaves, res)
+    if res["issues"]:
+        return None, []
+    return meta, entries
+
+
+def _verify_core_phase(rd: _Reader, meta: dict[str, Any], entries: list,
+                       opts: Any, res: dict[str, Any]) -> bool:
+    """包含证明 → 链 → 锚 → 信封 → 挂账 → 判定；False = 已定案失败。"""
+    _check_proofs(entries, res)
+    _check_chain(entries, meta, res)
+    check_anchor(entries, meta, opts.anchor, res)
+    _check_extras(rd, entries, res["issues"])
+    if res["issues"]:
+        return False
+    _check_attestations(rd, meta, entries, opts.key, res)
+    if res["issues"]:
+        return False
+    _check_decision(rd, meta, entries, res, opts.expected_policy_digest)
+    return not res["issues"]
+
+
+def _verify_time_phase(res: dict[str, Any], bundle: str, opts: Any, at: str):
+    """时间令牌锚定 → 新 at；None = 已定案失败。"""
+    if opts.time_record is not None:
+        anchored = _apply_time_token(res, bundle, opts.time_record, opts.time_ca,
+                                     opts.time_untrusted)
+        if anchored is None:
+            return None
+        return anchored or at
+    return at
 
 
 def _verify_uncosted(bundle: str, opts: VerifyOptions | None = None) -> dict[str, Any]:
@@ -70,42 +131,14 @@ def _verify_uncosted(bundle: str, opts: VerifyOptions | None = None) -> dict[str
     res = _empty_result()
     rd = _Reader(bundle)
     try:
-        try:
-            meta = _load_meta(rd)
-        except ValueError as exc:
-            res["issues"].append(str(exc))
+        meta, entries = _verify_structure(rd, res)
+        if meta is None:
             return res
-        entries = meta.get("entries") or []
-        res["count"] = len(entries)
-        _fill_header(res, meta)
-        res["issues"].extend(rd.issues)
-        if not entries:
-            res["issues"].append("证据包为空（" + GUIDE + "pack 时请至少给一个目标文件；"
-                                 "空包不给 ok）")
+        if not _verify_core_phase(rd, meta, entries, opts, res):
             return res
-        leaves = _check_members(rd, entries, res["issues"])
-        if res["issues"]:
+        at = _verify_time_phase(res, bundle, opts, at)
+        if at is None:
             return res
-        _check_root(leaves, res)
-        if res["issues"]:
-            return res
-        _check_proofs(entries, res)
-        _check_chain(entries, meta, res)
-        check_anchor(entries, meta, anchor, res)
-        _check_extras(rd, entries, res["issues"])
-        if res["issues"]:
-            return res
-        _check_attestations(rd, meta, entries, key, res)
-        if res["issues"]:
-            return res
-        _check_decision(rd, meta, entries, res, expected_policy_digest)
-        if res["issues"]:
-            return res
-        if time_record is not None:
-            anchored = _apply_time_token(res, bundle, time_record, time_ca, time_untrusted)
-            if anchored is None:
-                return res
-            at = anchored or at
         fresh: dict[str, Any] = {"state": "unknown", "expires_at": "", "basis": "none"}
         if _apply_revocation(rd, entries, revocations, res, fresh, at):
             return res
@@ -142,15 +175,6 @@ def _check_extras(rd: _Reader, entries: Sequence[dict[str, Any]],
 
 
 
-def _payload_find(read: Any, rel: str) -> bytes | None:
-    """成员实体查找：先按原相对路径，再退化到 payload/ 前缀（bundle 形态用前缀）。"""
-    for name in (rel, PAYLOAD_DIR + rel):
-        data = read(name)
-        if data is not None:
-            return data
-    return None
-
-
 
 
 def _schema_of(raw: bytes | None) -> str:
@@ -165,10 +189,8 @@ def _schema_of(raw: bytes | None) -> str:
 
 
 
-def _detect_container(rd: _Reader, kind: str = "") -> tuple[str, dict[str, Any]]:
-    """容器（zip / 目录）→ (形态, 文档)。显式 --kind 时只做形状确认，不猜。"""
-    if rd.read(BUNDLE_ENTRY) is not None:
-        return "bundle", _load_meta(rd)
+def _found_docs(rd: _Reader) -> dict[str, dict[str, Any]]:
+    """容器内按 schema 找证据文档 → {schema: doc}（坏件跳过，首见为准）。"""
     found: dict[str, dict[str, Any]] = {}
     for name in [n for n in rd.names() if n.endswith(".json")]:
         raw = rd.read(name)
@@ -178,6 +200,14 @@ def _detect_container(rd: _Reader, kind: str = "") -> tuple[str, dict[str, Any]]
                 found[schema] = json_doc.loads(raw.decode(), dict, what="证据文档")  # type: ignore[arg-type]
             except (ValueError, UnicodeDecodeError):
                 continue
+    return found
+
+
+def _detect_container(rd: _Reader, kind: str = "") -> tuple[str, dict[str, Any]]:
+    """容器（zip / 目录）→ (形态, 文档)。显式 --kind 时只做形状确认，不猜。"""
+    if rd.read(BUNDLE_ENTRY) is not None:
+        return "bundle", _load_meta(rd)
+    found = _found_docs(rd)
     for schema, form in ((RECEIPTS_SCHEMA, "receipts"), (ATTEST_SCHEMA, "attest"),
                          (ATTEST_SET_SCHEMA, "attest")):
         if schema in found and (not kind or kind == form):
@@ -220,23 +250,7 @@ def _verify_receipts(doc: dict[str, Any], read: Any,
     if not entries:
         issues.append("回执为空（" + GUIDE + "空根不能证明任何事——请生成含成员的回执）")
         return res
-    leaves: list[bytes] = []
-    for e in entries:
-        rel = _norm(str(e.get("id") or e.get("path") or ""))
-        data = _payload_find(read, rel) if rel else None
-        if data is None:
-            issues.append(f"缺成员实体：{rel or '?'}（{GUIDE}回执只证明「根里有这条」，验它需要"
-                          "成员字节——请把成员与回执放在同一根下，或用 nf evidence pack 打包）")
-            continue
-        digest = _sha256(data)
-        want = str(e.get("digest") or "")
-        if digest != want:
-            issues.append(f"成员摘要不符：{rel}（记录={want[:16]} 实测={digest[:16]}）"
-                          f"（{GUIDE}成员被改过——回执证明的就是字节，字节变了判定必红）")
-        want_leaf = _leaf(rel, digest)
-        if want_leaf != str(e.get("leaf") or ""):
-            issues.append(f"叶复算不符：{rel}（{GUIDE}叶定义须与 receipts 同源；改动后请重签回执）")
-        leaves.append(bytes.fromhex(want_leaf))
+    leaves = _receipt_leaves(entries, read, issues)
     if issues:
         return res
     _check_root(leaves, res)
@@ -246,10 +260,7 @@ def _verify_receipts(doc: dict[str, Any], read: Any,
     if issues:
         return res
     res["level"] = "receipts_only"
-    fresh: dict[str, Any] = {"state": "unknown", "expires_at": "", "basis": "none"}
-    if _apply_revocation_doc(revocations, entries, res, fresh, at):
-        return res
-    if _apply_freshness(res, require_fresh_revocations, at, fresh):
+    if not _receipts_tail(res, entries, revocations, require_fresh_revocations, at):
         return res
     res["verdict"] = "ok"
     return res
@@ -270,46 +281,13 @@ def _verify_attest(doc: dict[str, Any], read: Any, key: bytes | None = None,
         issues.append("信封集为空（" + GUIDE + "nf-attest-set/1 必须至少含一份信封）")
         return res
     res["count"] = len(envs)
-    entries: list[dict[str, Any]] = []
     with tempfile.TemporaryDirectory(prefix="nf_attestset_") as tmp:
-        for env in envs:
-            if not isinstance(env, dict):
-                issues.append("信封不是对象（" + GUIDE + "重跑 nf attest --out 生成）")
-                continue
-            subj = _norm(str((env.get("subject") or {}).get("path") or ""))
-            data = _payload_find(read, subj) if subj else None
-            if data is None:
-                issues.append(f"缺成员实体：{subj or '?'}（{GUIDE}信封只证明「这份内容被签过」，"
-                              "验它需要内容本身——请把成员与信封放在同一根下）")
-                continue
-            digest = _sha256(data)
-            entries.append({"path": subj, "digest": digest})
-            full = os.path.join(tmp, *subj.split("/"))
-            parent = os.path.dirname(full)
-            if parent:
-                os.makedirs(parent, exist_ok=True)
-            with open(full, "wb") as fh:
-                fh.write(data)
+        entries = _attest_entries(envs, read, tmp, issues)
         if issues:
             return res
-        passed: list[str] = []
-        failed: list[str] = []
-        for env in envs:
-            ok, att_issues, level = attest.verify(env, tmp, key=key)
-            passed.extend([level] if ok else [])
-            failed.extend([] if ok else att_issues)
-        if not passed:
-            res["issues"].append(f"所有信封均未通过校验：{'；'.join(failed[:3]) or '无可用信封'}"
-                                 f"（{GUIDE}hmac 级须提供同一密钥 --key-file；缺密钥一律拒绝）")
+        if not _attest_verdicts(envs, tmp, key, res):
             return res
-        res["level"] = max(passed, key=lambda lv: LEVELS.index(lv) if lv in LEVELS else -1)
-        res["attestations_ok"] = len(passed)
-    fresh: dict[str, Any] = {"state": "unknown", "expires_at": "", "basis": "none"}
-    if _apply_revocation_doc(revocations, entries, res, fresh, at):
-        return res
-    if _apply_expiry(res, at):
-        return res
-    if _apply_freshness(res, require_fresh_revocations, at, fresh):
+    if not _attest_tail(res, entries, revocations, require_fresh_revocations, at):
         return res
     res["verdict"] = "ok"
     return res

@@ -5,8 +5,8 @@
     "floor": 5,
     "prod": 1079,
     "projection": 540,
-    "support": 2197,
-    "verify": 1576
+    "support": 2217,
+    "verify": 1579
   },
   "generated_by": "core.role_model.projection（nf layers --write）",
   "kernel": [
@@ -5679,6 +5679,18 @@
       "path": "community/预训练与继续预训练域包/protocol.yaml",
       "role": "prod",
       "rule": "R-prod"
+    },
+    {
+      "function": "cq6_scorecard 私有子模块：D1–D8 证据规则给分（按证据规则打 0–5，返回 score/reason/evidence/gaps）。",
+      "path": "desktop/src/core/_cq6_dims.py",
+      "role": "verify",
+      "rule": "auto:R-core"
+    },
+    {
+      "function": "core.ops 私有子模块：运行面/供应商面的形状判据（供 core.ops.validate_* 复用）。",
+      "path": "desktop/src/core/_ops_checks.py",
+      "role": "verify",
+      "rule": "auto:R-core"
     },
     {
       "function": "「未知 ≠ 不存在」守卫（机制借鉴 axiomcodegraph SKILL.md:43-81 / nuke AGENTS.md:53-54）。",
@@ -13577,6 +13589,12 @@
       "rule": "R-verify"
     },
     {
+      "function": "",
+      "path": "engine/rust/canonical/src/jcs.rs",
+      "role": "verify",
+      "rule": "R-verify"
+    },
+    {
       "function": "[derive(Debug)]",
       "path": "engine/rust/canonical/src/main.rs",
       "role": "verify",
@@ -13961,7 +13979,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "",
+      "function": "[allow(clippy::too_many_arguments)]",
       "path": "engine/rust/src/drill_fidelity/part2.rs",
       "role": "verify",
       "rule": "R-verify"
@@ -14147,7 +14165,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "",
+      "function": "[allow(clippy::too_many_arguments)]",
       "path": "engine/rust/src/knowledge/part1.rs",
       "role": "verify",
       "rule": "R-verify"
@@ -14297,7 +14315,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "",
+      "function": "[allow(clippy::too_many_arguments)]",
       "path": "engine/rust/src/output_forms/part1.rs",
       "role": "verify",
       "rule": "R-verify"
@@ -14345,7 +14363,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "",
+      "function": "[allow(clippy::too_many_arguments)]",
       "path": "engine/rust/src/output_forms_verify/part2.rs",
       "role": "verify",
       "rule": "R-verify"
@@ -14399,7 +14417,7 @@
       "rule": "R-verify"
     },
     {
-      "function": "",
+      "function": "[allow(clippy::too_many_arguments)]",
       "path": "engine/rust/src/pack_combo_core/part3.rs",
       "role": "verify",
       "rule": "R-verify"
@@ -15972,17 +15990,17 @@
     }
   ],
   "note": "核内（floor/prod/verify）逐件；核外由规则批量覆盖。职能句取自件自述。",
-  "root_digest": "2dd0af768e5d0b39ad7fe5d8b1a153b2ffdd80084b9b39de457cb46ceca82b71",
+  "root_digest": "757debe7d1768b8752eb63af303914b0c7226c72daf552e288dd440c9bed438a",
   "rule_counts": {
     "R-app": 1512,
-    "R-catch": 2035,
+    "R-catch": 2055,
     "R-entry": 26,
     "R-floor": 5,
     "R-prod": 944,
     "R-projection": 513,
     "R-support": 130,
-    "R-verify": 1448,
-    "auto:R-core": 322
+    "R-verify": 1449,
+    "auto:R-core": 324
   },
   "schema": "nf-role-coordinates/1"
 }

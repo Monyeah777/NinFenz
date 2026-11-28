@@ -33,21 +33,20 @@ WORLD_ENTRY_KEYS = {"name", "keys", "content", "enabled",
 MCP_RESOURCE_KEYS = {"uri", "name", "mimeType", "text"}
 
 
-def check_ccv3_chara(path: str) -> List[str]:
-    issues: List[str] = []
+def _load_json_file(path: str, label: str) -> tuple:
+    """读 JSON 产物 → (值, issues)；缺失/解析失败折成文案 issue（不抛）。"""
     if not os.path.isfile(path):
-        return [f"ccv3 chara.json 缺失: {path}"]
+        return None, [f"{label} 缺失: {path}"]
     try:
         with open(path, encoding="utf-8") as f:
-            data = json.load(f)
+            return json.load(f), []
     except Exception as e:
-        return [f"ccv3 chara.json 解析失败: {e}"]
-    if not isinstance(data, dict):
-        return ["ccv3 chara.json 应为对象"]
-    for k in CCV3_CHARA_KEYS:
-        if k not in data:
-            issues.append(f"ccv3 chara 缺必填键: {k}")
-    # v3 真形状：内容字段须落在 data 内（顶层镜像仅作 v2 兼容，不作为权威位）
+        return None, [f"{label} 解析失败: {e}"]
+
+
+def _chara_inner_issues(data: dict) -> List[str]:
+    """v3 真形状：内容字段须落在 data 内（顶层镜像仅作 v2 兼容，不作为权威位）。"""
+    issues: List[str] = []
     if isinstance(data.get("data"), dict):
         inner = data["data"]
         for k in ("name", "character_book"):
@@ -58,8 +57,15 @@ def check_ccv3_chara(path: str) -> List[str]:
                 issues.append(f"ccv3 chara 顶层镜像与 data.{k} 不一致（镜像须同源）")
     elif "data" in data:
         issues.append("ccv3 chara.data 应为对象（v3 真形状）")
-    # v2.4.0 A2 核查：SillyTavern validator 要求 Number(spec_version) ∈ [3.0,4.0)
-    # ——"v3" 字符串经 Number() 得 NaN 校验 fail，须为数值字符串 "3.0"（bug 级差距机读化）
+    return issues
+
+
+def _chara_version_issues(data: dict) -> List[str]:
+    """v2.4.0 A2 核查：SillyTavern validator 要求 Number(spec_version) ∈ [3.0,4.0)。
+
+    ——"v3" 字符串经 Number() 得 NaN 校验 fail，须为数值字符串 "3.0"（bug 级差距机读化）
+    """
+    issues: List[str] = []
     sv = data.get("spec_version")
     if sv is not None:
         try:
@@ -68,6 +74,12 @@ def check_ccv3_chara(path: str) -> List[str]:
             n = float("nan")
         if not (3.0 <= n < 4.0):
             issues.append(f"ccv3 chara spec_version 非数值字符串 3.0-4.0: {sv!r}")
+    return issues
+
+
+def _chara_book_issues(data: dict) -> List[str]:
+    """character_book.entries[] 必须是对象列表，每项带 name/content。"""
+    issues: List[str] = []
     book = data.get("character_book") if isinstance(data, dict) else None
     if book is not None:
         entries = book.get("entries") if isinstance(book, dict) else None
@@ -77,6 +89,22 @@ def check_ccv3_chara(path: str) -> List[str]:
             for i, entry in enumerate(entries):
                 if not isinstance(entry, dict) or not entry.get("name") or not entry.get("content"):
                     issues.append(f"ccv3 world 条目 {i} 缺 name/content")
+    return issues
+
+
+def check_ccv3_chara(path: str) -> List[str]:
+    data, load_issues = _load_json_file(path, "ccv3 chara.json")
+    if load_issues:
+        return load_issues
+    if not isinstance(data, dict):
+        return ["ccv3 chara.json 应为对象"]
+    issues: List[str] = []
+    for k in CCV3_CHARA_KEYS:
+        if k not in data:
+            issues.append(f"ccv3 chara 缺必填键: {k}")
+    issues.extend(_chara_inner_issues(data))
+    issues.extend(_chara_version_issues(data))
+    issues.extend(_chara_book_issues(data))
     return issues
 
 
@@ -123,6 +151,25 @@ def _check_md_frontmatter(path: str, required: tuple) -> List[str]:
     return issues
 
 
+def _skill_name_issues(m, path: str) -> List[str]:
+    """agentskills.io name 硬约束（仅 a-z0-9- / ≤64 / 非首尾连字符 / 禁连续 -- / 匹配父目录）。"""
+    issues: List[str] = []
+    name = m.group(1)
+    if len(name) > 64:
+        issues.append(f"skill name 超 64 字符: {len(name)}")
+    if not re.fullmatch(r"[a-z0-9-]+", name):
+        issues.append(f"skill name 含非法字符（仅 a-z/0-9/-）: {name!r}")
+    if name.startswith("-") or name.endswith("-"):
+        issues.append(f"skill name 首尾连字符非法: {name!r}")
+    if "--" in name:
+        issues.append(f"skill name 连续连字符非法: {name!r}")
+    # 匹配父目录（skill 产物在 dest/<name>/SKILL.md）
+    parent = os.path.basename(os.path.dirname(os.path.abspath(path)))
+    if parent != name:
+        issues.append(f"skill name 与父目录不匹配: name={name!r} dir={parent!r}")
+    return issues
+
+
 def check_skill_md(path: str) -> List[str]:
     issues = _check_md_frontmatter(path, ("name", "description"))
     if not os.path.isfile(path):
@@ -135,19 +182,7 @@ def check_skill_md(path: str) -> List[str]:
     fm = txt[4:end] if end > 0 else ""
     m = re.search(r"^name:\s*(.+?)\s*$", fm, re.M)
     if m:
-        name = m.group(1)
-        if len(name) > 64:
-            issues.append(f"skill name 超 64 字符: {len(name)}")
-        if not re.fullmatch(r"[a-z0-9-]+", name):
-            issues.append(f"skill name 含非法字符（仅 a-z/0-9/-）: {name!r}")
-        if name.startswith("-") or name.endswith("-"):
-            issues.append(f"skill name 首尾连字符非法: {name!r}")
-        if "--" in name:
-            issues.append(f"skill name 连续连字符非法: {name!r}")
-        # 匹配父目录（skill 产物在 dest/<name>/SKILL.md）
-        parent = os.path.basename(os.path.dirname(os.path.abspath(path)))
-        if parent != name:
-            issues.append(f"skill name 与父目录不匹配: name={name!r} dir={parent!r}")
+        issues.extend(_skill_name_issues(m, path))
     d = re.search(r"^description:\s*(.+?)\s*$", fm, re.M)
     if d and len(d.group(1)) > 1024:
         issues.append(f"skill description 超 1024 字符: {len(d.group(1))}")
@@ -177,30 +212,39 @@ def check_claude_md(path: str) -> List[str]:
     return check_agents_md(path)
 
 
-def check_mcp_json(path: str) -> List[str]:
+def _mcp_caps_issues(mcp: dict) -> List[str]:
+    """mcp.name / mcp.capabilities.resources 必填。"""
     issues: List[str] = []
-    if not os.path.isfile(path):
-        return [f"mcp.json 缺失: {path}"]
-    try:
-        with open(path, encoding="utf-8") as f:
-            data = json.load(f)
-    except Exception as e:
-        return [f"mcp.json 解析失败: {e}"]
-    mcp = data.get("mcp") if isinstance(data, dict) else None
-    if not isinstance(mcp, dict):
-        return ["mcp.json 缺 mcp 对象"]
     if not mcp.get("name"):
         issues.append("mcp.name 缺失")
     caps = mcp.get("capabilities") if isinstance(mcp, dict) else None
     if not isinstance(caps, dict) or "resources" not in caps:
         issues.append("mcp.capabilities.resources 缺失")
+    return issues
+
+
+def _mcp_resource_issues(res: list) -> List[str]:
+    """resources[] 每项须带 uri/name/mimeType/text 四键。"""
+    issues: List[str] = []
+    for i, r in enumerate(res):
+        if not isinstance(r, dict) or not all(k in r for k in MCP_RESOURCE_KEYS):
+            issues.append(f"mcp resource {i} 缺字段（uri/name/mimeType/text）")
+    return issues
+
+
+def check_mcp_json(path: str) -> List[str]:
+    data, load_issues = _load_json_file(path, "mcp.json")
+    if load_issues:
+        return load_issues
+    mcp = data.get("mcp") if isinstance(data, dict) else None
+    if not isinstance(mcp, dict):
+        return ["mcp.json 缺 mcp 对象"]
+    issues = _mcp_caps_issues(mcp)
     res = mcp.get("resources")
     if not isinstance(res, list):
         issues.append("mcp.resources[] 缺失或非列表")
-    else:
-        for i, r in enumerate(res):
-            if not isinstance(r, dict) or not all(k in r for k in MCP_RESOURCE_KEYS):
-                issues.append(f"mcp resource {i} 缺字段（uri/name/mimeType/text）")
+        return issues
+    issues.extend(_mcp_resource_issues(res))
     return issues
 
 

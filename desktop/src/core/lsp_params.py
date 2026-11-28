@@ -81,6 +81,16 @@ def pos_of(params: Dict[str, Any]) -> Optional[Tuple[int, int]]:
     return line, character
 
 
+def _diagnostics_issue(params: Dict[str, Any]) -> str:
+    ctx = params.get("context")
+    if not isinstance(ctx, dict):
+        return "缺 context 对象（codeAction 需要 {diagnostics: [...]}）"
+    diags = ctx.get("diagnostics")
+    if not isinstance(diags, list) or any(not isinstance(d, dict) for d in diags):
+        return "context.diagnostics 须为对象数组（每项含 code/range）"
+    return ""
+
+
 def advise_request(method: Any, params: Dict[str, Any]) -> str:
     """请求参数准入 → 错误说明（空串 = 通过）。"""
     need = _REQUIREMENTS.get(str(method))
@@ -93,12 +103,7 @@ def advise_request(method: Any, params: Dict[str, Any]) -> str:
     if "query" in need and not isinstance(params.get("query"), str):
         return "workspace/symbol 的 query 须为字符串（可省略，传别的类型即参数非法）"
     if "diagnostics" in need:
-        ctx = params.get("context")
-        if not isinstance(ctx, dict):
-            return "缺 context 对象（codeAction 需要 {diagnostics: [...]}）"
-        diags = ctx.get("diagnostics")
-        if not isinstance(diags, list) or any(not isinstance(d, dict) for d in diags):
-            return "context.diagnostics 须为对象数组（每项含 code/range）"
+        return _diagnostics_issue(params)
     return ""
 
 

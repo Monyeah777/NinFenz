@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 SCHEMA = "nf-policy/1"
 REL = "protocol/policy_rules.json"
@@ -59,6 +59,17 @@ def evaluate(facts: Dict[str, Any], root: str = ".") -> Dict[str, Any]:
     if not isinstance(facts, dict) or not facts:
         raise PolicyError("缺事实（修复指引：给出 required_level/contract_status/has_evidence 等）",
                           code="FACTS-MISSING")
+    hits = _collect_hits(reg, facts)
+    effect, reason, obligations = _decide(hits, reg)
+    return {"schema": "nf-policy-decision/1", "allowed": effect == "allow",
+            "effect": effect, "reason": reason,
+            "matched": [h["id"] for h in hits], "obligations": obligations,
+            "missing_facts": _missing_facts(facts),
+            "note": "默认拒绝；同优先级 deny 胜 allow；不声称 OPA/Cedar 兼容"}
+
+
+def _collect_hits(reg: Dict[str, Any], facts: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """按 priority 升序取命中规则（同优先级保持声明顺序）。"""
     hits: List[Dict[str, Any]] = []
     for rule in sorted(reg.get("rules") or [], key=lambda r: int(r.get("priority") or 0)):
         when = rule.get("when") or {}
@@ -66,32 +77,57 @@ def evaluate(facts: Dict[str, Any], root: str = ".") -> Dict[str, Any]:
             hits.append({"id": str(rule.get("id")), "effect": str(rule.get("effect")),
                          "priority": int(rule.get("priority") or 0),
                          "reason": str(rule.get("reason"))})
+    return hits
+
+
+def _decide(hits: List[Dict[str, Any]],
+            reg: Dict[str, Any]) -> Tuple[str, str, List[str]]:
+    """命中集 → (effect, reason, obligations)；无命中落默认。"""
     effect = str(reg.get("default_effect") or "deny")
     reason = "无规则命中 → 默认拒绝（不静默放行）"
     obligations: List[str] = []
-    if hits:
-        denies = [h for h in hits if h["effect"] == "deny"]
-        allows = [h for h in hits if h["effect"] == "allow"]
-        requires = [h for h in hits if h["effect"] == "require"]
-        if denies:
-            effect, reason = "deny", denies[0]["reason"]
-        elif requires:
-            effect = "require"
-            obligations = [h["reason"] for h in requires]
-            reason = "需要义务：%s" % "；".join(obligations[:2])
-        elif allows:
-            effect, reason = "allow", allows[0]["reason"]
-    missing = [k for k in ("required_level", "contract_status", "has_evidence") if k not in facts]
-    return {"schema": "nf-policy-decision/1", "allowed": effect == "allow",
-            "effect": effect, "reason": reason,
-            "matched": [h["id"] for h in hits], "obligations": obligations,
-            "missing_facts": missing,
-            "note": "默认拒绝；同优先级 deny 胜 allow；不声称 OPA/Cedar 兼容"}
+    if not hits:
+        return effect, reason, obligations
+    denies = _by_effect(hits, "deny")
+    requires = _by_effect(hits, "require")
+    allows = _by_effect(hits, "allow")
+    if denies:
+        return "deny", denies[0]["reason"], obligations
+    if requires:
+        obligations = [h["reason"] for h in requires]
+        return "require", "需要义务：%s" % "；".join(obligations[:2]), obligations
+    if allows:
+        return "allow", allows[0]["reason"], obligations
+    return effect, reason, obligations
+
+
+def _by_effect(hits: List[Dict[str, Any]], effect: str) -> List[Dict[str, Any]]:
+    """命中集里某 effect 的规则（保持声明顺序）。"""
+    return [h for h in hits if h["effect"] == effect]
+
+
+def _missing_facts(facts: Dict[str, Any]) -> List[str]:
+    """求值器必需事实里缺了哪些。"""
+    return [k for k in ("required_level", "contract_status", "has_evidence") if k not in facts]
 
 
 def check_registry(root: str = ".") -> List[str]:
     issues: List[str] = []
     reg = load_registry(root)
+    issues += _registry_head_issues(reg)
+    issues += _rule_issues(reg.get("rules") or [])
+    vocab = [str(x) for x in reg.get("facts_vocabulary") or []]
+    if sorted(vocab) != sorted(FACTS):
+        issues.append("facts_vocabulary 与求值器事实集不一致")
+    boundary = " ".join(str(x) for x in reg.get("claims_boundary") or [])
+    if "不声称" not in boundary:
+        issues.append("claims_boundary 必须写明不声称 OPA/Cedar 兼容")
+    return issues
+
+
+def _registry_head_issues(reg: Dict[str, Any]) -> List[str]:
+    """注册表头部口径（默认拒绝 / 规则集非空 / id 唯一）。"""
+    issues: List[str] = []
     if str(reg.get("default_effect")) != "deny":
         issues.append("default_effect 必须 deny（修复指引：默认放行不可接受）")
     rules = reg.get("rules") or []
@@ -100,24 +136,31 @@ def check_registry(root: str = ".") -> List[str]:
     ids = [str(r.get("id")) for r in rules]
     if len(ids) != len(set(ids)):
         issues.append("规则 id 重复")
+    return issues
+
+
+def _rule_issues(rules: List[Dict[str, Any]]) -> List[str]:
+    """逐条规则口径。"""
+    issues: List[str] = []
     for rule in rules:
-        rid = str(rule.get("id"))
-        if str(rule.get("effect")) not in EFFECTS:
-            issues.append("%s effect 非法：%s" % (rid, rule.get("effect")))
-        if not isinstance(rule.get("priority"), int):
-            issues.append("%s priority 必须是整数" % rid)
-        when = rule.get("when") or {}
-        if not when:
-            issues.append("%s when 不能为空（空条件=无条件命中）" % rid)
-        for key in when:
-            if key not in FACTS:
-                issues.append("%s when 含未知事实：%s（修复指引：登记到 facts_vocabulary）" % (rid, key))
-        if not str(rule.get("reason") or "").strip():
-            issues.append("%s 缺 reason" % rid)
-    vocab = [str(x) for x in reg.get("facts_vocabulary") or []]
-    if sorted(vocab) != sorted(FACTS):
-        issues.append("facts_vocabulary 与求值器事实集不一致")
-    boundary = " ".join(str(x) for x in reg.get("claims_boundary") or [])
-    if "不声称" not in boundary:
-        issues.append("claims_boundary 必须写明不声称 OPA/Cedar 兼容")
+        issues += _one_rule_issues(rule)
+    return issues
+
+
+def _one_rule_issues(rule: Dict[str, Any]) -> List[str]:
+    """单条规则的 effect/priority/when/reason 口径。"""
+    issues: List[str] = []
+    rid = str(rule.get("id"))
+    if str(rule.get("effect")) not in EFFECTS:
+        issues.append("%s effect 非法：%s" % (rid, rule.get("effect")))
+    if not isinstance(rule.get("priority"), int):
+        issues.append("%s priority 必须是整数" % rid)
+    when = rule.get("when") or {}
+    if not when:
+        issues.append("%s when 不能为空（空条件=无条件命中）" % rid)
+    for key in when:
+        if key not in FACTS:
+            issues.append("%s when 含未知事实：%s（修复指引：登记到 facts_vocabulary）" % (rid, key))
+    if not str(rule.get("reason") or "").strip():
+        issues.append("%s 缺 reason" % rid)
     return issues

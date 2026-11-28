@@ -39,38 +39,58 @@ def _r(x: float) -> float:
 
 # ------------------------------------------------------------------ 数据装载
 
-def load_equity_curve(path: str | Path) -> Tuple[Dict[str, Any], str]:
-    """读净值曲线 CSV（表头须含 date,equity[,benchmark]）；口径错误即返回错误串。"""
-    p = Path(path)
+def _read_curve_rows(p: Path):
     try:
         text = p.read_text(encoding="utf-8")
     except OSError as exc:
-        return {}, "不可读：%s" % exc
+        return [], "不可读：%s" % exc
     rows = list(csv.DictReader(text.splitlines()))
     if not rows:
-        return {}, "空表"
-    cols = {c.strip().lower() for c in (rows[0].keys() if rows else []) if c}
-    for need in ("date", "equity"):
-        if need not in cols:
-            return {}, "缺列 %s（实际列：%s）" % (need, sorted(cols))
+        return [], "空表"
+    return rows, ""
+
+
+def _curve_columns(rows: List[Dict[str, Any]]) -> set:
+    return {c.strip().lower() for c in (rows[0].keys() if rows else []) if c}
+
+
+def _curve_row_values(row: Dict[str, Any], has_bench: bool):
+    date = str(row.get("date") or row.get("Date") or "").strip()
+    value = float(row.get("equity") or row.get("Equity") or "")
+    bench = float(row.get("benchmark") or row.get("Benchmark") or "") if has_bench else None
+    return date, value, bench
+
+
+def _parse_curve_rows(rows: List[Dict[str, Any]], has_bench: bool):
     dates: List[str] = []
     equity: List[float] = []
     bench: List[float] = []
-    has_bench = "benchmark" in cols
     for i, row in enumerate(rows, 2):
         try:
-            dates.append(str(row.get("date") or row.get("Date") or "").strip())
-            equity.append(float(row.get("equity") or row.get("Equity") or ""))
-            if has_bench:
-                bench.append(float(row.get("benchmark") or row.get("Benchmark") or ""))
+            date, value, bvalue = _curve_row_values(row, has_bench)
         except (TypeError, ValueError):
-            return {}, "第 %d 行数值不可解析" % i
+            return None, "第 %d 行数值不可解析" % i
+        dates.append(date)
+        equity.append(value)
+        if bvalue is not None:
+            bench.append(bvalue)
     if len(equity) < 3:
-        return {}, "样本过短（< 3 个净值点）"
+        return None, "样本过短（< 3 个净值点）"
     if any(v <= 0 for v in equity):
-        return {}, "净值须为正数（口径：净值序列，非累计收益）"
-    return {"dates": dates, "equity": equity,
-            "benchmark": bench if has_bench else None}, ""
+        return None, "净值须为正数（口径：净值序列，非累计收益）"
+    return {"dates": dates, "equity": equity, "benchmark": bench if has_bench else None}, ""
+
+
+def load_equity_curve(path: str | Path) -> Tuple[Dict[str, Any], str]:
+    """读净值曲线 CSV（表头须含 date,equity[,benchmark]）；口径错误即返回错误串。"""
+    rows, error = _read_curve_rows(Path(path))
+    if error:
+        return {}, error
+    cols = _curve_columns(rows)
+    for need in ("date", "equity"):
+        if need not in cols:
+            return {}, "缺列 %s（实际列：%s）" % (need, sorted(cols))
+    return _parse_curve_rows(rows, "benchmark" in cols)
 
 
 # ------------------------------------------------------------------ 基础口径

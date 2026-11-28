@@ -54,72 +54,119 @@ def _evidence_issues(root: str, refs: Any, where: str,
     return issues
 
 
-def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
-    issues: List[str] = []
-    std = doc.get("standard") or {}
+def _standard_issues(std: Dict[str, Any]) -> List[str]:
+    out: List[str] = []
     for key in ("wcag", "iso_9241_11", "human_ai"):
         if not str(std.get(key) or "").strip():
-            issues.append("standard 缺 %s" % key)
-    for rel in doc.get("declared_surfaces") or []:
+            out.append("standard 缺 %s" % key)
+    return out
+
+
+def _surface_issues(root: str, surfaces: List[Any]) -> List[str]:
+    out: List[str] = []
+    for rel in surfaces:
         if not _exists(root, str(rel)):
-            issues.append("declared_surfaces 不在场：%s" % rel)
-    rows = doc.get("wcag") or []
+            out.append("declared_surfaces 不在场：%s" % rel)
+    return out
+
+
+def _wcag_status_issues(row: Dict[str, Any], wid: str, status: str) -> List[str]:
+    out: List[str] = []
+    if status == "not-applicable" and not str(row.get("reason") or "").strip():
+        out.append("%s 标 not-applicable 但缺 reason" % wid)
+    if status == "planned" and str(row.get("planned_gate")) not in GATES:
+        out.append("%s 标 planned 但缺 planned_gate" % wid)
+    return out
+
+
+def _wcag_row_issues(root: str, row: Any) -> List[str]:
+    if not isinstance(row, dict):
+        return ["wcag 含非对象"]
+    wid = str(row.get("id"))
+    status = str(row.get("status"))
+    out: List[str] = []
+    if str(row.get("level")) not in LEVELS:
+        out.append("%s 的 level 非法：%s" % (wid, row.get("level")))
+    if status not in STATUSES:
+        out.append("%s 的 status 非法：%s" % (wid, status))
+    if not str(row.get("control") or "").strip():
+        out.append("%s 缺 control（控制点）" % wid)
+    out += _evidence_issues(root, row.get("evidence"), wid,
+                            require_test=(status == "enforced"))
+    out += _wcag_status_issues(row, wid, status)
+    return out
+
+
+def _wcag_issues(root: str, rows: List[Any]) -> List[str]:
+    out: List[str] = []
     ids = [str(r.get("id")) for r in rows if isinstance(r, dict)]
     if len(rows) < 6:
-        issues.append("wcag 至少 6 条适用项（%s）" % GUIDE)
+        out.append("wcag 至少 6 条适用项（%s）" % GUIDE)
     if len(ids) != len(set(ids)):
-        issues.append("wcag id 重复：%s" % ids)
+        out.append("wcag id 重复：%s" % ids)
     for row in rows:
-        if not isinstance(row, dict):
-            issues.append("wcag 含非对象")
-            continue
-        wid = str(row.get("id"))
-        if str(row.get("level")) not in LEVELS:
-            issues.append("%s 的 level 非法：%s" % (wid, row.get("level")))
-        status = str(row.get("status"))
-        if status not in STATUSES:
-            issues.append("%s 的 status 非法：%s" % (wid, status))
-        if not str(row.get("control") or "").strip():
-            issues.append("%s 缺 control（控制点）" % wid)
-        issues += _evidence_issues(root, row.get("evidence"), wid,
-                                   require_test=(status == "enforced"))
-        if status == "not-applicable" and not str(row.get("reason") or "").strip():
-            issues.append("%s 标 not-applicable 但缺 reason" % wid)
-        if status == "planned" and str(row.get("planned_gate")) not in GATES:
-            issues.append("%s 标 planned 但缺 planned_gate" % wid)
-    hf = doc.get("human_factors") or []
-    hf_ids = [str(h.get("id")) for h in hf if isinstance(h, dict)]
-    if len(hf) < 4:
-        issues.append("human_factors 至少 4 条（PAIR/HAX；%s）" % GUIDE)
+        out += _wcag_row_issues(root, row)
+    return out
+
+
+def _hf_row_issues(root: str, row: Any) -> List[str]:
+    if not isinstance(row, dict):
+        return ["human_factors 含非对象"]
+    hid = str(row.get("id"))
+    out: List[str] = []
+    if str(row.get("framework")) not in FRAMEWORKS:
+        out.append("%s 的 framework 非法：%s" % (hid, row.get("framework")))
+    if not str(row.get("principle") or "").strip():
+        out.append("%s 缺 principle" % hid)
+    out += _evidence_issues(root, row.get("evidence"), hid)
+    return out
+
+
+def _hf_issues(root: str, rows: List[Any]) -> List[str]:
+    out: List[str] = []
+    hf_ids = [str(h.get("id")) for h in rows if isinstance(h, dict)]
+    if len(rows) < 4:
+        out.append("human_factors 至少 4 条（PAIR/HAX；%s）" % GUIDE)
     if len(hf_ids) != len(set(hf_ids)):
-        issues.append("human_factors id 重复：%s" % hf_ids)
-    for row in hf:
-        if not isinstance(row, dict):
-            issues.append("human_factors 含非对象")
-            continue
-        hid = str(row.get("id"))
-        if str(row.get("framework")) not in FRAMEWORKS:
-            issues.append("%s 的 framework 非法：%s" % (hid, row.get("framework")))
-        if not str(row.get("principle") or "").strip():
-            issues.append("%s 缺 principle" % hid)
-        issues += _evidence_issues(root, row.get("evidence"), hid)
-    tests = doc.get("usability_tests") or []
+        out.append("human_factors id 重复：%s" % hf_ids)
+    for row in rows:
+        out += _hf_row_issues(root, row)
+    return out
+
+
+def _usability_issues(tests: List[Any]) -> List[str]:
+    out: List[str] = []
     if not tests:
-        issues.append("缺 usability_tests（至少模板级）")
+        out.append("缺 usability_tests（至少模板级）")
     for test in tests:
         if not isinstance(test, dict):
-            issues.append("usability_tests 含非对象")
+            out.append("usability_tests 含非对象")
             continue
         if str(test.get("status")) not in ("template-only", "done-external"):
-            issues.append("可用性测试 %s 的 status 非法：%s"
-                          % (test.get("id"), test.get("status")))
+            out.append("可用性测试 %s 的 status 非法：%s"
+                       % (test.get("id"), test.get("status")))
         if str(test.get("status")) == "template-only" and not str(test.get("note") or "").strip():
-            issues.append("可用性测试 %s 标 template-only 但缺 note（如实写未做）" % test.get("id"))
+            out.append("可用性测试 %s 标 template-only 但缺 note（如实写未做）" % test.get("id"))
+    return out
+
+
+def _claims_boundary_issues(boundary_values: Any) -> List[str]:
+    boundary = " ".join(str(x) for x in boundary_values or [])
+    if "不声称" not in boundary:
+        return ["claims_boundary 必须显式写「不声称 WCAG 合规/认证」"]
+    return []
+
+
+def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
+    issues: List[str] = []
+    issues += _standard_issues(doc.get("standard") or {})
+    issues += _surface_issues(root, doc.get("declared_surfaces") or [])
+    issues += _wcag_issues(root, doc.get("wcag") or [])
+    issues += _hf_issues(root, doc.get("human_factors") or [])
+    issues += _usability_issues(doc.get("usability_tests") or [])
     if doc.get("violation_budget") != 0:
         issues.append("violation_budget 必须为 0（声明面不允许已知违规存量）")
-    boundary = " ".join(str(x) for x in doc.get("claims_boundary") or [])
-    if "不声称" not in boundary:
-        issues.append("claims_boundary 必须显式写「不声称 WCAG 合规/认证」")
+    issues += _claims_boundary_issues(doc.get("claims_boundary") or [])
     return issues
 
 

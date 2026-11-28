@@ -36,21 +36,18 @@ def _license_atoms(expr: str) -> list:
     return [t for t in _EXPR_TOKEN.findall(expr) if t not in ("(", ")")]
 
 
-def expression_issue(expr: str) -> str:
-    """SPDX 表达式词法体检 → 违规说明（空串 = 合规，或 None 表示非表达式形态）。"""
-    text = str(expr or "").strip()
-    if not text:
-        return "许可为空"
-    if text in ("专有", UNDECLARED):   # NF 专属占位（非 SPDX 表达式形态）
-        return ""
+def _lexical_issue(text: str) -> str:
     tokens = _EXPR_TOKEN.findall(text)
     if "".join(tokens) != re.sub(r"\s+", "", text):
         return "含非法字符（修复指引：SPDX id / AND / OR / WITH / 括号 / `+` 之外不得出现）"
     if text.count("(") != text.count(")"):
         return "括号不配平"
-    atoms = _license_atoms(text)
-    if not atoms:
+    if not _license_atoms(text):
         return "表达式无许可 id"
+    return ""
+
+
+def _atom_issue(atoms) -> str:
     for a in atoms:
         if a in OPERATORS:
             continue
@@ -59,16 +56,42 @@ def expression_issue(expr: str) -> str:
             continue
         return ("许可 id 不在词表：%s（允许：%s；或用 `LicenseRef-<自定义>` 显式自造）"
                 % (a, "、".join(sorted(x for x in ALLOWED if x not in (UNDECLARED,)))))
-    # 运算符不得相邻 / 首尾（词法级：两个运算符挨着 = 缺操作数）
+    return ""
+
+
+def _operator_position_issue(tokens: List[str], i: int, tok: str) -> str:
+    if i == 0 or i == len(tokens) - 1:
+        return "运算符 %s 出现在表达式首/尾（缺操作数）" % tok
+    if tokens[i - 1] in OPERATORS or tokens[i - 1] == "(":
+        return "运算符 %s 前缺少操作数" % tok
+    if tokens[i + 1] == ")":
+        return "运算符 %s 后缺少操作数" % tok
+    return ""
+
+
+def _operator_issue(tokens: List[str]) -> str:
     for i, tok in enumerate(tokens):
         if tok in OPERATORS:
-            if i == 0 or i == len(tokens) - 1:
-                return "运算符 %s 出现在表达式首/尾（缺操作数）" % tok
-            if tokens[i - 1] in OPERATORS or tokens[i - 1] == "(":
-                return "运算符 %s 前缺少操作数" % tok
-            if tokens[i + 1] == ")":
-                return "运算符 %s 后缺少操作数" % tok
+            issue = _operator_position_issue(tokens, i, tok)
+            if issue:
+                return issue
     return ""
+
+
+def expression_issue(expr: str) -> str:
+    """SPDX 表达式词法体检 → 违规说明（空串 = 合规，或 None 表示非表达式形态）。"""
+    text = str(expr or "").strip()
+    if not text:
+        return "许可为空"
+    if text in ("专有", UNDECLARED):   # NF 专属占位（非 SPDX 表达式形态）
+        return ""
+    issue = _lexical_issue(text)
+    if issue:
+        return issue
+    issue = _atom_issue(_license_atoms(text))
+    if issue:
+        return issue
+    return _operator_issue(_EXPR_TOKEN.findall(text))
 
 _ROW = re.compile(r"^\|\s*(NF-[A-Za-z0-9\-]+)\s*\|")
 _INLINE = re.compile(r"(?m)^\s*(?:>\s*)?(?:许可|license)\s*[:：]\s*([^\s（(]+)")

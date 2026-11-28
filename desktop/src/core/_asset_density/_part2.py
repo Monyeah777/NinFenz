@@ -133,6 +133,29 @@ def count_keys(blob: str, keys) -> Dict[str, int]:
     return matcher.counts(blob)
 
 
+def _check_keys_limit(keys) -> List[str]:
+    """键集上限校验（键数 + 字符数）→ 字符串键列表；超限即抛。"""
+    keys = [str(k) for k in keys]
+    if len(keys) > MAX_KEYS or sum(map(len, keys)) > MAX_KEY_CHARS:
+        raise ValueError("键集超过计数上限（修复指引：缩小资产键集或拆分资产文件）")
+    return keys
+
+
+def _cached_counts(text: str, keys: List[str], matcher, keys_key: str, dg: str) -> Dict[str, int]:
+    """单件计数（按键集+件摘要缓存；无自动机时退回 str.count）→ 稀疏计数表。"""
+    ck = (dg, keys_key)
+    per = _FILE_COUNT_CACHE.get(ck)
+    if per is None:
+        per = matcher.counts(text) if matcher is not None \
+            else {k: text.count(k) for k in keys}
+        sparse = {k: n for k, n in per.items() if n}      # 稀疏：单件里绝大多数键一次都不出现
+        if len(_FILE_COUNT_CACHE) >= _FILE_COUNT_CACHE_MAX:
+            _FILE_COUNT_CACHE.clear()
+        _FILE_COUNT_CACHE[ck] = sparse
+        per = sparse
+    return per
+
+
 def count_keys_additive(texts, keys, digests=None) -> Dict[str, int]:
     """**逐件计数再相加**（等价于把语料用 `"\\n"` 连起来数一次），但**逐件**结果可缓存。
 
@@ -151,9 +174,7 @@ def count_keys_additive(texts, keys, digests=None) -> Dict[str, int]:
     省掉这里再 `sha256(text.encode())` 一遍——一次新内容状态里那是 2815 次编码 + 哈希（实测 ~5 ms）。
     摘要口径与这里现算的完全一致（同一 payload 语义，见 `conformance_scan._payload_digest`）。
     """
-    keys = [str(k) for k in keys]
-    if len(keys) > MAX_KEYS or sum(map(len, keys)) > MAX_KEY_CHARS:
-        raise ValueError("键集超过计数上限（修复指引：缩小资产键集或拆分资产文件）")
+    keys = _check_keys_limit(keys)
     if any("\n" in k for k in keys):
         return count_keys("\n".join(texts), keys)
     keys_key = hashlib.sha256("\x01".join(sorted(keys)).encode("utf-8")).hexdigest()
@@ -164,27 +185,13 @@ def count_keys_additive(texts, keys, digests=None) -> Dict[str, int]:
             raise ValueError("单件文本过大（%d > %d 字符）" % (len(text), MAX_BLOB_TEXT))
         dg = digests[idx] if digests is not None else \
             hashlib.sha256(text.encode("utf-8")).hexdigest()
-        ck = (dg, keys_key)
-        per = _FILE_COUNT_CACHE.get(ck)
-        if per is None:
-            per = matcher.counts(text) if matcher is not None \
-                else {k: text.count(k) for k in keys}
-            sparse = {k: n for k, n in per.items() if n}      # 稀疏：单件里绝大多数键一次都不出现
-            if len(_FILE_COUNT_CACHE) >= _FILE_COUNT_CACHE_MAX:
-                _FILE_COUNT_CACHE.clear()
-            _FILE_COUNT_CACHE[ck] = sparse
-            per = sparse
-        for k, n in per.items():
+        for k, n in _cached_counts(text, keys, matcher, keys_key, dg).items():
             totals[k] += n
     return totals
 
 
-def usage_scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
-    """资产引用度体检：每个资产键在 04/community/docs 全语料中被引用次数。
-
-    FAIL 面留空（纯统计）：zero_usage 为「注册了但全语料无引用」的键清单，
-    供作者裁决（低信息键候选），不自动删。
-    """
+def _usage_keys(root: str) -> Dict[str, str]:
+    """资产键集（键 → 首个出处）：跳过 README、超大件与不可读件。"""
     keys: Dict[str, str] = {}
     for pat in ("community/*/assets/*.md", "05_资产库/用户自定义/*.md"):
         for rel in csc.iter_files(root, pat):
@@ -205,19 +212,50 @@ def usage_scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                     keys.setdefault(k, rel)
             except (OSError, ValueError):
                 continue
-    # 内容键：**语料面指纹**（常驻层逐件摘要，不读正文）＋ 键集。口径与旧实现一致（同一批件、
-    # 同一 payload 语义），但不再把 3.5 MB 正文逐件 `encode()` + 重哈希——而且键能**先算**，
-    # 于是命中时**根本不必把 2815 份语料读成列表**（旧实现是「先全读、再查表」）。
-    # 面指纹与**逐件摘要**一次拿到：未命中时 `face_digests` 已经把 2815 份语料的摘要算齐，
-    # 下面 `count_keys_additive` 的逐件缓存键直接复用它们——过去同一批摘要算了两遍（实测 ~5.6 ms）。
-    fp, digest_map = csc.face_digests(root, CORPUS_PATTERNS)
+    return keys
+
+
+def _census_hash(keys: Dict[str, str], fp: str) -> str:
+    """普查内容键：语料面指纹 + 排序键集（键先算，命中时不读正文）。"""
     h = hashlib.sha256()
     h.update(fp.encode("utf-8"))
     h.update(b"\x00")
     for k in sorted(keys):
         h.update(k.encode("utf-8"))
         h.update(b"\x01")
-    ckey = h.hexdigest()
+    return h.hexdigest()
+
+
+def _corpus_texts(root: str, digest_map) -> Tuple[List[str], List[str]]:
+    """未命中缓存时读语料 → (正文列表, 逐件摘要 hex 列表)。"""
+    corpus: List[str] = []
+    digests: List[str] = []
+    for rel in (r for pat in CORPUS_PATTERNS for r in csc.iter_files(root, pat)):
+        try:
+            corpus.append(csc.read_text_cached(Path(root) / rel))
+        except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
+            continue
+        dg = (digest_map or {}).get(rel)
+        if dg is None:                     # 面指纹是**复用**来的（手里没摘要）→ 现取
+            dg = csc._payload_digest(root, rel)
+        digests.append(dg.hex())
+    return corpus, digests
+
+
+def usage_scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
+    """资产引用度体检：每个资产键在 04/community/docs 全语料中被引用次数。
+
+    FAIL 面留空（纯统计）：zero_usage 为「注册了但全语料无引用」的键清单，
+    供作者裁决（低信息键候选），不自动删。
+    """
+    keys = _usage_keys(root)
+    # 内容键：**语料面指纹**（常驻层逐件摘要，不读正文）＋ 键集。口径与旧实现一致（同一批件、
+    # 同一 payload 语义），但不再把 3.5 MB 正文逐件 `encode()` + 重哈希——而且键能**先算**，
+    # 于是命中时**根本不必把 2815 份语料读成列表**（旧实现是「先全读、再查表」）。
+    # 面指纹与**逐件摘要**一次拿到：未命中时 `face_digests` 已经把 2815 份语料的摘要算齐，
+    # 下面 `count_keys_additive` 的逐件缓存键直接复用它们——过去同一批摘要算了两遍（实测 ~5.6 ms）。
+    fp, digest_map = csc.face_digests(root, CORPUS_PATTERNS)
+    ckey = _census_hash(keys, fp)
     # 落盘键另叠**代码面 + 运行时**（见 core.disk_cache）：改了普查算法必然换键，
     # 不靠"记得手工 bump 版本标签"。
     dkey = disk_cache.key("census", ckey, root=root,
@@ -233,17 +271,7 @@ def usage_scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
         # （逐件 Aho–Corasick + 非重叠贪心，再相加；与「拼成一整条再数」逐键等价，见其 docstring），
         # 于是**逐件**结果能按文件内容缓存：真编辑只让被改的那一件重算。实测整条 3.11 s → ~0.2 s，
         # 且改一件之后再算只需那一件的钱。
-        corpus: List[str] = []
-        digests: List[str] = []
-        for rel in (r for pat in CORPUS_PATTERNS for r in csc.iter_files(root, pat)):
-            try:
-                corpus.append(csc.read_text_cached(Path(root) / rel))
-            except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
-                continue
-            dg = (digest_map or {}).get(rel)
-            if dg is None:                     # 面指纹是**复用**来的（手里没摘要）→ 现取
-                dg = csc._payload_digest(root, rel)
-            digests.append(dg.hex())
+        corpus, digests = _corpus_texts(root, digest_map)
         counts = count_keys_additive(corpus, keys, digests=digests)
         disk_cache.store("census", dkey, counts)
     if ckey not in _CENSUS_CACHE:
@@ -258,37 +286,50 @@ def usage_scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     return [], stats
 
 
-def _thickness_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
-    """真算（未命中缓存时走这里）。"""
+def _row_metrics(text: str, keys) -> Tuple[int, int, bool]:
+    """单件厚度度量：小节数 / 表格行数 / 低信息档判定。"""
     import re as _re
 
+    lines = text.splitlines()
+    sections = sum(1 for ln in lines if _re.match(r"^#{1,3}\s", ln))
+    tables = sum(1 for ln in lines if ln.lstrip().startswith("|"))
+    low = len(text) < 200 or (not keys and sections == 0)
+    return sections, tables, low
+
+
+def _thickness_row(root: str, rel: str) -> Optional[Dict[str, Any]]:
+    """单件厚度行；README/超大件/不可读/空件/键集超限 → None（跳过）。"""
+    if rel.rsplit("/", 1)[-1] == "README.md":
+        return None
+    try:
+        path = Path(root) / rel
+        if path.stat().st_size > MAX_ASSET_FILE_BYTES:
+            return None
+        text = csc.read_text_cached(path)
+    except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
+        return None
+    if not text.strip():
+        return None
+    try:
+        keys = _keys_of(Path(rel), text)
+    except ValueError:
+        # 键集超限已由 scan 的面级问题报告；厚度统计跳过该件。
+        return None
+    sections, tables, low = _row_metrics(text, keys)
+    pkg = rel.split("/")[1] if rel.startswith("community") else "官方"
+    return {"package": pkg, "file": rel, "chars": len(text),
+            "keys": len(keys), "sections": sections,
+            "tables": tables, "low_info": low}
+
+
+def _thickness_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
+    """真算（未命中缓存时走这里）。"""
     rows = []
     for pat in ("community/*/assets/*.md", "05_资产库/用户自定义/*.md"):
         for rel in csc.iter_files(root, pat):
-            if rel.rsplit("/", 1)[-1] == "README.md":
-                continue
-            try:
-                path = Path(root) / rel
-                if path.stat().st_size > MAX_ASSET_FILE_BYTES:
-                    continue
-                text = csc.read_text_cached(path)
-            except OSError:  # 尽力而为：跳过不可读/不可解析项；该类缺口由对应门禁另行报出（见 AUD-0016）
-                continue
-            if not text.strip():
-                continue
-            try:
-                keys = _keys_of(Path(rel), text)
-            except ValueError:
-                # 键集超限已由 scan 的面级问题报告；厚度统计跳过该件。
-                continue
-            lines = text.splitlines()
-            sections = sum(1 for ln in lines if _re.match(r"^#{1,3}\s", ln))
-            tables = sum(1 for ln in lines if ln.lstrip().startswith("|"))
-            low = len(text) < 200 or (not keys and sections == 0)
-            pkg = rel.split("/")[1] if rel.startswith("community") else "官方"
-            rows.append({"package": pkg, "file": rel, "chars": len(text),
-                         "keys": len(keys), "sections": sections,
-                         "tables": tables, "low_info": low})
+            row = _thickness_row(root, rel)
+            if row is not None:
+                rows.append(row)
     low_files = sorted(x["file"] for x in rows if x["low_info"])
     stats = {"files": len(rows),
              "low_info": len(low_files), "low_files": low_files,

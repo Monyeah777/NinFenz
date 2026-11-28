@@ -1,6 +1,7 @@
 """core.pack_combo 私有实现分片 2/2（对外只经 core.pack_combo 门面导入）：breadth 等"""
 
 from __future__ import annotations
+from typing import Any, Dict, List, Set, Tuple
 
 import copy
 import itertools
@@ -32,36 +33,51 @@ def breadth(root: str = '.', opts: BreadthOptions | None = None) -> Dict[str, An
     结果按**输入内容指纹 + 抽样参数**缓存（`_CONTENT_CACHE`）：广度证明是诸输入的纯函数，
     输入没变就不必重跑 6910 次组合（实测 ~0.92 s）；输入一变指纹就变，无陈旧风险。
     """
-
     opts = opts if opts is not None else BreadthOptions()
-    triple_sample = opts.triple_sample
-    quad_sample = opts.quad_sample
-    quint_sample = opts.quint_sample
-    sext_sample = opts.sext_sample
-    seed = opts.seed
-    _witness = opts._witness
     fp = _inputs_fingerprint(root)          # 只算一遍：进程内键与落盘键共用（过去算两遍，白花 57 ms）
-    content_key = ("breadth", fp, triple_sample, quad_sample,
-                   quint_sample, sext_sample, seed)
-    hit = _CONTENT_CACHE.get(content_key)
-    dkey = None
-    if hit is None:                        # 进程内没命中 → 再看持久层（广度证明 ~0.9 s 一笔）
-        from core import disk_cache
-        dkey = disk_cache.key("pack-breadth", str(fp),
-                              str(triple_sample), str(quad_sample), str(quint_sample),
-                              str(sext_sample), str(seed), root=root,
-                              code_scope=_ig.code_scope_fingerprint(root, ("core.pack_combo",)))
-        hit = disk_cache.load("pack-breadth", dkey,
-                             validate=lambda v: isinstance(v, dict) and bool(v))
-        if hit is not None:
-            _content_store(content_key, hit)
+    content_key = ("breadth", fp, opts.triple_sample, opts.quad_sample,
+                   opts.quint_sample, opts.sext_sample, opts.seed)
+    hit, dkey = _cached_breadth(root, content_key, fp)
     if hit is not None:
         return copy.deepcopy(hit)
+    env = _breadth_env(root, opts)
+    _judge_pairs(env)
+    rnd = random.Random(opts.seed)
+    _judge_sample(env, rnd, 3, opts.triple_sample, "triples", False)
+    _judge_sample(env, rnd, 4, opts.quad_sample, "quads", False)
+    for size, tag in ((5, "quints"), (6, "sexts")):
+        want = min(opts.quint_sample if size == 5 else opts.sext_sample, 5000)
+        _judge_sample(env, rnd, size, want, tag, True)
+    env["stats"]["all_legal"] = _all_legal(env["stats"])
+    _store_breadth(content_key, env["stats"], dkey)
+    return env["stats"]
+
+
+def _cached_breadth(root: str, content_key: tuple, fp):
+    """进程内缓存 → 持久层缓存 → (命中值或 None, 落盘键)。"""
+    hit = _CONTENT_CACHE.get(content_key)
+    if hit is not None:
+        return hit, None
+    from core import disk_cache
+    triple_sample, quad_sample, quint_sample, sext_sample, seed = content_key[2:]
+    dkey = disk_cache.key("pack-breadth", str(fp),
+                          str(triple_sample), str(quad_sample), str(quint_sample),
+                          str(sext_sample), str(seed), root=root,
+                          code_scope=_ig.code_scope_fingerprint(root, ("core.pack_combo",)))
+    hit = disk_cache.load("pack-breadth", dkey,
+                          validate=lambda v: isinstance(v, dict) and bool(v))
+    if hit is not None:
+        _content_store(content_key, hit)
+    return hit, dkey
+
+
+def _breadth_env(root: str, opts: BreadthOptions) -> Dict[str, Any]:
+    """广度证明上下文（输入面 + 见证 + 统计骨架）。"""
     key = _cache_key(root)
     prof = profiles(root)
     contracts = _module_contracts(root)
     # 逐组合判决缓存的全局见证（本轮算一遍；`scan()` 已算过就直接复用）
-    witness = _witness or _combo_witness(root, prof, contracts)
+    witness = opts._witness or _combo_witness(root, prof, contracts)
     cached = _root_cache(key)
     cached.update({"prof": prof, "contracts": contracts})
     _CACHE[key] = cached
@@ -71,53 +87,70 @@ def breadth(root: str = '.', opts: BreadthOptions | None = None) -> Dict[str, An
                              "quints": 0, "quints_legal": 0,
                              "sexts": 0, "sexts_legal": 0,
                              "failures": []}
-    for a, b in itertools.combinations(names, 2):
-        legal, dangling, unbridged = _verdict_cached(root, (a, b), prof, contracts, witness)
+    return {"root": root, "prof": prof, "contracts": contracts, "witness": witness,
+            "names": names, "stats": stats}
+
+
+def _judge_pairs(env: Dict[str, Any]) -> None:
+    """全部两两组合判决。"""
+    stats = env["stats"]
+    for a, b in itertools.combinations(env["names"], 2):
+        legal, dangling, unbridged = _verdict_cached(
+            env["root"], (a, b), env["prof"], env["contracts"], env["witness"])
         stats["pairs"] += 1
         stats["pairs_legal"] += 1 if legal else 0
-        if not legal and len(stats["failures"]) < 10:
-            stats["failures"].append({"combo": [a, b], "dangling": dangling,
-                                      "unbridged": unbridged})
-    rnd = random.Random(seed)
-    triples: Set[Tuple[str, ...]] = set()
-    if len(names) >= 3:
-        while len(triples) < min(triple_sample, 5000):
-            triples.add(tuple(sorted(rnd.sample(names, 3))))
-    for t in sorted(triples):
-        legal, _dg, _ub = _verdict_cached(root, t, prof, contracts, witness)
-        stats["triples"] += 1
-        stats["triples_legal"] += 1 if legal else 0
-    quads: Set[Tuple[str, ...]] = set()
-    if len(names) >= 4:
-        while len(quads) < min(quad_sample, 5000):
-            quads.add(tuple(sorted(rnd.sample(names, 4))))
-    for q in sorted(quads):
-        legal, _dg, _ub = _verdict_cached(root, q, prof, contracts, witness)
-        stats["quads"] += 1
-        stats["quads_legal"] += 1 if legal else 0
-    for size, tag in ((5, "quints"), (6, "sexts")):
-        want = min(quint_sample if size == 5 else sext_sample, 5000)
-        picks: Set[Tuple[str, ...]] = set()
-        if len(names) >= size:
-            while len(picks) < want:
-                picks.add(tuple(sorted(rnd.sample(names, size))))
-        for p in sorted(picks):
-            legal, dangling, unbridged = _verdict_cached(root, p, prof, contracts, witness)
-            stats[tag] += 1
-            stats[tag + "_legal"] += 1 if legal else 0
-            if not legal and len(stats["failures"]) < 10:
-                stats["failures"].append({"combo": list(p), "dangling": dangling,
-                                          "unbridged": unbridged})
-    stats["all_legal"] = bool(
+        _maybe_failure(env, [a, b], legal, dangling, unbridged)
+
+
+def _maybe_failure(env: Dict[str, Any], combo: list, legal: bool, dangling,
+                   unbridged) -> None:
+    """不合法组合记入 failures（最多 10 条）。"""
+    stats = env["stats"]
+    if not legal and len(stats["failures"]) < 10:
+        stats["failures"].append({"combo": combo, "dangling": dangling,
+                                  "unbridged": unbridged})
+
+
+def _sample_combos(env: Dict[str, Any], rnd, size: int, want: int) -> Set[Tuple[str, ...]]:
+    """定种子抽 size 元组合（去重、稳定）。"""
+    names = env["names"]
+    picks: Set[Tuple[str, ...]] = set()
+    if len(names) < size:
+        return picks
+    while len(picks) < min(want, 5000):
+        picks.add(tuple(sorted(rnd.sample(names, size))))
+    return picks
+
+
+def _judge_sample(env: Dict[str, Any], rnd, size: int, want: int, tag: str,
+                  collect: bool) -> None:
+    """抽 size 元组合并逐组合判决。"""
+    stats = env["stats"]
+    for p in sorted(_sample_combos(env, rnd, size, want)):
+        legal, dangling, unbridged = _verdict_cached(
+            env["root"], p, env["prof"], env["contracts"], env["witness"])
+        stats[tag] += 1
+        stats[tag + "_legal"] += 1 if legal else 0
+        if collect:
+            _maybe_failure(env, list(p), legal, dangling, unbridged)
+
+
+def _all_legal(stats: Dict[str, Any]) -> bool:
+    """各元数「合法数 == 总数」的不变量。"""
+    return bool(
         stats["pairs"] == stats["pairs_legal"]
         and stats["triples"] == stats["triples_legal"]
         and stats["quads"] == stats["quads_legal"]
         and stats["quints"] == stats["quints_legal"]
         and stats["sexts"] == stats["sexts_legal"])
+
+
+def _store_breadth(content_key: tuple, stats: Dict[str, Any], dkey) -> None:
+    """结果写回进程内缓存与持久层。"""
     _content_store(content_key, stats)
     if dkey is not None:
+        from core import disk_cache
         disk_cache.store("pack-breadth", dkey, stats)
-    return stats
 
 
 def _scan_impl(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:

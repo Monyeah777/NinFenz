@@ -77,15 +77,10 @@ def load(root: str = ".") -> Dict[str, Any]:
     return doc
 
 
-def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
-    """登记表结构校验（平面互斥/模块在场/动态白名单可核）→ 问题列表。"""
+def _plane_issues(planes: Dict[str, Any],
+                  universe: Dict[str, Path]) -> Tuple[List[str], Dict[str, str]]:
+    """平面三组互斥、非空、模块在场 → (issues, 模块→平面)。"""
     issues: List[str] = []
-    planes = doc.get("planes")
-    if not isinstance(planes, dict):
-        return ["缺 planes 对象（" + GUIDE + "登记 production/governance/shared 三组）"]
-    universe = _universe(root)
-    if not universe:
-        issues.append("读不到 core 模块目录（" + GUIDE + "在仓库根运行）")
     seen: Dict[str, str] = {}
     for plane in PLANES:
         names = planes.get(plane)
@@ -102,12 +97,33 @@ def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
             if universe and name not in universe:
                 issues.append("平面 %s 登记了不存在的模块：%s（%s 删除或改指向真实件）"
                               % (plane, name, GUIDE))
+    return issues, seen
+
+
+def _dynamic_allow_issues(doc: Dict[str, Any], seen: Dict[str, str]) -> List[str]:
+    """dynamic_allow 白名单：必须已归平面且写明理由。"""
+    issues: List[str] = []
     for name, reason in (doc.get("dynamic_allow") or {}).items():
         if str(name) not in seen:
             issues.append("dynamic_allow 登记了不在任何平面的模块：%s（%s 先归平面）"
                           % (name, GUIDE))
         if not str(reason or "").strip():
             issues.append("dynamic_allow.%s 缺理由（%s 动态导入白名单须可复核）" % (name, GUIDE))
+    return issues
+
+
+def validate(doc: Dict[str, Any], root: str = ".") -> List[str]:
+    """登记表结构校验（平面互斥/模块在场/动态白名单可核）→ 问题列表。"""
+    issues: List[str] = []
+    planes = doc.get("planes")
+    if not isinstance(planes, dict):
+        return ["缺 planes 对象（" + GUIDE + "登记 production/governance/shared 三组）"]
+    universe = _universe(root)
+    if not universe:
+        issues.append("读不到 core 模块目录（" + GUIDE + "在仓库根运行）")
+    plane_issues, seen = _plane_issues(planes, universe)
+    issues.extend(plane_issues)
+    issues.extend(_dynamic_allow_issues(doc, seen))
     return issues
 
 
@@ -119,13 +135,10 @@ def _deps(path: Path) -> Optional[Tuple[frozenset, bool]]:
     return import_graph.parse(text)
 
 
-def _closure_path(root: str, seeds: List[str],
-                  universe: Dict[str, Path]) -> Tuple[Dict[str, List[str]], Dict[str, Tuple[str, ...]]]:
-    """从 seeds 出发的静态导入闭包 → ({模块: 依赖}, {被依赖模块: 最短路径})。
-
-    路径形如 `("a","b","c")` 表示 a → b → c；用于把违规边说清，不只报「有交叉」。
-    """
-    memo: Dict[str, Optional[Tuple[frozenset, bool]]] = {}
+def _closure_walk(seeds: List[str], universe: Dict[str, Path],
+                  memo: Dict[str, Optional[Tuple[frozenset, bool]]]
+                  ) -> Tuple[set, Dict[str, Optional[str]]]:
+    """从 seeds 做静态导入闭包遍历 → (已达集合, 父指针)。"""
     seen: set = set()
     stack = list(seeds)
     parent: Dict[str, Optional[str]] = {}
@@ -144,7 +157,12 @@ def _closure_path(root: str, seeds: List[str],
                 parent[dep] = name
             if dep not in seen:
                 stack.append(dep)
-    edges = {n: sorted((memo.get(n) or (frozenset(), False))[0]) for n in seen}
+    return seen, parent
+
+
+def _shortest_paths(seen: set,
+                    parent: Dict[str, Optional[str]]) -> Dict[str, Tuple[str, ...]]:
+    """父指针还原每个模块的最短路径（上限 64 跳，防环）。"""
     paths: Dict[str, Tuple[str, ...]] = {}
     for name in seen:
         chain: List[str] = [name]
@@ -153,7 +171,70 @@ def _closure_path(root: str, seeds: List[str],
             cur = str(parent[cur])
             chain.append(cur)
         paths[name] = tuple(reversed(chain))
+    return paths
+
+
+def _closure_path(root: str, seeds: List[str],
+                  universe: Dict[str, Path]) -> Tuple[Dict[str, List[str]], Dict[str, Tuple[str, ...]]]:
+    """从 seeds 出发的静态导入闭包 → ({模块: 依赖}, {被依赖模块: 最短路径})。
+
+    路径形如 `("a","b","c")` 表示 a → b → c；用于把违规边说清，不只报「有交叉」。
+    """
+    memo: Dict[str, Optional[Tuple[frozenset, bool]]] = {}
+    seen, parent = _closure_walk(seeds, universe, memo)
+    edges = {n: sorted((memo.get(n) or (frozenset(), False))[0]) for n in seen}
+    paths = _shortest_paths(seen, parent)
     return edges, paths
+
+
+def _scan_indexes(doc: Dict[str, Any]) -> Tuple[Dict[str, List[str]], Dict[str, str], set]:
+    """扫描用的三视图：平面→模块、模块→平面、动态白名单集合。"""
+    planes = {p: [str(n) for n in doc["planes"][p]] for p in PLANES}
+    owner = {name: plane for plane in PLANES for name in planes[plane]}
+    allow = {str(k) for k in (doc.get("dynamic_allow") or {})}
+    return planes, owner, allow
+
+
+def _forbidden_targets() -> Dict[str, set]:
+    """源平面 → 它不许到达的目标平面集合。"""
+    return {plane: {dst for src, dst in FORBIDDEN if src == plane}
+            for plane in PLANES}
+
+
+def _closure_edge_issues(plane: str, planes: Dict[str, List[str]],
+                         paths: Dict[str, Tuple[str, ...]], edges: Dict[str, List[str]],
+                         forbidden_targets: Dict[str, set]) -> Tuple[List[str], int]:
+    """单平面的闭包越界逐边报 → (issues, 违规边数)。"""
+    issues: List[str] = []
+    count = 0
+    reachable = set(edges)
+    for dst_plane in sorted(forbidden_targets[plane]):
+        for target in sorted(reachable & set(planes[dst_plane])):
+            chain = paths.get(target, (target,))
+            issues.append(
+                "%s 平面闭包越界：%s 到达 %s 平面的 %s（%s 断开这条边；"
+                "跨平面只许经共享原语/契约数据）"
+                % (plane, " → ".join(chain), dst_plane, target, GUIDE))
+            count += 1
+    return issues, count
+
+
+def _dynamic_import_issues(owner: Dict[str, str], universe: Dict[str, Path],
+                           allow: set) -> List[str]:
+    """动态导入面：解析不出即报；含动态导入且未登记理由也报。"""
+    issues: List[str] = []
+    for name in sorted(owner):
+        path = universe.get(name)
+        if path is None:
+            continue
+        info = _deps(path)
+        if info is None:
+            issues.append("解析不出模块 %s（%s 修语法或删除登记）" % (name, GUIDE))
+            continue
+        if info[1] and name not in allow:
+            issues.append("模块 %s 含动态导入，静态边界无法证明（%s 改为静态 import，"
+                          "或在 dynamic_allow 显式登记理由）" % (name, GUIDE))
+    return issues
 
 
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
@@ -170,37 +251,19 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
                              "forbidden_edges": 0, "dynamic_allow": 0}
     if issues:
         return issues, stats
-    planes = {p: [str(n) for n in doc["planes"][p]] for p in PLANES}
+    planes, owner, allow = _scan_indexes(doc)
     for p in PLANES:
         stats[p] = len(planes[p])
-    owner = {name: plane for plane in PLANES for name in planes[plane]}
-    allow = {str(k) for k in (doc.get("dynamic_allow") or {})}
     stats["dynamic_allow"] = len(allow)
 
-    forbidden_targets = {plane: {dst for src, dst in FORBIDDEN if src == plane}
-                         for plane in PLANES}
+    forbidden_targets = _forbidden_targets()
     for plane in PLANES:
         edges, paths = _closure_path(root, planes[plane], universe)
-        reachable = set(edges)
-        for dst_plane in sorted(forbidden_targets[plane]):
-            for target in sorted(reachable & set(planes[dst_plane])):
-                chain = paths.get(target, (target,))
-                issues.append(
-                    "%s 平面闭包越界：%s 到达 %s 平面的 %s（%s 断开这条边；"
-                    "跨平面只许经共享原语/契约数据）"
-                    % (plane, " → ".join(chain), dst_plane, target, GUIDE))
-                stats["forbidden_edges"] += 1
-    for name in sorted(owner):
-        path = universe.get(name)
-        if path is None:
-            continue
-        info = _deps(path)
-        if info is None:
-            issues.append("解析不出模块 %s（%s 修语法或删除登记）" % (name, GUIDE))
-            continue
-        if info[1] and name not in allow:
-            issues.append("模块 %s 含动态导入，静态边界无法证明（%s 改为静态 import，"
-                          "或在 dynamic_allow 显式登记理由）" % (name, GUIDE))
+        edge_issues, count = _closure_edge_issues(plane, planes, paths, edges,
+                                                  forbidden_targets)
+        issues.extend(edge_issues)
+        stats["forbidden_edges"] += count
+    issues.extend(_dynamic_import_issues(owner, universe, allow))
     return issues, stats
 
 

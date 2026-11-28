@@ -24,6 +24,10 @@ def uri_template_issue(template: str) -> str:
         return "模板不得含查询串/片段（资源寻址只到路径）"
     if "{" not in t:
         return "模板无变量（固定 uri 不该登记为模板）"
+    return _uri_var_issues(t)
+
+
+def _uri_var_issues(t):
     # 逐段检查花括号
     for part in re.findall(r"\{[^}]*\}", t):
         inner = part[1:-1]

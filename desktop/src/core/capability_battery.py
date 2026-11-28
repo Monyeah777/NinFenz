@@ -131,39 +131,50 @@ def _raises(fn: Callable[..., Any], args: List[Any], kwargs: Dict[str, Any]) -> 
     return False
 
 
+def _case_problems(fn, cases) -> List[str]:
+    problems: List[str] = []
+    for i, case in enumerate(cases):
+        args = _resolve(case.get("args") or [])
+        kwargs = _resolve(case.get("kwargs") or {})
+        exp = case.get("expect") or {}
+        if exp.get("raises"):
+            if not _raises(fn, args, kwargs):
+                problems.append("用例 %d：契约要求抛异常但未抛" % i)
+            continue
+        try:
+            value = fn(*args, **kwargs)
+        except Exception as exc:  # 未声明 raises 却抛 = 契约不成立，如实记不静默
+            problems.append("用例 %d 抛异常：%s" % (i, exc))
+            continue
+        ok, detail = judge(value, exp)
+        if not ok:
+            problems.append("用例 %d 判定不符：%s" % (i, detail))
+    return problems
+
+
+def _entry_problems(mod, fn, mod_name: str, entry: str, cap: Dict[str, Any]) -> List[str]:
+    if mod is None:
+        return ["模块不在电池装载面：%s" % mod_name]
+    if not callable(fn):
+        return ["入口不存在或不可调用：%s.%s" % (mod_name, entry)]
+    return _case_problems(fn, cap.get("cases") or [])
+
+
+def _capability_row(cap: Dict[str, Any]) -> Dict[str, Any]:
+    cid = str(cap.get("id") or "")
+    mod_name = str(cap.get("module") or "")
+    entry = str(cap.get("entry") or "")
+    mod = MODULES.get(mod_name)
+    fn = getattr(mod, entry, None) if mod is not None else None
+    problems: List[str] = _entry_problems(mod, fn, mod_name, entry, cap)
+    return {"id": cid, "module": mod_name, "entry": entry,
+            "ok": not problems, "problems": problems}
+
+
 def run(root: str = ".") -> Dict[str, Any]:
     """跑全部契约 → {total, passed, failed, rows}（逐项含问题清单）。"""
-    rows: List[Dict[str, Any]] = []
-    for cap in contracts(root).get("capabilities") or []:
-        cid = str(cap.get("id") or "")
-        mod_name = str(cap.get("module") or "")
-        entry = str(cap.get("entry") or "")
-        problems: List[str] = []
-        mod = MODULES.get(mod_name)
-        fn = getattr(mod, entry, None) if mod is not None else None
-        if mod is None:
-            problems.append("模块不在电池装载面：%s" % mod_name)
-        elif not callable(fn):
-            problems.append("入口不存在或不可调用：%s.%s" % (mod_name, entry))
-        else:
-            for i, case in enumerate(cap.get("cases") or []):
-                args = _resolve(case.get("args") or [])
-                kwargs = _resolve(case.get("kwargs") or {})
-                exp = case.get("expect") or {}
-                if exp.get("raises"):
-                    if not _raises(fn, args, kwargs):
-                        problems.append("用例 %d：契约要求抛异常但未抛" % i)
-                    continue
-                try:
-                    value = fn(*args, **kwargs)
-                except Exception as exc:  # 未声明 raises 却抛 = 契约不成立，如实记不静默
-                    problems.append("用例 %d 抛异常：%s" % (i, exc))
-                    continue
-                ok, detail = judge(value, exp)
-                if not ok:
-                    problems.append("用例 %d 判定不符：%s" % (i, detail))
-        rows.append({"id": cid, "module": mod_name, "entry": entry,
-                     "ok": not problems, "problems": problems})
+    rows: List[Dict[str, Any]] = [_capability_row(cap)
+                                 for cap in contracts(root).get("capabilities") or []]
     total = len(rows)
     failed = sum(1 for r in rows if not r["ok"])
     return {"schema": SCHEMA, "total": total, "passed": total - failed,

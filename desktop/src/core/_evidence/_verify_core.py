@@ -162,6 +162,45 @@ def _one_envelope(rd: _Reader, name: str, by_path: dict[str, str], tmp: str,
 
 
 
+def _path_digests(entries: Sequence[dict[str, Any]]) -> dict[str, str]:
+    """成员归一路径 → 摘要（信封 subject 同源比对用）。"""
+    return {_norm(str(e.get("path") or "")): str(e.get("digest") or "") for e in entries}
+
+
+def _append_envelope_failure(res: dict[str, Any], failed: list[str]) -> None:
+    """严格口径：清单里的**每一份**信封都必须通过。
+
+    容忍「有一份过了就算过」等于给了「悄悄塞一份坏信封」的容错面——证据强度只能由最弱
+    那环决定，不能挑最好看的报。
+    """
+    joined = "；".join(failed[:3]) or "无可用信封"
+    res["issues"].append(f"信封未全部通过校验：{joined}（{GUIDE}hmac 级须提供同一密钥 "
+                         "--key-file；缺密钥一律拒绝，不降级为 digest_only；坏信封请"
+                         "重新 nf evidence pack）")
+
+
+def _collect_envelopes(rd: _Reader, att_names: list, by_path: dict, tmp: str,
+                       key: bytes | None) -> tuple[list[str], list[str], set[str]]:
+    """逐份信封校验 → (通过等级, 失败原因, 覆盖成员)。"""
+    passed: list[str] = []
+    failed: list[str] = []
+    covered: set[str] = set()
+    for name in att_names:
+        level, why, subj = _one_envelope(rd, name, by_path, tmp, key)
+        if level:
+            passed.append(level)
+            covered.add(subj)
+        else:
+            failed.extend(why)
+    return passed, failed, covered
+
+
+def _uncovered_members(entries: Sequence[dict[str, Any]], covered: set[str]) -> list[str]:
+    """没有信封背书的成员（相对路径排序）。"""
+    return sorted({_norm(str(e.get("path") or e.get("id") or "")) for e in entries}
+                  - covered)
+
+
 def _check_attestations(rd: _Reader, meta: dict[str, Any],
                         entries: Sequence[dict[str, Any]], key: bytes | None,
                         res: dict[str, Any]) -> None:
@@ -171,29 +210,14 @@ def _check_attestations(rd: _Reader, meta: dict[str, Any],
         res["issues"].append("包内无 attestation（" + GUIDE + "证据必须带信封——只有摘要的包"
                              "证明不了签发方；请用 nf evidence pack，它会为每个成员生成一份）")
         return
-    by_path = {_norm(str(e.get("path") or "")): str(e.get("digest") or "") for e in entries}
-    passed: list[str] = []
-    failed: list[str] = []
-    covered: set[str] = set()
+    by_path = _path_digests(entries)
     with tempfile.TemporaryDirectory(prefix="nf_evidence_") as tmp:
         _extract(rd, entries, tmp)
-        for name in att_names:
-            level, why, subj = _one_envelope(rd, name, by_path, tmp, key)
-            if level:
-                passed.append(level)
-                covered.add(subj)
-            else:
-                failed.extend(why)
+        passed, failed, covered = _collect_envelopes(rd, att_names, by_path, tmp, key)
     if failed:
-        # 严格口径：清单里的**每一份**信封都必须通过。容忍「有一份过了就算过」等于给了
-        # 「悄悄塞一份坏信封」的容错面——证据强度只能由最弱那环决定，不能挑最好看的报。
-        joined = "；".join(failed[:3]) or "无可用信封"
-        res["issues"].append(f"信封未全部通过校验：{joined}（{GUIDE}hmac 级须提供同一密钥 "
-                             "--key-file；缺密钥一律拒绝，不降级为 digest_only；坏信封请"
-                             "重新 nf evidence pack）")
+        _append_envelope_failure(res, failed)
         return
-    uncovered = sorted({_norm(str(e.get("path") or e.get("id") or "")) for e in entries}
-                       - covered)
+    uncovered = _uncovered_members(entries, covered)
     if uncovered:
         res["issues"].append(f"成员缺信封：{', '.join(uncovered[:3])}（{GUIDE}每个成员都要有一份"
                              "信封——没有签发背书的成员不算证据，请重新 nf evidence pack）")
@@ -204,39 +228,36 @@ def _check_attestations(rd: _Reader, meta: dict[str, Any],
 
 
 
-def _check_decision(rd: _Reader, meta: dict[str, Any],
-                    entries: Sequence[dict[str, Any]], res: dict[str, Any],
-                    expected_policy_digest: str = "") -> None:
-    """决策证据块（Q0）：声明面（bundle.json）必须与绑定面（相符信封）一致。
-
-    只证明「这份证据绑定过一次 cc_check 的判定」；**不证明策略内容正确**——策略正确性
-    需要验方用自己信任的 policy 重算 policy_digest 后比对（v0 不提供期望参数）。
-    digest_only 级的信封只算 declared（没签名覆盖，证不了签发方认可该策略）。
-    """
+def _decision_envs(rd: _Reader, meta: dict[str, Any]) -> list[dict[str, Any]]:
+    """读出清单声明的信封（坏信封由上游 fail-closed 判死，这里跳过不重复记账）。"""
     envs: list[dict[str, Any]] = []
     for name in [str(n) for n in (meta.get("attestations") or [])]:
         raw = rd.read(name)
         if raw is None:
             continue
-        try:            # 坏信封由上游 fail-closed 判死，这里跳过不重复记账
+        try:
             env = json_doc.loads(raw.decode(), dict, what="信封")
         except (ValueError, UnicodeDecodeError):
             continue
         if isinstance(env, dict):
             envs.append(env)
-    decision = meta.get("decision")
-    if decision is None:
-        if any(isinstance(env.get("decision"), dict) for env in envs):
-            res["issues"].append("信封带 decision 但清单未声明（声明面被删，绑定面仍在）"
-                                 "（" + GUIDE + "重新 pack 让声明面与绑定面同源）")
-        elif expected_policy_digest:
-            res["warnings"].append("包内无 decision，无法比对策略（只证字节与信封；"
-                                   "" + GUIDE + "需要策略绑定请 pack 时带 decision）")
-        return
-    issues = attest.decision_issues(decision, [str(e.get("digest") or "") for e in entries])
-    if issues:
-        res["issues"].extend(issues)
-        return
+    return envs
+
+
+def _decision_missing_issues(res: dict[str, Any], envs: list,
+                             expected_policy_digest: str) -> None:
+    """清单未声明 decision 时的两种诊断（绑定面仍在 / 只证字节）。"""
+    if any(isinstance(env.get("decision"), dict) for env in envs):
+        res["issues"].append("信封带 decision 但清单未声明（声明面被删，绑定面仍在）"
+                             "（" + GUIDE + "重新 pack 让声明面与绑定面同源）")
+    elif expected_policy_digest:
+        res["warnings"].append("包内无 decision，无法比对策略（只证字节与信封；"
+                               "" + GUIDE + "需要策略绑定请 pack 时带 decision）")
+
+
+def _decision_binding(res: dict[str, Any], envs: list,
+                      decision: dict[str, Any]) -> tuple[int, bool, bool]:
+    """逐信封比对主体摘要与绑定面 → (匹配数, 是否签名, 是否一致)。"""
     obj = str(decision.get("object_sha256") or "")
     matched, signed = 0, False
     for env in envs:
@@ -248,8 +269,47 @@ def _check_decision(rd: _Reader, meta: dict[str, Any],
             res["issues"].append("decision 声明面与信封绑定面不一致（换策略/删块都会在这里断）"
                                  "（" + GUIDE + "重新 nf evidence pack 并把同一 decision 交给"
                                  " pack）")
-            return
+            return matched, signed, False
         signed = signed or bool(env.get("signature"))
+    return matched, signed, True
+
+
+def _decision_policy_issues(res: dict[str, Any], decision: dict[str, Any],
+                            expected_policy_digest: str) -> None:
+    """给了期望策略摘要时比对 policy_digest（不符即 fail-closed）。"""
+    if not expected_policy_digest:
+        return
+    want = expected_policy_digest.strip().lower()
+    got = str(decision.get("policy_digest") or "")
+    if want != got:
+        res["issues"].append(f"decision.policy_digest 与期望策略不符（期望={want[:16]} "
+                             f"实际={got[:16]}）（{GUIDE}确认包与策略是同一份；"
+                             "策略内容正确性只能由验方用自己信任的策略比对）")
+        return
+    res["policy_verified"] = True
+
+
+def _check_decision(rd: _Reader, meta: dict[str, Any],
+                    entries: Sequence[dict[str, Any]], res: dict[str, Any],
+                    expected_policy_digest: str = "") -> None:
+    """决策证据块（Q0）：声明面（bundle.json）必须与绑定面（相符信封）一致。
+
+    只证明「这份证据绑定过一次 cc_check 的判定」；**不证明策略内容正确**——策略正确性
+    需要验方用自己信任的 policy 重算 policy_digest 后比对（v0 不提供期望参数）。
+    digest_only 级的信封只算 declared（没签名覆盖，证不了签发方认可该策略）。
+    """
+    envs = _decision_envs(rd, meta)
+    decision = meta.get("decision")
+    if decision is None:
+        _decision_missing_issues(res, envs, expected_policy_digest)
+        return
+    issues = attest.decision_issues(decision, [str(e.get("digest") or "") for e in entries])
+    if issues:
+        res["issues"].extend(issues)
+        return
+    matched, signed, consistent = _decision_binding(res, envs, decision)
+    if not consistent:
+        return
     if not matched:
         res["issues"].append("decision 找不到主体摘要相符的信封（决策未绑定到任何签发面）"
                              "（" + GUIDE + "重新 pack，decision.object_sha256 必须等于某个"
@@ -257,12 +317,4 @@ def _check_decision(rd: _Reader, meta: dict[str, Any],
         return
     res["decision"] = dict(decision)
     res["decision_status"] = "bound" if signed else "declared"
-    if expected_policy_digest:
-        want = expected_policy_digest.strip().lower()
-        got = str(decision.get("policy_digest") or "")
-        if want != got:
-            res["issues"].append(f"decision.policy_digest 与期望策略不符（期望={want[:16]} "
-                                 f"实际={got[:16]}）（{GUIDE}确认包与策略是同一份；"
-                                 "策略内容正确性只能由验方用自己信任的策略比对）")
-            return
-        res["policy_verified"] = True
+    _decision_policy_issues(res, decision, expected_policy_digest)

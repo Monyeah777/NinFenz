@@ -144,6 +144,52 @@ def to_export(records: List[Dict[str, Any]],
     }]}
 
 
+def _reject_constant(name: str):
+    raise ValueError("含非有限数 %s（JSON 无 NaN/Infinity）" % name)
+
+
+def _trace_size(path: str) -> int:
+    try:
+        size = Path(path).stat().st_size
+    except OSError as exc:
+        raise ValueError("trace 不可读：%s（%s）" % (path, exc)) from exc
+    if size > MAX_TRACE_BYTES:
+        raise ValueError("trace 过大（%d > %d 字节）" % (size, MAX_TRACE_BYTES))
+    return size
+
+
+def _trace_records(data: Any) -> List[Any]:
+    if isinstance(data, dict) and isinstance(data.get("records"), list):
+        return data["records"]
+    if isinstance(data, dict):
+        return [data]
+    if not isinstance(data, list):
+        raise ValueError("trace 顶层须为对象或数组，实为 %s（修复指引：单条记录 {...} 或 "
+                         "{records:[...]}）" % type(data).__name__)
+    return data
+
+
+def _trace_record_check(data: List[Any]) -> None:
+    bad = sorted({type(r).__name__ for r in data if not isinstance(r, dict)})
+    if bad:
+        raise ValueError("trace 记录必须都是 JSON 对象，实见 %s（修复指引：去掉标量元素）"
+                         % ", ".join(bad))
+    if data and any(not r for r in data):
+        raise ValueError("trace 含空对象记录 {}（没有任何可消费字段）"
+                         "（修复指引：给记录字段，或删掉该条）")
+
+
+def _parse_trace(text: str) -> List[Dict[str, Any]]:
+    try:
+        data = json.loads(text, parse_constant=_reject_constant)
+    except ValueError as exc:
+        raise ValueError("trace 不是合法 JSON：%s（修复指引：单条记录 {...} 或 "
+                         "{records:[...]}）" % exc)
+    records = _trace_records(data)
+    _trace_record_check(records)
+    return list(records)
+
+
 def load_trace(path: str) -> List[Dict[str, Any]]:
     """读 trace JSON：单条记录或记录数组均可（兼容 nf assemble --trace 产物）。
 
@@ -152,34 +198,7 @@ def load_trace(path: str) -> List[Dict[str, Any]]:
     knowledge.harvest_frequency 对同一批形状已经拒了；两处口径由 test_trace_shapes 钉住一致
     （刻意不在两模块间加边：telemetry_semconv 是叶子，加边会动耦合面）。
     """
-    def _reject_constant(name: str):
-        raise ValueError("含非有限数 %s（JSON 无 NaN/Infinity）" % name)
-
-    try:
-        size = Path(path).stat().st_size
-    except OSError as exc:
-        raise ValueError("trace 不可读：%s（%s）" % (path, exc)) from exc
-    if size > MAX_TRACE_BYTES:
-        raise ValueError("trace 过大（%d > %d 字节）" % (size, MAX_TRACE_BYTES))
+    _trace_size(path)
     with open(path, encoding="utf-8-sig") as fh:   # 容忍外来件 BOM（审计 N4）
         text = fh.read()
-    try:
-        data = json.loads(text, parse_constant=_reject_constant)
-    except ValueError as exc:
-        raise ValueError("trace 不是合法 JSON：%s（修复指引：单条记录 {...} 或 "
-                         "{records:[...]}）" % exc)
-    if isinstance(data, dict) and isinstance(data.get("records"), list):
-        data = data["records"]
-    elif isinstance(data, dict):
-        data = [data]
-    if not isinstance(data, list):
-        raise ValueError("trace 顶层须为对象或数组，实为 %s（修复指引：单条记录 {...} 或 "
-                         "{records:[...]}）" % type(data).__name__)
-    bad = sorted({type(r).__name__ for r in data if not isinstance(r, dict)})
-    if bad:
-        raise ValueError("trace 记录必须都是 JSON 对象，实见 %s（修复指引：去掉标量元素）"
-                         % ", ".join(bad))
-    if data and any(not r for r in data):
-        raise ValueError("trace 含空对象记录 {}（没有任何可消费字段）"
-                         "（修复指引：给记录字段，或删掉该条）")
-    return list(data)
+    return _parse_trace(text)

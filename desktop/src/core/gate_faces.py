@@ -307,38 +307,65 @@ def covered(path: str, patterns: Iterable[str]) -> bool:
     return False
 
 
+def _manifest_issues(doc) -> tuple[list[str], list[str]]:
+    if not doc:
+        return [], ["声明面缺件（%s 未落，见 W-03.3）：本次无专家可对账" % MANIFEST_REL]
+    return validate_manifest(doc), []
+
+
+def _static_issues(eid: str, reads: list[str], st: list[str]) -> list[str]:
+    issues: list[str] = []
+    for p in st:
+        if not covered(p, reads):
+            issues.append("静态面未声明：%s 的 %s（补 reads 或删该读取）" % (eid, p))
+    return issues
+
+
+def _observed_issues(eid: str, reads: list[str], ob: list[str]) -> list[str]:
+    issues: list[str] = []
+    for p in ob:
+        if not covered(p, reads):
+            issues.append("观测面未声明：%s 的 %s（声明⊄观测=过期）" % (eid, p))
+    for p in reads:
+        if not any(covered(o, [p]) for o in ob):
+            issues.append("声明未观测到：%s 的 %s（观测⊄声明=抽取漏洞或读面已变）" % (eid, p))
+    return issues
+
+
+def _derived_issues(root: str, eid: str, e: dict[str, Any]) -> tuple[Any, list[str]]:
+    derived, why = derive_skip_safety(root, e)
+    if derived and e.get("skip_safety") and e["skip_safety"] != derived:
+        return derived, ["声明级别与推导不符：%s 声明 %s，推导 %s（%s）"
+                         % (eid, e["skip_safety"], derived, "; ".join(why[:3]))]
+    return derived, []
+
+
+def _audit_expert(root: str, eid: str, e: dict[str, Any], static: dict[str, list[str]],
+                  observed: dict[str, list[str]] | None) -> tuple[dict[str, Any], list[str]]:
+    reads = [str(x) for x in (e.get("reads") or [])]
+    st = list((static or {}).get(eid) or [])
+    ob = list(observed[eid]) if (observed and eid in observed) else None
+    fact = {"declared": len(reads), "static": len(st),
+            "observed": len(ob) if ob is not None else None}
+    issues = _static_issues(eid, reads, st)
+    derived, derived_issues = _derived_issues(root, eid, e)
+    fact["derived_skip_safety"] = derived
+    issues += derived_issues
+    if ob is not None:
+        issues += _observed_issues(eid, reads, ob)
+    return fact, issues
+
+
 def audit(root: str = ".", observed: dict[str, list[str]] | None = None,
           static: dict[str, list[str]] | None = None
           ) -> tuple[list[str], dict[str, Any]]:
     """三源对账 → (issues, stats)。observed/static 可注入（测试与后续接线共用）。"""
     doc = load_manifest_doc(root)
     declared = load_manifest(root)
-    issues: list[str] = []
-    stats: dict[str, Any] = {"experts": len(declared), "facts": {}, "warns": []}
-    if not doc:
-        stats["warns"].append("声明面缺件（%s 未落，见 W-03.3）：本次无专家可对账" % MANIFEST_REL)
-    else:
-        issues += validate_manifest(doc)
+    issues, warns = _manifest_issues(doc)
+    stats: dict[str, Any] = {"experts": len(declared), "facts": {}, "warns": warns}
     for eid, e in sorted(declared.items()):
-        reads = [str(x) for x in (e.get("reads") or [])]
-        st = list((static or {}).get(eid) or [])
-        ob = list(observed[eid]) if (observed and eid in observed) else None
-        stats["facts"][eid] = {"declared": len(reads), "static": len(st),
-                               "observed": len(ob) if ob is not None else None}
-        for p in st:
-            if not covered(p, reads):
-                issues.append("静态面未声明：%s 的 %s（补 reads 或删该读取）" % (eid, p))
-        derived, why = derive_skip_safety(root, e)
-        stats["facts"][eid]["derived_skip_safety"] = derived
-        if derived and e.get("skip_safety") and e["skip_safety"] != derived:
-            issues.append("声明级别与推导不符：%s 声明 %s，推导 %s（%s）"
-                          % (eid, e["skip_safety"], derived, "; ".join(why[:3])))
-        if ob is None:
-            continue
-        for p in ob:
-            if not covered(p, reads):
-                issues.append("观测面未声明：%s 的 %s（声明⊄观测=过期）" % (eid, p))
-        for p in reads:
-            if not any(covered(o, [p]) for o in ob):
-                issues.append("声明未观测到：%s 的 %s（观测⊄声明=抽取漏洞或读面已变）" % (eid, p))
+        fact, expert_issues = _audit_expert(root, eid, e, static or {}, observed)
+        stats["facts"][eid] = fact
+        issues += expert_issues
     return issues, stats

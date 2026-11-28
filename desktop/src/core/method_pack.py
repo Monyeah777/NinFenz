@@ -52,61 +52,93 @@ def _load_json(path: Path) -> Any:
                          + "（" + GUIDE + "修好语法后重跑）") from exc
 
 
+def _pack_head_issues(doc: dict[str, Any]) -> list[str]:
+    """包头三字段（id/version/domain）必填。"""
+    issues: list[str] = []
+    for field in ("id", "version", "domain"):
+        if not str(doc.get(field) or "").strip():
+            issues.append("包缺 " + field + "（" + GUIDE + "补齐后重跑）")
+    return issues
+
+
+def _move_maps_issues(mv: dict[str, Any], label: str) -> list[str]:
+    """expert_move 的 maps_to：非空且只能引用已知动作。"""
+    issues: list[str] = []
+    maps = mv.get("maps_to")
+    if not isinstance(maps, list) or not maps:
+        issues.append("expert_move " + label + " 缺 maps_to（" + GUIDE +
+                      "必须映射到已知动作）")
+        return issues
+    unknown = [str(x) for x in maps if str(x) not in KNOWN_ACTIONS]
+    if unknown:
+        issues.append("expert_move " + label + " 的 maps_to 含未知动作：" +
+                      str(unknown)
+                      + "（" + GUIDE + "只能引用 33 原子 / 11 算子 / 15 meta move）")
+    return issues
+
+
+def _move_issues(mv: Any, i: int, seen: set[str]) -> list[str]:
+    """单条 expert_move：对象化、id 唯一、name/why 非空、maps_to 可解析。"""
+    if not isinstance(mv, dict):
+        return ["第 " + str(i) + " 条 expert_move 不是对象（" + GUIDE + "改写成对象）"]
+    issues: list[str] = []
+    mid = str(mv.get("id") or "").strip()
+    if not mid:
+        issues.append("第 " + str(i) + " 条 expert_move 缺 id（" + GUIDE + "给唯一 id）")
+    elif mid in seen:
+        issues.append("expert_move id 重复：" + mid + "（" + GUIDE + "改成唯一 id）")
+    else:
+        seen.add(mid)
+    label = mid or str(i)
+    if not str(mv.get("name") or "").strip():
+        issues.append("expert_move " + label + " 缺 name（" + GUIDE + "写清动作名）")
+    if not str(mv.get("why") or "").strip():
+        issues.append("expert_move " + label + " 缺 why（" + GUIDE +
+                      "说明为何这一步必要）")
+    issues.extend(_move_maps_issues(mv, label))
+    return issues
+
+
+def _standard_item_issues(st: Any, i: int) -> list[str]:
+    """单条 evidence_standard：对象化、claim_kind 非空、required 非空。"""
+    if not isinstance(st, dict):
+        return ["第 " + str(i) + " 条 evidence_standard 不是对象（" + GUIDE +
+                "改写成对象）"]
+    issues: list[str] = []
+    if not str(st.get("claim_kind") or "").strip():
+        issues.append("第 " + str(i) + " 条 evidence_standard 缺 claim_kind（" + GUIDE +
+                      "写清哪类主张）")
+    need = st.get("required")
+    if not isinstance(need, list) or not need:
+        issues.append("第 " + str(i) + " 条 evidence_standard 的 required 为空（" + GUIDE +
+                      "写清要交出什么）")
+    return issues
+
+
+def _standards_issues(stds: Any) -> list[str]:
+    """evidence_standards：非空列表 + 逐条形状。"""
+    if not isinstance(stds, list) or not stds:
+        return ["包缺 evidence_standards（" + GUIDE + "至少一条：这个领域什么算证据）"]
+    issues: list[str] = []
+    for i, st in enumerate(stds, 1):
+        issues.extend(_standard_item_issues(st, i))
+    return issues
+
+
 def validate_pack(doc: Any) -> list[str]:
     """单包形状校验 → 问题列表（空 = 合法）。"""
     issues: list[str] = []
     if not isinstance(doc, dict) or str(doc.get("schema") or "") != SCHEMA:
         return ["方法包 schema 不匹配（" + GUIDE + "需要 " + SCHEMA + "）"]
-    for field in ("id", "version", "domain"):
-        if not str(doc.get(field) or "").strip():
-            issues.append("包缺 " + field + "（" + GUIDE + "补齐后重跑）")
+    issues.extend(_pack_head_issues(doc))
     moves = doc.get("expert_moves")
     if not isinstance(moves, list) or not moves:
         issues.append("包缺 expert_moves（" + GUIDE + "至少一条专家动作）")
         return issues
     seen: set[str] = set()
     for i, mv in enumerate(moves, 1):
-        if not isinstance(mv, dict):
-            issues.append("第 " + str(i) + " 条 expert_move 不是对象（" + GUIDE + "改写成对象）")
-            continue
-        mid = str(mv.get("id") or "").strip()
-        if not mid:
-            issues.append("第 " + str(i) + " 条 expert_move 缺 id（" + GUIDE + "给唯一 id）")
-        elif mid in seen:
-            issues.append("expert_move id 重复：" + mid + "（" + GUIDE + "改成唯一 id）")
-        else:
-            seen.add(mid)
-        if not str(mv.get("name") or "").strip():
-            issues.append("expert_move " + (mid or str(i)) + " 缺 name（" + GUIDE + "写清动作名）")
-        if not str(mv.get("why") or "").strip():
-            issues.append("expert_move " + (mid or str(i)) + " 缺 why（" + GUIDE +
-                    "说明为何这一步必要）")
-        maps = mv.get("maps_to")
-        if not isinstance(maps, list) or not maps:
-            issues.append("expert_move " + (mid or str(i)) + " 缺 maps_to（" + GUIDE +
-                    "必须映射到已知动作）")
-        else:
-            unknown = [str(x) for x in maps if str(x) not in KNOWN_ACTIONS]
-            if unknown:
-                issues.append("expert_move " + (mid or str(i)) + " 的 maps_to 含未知动作：" +
-                        str(unknown)
-                              + "（" + GUIDE + "只能引用 33 原子 / 11 算子 / 15 meta move）")
-    stds = doc.get("evidence_standards")
-    if not isinstance(stds, list) or not stds:
-        issues.append("包缺 evidence_standards（" + GUIDE + "至少一条：这个领域什么算证据）")
-    else:
-        for i, st in enumerate(stds, 1):
-            if not isinstance(st, dict):
-                issues.append("第 " + str(i) + " 条 evidence_standard 不是对象（" + GUIDE +
-                        "改写成对象）")
-                continue
-            if not str(st.get("claim_kind") or "").strip():
-                issues.append("第 " + str(i) + " 条 evidence_standard 缺 claim_kind（" + GUIDE +
-                    "写清哪类主张）")
-            need = st.get("required")
-            if not isinstance(need, list) or not need:
-                issues.append("第 " + str(i) + " 条 evidence_standard 的 required 为空（" + GUIDE +
-                    "写清要交出什么）")
+        issues.extend(_move_issues(mv, i, seen))
+    issues.extend(_standards_issues(doc.get("evidence_standards")))
     if not isinstance(doc.get("common_failures"), list) or not doc.get("common_failures"):
         issues.append("包缺 common_failures（" + GUIDE +
                 "至少列一条常见错法——它比正确做法更能防错）")
@@ -165,14 +197,10 @@ def obligations(pack: dict[str, Any], claim_kind: str = "") -> dict[str, Any]:
                 for st in stds]}
 
 
-def compose(packs: list[dict[str, Any]]) -> dict[str, Any]:
-    """多包组合 → 去重后的专家动作与证据标准（序稳定，不评分不排序）。"""
-    if not packs:
-        raise ValueError("组合至少需要一个方法包（" + GUIDE + "给 --pack 一次或多次）")
+def _compose_moves(packs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """专家动作并集（按 id 去重，序稳定）。"""
     moves: list[dict[str, Any]] = []
     seen_moves: set[str] = set()
-    by_kind: dict[str, dict[str, Any]] = {}
-    order: list[str] = []
     for pack in packs:
         for mv in pack.get("expert_moves") or []:
             mid = str(mv.get("id") or "")
@@ -182,6 +210,15 @@ def compose(packs: list[dict[str, Any]]) -> dict[str, Any]:
             moves.append({"id": mid, "name": mv.get("name"),
                           "maps_to": list(mv.get("maps_to") or []),
                           "why": mv.get("why"), "from": str(pack.get("id"))})
+    return moves
+
+
+def _compose_standards(packs: list[dict[str, Any]]
+                       ) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    """证据标准按 claim_kind 归并（required 去重，from 记来源包，序稳定）。"""
+    by_kind: dict[str, dict[str, Any]] = {}
+    order: list[str] = []
+    for pack in packs:
         for st in pack.get("evidence_standards") or []:
             kind = str(st.get("claim_kind") or "")
             if kind not in by_kind:
@@ -193,11 +230,26 @@ def compose(packs: list[dict[str, Any]]) -> dict[str, Any]:
                     src["required"].append(item)
             if str(pack.get("id")) not in src["from"]:
                 src["from"].append(str(pack.get("id")))
+    return by_kind, order
+
+
+def _compose_failures(packs: list[dict[str, Any]]) -> list[str]:
+    """常见错法并集（去重，序稳定）。"""
     failures: list[str] = []
     for pack in packs:
         for item in pack.get("common_failures") or []:
             if item not in failures:
                 failures.append(item)
+    return failures
+
+
+def compose(packs: list[dict[str, Any]]) -> dict[str, Any]:
+    """多包组合 → 去重后的专家动作与证据标准（序稳定，不评分不排序）。"""
+    if not packs:
+        raise ValueError("组合至少需要一个方法包（" + GUIDE + "给 --pack 一次或多次）")
+    moves = _compose_moves(packs)
+    by_kind, order = _compose_standards(packs)
+    failures = _compose_failures(packs)
     return {"schema": "nf-method-compose/1",
             "packs": [str(p.get("id")) for p in packs],
             "expert_moves": moves,
@@ -206,6 +258,26 @@ def compose(packs: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 CHECKLIST_SCHEMA = "nf-method-checklist/1"
+
+
+def _checklist_items(moves: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """动作 → 可执行清单条目（step 按包内顺序编号）。"""
+    items = []
+    for mv in moves:
+        items.append({
+            "step": len(items) + 1,
+            "move": str(mv.get("id")),
+            "do": str(mv.get("name")),
+            "why": str(mv.get("why")),
+            "kind": str(mv.get("kind") or "advisory"),
+        })
+    return items
+
+
+def _checklist_stds(stds: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """证据标准 → 清单附带的 claim_kind/required 投影。"""
+    return [{"claim_kind": str(st.get("claim_kind")),
+             "required": list(st.get("required") or [])} for st in stds]
 
 
 def checklist(pack: dict[str, Any]) -> dict[str, Any]:
@@ -220,24 +292,14 @@ def checklist(pack: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("方法包不合法：" + "；".join(bad[:2]))
     moves = list(pack.get("expert_moves") or [])
     stds = list(pack.get("evidence_standards") or [])
-    items = []
-    for mv in moves:
-        items.append({
-            "step": len(items) + 1,
-            "move": str(mv.get("id")),
-            "do": str(mv.get("name")),
-            "why": str(mv.get("why")),
-            "kind": str(mv.get("kind") or "advisory"),
-        })
+    items = _checklist_items(moves)
     # 第 144 轮：清单带上「这个域怎么跑」（可跑入口），把包与命令接起来。
     runnable = [str(x) for x in (pack.get("runnable") or []) if str(x).strip()]
     return {"schema": CHECKLIST_SCHEMA, "pack": str(pack.get("id")),
             "domain": str(pack.get("domain") or ""),
             "items": items,
             "runnable": runnable,
-            "evidence_standards": [
-                {"claim_kind": str(st.get("claim_kind")),
-                 "required": list(st.get("required") or [])} for st in stds],
+            "evidence_standards": _checklist_stds(stds),
             "note": "按包内顺序；不评分不排序。每条动作要求的是「做一次并留证」，不是打卡"}
 
 

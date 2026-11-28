@@ -66,57 +66,77 @@ def _todo_scan(root: str) -> List[str]:
     return hits[:10]
 
 
-def probes(root: str = ".") -> Dict[str, Dict[str, Any]]:
-    """轻量探针（只读既有报告/调既有检查，不新造重扫描）。"""
-    out: Dict[str, Dict[str, Any]] = {}
-
+def _probe_assertions(root: str) -> Dict[str, Dict[str, Any]]:
+    """S0：断言全带 evidence。"""
     assertions = _json(root, "protocol/assertions.json")
     missing_ev = [str(a.get("id")) for a in assertions.get("assertions") or []
                   if not a.get("evidence")]
-    out["S0"] = {"status": "covered" if not missing_ev else "gap",
-                 "detail": "assertions 全带 evidence" if not missing_ev else
-                           "缺 evidence 的断言：%s" % missing_ev[:5]}
+    return {"S0": {"status": "covered" if not missing_ev else "gap",
+                   "detail": "assertions 全带 evidence" if not missing_ev else
+                             "缺 evidence 的断言：%s" % missing_ev[:5]}}
 
+
+def _probe_todos(root: str) -> Dict[str, Dict[str, Any]]:
+    """S1：core 无空标记 / NotImplemented。"""
     todos = _todo_scan(root)
-    out["S1"] = {"status": "covered" if not todos else "gap",
-                 "detail": "core 无 TODO/NotImplemented" if not todos else
-                           "发现空洞标记：%s" % todos[:5]}
+    return {"S1": {"status": "covered" if not todos else "gap",
+                   "detail": "core 无 TODO/NotImplemented" if not todos else
+                             "发现空洞标记：%s" % todos[:5]}}
 
+
+def _probe_cq(root: str) -> Dict[str, Dict[str, Any]]:
+    """S2：既有 CQ 扫描件 P0=0。"""
     cq = _json(root, "results/cq/scan.json")
-    out["S2"] = {"status": "covered-by-existing" if int(cq.get("p0") or 0) == 0 else "gap",
-                 "detail": "CQ P0=0（bandit/silent_skip 面已扫）" if int(cq.get("p0") or 0) == 0
-                           else "CQ P0=%s" % cq.get("p0")}
+    p0 = int(cq.get("p0") or 0)
+    return {"S2": {"status": "covered-by-existing" if p0 == 0 else "gap",
+                   "detail": "CQ P0=0（bandit/silent_skip 面已扫）" if p0 == 0
+                             else "CQ P0=%s" % cq.get("p0")}}
 
+
+def _probe_trust_vectors(root: str) -> Dict[str, Dict[str, Any]]:
+    """S3：trust 向量件在场。"""
     vectors = (Path(root) / "results/trust/trust_vectors.json").is_file()
-    out["S3"] = {"status": "covered-by-existing" if vectors else "gap",
-                 "detail": "trust 向量在" if vectors else "缺 trust 向量"}
+    return {"S3": {"status": "covered-by-existing" if vectors else "gap",
+                   "detail": "trust 向量在" if vectors else "缺 trust 向量"}}
 
-    out["S4"] = {"status": "gap", "detail": "删除/重排检出矩阵未系统化（WP-51）"}
 
+def _probe_schema(root: str) -> Dict[str, Dict[str, Any]]:
+    """S5：schema 面（复用 schema_lint 检查）。"""
     try:
         from core import schema_lint
         issues, _entries = schema_lint.check_schema_files(root)
     except Exception as exc:  # noqa: BLE001 - 探针失败降级，不冒充
         issues = ["schema_lint 不可用：%s" % exc]
-    out["S5"] = {"status": "covered" if not issues else "gap",
-                 "detail": "schema 面全绿" if not issues else "schema 问题：%s" % issues[:3]}
+    return {"S5": {"status": "covered" if not issues else "gap",
+                   "detail": "schema 面全绿" if not issues else "schema 问题：%s" % issues[:3]}}
 
+
+def _probe_weights(root: str) -> tuple[Dict[str, Dict[str, Any]], Dict[str, Any]]:
+    """S6：判据模块数/抽查项；返回 (探针行, verification_report 文档)。"""
     weights = _json(root, "protocol/check12_weights.json")
     modules = len(weights.get("modules") or {})
     tests = _json(root, "protocol/verification_report.json")
     test_count = len(tests.get("items") or [])
-    out["S6"] = {"status": "covered" if modules >= 100 and test_count >= 30 else "gap",
-                 "detail": "判据模块 %d · 抽查项 %d；覆盖率/全仓变异未测（QD-10）"
-                           % (modules, test_count)}
+    out = {"S6": {"status": "covered" if modules >= 100 and test_count >= 30 else "gap",
+                  "detail": "判据模块 %d · 抽查项 %d；覆盖率/全仓变异未测（QD-10）"
+                            % (modules, test_count)}}
+    return out, tests
 
+
+def _probe_docs_claims(root: str) -> Dict[str, Dict[str, Any]]:
+    """S7：文档 claims 面（复用 docs_claims 检查）。"""
     try:
         from core import docs_claims as dc
         claim_issues = dc.check(root)
     except Exception as exc:  # noqa: BLE001
         claim_issues = ["docs_claims 不可用：%s" % exc]
-    out["S7"] = {"status": "covered" if not claim_issues else "gap",
-                 "detail": "文档 claims 全绿" if not claim_issues else "claims 偏差：%s" % claim_issues[:3]}
+    return {"S7": {"status": "covered" if not claim_issues else "gap",
+                   "detail": "文档 claims 全绿" if not claim_issues
+                             else "claims 偏差：%s" % claim_issues[:3]}}
 
+
+def _probe_workflow(root: str) -> Dict[str, Dict[str, Any]]:
+    """S8：workflow 钉版/权限（复用 workflow_policy 检查）+ BLOCKED 工具。"""
     try:
         from core import workflow_policy as wp
         wf_issues, wf_warns, _ = wp.scan(root)
@@ -124,33 +144,38 @@ def probes(root: str = ".") -> Dict[str, Dict[str, Any]]:
         wf_issues, wf_warns = ["workflow_policy 不可用：%s" % exc], []
     tc = _json(root, "results/cq/toolchain.json")
     blocked = [b for b in (tc.get("blocked") or []) if b]
-    out["S8"] = {"status": "covered" if not wf_issues else "gap",
-                 "detail": "workflow 钉版/权限 %d 项告警" % len(wf_warns) if not wf_issues
-                           else "workflow 问题：%s" % wf_issues[:3]}
+    row = {"status": "covered" if not wf_issues else "gap",
+           "detail": "workflow 钉版/权限 %d 项告警" % len(wf_warns) if not wf_issues
+                     else "workflow 问题：%s" % wf_issues[:3]}
     if blocked:
-        out["S8"]["detail"] += "；BLOCKED 工具：%s" % ",".join(blocked)
+        row["detail"] += "；BLOCKED 工具：%s" % ",".join(blocked)
+    return {"S8": row}
 
+
+def _probe_paths_redos(root: str, tests: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """S9：paths 校验 + redos 检查证据。"""
     paths_mod = (Path(root) / "desktop/src/core/paths.py").is_file()
     redos_ok = any(str(i.get("id")) == "redos" and str(i.get("status")) == "pass"
                    for i in tests.get("items") or [])
-    out["S9"] = {"status": "covered-by-existing" if paths_mod and redos_ok else "gap",
-                 "detail": "paths 校验 + redos 检查在" if paths_mod and redos_ok
-                           else "缺 paths/redos 证据"}
+    return {"S9": {"status": "covered-by-existing" if paths_mod and redos_ok else "gap",
+                   "detail": "paths 校验 + redos 检查在" if paths_mod and redos_ok
+                             else "缺 paths/redos 证据"}}
 
-    out["S10"] = {"status": "covered-by-existing",
-                  "detail": "隐私契约/秘密扫描覆盖面：gitleaks BLOCKED（QD-05），不冒充全扫"}
 
-    out["S11"] = {"status": "covered-by-existing",
-                  "detail": "失败考古 + trust 失败路径测试在；故障注入矩阵未系统化"}
-
+def _probe_wiki(root: str) -> Dict[str, Dict[str, Any]]:
+    """S12：wiki 校验（复用 wiki_compiler 检查）。"""
     try:
         from core import wiki_compiler as wc
         wiki_issues = wc.check(root)
     except Exception as exc:  # noqa: BLE001
         wiki_issues = ["wiki_compiler 不可用：%s" % exc]
-    out["S12"] = {"status": "covered" if not wiki_issues else "gap",
-                  "detail": "wiki 校验全绿" if not wiki_issues else "wiki 问题：%s" % wiki_issues[:3]}
+    return {"S12": {"status": "covered" if not wiki_issues else "gap",
+                    "detail": "wiki 校验全绿" if not wiki_issues
+                              else "wiki 问题：%s" % wiki_issues[:3]}}
 
+
+def _probe_spec(root: str) -> Dict[str, Dict[str, Any]]:
+    """S13：样例 spec 可编译且可校验。"""
     try:
         from core import spec_compiler as sc
         intent = _json(root, "spec/intents/sample-document.json")
@@ -158,38 +183,71 @@ def probes(root: str = ".") -> Dict[str, Dict[str, Any]]:
         spec_issues = sc.validate_bundle(bundle, root)
     except Exception as exc:  # noqa: BLE001
         spec_issues = ["spec 编译不可用：%s" % exc]
-    out["S13"] = {"status": "covered" if not spec_issues else "gap",
-                  "detail": "样例 spec→task 可编译且可校验" if not spec_issues
-                            else "spec 问题：%s" % spec_issues[:3]}
+    return {"S13": {"status": "covered" if not spec_issues else "gap",
+                    "detail": "样例 spec→task 可编译且可校验" if not spec_issues
+                              else "spec 问题：%s" % spec_issues[:3]}}
 
+
+def _probe_independence(root: str) -> Dict[str, Dict[str, Any]]:
+    """S14：独立性报告 ok 且跨界 0。"""
     ind = _json(root, "results/independence.json")
     edges = int((ind.get("counts") or {}).get("forbidden_edges") or 0)
-    out["S14"] = {"status": "covered" if ind.get("ok") and edges == 0 else "gap",
-                  "detail": "独立性报告 ok、跨界 0" if ind.get("ok") and edges == 0
-                            else "独立性异常：ok=%s edges=%s" % (ind.get("ok"), edges)}
+    ok = ind.get("ok")
+    return {"S14": {"status": "covered" if ok and edges == 0 else "gap",
+                    "detail": "独立性报告 ok、跨界 0" if ok and edges == 0
+                              else "独立性异常：ok=%s edges=%s" % (ok, edges)}}
 
+
+def probes(root: str = ".") -> Dict[str, Dict[str, Any]]:
+    """轻量探针（只读既有报告/调既有检查，不新造重扫描）。"""
+    out: Dict[str, Dict[str, Any]] = {}
+    out.update(_probe_assertions(root))
+    out.update(_probe_todos(root))
+    out.update(_probe_cq(root))
+    out.update(_probe_trust_vectors(root))
+    out["S4"] = {"status": "gap", "detail": "删除/重排检出矩阵未系统化（WP-51）"}
+    out.update(_probe_schema(root))
+    weights_probe, tests = _probe_weights(root)
+    out.update(weights_probe)
+    out.update(_probe_docs_claims(root))
+    out.update(_probe_workflow(root))
+    out.update(_probe_paths_redos(root, tests))
+    out["S10"] = {"status": "covered-by-existing",
+                  "detail": "隐私契约/秘密扫描覆盖面：gitleaks BLOCKED（QD-05），不冒充全扫"}
+    out["S11"] = {"status": "covered-by-existing",
+                  "detail": "失败考古 + trust 失败路径测试在；故障注入矩阵未系统化"}
+    out.update(_probe_wiki(root))
+    out.update(_probe_spec(root))
+    out.update(_probe_independence(root))
     out["S15"] = {"status": "open", "detail": "红队角色（审计者/攻击者/新人视角）未系统化，需作者触发"}
     return out
+
+
+def _dim_row(item: Dict[str, Any], got: Dict[str, Any]) -> Dict[str, Any]:
+    """单个维度的报告行：探针状态 + status_hint 收窄 + 证据/责任/下一步。"""
+    did = str(item.get("id"))
+    probe = got.get(did) or {"status": "gap", "detail": "未登记探针"}
+    status = str(probe["status"])
+    if status == "covered" and item.get("status_hint") in ("gap", "open"):
+        status = str(item["status_hint"])
+    return {"id": did, "name": str(item.get("name")),
+            "status": status, "detail": str(probe.get("detail")),
+            "evidence": list(item.get("evidence") or []),
+            "owner": str(item.get("owner") or ""),
+            "next": str(item.get("next") or ""),
+            "note": str(item.get("note") or "")}
+
+
+def _summary(rows: List[Dict[str, Any]]) -> Dict[str, int]:
+    """按状态词表统计维度数（缺的状态记 0）。"""
+    return {status: sum(1 for r in rows if r["status"] == status) for status in STATUSES}
 
 
 def build(root: str = ".") -> Dict[str, Any]:
     reg = load_registry(root)
     got = probes(root)
-    rows = []
-    for item in reg.get("dimensions") or []:
-        did = str(item.get("id"))
-        probe = got.get(did) or {"status": "gap", "detail": "未登记探针"}
-        status = str(probe["status"])
-        if status == "covered" and item.get("status_hint") in ("gap", "open"):
-            status = str(item["status_hint"])
-        rows.append({"id": did, "name": str(item.get("name")),
-                     "status": status, "detail": str(probe.get("detail")),
-                     "evidence": list(item.get("evidence") or []),
-                     "owner": str(item.get("owner") or ""),
-                     "next": str(item.get("next") or ""),
-                     "note": str(item.get("note") or "")})
-    summary = {status: sum(1 for r in rows if r["status"] == status) for status in STATUSES}
-    report = {"schema": REPORT_SCHEMA, "dimensions": rows, "summary": summary,
+    rows = [_dim_row(item, got) for item in reg.get("dimensions") or []]
+    report = {"schema": REPORT_SCHEMA, "dimensions": rows, "summary": _summary(rows),
               "status_vocabulary": list(STATUSES),
               "rules": dict(reg.get("rules") or {}),
               "claims_boundary": list(reg.get("claims_boundary") or []),
@@ -201,6 +259,33 @@ render = report_module.render
 write = report_module.writer(REPORT_REL, build)
 
 
+def _dim_issues(dim: Dict[str, Any]) -> List[str]:
+    """单维度：status 词表 + covered 须有证据 + gap/open 须带 owner/next。"""
+    issues: List[str] = []
+    status = str(dim.get("status"))
+    if status not in STATUSES:
+        issues.append("%s status 非法：%s" % (dim.get("id"), status))
+    if status == "covered" and not dim.get("evidence"):
+        issues.append("%s 标 covered 但无证据（修复指引：给证据或降级）" % dim.get("id"))
+    if status in ("gap", "open"):
+        if not str(dim.get("owner")):
+            issues.append("%s gap/open 缺 owner" % dim.get("id"))
+        if not str(dim.get("next")):
+            issues.append("%s gap/open 缺 next（下一 WP/触发条件）" % dim.get("id"))
+    return issues
+
+
+def _summary_issues(committed: Dict[str, Any], dims: List[Dict[str, Any]]) -> List[str]:
+    """summary 与逐维统计必须一致。"""
+    summary = committed.get("summary") or {}
+    issues: List[str] = []
+    for status in STATUSES:
+        want = sum(1 for d in dims if d.get("status") == status)
+        if int(summary.get(status) or 0) != want:
+            issues.append("summary.%s 与逐维统计不一致" % status)
+    return issues
+
+
 def check(root: str = ".") -> List[str]:
     issues, committed, live = report_module.start(root, REPORT_REL, build, "自扫描聚合件与实时重算不一致（修复指引：重跑 write）")
     dims = committed.get("dimensions") or []
@@ -209,21 +294,8 @@ def check(root: str = ".") -> List[str]:
     if ids != expected:
         issues.append("维度必须恰为 S0–S15（当前 %s）" % ids)
     for dim in dims:
-        status = str(dim.get("status"))
-        if status not in STATUSES:
-            issues.append("%s status 非法：%s" % (dim.get("id"), status))
-        if status == "covered" and not dim.get("evidence"):
-            issues.append("%s 标 covered 但无证据（修复指引：给证据或降级）" % dim.get("id"))
-        if status in ("gap", "open"):
-            if not str(dim.get("owner")):
-                issues.append("%s gap/open 缺 owner" % dim.get("id"))
-            if not str(dim.get("next")):
-                issues.append("%s gap/open 缺 next（下一 WP/触发条件）" % dim.get("id"))
-    summary = committed.get("summary") or {}
-    for status in STATUSES:
-        want = sum(1 for d in dims if d.get("status") == status)
-        if int(summary.get(status) or 0) != want:
-            issues.append("summary.%s 与逐维统计不一致" % status)
+        issues.extend(_dim_issues(dim))
+    issues.extend(_summary_issues(committed, dims))
     boundary = " ".join(str(x) for x in committed.get("claims_boundary") or [])
     if "不是认证" not in boundary:
         issues.append("claims_boundary 必须写明不是认证/合规结论")

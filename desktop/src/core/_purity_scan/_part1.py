@@ -255,32 +255,57 @@ def _ast_facts(tree: ast.AST) -> tuple:
     modules: list = []
     sinks: list = []
     for node in ast.walk(tree):
-        if isinstance(node, ast.Raise) and isinstance(node.exc, ast.Call) and node.exc.args:
-            arg = node.exc.args[0]
-            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
-                raises.append((node.lineno, arg.value))
-            elif isinstance(arg, ast.JoinedStr):
-                parts = [v.value for v in arg.values
-                         if isinstance(v, ast.Constant) and isinstance(v.value, str)]
-                raises.append((node.lineno, "".join(parts)))
-        elif isinstance(node, ast.Import):
-            modules += [(a.name.split(".")[0], node.lineno) for a in node.names]
-        elif isinstance(node, ast.ImportFrom):
-            if node.level == 0 and node.module:
-                modules.append((node.module.split(".")[0], node.lineno))
-        elif isinstance(node, ast.Try) and _try_guards_import(node):
-            for sub in node.body:
-                for n2 in ast.walk(sub):
-                    if isinstance(n2, (ast.Import, ast.ImportFrom)):
-                        guarded.add(n2.lineno)
-        elif isinstance(node, ast.Call):
-            # 危险 sink 候选在这里就**摘成可序列化的三元组**（行号 / 被调名 / 是否 shell=True）：
-            # 判据与原来"拿着 AST 节点到 R6 再 unparse"逐条等价（有等价性判据守着），
-            # 但结果成了纯数据 ⇒ 整份事实可以按内容落盘，新进程不必再解析这 235 份源码。
-            sinks.append((node.lineno, ast.unparse(node.func),
-                          any(kw.arg == "shell" and isinstance(kw.value, ast.Constant)
-                              and kw.value.value is True for kw in node.keywords)))
+        raises += _raise_facts(node)
+        modules += _import_facts(node)
+        guarded |= _guarded_imports(node)
+        sinks += _sink_facts(node)
     return raises, guarded, modules, sinks
+
+
+def _raise_facts(node) -> list:
+    """Raise 节点的消息事实（R4）。"""
+    if not (isinstance(node, ast.Raise) and isinstance(node.exc, ast.Call) and node.exc.args):
+        return []
+    arg = node.exc.args[0]
+    if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+        return [(node.lineno, arg.value)]
+    if isinstance(arg, ast.JoinedStr):
+        parts = [v.value for v in arg.values
+                 if isinstance(v, ast.Constant) and isinstance(v.value, str)]
+        return [(node.lineno, "".join(parts))]
+    return []
+
+
+def _import_facts(node) -> list:
+    """Import/ImportFrom 节点的顶层模块事实（R5）。"""
+    if isinstance(node, ast.Import):
+        return [(a.name.split(".")[0], node.lineno) for a in node.names]
+    if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+        return [(node.module.split(".")[0], node.lineno)]
+    return []
+
+
+def _guarded_imports(node) -> set:
+    """try 守卫内的 import 行号（R5）。"""
+    if not (isinstance(node, ast.Try) and _try_guards_import(node)):
+        return set()
+    out: set = set()
+    for sub in node.body:
+        for n2 in ast.walk(sub):
+            if isinstance(n2, (ast.Import, ast.ImportFrom)):
+                out.add(n2.lineno)
+    return out
+
+
+def _sink_facts(node) -> list:
+    """危险 sink 事实（R6）：(行号 / 被调名 / 是否 shell=True)。"""
+    if not isinstance(node, ast.Call):
+        return []
+    # 危险 sink 候选在这里就**摘成可序列化的三元组**：判据与原来"拿着 AST 节点到 R6 再
+    # unparse"逐条等价（有等价性判据守着），但结果成了纯数据 ⇒ 整份事实可以按内容落盘。
+    return [(node.lineno, ast.unparse(node.func),
+             any(kw.arg == "shell" and isinstance(kw.value, ast.Constant)
+                 and kw.value.value is True for kw in node.keywords))]
 
 
 def _facts_for(text: str):

@@ -39,39 +39,58 @@ def unknown_classes(classes) -> List[str]:
     return [c for c in classes if c not in CLASSES]
 
 
+def _known_fields(found: Dict[str, Any]) -> set:
+    """已定型（!= untyped）的字段名集合。"""
+    known: set = set()
+    for _ev, fmap in found.items():
+        known |= {k for k, v in fmap.items() if v != "untyped"}
+    return known
+
+
+def _payload_rows(rel: str, text: str, known: set) -> List[Dict[str, Any]]:
+    """单件正文的 payload 行候选（行级可定位）。"""
+    from core import payload_harvest as ph
+    out: List[Dict[str, Any]] = []
+    for i, line in enumerate(text.splitlines(), 1):
+        m = re.search(r"payload\s*:\s*\{([^}]*)\}", line)
+        if not m:
+            continue
+        missing, kind = _payload_tokens(ph._split_top_level(m.group(1)), known)
+        if not missing:
+            continue
+        if not kind:
+            # 只有字段名、无任何类型证据 → 属「缺证据」类（内容工作，不许猜类型）
+            kind = "payload-no-evidence"
+        out.append({"class": kind, "file": rel, "line": i,
+                    "detail": "未定型字段：%s" % "、".join(missing[:6]),
+                    "snippet": line.strip()[:160]})
+    return out
+
+
+def _payload_tokens(tokens: List[str], known: set) -> Tuple[List[str], str]:
+    """逐 token 取字段名/类型 → (缺失字段名, 缺口类别)。"""
+    from core import payload_harvest as ph
+    kind = ""
+    missing: List[str] = []
+    for tok in tokens:
+        name, typ = ph._field_type(tok)
+        if not name or name in known:
+            continue
+        missing.append(name)
+        if typ and typ != "untyped":
+            kind = "unharvestable-payload"   # 正文有类型证据却收不到 → 真缺口
+    return missing, kind
+
+
 def _payload_candidates(root: str) -> List[Dict[str, Any]]:
     from core import conformance_scan as csc
     from core import payload_harvest as ph
-
     out: List[Dict[str, Any]] = []
     for doc in csc._module_docs(root):
         text = Path(doc).read_text(encoding="utf-8")
-        found = ph.harvest_doc(text)
-        known: set = set()
-        for _ev, fmap in found.items():
-            known |= {k for k, v in fmap.items() if v != "untyped"}
+        known = _known_fields(ph.harvest_doc(text))
         rel = os.path.relpath(doc, root).replace(os.sep, "/")
-        for i, line in enumerate(text.splitlines(), 1):
-            m = re.search(r"payload\s*:\s*\{([^}]*)\}", line)
-            if not m:
-                continue
-            tokens = ph._split_top_level(m.group(1))
-            kind = ""
-            missing = []
-            for tok in tokens:
-                name, typ = ph._field_type(tok)
-                if not name or name in known:
-                    continue
-                missing.append(name)
-                if typ and typ != "untyped":
-                    kind = "unharvestable-payload"   # 正文有类型证据却收不到 → 真缺口
-            if missing:
-                if not kind:
-                    # 只有字段名、无任何类型证据 → 属「缺证据」类（内容工作，不许猜类型）
-                    kind = "payload-no-evidence"
-                out.append({"class": kind, "file": rel, "line": i,
-                            "detail": "未定型字段：%s" % "、".join(missing[:6]),
-                            "snippet": line.strip()[:160]})
+        out.extend(_payload_rows(rel, text, known))
     return out
 
 
@@ -148,38 +167,51 @@ def candidates(root: str = ".", classes: Tuple[str, ...] = ()) -> List[Dict[str,
     return sorted(rows, key=lambda r: (r["class"], r["file"], r["line"]))
 
 
+def _evidence_unharvestable(root: str, row: Dict[str, Any]) -> str:
+    """unharvestable-payload 的确定性复核（payload 行在场且含类型信息）。"""
+    path = os.path.join(root, row["file"])
+    if not os.path.isfile(path):
+        return ""
+    with open(path, encoding="utf-8") as fh:
+        line = fh.read().splitlines()[row["line"] - 1]
+    return ("可证：该 payload 行含字段/类型信息，但收割器 `harvest_doc` 只认 "
+            "`event:`/`name:`/`publish:` 标记，此行未提供 → 类型证据不可收割"
+            if "payload" in line else "")
+
+
+def _evidence_silent_skip(root: str, row: Dict[str, Any]) -> str:
+    """silent-skip 的确定性复核（except 行内联/前一行无说明）。"""
+    with open(os.path.join(root, row["file"]), encoding="utf-8") as fh:
+        lines = fh.read().splitlines()
+    idx = row["line"] - 2
+    if 0 <= idx < len(lines) and re.match(r"\s*except\b", lines[idx]):
+        prev = lines[idx - 1].strip() if idx else ""
+        if not prev.startswith("#") and "#" not in lines[idx].split(":", 1)[-1]:
+            return "可证：except 后直接 pass/continue，且前一行无说明（静默吞错面）"
+    return ""
+
+
+def _evidence_missing_rule(root: str, row: Dict[str, Any]) -> str:
+    """missing-quality-rule 的确定性复核（规范件不在数据契约登记表）。"""
+    if not _quality_rule_inputs_present(root):
+        return ""
+    dc = json_doc.load(Path(root, "protocol/data_contracts.json"), dict,
+                       what="protocol/data_contracts.json")
+    if row["snippet"] not in {c["artifact"] for c in dc.get("contracts") or []}:
+        return ("可证：该规范件在 normative 名单却不在数据契约登记表"
+                "（无 quality_rule/owner/freshness）")
+    return ""
+
+
 def evidence(root: str, row: Dict[str, Any]) -> str:
     """确定性复核：该类缺口能否由规则证实（空串 = 无证据 → 不进修复清单）。"""
     cls = row["class"]
     if cls == "unharvestable-payload":
-        path = os.path.join(root, row["file"])
-        if not os.path.isfile(path):
-            return ""
-        with open(path, encoding="utf-8") as fh:
-            line = fh.read().splitlines()[row["line"] - 1]
-        return ("可证：该 payload 行含字段/类型信息，但收割器 `harvest_doc` 只认 "
-                "`event:`/`name:`/`publish:` 标记，此行未提供 → 类型证据不可收割"
-                if "payload" in line else "")
+        return _evidence_unharvestable(root, row)
     if cls == "silent-skip":
-        with open(os.path.join(root, row["file"]), encoding="utf-8") as fh:
-            lines = fh.read().splitlines()
-        idx = row["line"] - 2
-        if 0 <= idx < len(lines) and re.match(r"\s*except\b", lines[idx]):
-            prev = lines[idx - 1].strip() if idx else ""
-            if not prev.startswith("#") and "#" not in lines[idx].split(":", 1)[-1]:
-                return "可证：except 后直接 pass/continue，且前一行无说明（静默吞错面）"
-        return ""
+        return _evidence_silent_skip(root, row)
     if cls == "missing-quality-rule":
-        if not _quality_rule_inputs_present(root):
-            return ""
-        dc = json_doc.load(Path(root,
- "protocol/data_contracts.json"),
- dict,
- what="protocol/data_contracts.json")
-        if row["snippet"] not in {c["artifact"] for c in dc.get("contracts") or []}:
-            return ("可证：该规范件在 normative 名单却不在数据契约登记表"
-                    "（无 quality_rule/owner/freshness）")
-        return ""
+        return _evidence_missing_rule(root, row)
     if cls == "payload-no-evidence":
         # 「缺证据」类：**不能靠改代码修**（类型要模块作者给），故只作挂账与统计，
         # 不进修复清单（返回空串 = 无"可修"证据）
@@ -196,6 +228,77 @@ class ReviewOptions:
     batch: int = 8
     timeout: float = 120.0
     classes: Tuple[str, ...] = ()
+
+
+def _chunk_state(chunk: List[Dict[str, Any]]) -> str:
+    """一批候选 → 决策层 state 文本（带行内容与类别，模型只对给定 state 作答）。"""
+    return json.dumps([{"i": i, "class": r["class"], "file": r["file"],
+                        "line": r["line"], "snippet": r["snippet"],
+                        "detail": r["detail"]} for i, r in enumerate(chunk)],
+                      ensure_ascii=False)
+
+
+def _chunk_questions(chunk: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """一批候选 → 逐条 gap(noul) + sev(score) 问题。"""
+    questions: Dict[str, Any] = {}
+    for i, r in enumerate(chunk):
+        questions["gap:%d" % i] = {
+            "type": "noul",
+            "instructions": "第 %d 条（%s @ %s:%s）是否构成**可证缺口**：%s"
+                            % (i, r["class"], r["file"], r["line"], r["detail"])}
+        questions["sev:%d" % i] = {
+            "type": "score", "levels": ["低", "中", "高"],
+            "instructions": "第 %d 条若成立，严重度如何" % i}
+    return questions
+
+
+def _row_verdict(row: Dict[str, Any]) -> str:
+    """双轨判定：有证据且模型不否决 → fixable；模型怀疑但无证据 → suspected。"""
+    if row["evidence"] and (row["model_gap_p"] is None
+                            or row["model_gap_p"] >= MODEL_THRESHOLD):
+        return "fixable"
+    if row["model_gap_p"] and not row["evidence"]:
+        return "suspected"
+    return "not-a-gap"
+
+
+def _chunk_verdicts(chunk: List[Dict[str, Any]], out: Dict[str, Any], adapter: str,
+                    root: str) -> List[Dict[str, Any]]:
+    """一批候选 → 带模型判定与证据复核的行。"""
+    verdicts: List[Dict[str, Any]] = []
+    for i, r in enumerate(chunk):
+        row = dict(r)
+        if out.get("status") == "ok":
+            ans = out["answers"]
+            row["model_gap_p"] = (ans.get("gap:%d" % i) or {}).get("p")
+            row["model_severity"] = (ans.get("sev:%d" % i) or {}).get("value")
+        else:
+            row["model_gap_p"] = None
+            row["model_severity"] = None
+            row["model_error"] = out.get("reason")
+        if adapter == "stub":
+            # stub 无判定能力（规则式）：**不得当否决票**——本轮以证据为准
+            row["model_gap_p"] = None
+            row["model_severity"] = None
+            row["model_note"] = "stub 无判定能力：本轮以确定性证据为准"
+        row["evidence"] = evidence(root, row)
+        row["verdict"] = _row_verdict(row)
+        verdicts.append(row)
+    return verdicts
+
+
+def _by_class(verdicts: List[Dict[str, Any]]) -> Dict[str, int]:
+    """按缺口类别计数。"""
+    by_class: Dict[str, int] = {}
+    for r in verdicts:
+        by_class[r["class"]] = by_class.get(r["class"], 0) + 1
+    return by_class
+
+
+def _missing_issues(missing: List[str]) -> List[str]:
+    """缺件导致某类候选无从判定时如实报 issue（不许静默当「无缺口」）。"""
+    return (["缺 %s（修复指引：在 NF 仓库根运行本审查——缺失时 missing-quality-rule "
+             "一类候选无从判定）" % "、".join(missing)] if missing else [])
 
 
 def review(root: str = '.', opts: ReviewOptions | None = None) -> Dict[str, Any]:
@@ -219,55 +322,15 @@ def review(root: str = '.', opts: ReviewOptions | None = None) -> Dict[str, Any]
     verdicts: List[Dict[str, Any]] = []
     for start in range(0, len(rows), max(1, batch)):
         chunk = rows[start:start + max(1, batch)]
-        state = json.dumps([{"i": i, "class": r["class"], "file": r["file"],
-                             "line": r["line"], "snippet": r["snippet"],
-                             "detail": r["detail"]} for i, r in enumerate(chunk)],
-                           ensure_ascii=False)
-        questions: Dict[str, Any] = {}
-        for i, r in enumerate(chunk):
-            questions["gap:%d" % i] = {
-                "type": "noul",
-                "instructions": "第 %d 条（%s @ %s:%s）是否构成**可证缺口**：%s"
-                                % (i, r["class"], r["file"], r["line"], r["detail"])}
-            questions["sev:%d" % i] = {
-                "type": "score", "levels": ["低", "中", "高"],
-                "instructions": "第 %d 条若成立，严重度如何" % i}
         out = dl.decide(
-            {'state': state, 'questions': questions},
+            {'state': _chunk_state(chunk), 'questions': _chunk_questions(chunk)},
             opts=dl.DecideOptions(adapter=adapter, endpoint=endpoint, timeout=timeout, root=root),
         )
-        for i, r in enumerate(chunk):
-            row = dict(r)
-            if out.get("status") == "ok":
-                ans = out["answers"]
-                row["model_gap_p"] = (ans.get("gap:%d" % i) or {}).get("p")
-                row["model_severity"] = (ans.get("sev:%d" % i) or {}).get("value")
-            else:
-                row["model_gap_p"] = None
-                row["model_severity"] = None
-                row["model_error"] = out.get("reason")
-            if adapter == "stub":
-                # stub 无判定能力（规则式）：**不得当否决票**——本轮以证据为准
-                row["model_gap_p"] = None
-                row["model_severity"] = None
-                row["model_note"] = "stub 无判定能力：本轮以确定性证据为准"
-            row["evidence"] = evidence(root, row)
-            if row["evidence"] and (row["model_gap_p"] is None
-                                    or row["model_gap_p"] >= MODEL_THRESHOLD):
-                row["verdict"] = "fixable"
-            elif row["model_gap_p"] and not row["evidence"]:
-                row["verdict"] = "suspected"
-            else:
-                row["verdict"] = "not-a-gap"
-            verdicts.append(row)
-    by_class: Dict[str, int] = {}
-    for r in verdicts:
-        by_class[r["class"]] = by_class.get(r["class"], 0) + 1
+        verdicts.extend(_chunk_verdicts(chunk, out, adapter, root))
     return {"schema": "nf-gap-review/1", "adapter": adapter, "scanned": len(verdicts),
-            "by_class": by_class,
+            "by_class": _by_class(verdicts),
             # 缺件导致**某类候选无从判定**时如实报出（不许静默当「无缺口」）：
-            "issues": (["缺 %s（修复指引：在 NF 仓库根运行本审查——缺失时 missing-quality-rule "
-                        "一类候选无从判定）" % "、".join(missing)] if missing else []),
+            "issues": _missing_issues(missing),
             "fixable": [r for r in verdicts if r["verdict"] == "fixable"],
             "suspected": [r for r in verdicts if r["verdict"] == "suspected"],
             "model_meta": {"calibrated": adapter != "stub", "threshold": MODEL_THRESHOLD,

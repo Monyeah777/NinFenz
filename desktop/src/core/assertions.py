@@ -108,38 +108,72 @@ def _k_count_at_least(root: str, params: Dict[str, Any]) -> Tuple[bool, str]:
     return (n >= want, "%d ≥ %d" % (n, want))
 
 
-def _k_json_value(root: str, params: Dict[str, Any]) -> Tuple[bool, str]:
+def _load_json_target(root: str,
+                      params: Dict[str, Any]) -> Tuple[Any, Tuple[bool, str] | None]:
+    """读目标 JSON 件 → (doc, 失败判定或 None)。"""
     path = Path(root) / str(params.get("path") or "")
     if not path.is_file():
-        return False, "目标件不存在：%s" % params.get("path")
+        return None, (False, "目标件不存在：%s" % params.get("path"))
     text, err = _read_bounded(path)
     if err is not None:
-        return False, "%s：%s" % (params.get("path"), err)
+        return None, (False, "%s：%s" % (params.get("path"), err))
     try:
-        doc = json_doc.loads(text or "", None, what=str(path))
+        return json_doc.loads(text or "", None, what=str(path)), None
     except ValueError as exc:
-        return False, "JSON 不可解析：%s" % exc
+        return None, (False, "JSON 不可解析：%s" % exc)
+
+
+def _json_key_value(doc: Any,
+                    params: Dict[str, Any]) -> Tuple[Any, Tuple[bool, str] | None]:
+    """按点路径取值 → (值, 失败判定或 None)。"""
     cur: Any = doc
     for part in str(params.get("key") or "").split("."):
         if not isinstance(cur, dict) or part not in cur:
-            return False, "缺键：%s" % params.get("key")
+            return None, (False, "缺键：%s" % params.get("key"))
         cur = cur[part]
-    op = str(params.get("op") or "")
-    val = params.get("value")
+    return cur, None
+
+
+def _op_nonempty(cur: Any) -> Tuple[bool, str]:
+    ok = bool(cur)
+    return (ok, "非空" if ok else "空值")
+
+
+def _op_in_vocab(cur: Any, val: Any) -> Tuple[bool, str]:
+    ok = cur in (val or [])
+    return (ok, "%s ∈ 词表" % cur if ok else "%s 越词表" % cur)
+
+
+def _op_contains_keys(cur: Any, val: Any) -> Tuple[bool, str]:
+    miss = [k for k in (val or []) if k not in (cur or {})]
+    return (not miss, "键齐" if not miss else "缺：%s" % ", ".join(miss))
+
+
+def _json_op_verdict(op: str, cur: Any, val: Any) -> Tuple[bool, str]:
+    """json_value 的 op 派发（封闭集：exists/nonempty/equals/in_vocab/contains_keys）。"""
     if op == "exists":
         return True, "键在场"
     if op == "nonempty":
-        ok = bool(cur)
-        return (ok, "非空" if ok else "空值")
+        return _op_nonempty(cur)
     if op == "equals":
         return (cur == val, "= %s" % val)
     if op == "in_vocab":
-        ok = cur in (val or [])
-        return (ok, "%s ∈ 词表" % cur if ok else "%s 越词表" % cur)
+        return _op_in_vocab(cur, val)
     if op == "contains_keys":
-        miss = [k for k in (val or []) if k not in (cur or {})]
-        return (not miss, "键齐" if not miss else "缺：%s" % ", ".join(miss))
+        return _op_contains_keys(cur, val)
     return False, "未知 op：%s（封闭集：exists/nonempty/equals/in_vocab/contains_keys）" % op
+
+
+def _k_json_value(root: str, params: Dict[str, Any]) -> Tuple[bool, str]:
+    doc, fail = _load_json_target(root, params)
+    if fail is not None:
+        return fail
+    cur, fail = _json_key_value(doc, params)
+    if fail is not None:
+        return fail
+    op = str(params.get("op") or "")
+    val = params.get("value")
+    return _json_op_verdict(op, cur, val)
 
 
 KINDS = {"regex_absent": _k_regex_absent, "regex_present": _k_regex_present,
@@ -157,6 +191,83 @@ def verify_sh_checks(root: str = ".") -> set:
     except (OSError, UnicodeDecodeError):
         return set()
     return {int(m) for m in re.findall(r"(?m)^check(\d+)\s*\(\)", text)}
+
+
+def _real_caps(vocab: List[str]) -> List[str]:
+    """真实能力（排除聚合器——它是能力的组合器，不是能力本身）。"""
+    return [c for c in vocab if c != AGGREGATE_CAPABILITY]
+
+
+def _cap_numbers_issues(index: Dict[str, Any], cap: str) -> Tuple[List[str], set]:
+    """单个能力的 check 号列表：非空 + 全整数 → (issues, 号集合)。"""
+    issues: List[str] = []
+    nums = index.get(cap)
+    if not isinstance(nums, list) or not nums:
+        issues.append("能力 %s 没有任何 check（空能力不可判定；修复指引：在 capability_index 补该能力压住的 check 号）" % cap)
+        return issues, set()
+    bad = [n for n in nums if not isinstance(n, int) or isinstance(n, bool)]
+    if bad:
+        issues.append("能力 %s 的 check 号须是整数：%s" % (cap, bad[:3]))
+    return issues, {n for n in nums if isinstance(n, int) and not isinstance(n, bool)}
+
+
+def _cap_index_issues(doc: Dict[str, Any], vocab: List[str]) -> Tuple[List[str], set]:
+    """能力词表 × 能力索引：聚合器在册 + 逐能力号表。"""
+    issues: List[str] = []
+    index = doc.get("capability_index") or {}
+    if AGGREGATE_CAPABILITY not in vocab:
+        issues.append("能力词表缺聚合器 %s（32/33/35/36 是能力的组合器，必须显式在册）"
+                      % AGGREGATE_CAPABILITY)
+    numbers = set()
+    for cap in vocab:
+        cap_issues, nums = _cap_numbers_issues(index, cap)
+        issues.extend(cap_issues)
+        numbers |= nums
+    return issues, numbers
+
+
+def _coverage_issues(numbers: set, declared_checks: set, real: List[str],
+                     index: Dict[str, Any]) -> Tuple[List[str], set]:
+    """索引号 vs verify.sh 实有 check：未知引用 + 能力空洞 → (issues, covered)。"""
+    covered = set()
+    for cap in real:
+        covered.update(n for n in (index.get(cap) or []) if isinstance(n, int))
+    issues: List[str] = []
+    if declared_checks:
+        unknown = sorted(numbers - declared_checks)
+        if unknown:
+            issues.append("能力索引引用了 verify.sh 里不存在的 check：%s（修复指引：核对 check 号是否随退役/重排变化）" % ", ".join(str(n) for n in unknown[:6]))
+        holes = sorted(declared_checks - numbers)
+        if holes:
+            issues.append("能力空洞：check %s 未被任何能力覆盖（修复指引：在 capability_index 里给该 check 挂能力，或明确它属于聚合器）" % ", ".join(str(n) for n in holes[:8]))
+    return issues, covered
+
+
+def _assertion_cap_issues(rows: List[Dict[str, Any]], vocab: List[str]) -> List[str]:
+    """断言表挂账面：每条须挂词表内能力。"""
+    issues: List[str] = []
+    missing = [str(a.get("id") or "(无名)") for a in rows if not a.get("capability")]
+    if missing:
+        issues.append("断言未挂能力：%s%s（修复指引：为每条断言在 capability 里选一个词表内的能力）" % (", ".join(missing[:4]), " 等 %d 条" % len(missing) if len(missing) > 4 else ""))
+    off = sorted({str(a.get("capability")) for a in rows
+                  if a.get("capability") and str(a.get("capability")) not in vocab})
+    if off:
+        issues.append("断言的 capability 越词表：%s" % ", ".join(off[:4]))
+    return issues
+
+
+def _cap_stats(real: List[str], vocab: List[str], declared_checks: set,
+               numbers: set, rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """能力面统计（口径同旧实现）。"""
+    return {
+        "declared": True,
+        "capabilities": len(real),
+        "aggregate_present": AGGREGATE_CAPABILITY in vocab,
+        "checks": len(declared_checks),
+        "covered": len(declared_checks & numbers),
+        "assertions": len(rows),
+        "mapped_assertions": sum(1 for a in rows if a.get("capability")),
+    }
 
 
 def capability_report(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
@@ -177,61 +288,71 @@ def capability_report(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     vocab = [str(c) for c in (doc.get("capability_vocabulary") or [])]
     if not vocab:
         return [], {"declared": False}
-    issues: List[str] = []
     index = doc.get("capability_index") or {}
     if not isinstance(index, dict):
         return ["能力索引须是对象（capability → check 号列表）"], {"declared": True}
-    if AGGREGATE_CAPABILITY not in vocab:
-        issues.append("能力词表缺聚合器 %s（32/33/35/36 是能力的组合器，必须显式在册）"
-                      % AGGREGATE_CAPABILITY)
-    numbers = set()
-    for cap in vocab:
-        nums = index.get(cap)
-        if not isinstance(nums, list) or not nums:
-            issues.append("能力 %s 没有任何 check（空能力不可判定；修复指引：在 capability_index "
-                          "补该能力压住的 check 号）" % cap)
-            continue
-        bad = [n for n in nums if not isinstance(n, int) or isinstance(n, bool)]
-        if bad:
-            issues.append("能力 %s 的 check 号须是整数：%s" % (cap, bad[:3]))
-        numbers.update(n for n in nums if isinstance(n, int) and not isinstance(n, bool))
+    index_issues, numbers = _cap_index_issues(doc, vocab)
+    issues: List[str] = list(index_issues)
     declared_checks = verify_sh_checks(root)
-    real = [c for c in vocab if c != AGGREGATE_CAPABILITY]
-    covered = set()
-    for cap in real:
-        covered.update(n for n in (index.get(cap) or []) if isinstance(n, int))
-    if declared_checks:
-        unknown = sorted(numbers - declared_checks)
-        if unknown:
-            issues.append("能力索引引用了 verify.sh 里不存在的 check：%s（修复指引：核对 check 号"
-                          "是否随退役/重排变化）" % ", ".join(str(n) for n in unknown[:6]))
-        holes = sorted(declared_checks - numbers)
-        if holes:
-            issues.append("能力空洞：check %s 未被任何能力覆盖（修复指引：在 capability_index 里"
-                          "给该 check 挂能力，或明确它属于聚合器）"
-                          % ", ".join(str(n) for n in holes[:8]))
+    real = _real_caps(vocab)
+    cov_issues, covered = _coverage_issues(numbers, declared_checks, real, index)
+    issues.extend(cov_issues)
     rows = doc.get("assertions") or []
-    missing = [str(a.get("id") or "(无名)") for a in rows if not a.get("capability")]
-    if missing:
-        issues.append("断言未挂能力：%s%s（修复指引：为每条断言在 capability 里选一个词表内的能力）"
-                      % (", ".join(missing[:4]),
-                         " 等 %d 条" % len(missing) if len(missing) > 4 else ""))
-    off = sorted({str(a.get("capability")) for a in rows
-                  if a.get("capability") and str(a.get("capability")) not in vocab})
-    if off:
-        issues.append("断言的 capability 越词表：%s" % ", ".join(off[:4]))
-    stats: Dict[str, Any] = {
-        "declared": True,
-        "capabilities": len(real),
-        "aggregate_present": AGGREGATE_CAPABILITY in vocab,
-        "checks": len(declared_checks),
-        "covered": len(declared_checks & numbers),
-        "assertions": len(rows),
-        "mapped_assertions": sum(1 for a in rows if a.get("capability")),
-    }
+    issues.extend(_assertion_cap_issues(rows, vocab))
+    stats = _cap_stats(real, vocab, declared_checks, numbers, rows)
     if declared_checks:
         stats["aggregate_only"] = sorted(declared_checks - covered)
     return issues, stats
+
+
+def _assertion_required_issues(a: Dict[str, Any], aid: str) -> List[str]:
+    """断言必填六字段（空对象算在场）。"""
+    issues: List[str] = []
+    for k in REQUIRED:
+        if not a.get(k) and a.get(k) != {}:
+            issues.append("断言 %s 缺必填字段：%s" % (aid or "(无名)", k))
+    return issues
+
+
+def _assertion_regex_issues(a: Dict[str, Any], aid: str) -> List[str]:
+    """regex_absent 断言的正则必须可安全执行。"""
+    if a.get("kind") != "regex_absent":
+        return []
+    try:
+        _compiled(str((a.get("params") or {}).get("pattern") or ""))
+    except (ValueError, re.error) as exc:
+        return ["断言 %s 的正则不可安全执行：%s" % (aid, exc)]
+    return []
+
+
+def _assertion_row_issues(a: Dict[str, Any], seen: set) -> List[str]:
+    """单条断言：必填面 + id 唯一 + severity/kind 词表 + 正则安全 + fix。"""
+    aid = str(a.get("id") or "")
+    issues: List[str] = _assertion_required_issues(a, aid)
+    if aid in seen:
+        issues.append("断言 id 重复：%s" % aid)
+    seen.add(aid)
+    if str(a.get("severity")) not in SEVERITIES:
+        issues.append("断言 %s severity 越词表：%s" % (aid, a.get("severity")))
+    if str(a.get("kind")) not in KINDS:
+        issues.append("断言 %s kind 不在封闭集：%s" % (aid, a.get("kind")))
+    else:
+        issues.extend(_assertion_regex_issues(a, aid))
+    if not str(a.get("fix") or "").strip():
+        issues.append("断言 %s 缺 fix（无修复指引不许入表）" % aid)
+    return issues
+
+
+def _decl_vocab_issues(doc: Dict[str, Any]) -> List[str]:
+    """声明头词表面：schema / severity 词表 / kind 词表。"""
+    issues: List[str] = []
+    if str(doc.get("schema") or "") != SCHEMA:
+        issues.append("断言表 schema 不匹配（期望 %s）" % SCHEMA)
+    if tuple(doc.get("severity_vocabulary") or ()) != SEVERITIES:
+        issues.append("severity 词表与判据不一致（期望 %s）" % "/".join(SEVERITIES))
+    if tuple(doc.get("kind_vocabulary") or ()) != tuple(KINDS):
+        issues.append("kind 词表必须与 runner 封闭集逐项一致（%s）" % "/".join(KINDS))
+    return issues
 
 
 def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
@@ -240,32 +361,10 @@ def scan(root: str = ".") -> Tuple[List[str], Dict[str, Any]]:
     doc = load(root)
     if not doc:
         return ["缺断言表 %s" % DECL_REL], {}
-    if str(doc.get("schema") or "") != SCHEMA:
-        issues.append("断言表 schema 不匹配（期望 %s）" % SCHEMA)
-    if tuple(doc.get("severity_vocabulary") or ()) != SEVERITIES:
-        issues.append("severity 词表与判据不一致（期望 %s）" % "/".join(SEVERITIES))
-    if tuple(doc.get("kind_vocabulary") or ()) != tuple(KINDS):
-        issues.append("kind 词表必须与 runner 封闭集逐项一致（%s）" % "/".join(KINDS))
+    issues.extend(_decl_vocab_issues(doc))
     seen = set()
     for a in doc.get("assertions") or []:
-        aid = str(a.get("id") or "")
-        for k in REQUIRED:
-            if not a.get(k) and a.get(k) != {}:
-                issues.append("断言 %s 缺必填字段：%s" % (aid or "(无名)", k))
-        if aid in seen:
-            issues.append("断言 id 重复：%s" % aid)
-        seen.add(aid)
-        if str(a.get("severity")) not in SEVERITIES:
-            issues.append("断言 %s severity 越词表：%s" % (aid, a.get("severity")))
-        if str(a.get("kind")) not in KINDS:
-            issues.append("断言 %s kind 不在封闭集：%s" % (aid, a.get("kind")))
-        elif str(a.get("kind")) == "regex_absent":
-            try:
-                _compiled(str((a.get("params") or {}).get("pattern") or ""))
-            except (ValueError, re.error) as exc:
-                issues.append("断言 %s 的正则不可安全执行：%s" % (aid, exc))
-        if not str(a.get("fix") or "").strip():
-            issues.append("断言 %s 缺 fix（无修复指引不许入表）" % aid)
+        issues.extend(_assertion_row_issues(a, seen))
     cap_issues, cap_stats = capability_report(root)
     issues.extend(cap_issues)
     stats = {"assertions": len(doc.get("assertions") or [])}

@@ -84,6 +84,37 @@ def _volume_supports_notifications(path) -> bool:
         return False
 
 
+def _probe_step(w, p: Path, step: str) -> bool:
+    before = w.generation
+    if step == "create":
+        p.write_text("一", encoding="utf-8")
+    elif step == "modify":
+        p.write_text("二", encoding="utf-8")
+    else:
+        p.unlink()
+    deadline = time.time() + 3.0
+    while time.time() < deadline:
+        if w.generation > before:
+            break
+        time.sleep(0.01)
+    else:
+        return False
+    return True
+
+
+def _cleanup_tmp(tmp: str) -> None:
+    # 清临时目录**不用 `shutil.rmtree`**：它是本仓登记在案的「递归删除面」危险 sink（CWE-73），
+    # 而这里本来就不需要递归——自检只会创建 probe.txt，删掉它再 `rmdir`（非递归）反而更安全：
+    # 真出现意外子树时 `rmdir` 会拒绝，而不是把意外内容一并抹掉。
+    try:
+        for leftover in Path(tmp).glob("*"):
+            if leftover.is_file():
+                leftover.unlink()
+        os.rmdir(tmp)
+    except OSError:
+        pass                                       # 删不干净也不影响判定（系统临时目录会回收）
+
+
 def selfcheck(root=None) -> bool:  # noqa: ARG001 - 调用契约：测试按 root= 传入
     """**机制自检**：在一个临时目录上真起一次监听，验「创建 / 改 / 删除」三类通知都到。
 
@@ -105,19 +136,7 @@ def selfcheck(root=None) -> bool:  # noqa: ARG001 - 调用契约：测试按 roo
             return False
         p = Path(tmp) / "probe.txt"
         for step in ("create", "modify", "delete"):
-            before = w.generation
-            if step == "create":
-                p.write_text("一", encoding="utf-8")
-            elif step == "modify":
-                p.write_text("二", encoding="utf-8")
-            else:
-                p.unlink()
-            deadline = time.time() + 3.0
-            while time.time() < deadline:
-                if w.generation > before:
-                    break
-                time.sleep(0.01)
-            else:
+            if not _probe_step(w, p, step):
                 return False                           # 某一类通知没到 → 机制不可信
         return True
     except Exception:                                  # noqa: BLE001 - 自检炸了也当不可用
@@ -125,16 +144,7 @@ def selfcheck(root=None) -> bool:  # noqa: ARG001 - 调用契约：测试按 roo
     finally:
         if w is not None:
             w.stop()
-        # 清临时目录**不用 `shutil.rmtree`**：它是本仓登记在案的「递归删除面」危险 sink（CWE-73），
-        # 而这里本来就不需要递归——自检只会创建 probe.txt，删掉它再 `rmdir`（非递归）反而更安全：
-        # 真出现意外子树时 `rmdir` 会拒绝，而不是把意外内容一并抹掉。
-        try:
-            for leftover in Path(tmp).glob("*"):
-                if leftover.is_file():
-                    leftover.unlink()
-            os.rmdir(tmp)
-        except OSError:
-            pass                                       # 删不干净也不影响判定（系统临时目录会回收）
+        _cleanup_tmp(tmp)
 
 
 class DirWatcher:
