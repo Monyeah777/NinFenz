@@ -48,6 +48,7 @@
       "内容契约层"
     ],
     "license": "MIT",
+    "app_license": "PolyForm-Noncommercial-1.0.0 for app/android/** (noncommercial use free; commercial use needs permission); protocol and engine remain MIT",
     "homepage": "https://ninfenz.dev/",
     "repository": "https://github.com/Monyeah777/NinFenz",
     "mirror": "https://gitee.com/monyeah777/ninfenz",

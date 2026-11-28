@@ -34,7 +34,7 @@ NF APP = **人的控制面**。它把「作者 → 协议/图/规范 → 装配 
 |---|---|---|---|
 | C-01 | 本机离线：Gradle / Android SDK / kotlinc / Go 不在场；crates.io 直连被失效代理拦截 | `results/app/BASELINE.md` §2.1 | 核心必须能在 `app/core` 内自足构建；端壳构建证据只能 OPEN-TOOLCHAIN |
 | C-02 | 不引入网络拉取脚本 | `CONTRACT.md` §6 供应链；`app/scripts/build_core.sh` 不取网 | 依赖只经锁文件；`.cargo/config.toml` 的第三方镜像属偏差，登记 OPEN-SUPPLY-001 |
-| C-03 | 许可 MIT | 实读 `LICENSE`（2026 Monyeah777） | 依赖须为宽松许可（见 `app/docs/DEPENDENCIES.md`）；NOTICE 义务单独登记 |
+| C-03 | 分层许可：协议/引擎 MIT；Android 应用 NC | 实读 `LICENSE`（MIT）+ `REUSE.toml`（`app/android/**` override） | 依赖须为宽松许可（见 `app/docs/DEPENDENCIES.md`）；NOTICE 义务单独登记 |
 | C-04 | 确定性：canonical 产物禁时间戳/随机/绝对路径/环境 | `CONTRACT.md` §7 | 产物只由输入决定；人读字段（history/at、provenance）按 schema 注解从 digest 剔除 |
 | C-05 | 无遥测、无账号、本地处理 | `CONTRACT.md` §6；`app/README.md` | 无出站网络层；诊断只落本地；崩溃上报不设计 |
 | C-06 | 不占用仓库门禁 check1–57 | `results/app/BASELINE.md` §0.5 | APP 门禁独立在 `app/gates/`；接仓库门禁只能新增 check58+ |

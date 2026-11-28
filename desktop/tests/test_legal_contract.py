@@ -67,7 +67,13 @@ class LegalContractTest(unittest.TestCase):
         community = lic["community_license"]
         self.assertTrue(community["spdx"].startswith("LicenseRef-"))
         self.assertTrue((ROOT / community["text"]).is_file())
-        self.assertEqual(3, len(legal._reuse_annotations(str(ROOT))),
+        app = lic.get("app_license") or {}
+        self.assertEqual("PolyForm-Noncommercial-1.0.0", app.get("spdx"))
+        self.assertTrue((ROOT / app["text"]).is_file(), "应用许可文本缺")
+        self.assertIn("app/android/**", app.get("scope") or [])
+        ids = {a.get("SPDX-License-Identifier") for a in legal._reuse_annotations(str(ROOT))}
+        self.assertIn("PolyForm-Noncommercial-1.0.0", ids, "REUSE 未声明应用许可 override")
+        self.assertEqual(4, len(legal._reuse_annotations(str(ROOT))),
                          "REUSE annotation 结构变化须同步判据")
 
     def test_plan_deviation_recorded(self):

@@ -60,7 +60,7 @@ Keybindings follow the mainstream terminal conventions: `Tab` switches panes, `�
 path arguments pass repository-containment checks, writes require typing `yes`, and API keys are read from the environment and masked.
 Details: `tui/README.md`.
 
-> MIT License · original open source · please cite the source when deriving/referencing
+> Protocol and engine: MIT · Android app: source-available under PolyForm Noncommercial 1.0.0 · please cite the source when deriving/referencing
 
 **In one sentence**: NF is a **content contract layer** — it defines the protocols, quality gates and asset standards for "AI reliably produces long-form content"; narrative is only the first official domain package, while the protocol itself is domain-neutral and model-agnostic.
 
@@ -120,7 +120,7 @@ AI assembly:
 - **Which models are supported?** Model-agnostic: any text-capable AI can assemble and load the protocols; nothing is bound to a vendor or a connection protocol.
 - **Does it need network access?** No. The repository is markdown source; `bash verify.sh` is local-only and runs offline.
 - **How is output judged?** Only by the internal chain: the verify gate (statically checkable) + the five-axis depth review + real drills. External praise is not used as quality evidence.
-- **How do I cite it?** MIT license; please credit the source — machine-readable metadata lives in `CITATION.cff` at the repository root.
+- **How do I cite it?** Protocol and engine are MIT (`LICENSE`); the Android app (`app/android/**`) is PolyForm Noncommercial 1.0.0 (free for noncommercial use; commercial use needs written permission). Please credit the source — machine-readable metadata lives in `CITATION.cff` at the repository root.
 - **Export & compliance?** Cryptography uses only the standard library plus external `ssh-keygen` (no home-grown algorithms); the export-control reading is in `docs/EXPORT.md`.
 - **How do I install it?** Zero-install: `npx -y ninfenz --version` (npm package `ninfenz`, no paid tier); to modify protocols or run the full gate, `git clone` then `python scripts/nf.py doctor` → `bash verify.sh`.
 - **What are the environment requirements?** Python ≥ 3.11 (core is standard-library only, no pip install); Node ≥ 18.17 only for the npm entry; on Windows run `bash verify.sh` from Git Bash.

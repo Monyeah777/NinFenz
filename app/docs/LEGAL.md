@@ -25,6 +25,14 @@
 - **影响**：（a）不存在 AGPL 的网络使用/源码开放义务；（b）MIT 下仍必须随附第三方组件许可与版权声明（§2）；（c）若作者未来决定改为 AGPL，属**作者决策**，需全量依赖许可兼容性复核 + 本件重写，不由实施 agent 自行改许可。
 - **owner**：lead；**状态**：登记完成（以实读为准）。
 
+### 1.2 分层许可（2026-11-28 作者决策，随 0.3.7-preview.1 生效）
+
+- **协议 / 引擎 / 仓库其它面：MIT**（根 `LICENSE` / `LICENSES/MIT.txt`，上表实读不变）。
+- **Android 应用（`app/android/**`）：PolyForm Noncommercial 1.0.0**（文本 `LICENSES/PolyForm-Noncommercial-1.0.0.txt`；REUSE override 见 `REUSE.toml`）。个人非商业使用免费；商业使用/商业再分发需书面授权（走仓库 `[cooperation]` issue）。
+- **为什么分层**：协议与引擎保持 MIT 以维持「模型无关、可被任何 AI 装载」的生态位；应用端（分发物与未来 Pro 买断）单独按 NC 授权，给商业盗用/二次售卖留下法务抓手，同时不改动 npm/crates/NuGet 等平台的 OSI 发布口径。
+- **边界**：MIT 不可撤销，已发布旧版本不受影响；本决策自 0.3.7-preview.1 起生效。Pro 功能与授权代码不进公开仓（闭源交付），盗版防线 = 许可 + 离线授权 + R8/拆分包，不宣称技术不可破解。
+- **判据**：`desktop/tests/test_license_chain.py`（根 MIT 链）、`test_reuse_contract.py`（override 与 LICENSES 双向闭合）、`test_governance_docs.py`（LICENSES 存在性）。
+
 ## 2. 第三方许可与 NOTICE 口径
 
 ### 2.1 现状

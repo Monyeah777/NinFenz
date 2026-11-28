@@ -59,7 +59,7 @@
 （无 TTY 亦可：`--list-actions --json` 给 agent 列动作与退出码）。命令在后台线程跑，运行中 `Ctrl-C` 只取消该命令；
 路径参数过仓库包含性判据、写盘需键入 `yes` 确认、密钥只从环境变量读并遮蔽显示。细节见 `tui/README.md`。
 
-> MIT License · 原创开源 · 衍生/引用请注明来源
+> 协议与引擎 MIT · Android 应用源码可见（PolyForm Noncommercial 1.0.0）· 原创 · 衍生/引用请注明来源
 
 NF 是内容契约层——定义“AI 稳定产出长内容”的协议、质量与资产标准；协议本身域中立、模型无关。
 
@@ -113,7 +113,7 @@ AI 装配：
 - **支持哪些模型？** 模型无关：任何能读文本的 AI 都能按协议装配与装载，不绑定某家模型或某个连接协议。
 - **必须联网吗？** 不必。仓库本身就是 markdown 源件；`bash verify.sh` 只读本地，可离线跑。
 - **产出怎么判合格？** 判据只来自内部链：verify 门禁（静态可核）+ 五维纵深自评 + 真实战例；外部评价不作为质量背书。
-- **怎么引用？** MIT 许可；引用请注明来源，机读元数据见仓库根引用文件（`CITATION.cff`）。
+- **怎么引用？** 协议与引擎为 MIT（`LICENSE`）；Android 应用（`app/android/**`）为 PolyForm Noncommercial 1.0.0（非商业使用免费，商业使用需书面授权）。引用请注明来源，机读元数据见仓库根引用文件（`CITATION.cff`）。
 - **出口与合规？** 密码学只走标准库 + 外部 `ssh-keygen`（不自制算法）；出口管制读法见 `docs/EXPORT.md`。
 - **怎么装？** 零安装：`npx -y ninfenz --version`（npm 包名 `ninfenz`，无付费版）；要改协议/跑全量门禁再 clone：`git clone` 后 `python scripts/nf.py doctor` → `bash verify.sh`。
 - **环境要求？** Python ≥ 3.11（核心纯标准库，无 pip 依赖）；Node ≥ 18.17 仅 npm 入口需要；Windows 下 `bash verify.sh` 用 Git Bash。

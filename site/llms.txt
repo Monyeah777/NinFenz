@@ -39,7 +39,7 @@
 - 可验证产物：Merkle inclusion proof（RFC 6962）+ hmac / ssh-sig / sigstore-keyless 锚；缺验证器 fail-closed
 - 接入面：只读 MCP（nf serve），双协议版本 2026-07-28 / 2025-11-25；已上架**官方 MCP Registry**（io.github.Monyeah777/ninfenz，装载：npx -y ninfenz serve）
 - 终端：python tui/nf.py（纯标准库）
-- 许可：MIT（CITATION.cff）
+- 许可：协议与引擎 MIT（CITATION.cff）；Android 应用（`app/android/**`）PolyForm Noncommercial 1.0.0（非商业使用免费，商业使用需授权）
 
 ## 引用
 

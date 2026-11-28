@@ -5,6 +5,12 @@
     "spdx": "MIT",
     "file": "LICENSE",
     "text": "LICENSES/MIT.txt",
+    "app_license": {
+      "spdx": "PolyForm-Noncommercial-1.0.0",
+      "text": "LICENSES/PolyForm-Noncommercial-1.0.0.txt",
+      "scope": ["app/android/**"],
+      "note": "Android 应用源码可见、非商业使用免费；商业使用/商业再分发需书面授权。协议与引擎仍 MIT。2026-11-28 作者决策，自 0.3.7-preview.1 生效。"
+    },
     "community_license": {
       "spdx": "LicenseRef-Community-Submission",
       "text": "LICENSES/LicenseRef-Community-Submission.txt",
@@ -36,7 +42,7 @@
     "rules": [
       "名称与标识仅用于指代本仓来源；不得暗示官方认证、背书或关联",
       "二次分发须保留本仓署名与 LICENSE/NOTICE；不得移除版权声明",
-      "商业使用按 MIT 条款；不得使用本仓名称给衍生品背书"
+      "协议/引擎商业使用按 MIT 条款；Android 应用商业使用按 PolyForm Noncommercial 1.0.0（需授权）；不得使用本仓名称给衍生品背书"
     ],
     "attribution": "版权署名 = 2026 Monyeah777；第三方归属见 THIRD-PARTY-NOTICES.md",
     "no_endorsement": "不得暗示官方认证/背书"
@@ -85,6 +91,6 @@
   "claims_boundary": [
     "不提供法律意见（许可/出口/合同模板仅供参考，签发前须人工/律师复核）",
     "不声称合规或认证",
-    "不虚构 AGPL/双许可：实际为 MIT + 投稿面 LicenseRef（见 license.plan_deviation）"
+    "不虚构 AGPL/双许可：实际为 MIT（协议/引擎）+ 投稿面 LicenseRef + Android 应用 PolyForm Noncommercial（见 license.plan_deviation / license.app_license）"
   ]
 }

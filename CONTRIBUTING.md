@@ -217,7 +217,7 @@ python3 -m compileall -q desktop/src scripts
 > 依据：2026-10-10 全仓审计 §11af（贡献者条款此前 DCO/CLA/inbound/outbound 全 0）。
 
 - **inbound = outbound**：你提交到本仓库的任何贡献（代码 / 文档 / 协议补丁 / 社区包）均按本仓库的
-  **MIT 许可**（见 LICENSE）授权分发；你保留版权，**不额外要求 CLA**。
+  **MIT 许可**（见 LICENSE）授权分发；提交到 `app/android/**` 的贡献按该子树的 **PolyForm Noncommercial 1.0.0** 授权。你保留版权，**不额外要求 CLA**。
 - **DCO**：提交信息须带 `Signed-off-by: 真实姓名 <邮箱>`（`git commit -s`），表示你有权按上述
   条款提交该内容。无法签署 DCO 的贡献，请先联系维护者（见 MAINTAINERS.md）。
 - **投稿（`library/` 与 `community/`）**：见 `library/INDEX.md` 的投稿须知（机读闸门真源 = `library/intake.json`）——投稿即声明原创
