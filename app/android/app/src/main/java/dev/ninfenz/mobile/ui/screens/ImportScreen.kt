@@ -301,7 +301,10 @@ internal suspend fun imageImportSource(
     onError: (CoreError?) -> Unit,
     onNotice: (String?) -> Unit
 ): File? {
-    val extraction = runCatching { dev.ninfenz.mobile.data.ImageOcrImporter.extract(context, file) }
+    // MLKit 的 TextRecognizer 禁止在主线程调用（真机实测：Must not be called on the main application thread）
+    val extraction = withContext(Dispatchers.IO) {
+        runCatching { dev.ninfenz.mobile.data.ImageOcrImporter.extract(context, file) }
+    }
     if (extraction.isFailure) {
         onError(CoreResponse.failure(
             "NF-IMP-004",
@@ -313,7 +316,9 @@ internal suspend fun imageImportSource(
     }
     var markdown = extraction.orNullLogged("ImportScreen")?.takeIf { it.isNotBlank() }
     if (markdown == null) {
-        val ocr = runCatching { dev.ninfenz.mobile.data.PdfOcrImporter.extract(context, file) }
+        val ocr = withContext(Dispatchers.IO) {
+            runCatching { dev.ninfenz.mobile.data.PdfOcrImporter.extract(context, file) }
+        }
         if (ocr.isFailure) {
             onError(CoreResponse.failure(
                 "NF-IMP-004",
