@@ -1,8 +1,8 @@
 {
   "approved_at": "2026-11-28",
   "approved_by": "Monyeah777",
-  "note": "0.3.7-preview.1 直装发布：合并 origin/main 后全量重算",
+  "note": "0.3.7-preview.1 历史重写（发布二进制移出 git）后重算",
   "schema": "nf-approval/1",
   "subject": "protocol/conformance_report.json",
-  "subject_digest": "e0c1e25dbd7e259f7f0b4f21e9bc85773883c4d0a6a642d5df7baaa940aa4af3"
+  "subject_digest": "a6f71b3e606494f879ff2bf7dc8beabeefacb390fc7db0083ba559e325b88333"
 }
