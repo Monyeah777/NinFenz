@@ -1,0 +1,18 @@
+0.3.8-preview.1 产物摘要（2026-11-28）
+
+universal APK  results/app/nf-mobile-0.3.8-preview.1.apk
+  size    43561975
+  sha256  58f54acadb1020d4e8ba32dfe565a02e2e53d240d695257b5df7a9cfe0144cc1
+  signer  upload key, cert SHA-256 A4:F4:68:7A:3C:E7:3E:E1:…:1D:B6:4C:4B
+  align   16KB OK (zipalign -c -P 16 4)
+
+release AAB  app/android/app/build/outputs/bundle/release/app-release.aab
+  size    31683053
+  sha256  7e89a627be2b4da486de47bbe474acf60406efc6b25d0e618e100f67c74e0fd4
+
+core native  app/android/app/src/main/jniLibs/{arm64-v8a,x86_64}/libnf_app_core.so
+  load align 0x4000 (16KB)
+
+工具链
+  JDK 21.0.8.9 / Android SDK 36 / build-tools 36.0.0 / NDK 27.0.12077973
+  bundletool 1.18.1 (--mode=universal)

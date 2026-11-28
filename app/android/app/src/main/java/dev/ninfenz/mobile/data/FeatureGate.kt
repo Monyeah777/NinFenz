@@ -21,6 +21,18 @@ object FeatureGate {
 
     fun defaultTier(): Tier = initialTier
 
+    /**
+     * 授权层唯一入口：EntitlementStore 离线验签后调用（null = 无有效授权 → 回默认层级）。
+     * 免费能力不回锁；Pro/CCOS 只在有有效授权时放开。
+     */
+    fun applyEntitlement(edition: String?) {
+        activeTier = when (edition?.trim()?.lowercase()) {
+            "pro" -> Tier.PRO
+            "studio", "ccos" -> Tier.CCOS
+            else -> initialTier
+        }
+    }
+
     /** 仅用于调试/自检切换；发布版没有购买入口，仍默认 Daily。 */
     fun setTierForDebug(tier: Tier) {
         activeTier = tier

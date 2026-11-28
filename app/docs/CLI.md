@@ -42,6 +42,7 @@ nf-app-core <op> --in <req.json|->   # → stdout: 单行 JSON（响应信封）
 | `graph-validate` | `graph`: nf-pipeline-graph/1 | `nf-validate-report/1`（L0+L1） | 失败 → 1 |
 | `graph-compile` | `graph`, `spec?`（用于 slots 推导） | `nf-assembly-plan/1` | 校验失败 → 1 |
 | `spec-validate` | `spec`: nf-md-spec/1 | `nf-validate-report/1` | 失败 → 1 |
+| `license-verify` | `code`: str（`NF1.<payload>.<sig>`）; `app_major?`: int（默认 0） | `nf-license-verify/1`（`valid`/`edition`/`major`/`order`/`reason`） | **恒 0**：valid=false 不是协议错误（无授权 ≠ 产物校验失败） |
 | `assemble` | `plan`, `spec`, `inputs`: {slot: str}, `stage?`, `block?`, `base_markdown?`（给 block 时必填）, `out_dir?` | `{markdown: str, meta: nf-assemble-result/1}`（`out_dir` 时写 `result.md` + `result.meta.json`） | 必填缺失 → NF-ASM-002 (1)；digest 不匹配 → NF-ASM-001 (1) |
 | `validate` | `markdown`, `spec`, `plan`, `level`: L0/L1/L2 | `nf-validate-report/1` | fail → 1；L2 不可用 → NF-VAL-005 (4) |
 | `export` | `markdown`/`result`, `plan_digest?`, `spec_digest?`, `project_id?`, `title?`, `format`: md/zip/json/**docx**/**skill**（pdf=平台打印）, `out_dir`, `manifest?: bool` | `nf-export-manifest/1` | 越界 → NF-EXP-002 (3)；重名 → NF-EXP-003 (1)；pdf → NF-EXP-004 (4，平台打印) |

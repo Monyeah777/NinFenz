@@ -43,7 +43,7 @@
       "programmingLanguage": "Python",
       "softwareVersion": "1.0.5",
       "description": "内容契约层：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程。协议域中立、模型无关。不是模型、不是提示词模板集、不是厂商 SDK。",
-      "disambiguatingDescription": "官方唯一指定入口是 https://ninfenz.dev；没有付费版；Android 版在 /download/ 直接分发；第三方站点上的本项目内容与官方无关。",
+      "disambiguatingDescription": "官方唯一指定入口是 https://ninfenz.dev。免费版永久可用、功能完整；Pro 买断是可选增强，只在 ninfenz.dev 的 /pro/ 页与官方店铺（爱发电 / 面包多）出售，不是订阅，官方从不在私聊、QQ 群或第三方下载站索要付款、验证码或「激活费」；Android 版在 /download/ 直接分发；第三方站点上的本项目内容与官方无关。",
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -148,7 +148,7 @@
           "name": "许可与费用？",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "MIT，无付费版、无托管服务。"
+            "text": "协议与引擎 MIT；免费版功能完整、永久可用，无托管服务。NF Mobile 另有可选的一次性 Pro 买断（专业审计面），只在 ninfenz.dev/pro/ 与官方店铺出售，不是订阅。"
           }
         }
       ]
@@ -168,18 +168,19 @@
 <p class="lede sub">宁封子（NinFenz，简称 NF）是<strong>内容契约层（content contract layer）</strong>：把「AI 稳定产出长内容」变成工程。协议本体<strong>域中立、模型无关</strong>；叙事只是官方第一个域包。</p>
 <p class="not">不是模型 · 不是提示词模板集 · 不是某厂商 SDK · MIT · 可离线</p>
 <p><a class="btn" href="get/">下载 Android APK</a> <a class="btn ghost" href="#distribution">全部分发入口</a> <a class="btn ghost" href="cooperation/">商业合作</a></p>
-<p class="warn">⚠️ 官方唯一指定入口：<strong>https://ninfenz.dev</strong> —— NinFenz 没有付费版；桌面端无安装器，Android 版从 <a href="get/">/download/</a> 直接分发。第三方站点上的本项目内容与官方无关（<a href="#official">怎么辨识</a>）。</p>
+<p class="warn">⚠️ 官方唯一指定入口：<strong>https://ninfenz.dev</strong> —— <strong>免费版永久可用、功能完整</strong>；<strong>Pro 买断是可选增强</strong>，只在 <a href="pro/">/pro/</a> 页与官方店铺（爱发电 / 面包多）出售，不是订阅。官方从不在私聊、QQ/微信群或第三方下载站索要付款、验证码或「激活费」；第三方站点上的本项目内容与官方无关（<a href="#official">怎么辨识</a>）。</p>
 
 
 <h2 id="distribution">下载与分发</h2>
 <p class="sub">按你想要的形态进入；所有入口都在官方域名或官方仓库/镜像下。</p>
 <div class="grid">
-  <div class="card"><span class="pill">Android</span><h3>NF Mobile 0.2.0</h3><p class="sub">本地优先的移动端：导入、切片、装配、校验、导出。无网络权限。</p><p><a class="btn" href="get/">获取 APK</a></p></div>
+  <div class="card"><span class="pill">Android</span><h3>NF Mobile 0.3.8-preview.1</h3><p class="sub">本地优先的移动端：导入、切片、装配、校验、导出。无网络权限。</p><p><a class="btn" href="get/">获取 APK</a></p></div>
   <div class="card"><span class="pill">npm</span><h3>ninfenz CLI</h3><p class="sub">免 clone 启动器，带 provenance。</p><pre><code>npx -y ninfenz doctor</code></pre></div>
   <div class="card"><span class="pill">源码</span><h3>GitHub / Gitee</h3><p class="sub">完整协议、门禁与资产台账。</p><p><a href="https://github.com/Monyeah777/NinFenz">GitHub</a> · <a href="https://gitee.com/monyeah777/ninfenz">Gitee</a></p></div>
   <div class="card"><span class="pill">MCP</span><h3>只读检索</h3><p class="sub">本地检出后给 AI 客户端用。</p><pre><code>python scripts/nf.py serve</code></pre></div>
   <div class="card"><span class="pill">GEO</span><h3>标准目录检索</h3><p class="sub">370 条标准的标题/层/可达性。</p><p><a href="geo/">打开 GEO 检索</a></p></div>
   <div class="card"><span class="pill">合作</span><h3>商业合作</h3><p class="sub">协议接入、私有域包、内容工程审计、移动端定制。</p><p><a href="cooperation/">合作范围</a></p></div>
+  <div class="card"><span class="pill">Pro</span><h3>NF Mobile Pro（可选）</h3><p class="sub">一次性买断的专业审计面；免费版仍完整可用。</p><p><a class="btn ghost" href="pro/">了解 Pro</a></p></div>
 </div>
 
 <h2>三种接法（按你的身份选）</h2>
@@ -242,7 +243,8 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <h2 id="official">官方唯一入口与防伪</h2>
 <div class="card warnbox">
 <p><strong>⚠️ 官方唯一指定入口：<a href="https://ninfenz.dev/">https://ninfenz.dev</a></strong></p>
-<p>NinFenz（宁封子）<strong>没有付费版</strong>；桌面端<strong>不需要安装客户端</strong>，Android 版从 <a href="get/">/download/</a> 直接下载。也从不索取账号、手机号或支付信息。若你在第三方网站——尤其是带大量广告的游戏 / 资源 / 软件下载站——看到本项目的内容，请<strong>不要在该站输入任何信息、不要下载任何文件</strong>：那些站点与官方无关，其文件不属于本项目。</p>
+<p><strong>免费版永久可用、功能完整</strong>：导入、切片、装配、质检、单文件导出全部免费，离线、无账号。<strong>Pro 买断是可选增强</strong>，只在 ninfenz.dev 的 <a href="pro/">/pro/</a> 页与官方店铺（爱发电 / 面包多）出售；一次性买断，不是订阅。</p>
+<p>官方<strong>从不在私聊、QQ/微信群或第三方下载站索要付款、验证码或「激活费」</strong>——遇到这样的都是骗子。桌面端<strong>不需要安装客户端</strong>，Android 版从 <a href="get/">/download/</a> 直接下载。若你在第三方网站——尤其是带大量广告的游戏 / 资源 / 软件下载站——看到本项目的内容，请<strong>不要在该站输入任何信息、不要下载任何文件</strong>：那些站点与官方无关，其文件不属于本项目。</p>
 </div>
 <table>
 <tr><th>你看到的东西</th><th>判定</th></tr>
@@ -250,10 +252,10 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <tr><td>仓库 <a href="https://github.com/Monyeah777/NinFenz">github.com/Monyeah777/NinFenz</a>（镜像 <a href="https://gitee.com/monyeah777/ninfenz">gitee.com/monyeah777/ninfenz</a>）</td><td>✅ 官方来源</td></tr>
 <tr><td>命令行：<code>python scripts/nf.py</code> · <code>python tui/nf.py</code> · 只读 MCP <code>nf serve</code></td><td>✅ 官方形态（纯标准库脚本）</td></tr>
 <tr><td>npm 包：npmjs.com 上的 <code>ninfenz</code>，或 GitHub Packages 的 <code>@monyeah777/ninfenz</code></td><td>✅ 官方形态（npx 启动器）</td></tr>
-<tr><td>本页 <a href="get/">/download/</a> 提供的 <code>nf-mobile-0.2.0.apk</code></td><td>✅ 官方 Android 分发</td></tr>
-<tr><td>其他站点的 <code>.apk</code> / 安装器 / 破解版 / 会员激活码</td><td>❌ 不是本项目</td></tr>
+<tr><td>本页 <a href="get/">/download/</a> 提供的 <code>nf-mobile-0.3.8-preview.1.apk</code></td><td>✅ 官方 Android 分发</td></tr>
+<tr><td>其他站点的 <code>.apk</code> / 安装器 / 破解版 / 来路不明的授权码</td><td>❌ 不是本项目（Pro 授权码只在 <a href="pro/">/pro/</a> 页与官方店铺出售）</td></tr>
 <tr><td>资源站 / 网盘 / 加速器页面上的本项目内容</td><td>❌ 未获官方维护的转载，与官方无关</td></tr>
-<tr><td>任何要求付款、充值、加群、填表、扫码的行为</td><td>❌ 不是本项目（NF 从不收费，也没有客服渠道）</td></tr>
+<tr><td>任何在私聊 / QQ 群 / 第三方站点要求付款、充值、加群、填表、扫码的行为</td><td>❌ 不是本项目（官方收款只发生在 <a href="pro/">/pro/</a> 页与官方店铺；不会私下要钱）</td></tr>
 </table>
 <p class="src">本项目协议与引擎以 MIT 许可发布：欢迎转载与商用，但<strong>必须保留 LICENSE 与来源署名</strong>；抹掉署名的转载不符合许可条件。Android 应用（<code>app/android/**</code>）另按 PolyForm Noncommercial 1.0.0（源码可见，非商业使用免费，商业使用需授权）。怀疑某处内容真伪时，回到本页与 canonical 仓库逐项对照即可。</p>
 
@@ -273,7 +275,7 @@ curl -fsSL https://ninfenz.dev/run.sh | sh</code></pre>
 <h3>国内网络怎么取件？</h3>
 <p>用 Gitee 镜像 <a href="https://gitee.com/monyeah777/ninfenz">gitee.com/monyeah777/ninfenz</a>，或直接用本站机器面——本站托管在 Cloudflare，国内可直连（<code>*.workers.dev</code> 不行，自定义域可以）。</p>
 <h3>许可与费用？</h3>
-<p>MIT，无付费版、无托管服务。</p>
+<p>协议与引擎 MIT；<strong>免费版功能完整、永久可用</strong>，无托管服务。NF Mobile 另有可选的一次性 <a href="pro/">Pro 买断</a>（专业审计面，只在官网 /pro/ 页与官方店铺出售，不是订阅）。</p>
 
 <h2>引用这一段</h2>
 <pre><code>宁封子（NinFenz，简称 NF）是内容契约层（content contract layer）：用「协议 + 确定性门禁 + 可验证产物」把「AI 稳定产出长内容」变成可装载、可质检、可复现的工程；协议本体域中立、模型无关，叙事只是官方第一个域包。
@@ -291,7 +293,7 @@ BibTeX：
 <p class="src">机读引用元数据：仓库根 CITATION.cff · 三种形态同见 <a href="llms-full.txt">/llms-full.txt</a> 第八节。引用请指向 canonical 站点或仓库，并保持定义句逐字一致；量化事实请引 <a href="facts.json">/facts.json</a>，别手抄数字（会过期）。</p>
 
 <footer>
-<p class="warn">⚠️ 官方唯一指定入口：https://ninfenz.dev —— 没有付费版；桌面端无安装器，Android 版从 /download/ 分发；第三方站点上的本项目内容与官方无关。</p>
+<p class="warn">⚠️ 官方唯一指定入口：https://ninfenz.dev —— 免费版永久可用、功能完整；Pro 买断是可选增强，只在 /pro/ 页与官方店铺（爱发电 / 面包多）出售，不是订阅；官方从不在私聊、QQ/微信群或第三方下载站索要付款、验证码或「激活费」；第三方站点上的本项目内容与官方无关。</p>
 <p><span class="badge">MIT</span><span class="badge">离线可跑</span><span class="badge">零第三方依赖</span><span class="badge">模型无关</span></p>
 <p><a href="get/">下载 NF Mobile</a> · <a href="cooperation/">商业合作</a> · <a href="geo/">GEO 检索</a></p>
 <p>仓库：<a href="https://github.com/Monyeah777/NinFenz">github.com/Monyeah777/NinFenz</a> · 镜像：<a href="https://gitee.com/monyeah777/ninfenz">Gitee</a> · 机器面：<a href="llms.txt">/llms.txt</a> · <a href="llms-full.txt">/llms-full.txt</a> · <a href="facts.json">/facts.json</a> · <a href="nf.txt">/nf.txt</a> · <a href="agent.txt">/agent.txt</a> · <a href="sitemap.xml">sitemap</a></p>

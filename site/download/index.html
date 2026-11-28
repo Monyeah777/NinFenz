@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>下载 NF Mobile · NinFenz</title>
-<meta name="description" content="NF Mobile 0.3.7-preview.1 Android APK 官方分发入口。本地优先、无网络权限；不在 Google Play 上架，直接下载安装。">
+<meta name="description" content="NF Mobile 0.3.8-preview.1 Android APK 官方分发入口。本地优先、无网络权限；不在 Google Play 上架，直接下载安装。">
 <link rel="canonical" href="https://ninfenz.dev/download/">
 <link rel="stylesheet" href="../assets/site.css">
 </head>
@@ -19,18 +19,18 @@
 <p class="lede sub">Android 版直接分发。无账号、无订阅、无网络权限，内容只在本机处理。</p>
 
 <div class="card">
-  <span class="pill">Android 8.0+</span><span class="pill">arm64-v8a / x86_64</span><span class="pill">v0.3.7-preview.1</span>
-  <h2 style="border:0;padding-top:0;margin-top:12px">NF Mobile 0.3.7-preview.1</h2>
+  <span class="pill">Android 8.0+</span><span class="pill">arm64-v8a / x86_64</span><span class="pill">v0.3.8-preview.1</span>
+  <h2 style="border:0;padding-top:0;margin-top:12px">NF Mobile 0.3.8-preview.1</h2>
   <div class="kv">
-    <b>文件名</b><span><code>nf-mobile-0.3.7-preview.1.apk</code></span>
-    <b>大小</b><span>43,533,303 B</span>
-    <b>SHA-256</b><span><code>3798bf48c97602a233cb332fc071094b8c112d3a178a1a9be91b29cdab1445e0</code></span>
+    <b>文件名</b><span><code>nf-mobile-0.3.8-preview.1.apk</code></span>
+    <b>大小</b><span>43,561,975 B</span>
+    <b>SHA-256</b><span><code>58f54acadb1020d4e8ba32dfe565a02e2e53d240d695257b5df7a9cfe0144cc1</code></span>
     <b>签名</b><span>upload key · SHA-256 <code>A4:F4:68:7A:3C:E7:3E:E1:…:1D:B6:4C:4B</code></span>
     <b>包名</b><span><code>dev.ninfenz.mobile</code></span>
     <b>形态</b><span>universal（含 OCR 融合模块；无 INTERNET 权限）</span>
   </div>
-  <p><a class="btn" href="https://github.com/Monyeah777/NinFenz/releases/download/mobile-v0.3.7-preview.1/nf-mobile-0.3.7-preview.1.apk" rel="noopener">直接下载 APK（GitHub Releases）</a></p>
-  <p class="src">当前为 pre-release 直装版；若链接失效，到 Releases 找 tag <code>mobile-v0.3.7-preview.1</code>。旧版 0.2.0 已下架。</p>
+  <p><a class="btn" href="https://github.com/Monyeah777/NinFenz/releases/download/mobile-v0.3.8-preview.1/nf-mobile-0.3.8-preview.1.apk" rel="noopener">直接下载 APK（GitHub Releases）</a></p>
+  <p class="src">当前为 pre-release 直装版；若链接失效，到 Releases 找 tag <code>mobile-v0.3.8-preview.1</code>。旧版 0.2.0 已下架。</p>
 </div>
 
 <h2>安装</h2>
@@ -41,23 +41,27 @@
 <li>不需要登录，不需要联网。图片导入走本机 OCR（模型随包内置）。</li>
 </ol>
 
+<h2>从 0.3.7 升级（可选）</h2>
+<p>0.3.7 与 0.3.8 使用同一 upload key：<strong>可直接覆盖安装，项目数据保留</strong>。覆盖后旧版 Pro 授权不会自动出现（0.3.7 无激活入口），需要 0.3.8 里重新粘贴授权码。</p>
+
 <h2>从 0.2.0 升级（重要）</h2>
 <p>0.3.7 使用新的发布签名（旧签名私钥已不可用），<strong>不能直接覆盖安装 0.2.0</strong>。请按顺序：</p>
 <ol>
 <li>在 0.2.0 里打开项目 → 备份/导出项目包（zip）；</li>
 <li>卸载 0.2.0（注意：卸载会删除应用内项目数据）；</li>
-<li>安装 0.3.7-preview.1，用“导入项目包”恢复。</li>
+<li>安装 0.3.8-preview.1，用“导入项目包”恢复。</li>
 </ol>
 
 <h2>校验下载</h2>
 <p>Windows：</p>
-<pre><code>certutil -hashfile nf-mobile-0.3.7-preview.1.apk SHA256</code></pre>
+<pre><code>certutil -hashfile nf-mobile-0.3.8-preview.1.apk SHA256</code></pre>
 <p>Linux / macOS：</p>
-<pre><code>sha256sum nf-mobile-0.3.7-preview.1.apk</code></pre>
-<p>应得到：<code>3798bf48c97602a233cb332fc071094b8c112d3a178a1a9be91b29cdab1445e0</code></p>
+<pre><code>sha256sum nf-mobile-0.3.8-preview.1.apk</code></pre>
+<p>应得到：<code>58f54acadb1020d4e8ba32dfe565a02e2e53d240d695257b5df7a9cfe0144cc1</code></p>
 
 <h2>许可</h2>
 <p>协议与引擎：MIT（<code>LICENSE</code>）。Android 应用（<code>app/android/**</code>）：<strong>PolyForm Noncommercial 1.0.0</strong>——个人非商业使用免费，商业使用/商业再分发需书面授权（<a href="../cooperation/">商业合作</a>）。</p>
+<p class="src">NF Mobile 另有可选的一次性 <a href="../pro/">Pro 买断</a>（专业审计面）；免费版功能完整、永久可用。Pro 激活需要 0.3.8 及以上版本：本页即为 0.3.8-preview.1，可离线激活。</p>
 
 <h2>已知限制</h2>
 <ul>
@@ -80,7 +84,7 @@
 <p class="src">非官方渠道的“破解版 / 会员版 / 网盘加速下载”与本项目无关；只从本页或 GitHub Releases 取件。</p>
 
 <footer>
-<p><a href="../">返回 NinFenz</a> · <a href="../cooperation/">商业合作</a> · <a href="../geo/">GEO 检索</a> · <a href="https://github.com/Monyeah777/NinFenz">GitHub</a></p>
+<p><a href="../">返回 NinFenz</a> · <a href="../pro/">Pro 买断</a> · <a href="../cooperation/">商业合作</a> · <a href="../geo/">GEO 检索</a> · <a href="https://github.com/Monyeah777/NinFenz">GitHub</a></p>
 </footer>
 </div>
 </body>

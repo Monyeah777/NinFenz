@@ -23,6 +23,8 @@
   Link: </llms.txt>; rel="describedby"; type="text/plain"
 /use/
   Cache-Control: public, max-age=0, must-revalidate
+/pro/
+  Cache-Control: public, max-age=0, must-revalidate
 /en/use/
   Cache-Control: public, max-age=0, must-revalidate
 /*.html

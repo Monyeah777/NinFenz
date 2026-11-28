@@ -25,6 +25,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.OutlinedButton
@@ -56,6 +57,8 @@ import dev.ninfenz.mobile.data.FeatureGate
 import dev.ninfenz.mobile.data.FeaturePolicy
 import dev.ninfenz.mobile.data.CrashLogStore
 import dev.ninfenz.mobile.data.DiagnosticsBundle
+import dev.ninfenz.mobile.data.EntitlementPolicy
+import dev.ninfenz.mobile.data.EntitlementStore
 import dev.ninfenz.mobile.data.BackupService
 import dev.ninfenz.mobile.data.StorageStats
 import dev.ninfenz.mobile.share.ShareExporter
@@ -193,6 +196,57 @@ internal fun SettingsTierCard(s: SettingsUiState) {
                 )
             }
         }
+}
+
+@Composable
+internal fun SettingsLicenseCard(s: SettingsUiState) {
+    CardBox(title = stringResource(dev.ninfenz.mobile.R.string.settings_license_title)) {
+        if (s.licenseValid) {
+            KeyValue(
+                stringResource(dev.ninfenz.mobile.R.string.settings_license_state),
+                EntitlementPolicy.editionLabel(EntitlementStore.storedEdition(s.context))
+            )
+            val order = EntitlementStore.storedOrder(s.context)
+            if (order.isNotEmpty()) {
+                KeyValue(stringResource(dev.ninfenz.mobile.R.string.settings_license_order), order)
+            }
+        } else {
+            Text(
+                stringResource(dev.ninfenz.mobile.R.string.settings_license_desc),
+                style = NfType.meta,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            OutlinedTextField(
+                value = s.licenseInput,
+                onValueChange = { s.licenseInput = it.trim() },
+                label = { Text(stringResource(dev.ninfenz.mobile.R.string.settings_license_hint)) },
+                singleLine = false,
+                modifier = androidx.compose.ui.Modifier.heightIn(min = 88.dp)
+            )
+            Button(
+                onClick = { s.activateLicense() },
+                enabled = !s.licenseBusy && s.licenseInput.isNotBlank()
+            ) {
+                Text(stringResource(dev.ninfenz.mobile.R.string.settings_license_activate))
+            }
+        }
+        s.licenseReason?.let { reason ->
+            val ok = reason == "ok"
+            val text = when (reason) {
+                "ok" -> stringResource(
+                    dev.ninfenz.mobile.R.string.settings_license_ok,
+                    EntitlementPolicy.editionLabel(EntitlementStore.storedEdition(s.context))
+                )
+                "NF-LIC-002" -> stringResource(dev.ninfenz.mobile.R.string.settings_license_version)
+                else -> stringResource(dev.ninfenz.mobile.R.string.settings_license_invalid)
+            }
+            Text(
+                text,
+                style = NfType.meta,
+                color = if (ok) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+            )
+        }
+    }
 }
 
 @Composable

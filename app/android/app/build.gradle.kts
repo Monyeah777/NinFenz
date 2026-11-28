@@ -23,8 +23,8 @@ android {
         applicationId = "dev.ninfenz.mobile"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10
-        versionName = "0.3.7-preview.1"
+        versionCode = 11
+        versionName = "0.3.8-preview.1"
         buildConfigField("String", "NF_EDITION", "\"$nfEdition\"")
         // ABI 与 Rust 交叉编译目标一致（app/scripts/build_core_android.sh）
         if (!abiSplit) {

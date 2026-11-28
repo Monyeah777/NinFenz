@@ -55,6 +55,7 @@ import dev.ninfenz.mobile.data.BackupRestoreService
 import dev.ninfenz.mobile.data.FeatureGate
 import dev.ninfenz.mobile.data.FeaturePolicy
 import dev.ninfenz.mobile.data.CrashLogStore
+import dev.ninfenz.mobile.data.EntitlementStore
 import dev.ninfenz.mobile.data.DiagnosticsBundle
 import dev.ninfenz.mobile.data.BackupService
 import dev.ninfenz.mobile.data.StorageStats
@@ -109,6 +110,23 @@ internal class SettingsUiState(
     var copied by mutableStateOf(false)
     var selfCheck by mutableStateOf<dev.ninfenz.mobile.data.PropertyHarness.Report?>(null)
     var tier by mutableStateOf(FeatureGate.tier())
+    var licenseInput by mutableStateOf("")
+    var licenseBusy by mutableStateOf(false)
+    var licenseReason by mutableStateOf<String?>(null)
+    var licenseValid by mutableStateOf(EntitlementStore.isActivated(context))
+
+    fun activateLicense() {
+        if (licenseBusy) return
+        licenseBusy = true
+        scope.launch {
+            val state = EntitlementStore.activate(context, licenseInput)
+            licenseValid = state.valid
+            licenseReason = if (state.valid) "ok" else (state.reasonCode ?: "NF-LIC-001")
+            if (state.valid) licenseInput = ""
+            tier = FeatureGate.tier()
+            licenseBusy = false
+        }
+    }
     val audit = FeatureGate.auditEnabled()
     val extensionStore = ExtensionStore(context.filesDir)
     val workspacePresets = extensionStore.contributions(setOf("workspace_preset"))

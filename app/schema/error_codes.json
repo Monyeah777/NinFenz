@@ -752,6 +752,16 @@
       "code": "NF-STY-002", "severity": "error", "exit": 1,
       "message": "样式模板匹配失败/未识别样式",
       "fix": "改用 DOCX 样式参考，逐条处理未映射"
+    },
+    {
+      "code": "NF-LIC-001", "severity": "error", "exit": 1,
+      "message": "离线授权码格式非法或验签失败",
+      "fix": "核对码是否完整复制（NF1.xxx.yyy）；确认购买渠道为官网/官方店铺；换码走 issue_license 重签"
+    },
+    {
+      "code": "NF-LIC-002", "severity": "error", "exit": 1,
+      "message": "离线授权码与当前大版本不符",
+      "fix": "买断按大版本：跨大版本需签发新码（官方承诺 5 折），不要手工改 payload"
     }
   ]
 }
